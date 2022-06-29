@@ -1,0 +1,15 @@
+﻿  stdafx.cpp
+  Camera.cpp
+  GameFramework.cpp
+  LabProject07-3.cpp
+  Mesh.cpp
+  Object.cpp
+  Player.cpp
+  Scene.cpp
+  Shader.cpp
+  Timer.cpp
+  코드를 생성하고 있습니다.
+  Previous IPDB not found, fall back to full compilation.
+  All 266 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  코드를 생성했습니다.
+  LabProject07-3.vcxproj -> C:\Users\백 아울\Downloads\LabProject07-3\x64\Release\LabProject07-3.exe
