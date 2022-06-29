@@ -92,10 +92,12 @@ public:
 
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
-protected:
-	CGameObject						**m_ppObjects = 0;
+
+
+	CGameObject** m_ppObjects = 0;
 	int								m_nObjects = 0;
 
+protected:
 	ID3D12Resource					*m_pd3dcbGameObjects = NULL;
 	CB_GAMEOBJECT_INFO				*m_pcbMappedGameObjects = NULL;
 };

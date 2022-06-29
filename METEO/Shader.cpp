@@ -288,7 +288,10 @@ void CObjectsShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsComman
 {
 	int nSceneTextures = 0;
 	m_ppObjects = ::LoadGameObjectsFromFile(pd3dDevice, pd3dCommandList, pstrFileName, &m_nObjects);
-
+	for (int i = 0; i < m_nObjects; ++i)
+	{
+		if (m_ppObjects[i]) m_ppObjects[i]->MakeBoundingBox(); //바운딩 박스 
+	}
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 

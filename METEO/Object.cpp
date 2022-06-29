@@ -295,3 +295,17 @@ void CGameObject::LoadGameObjectFromFile(ID3D12Device *pd3dDevice, ID3D12Graphic
 
 	::fclose(pFile);
 }
+
+
+
+
+void CGameObject::MakeBoundingBox()
+{
+	m_xmOOBB.Center = m_pMesh->m_xmBoundingBox.Center;
+	m_xmOOBB.Extents = m_pMesh->m_xmBoundingBox.Extents;
+}
+
+void CGameObject::UpdateBoundingBox()
+{
+	m_xmOOBB.Center.x = GetPosition().x;	m_xmOOBB.Center.y = GetPosition().y;	m_xmOOBB.Center.z = GetPosition().z;
+}

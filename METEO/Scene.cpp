@@ -89,7 +89,11 @@ void CScene::BuildLightsAndMaterials()
 	m_pMaterials->m_pReflections[14] = { XMFLOAT4(0.3f, 0.3f, 0.6f, 1.0f), XMFLOAT4(0.3f, 0.3f, 0.5f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 35.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	m_pMaterials->m_pReflections[15] = { XMFLOAT4(0.7f, 0.5f, 0.7f, 1.0f), XMFLOAT4(0.5f, 0.0f, 0.5f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 40.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 }
+void CScene::BuildMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) {
 
+
+
+}
 void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
@@ -101,6 +105,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	pObjectShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	pObjectShader->BuildObjects(pd3dDevice, pd3dCommandList, "Models/Scene.bin");
 	m_ppShaders[0] = pObjectShader;
+
+
 
 	BuildLightsAndMaterials();
 
@@ -248,6 +254,23 @@ bool CScene::ProcessInput(UCHAR *pKeysBuffer)
 	return(false);
 }
 
+void CScene::CheckObjectByPlayerCollisions()
+{
+	CObjectsShader* Objects = (CObjectsShader*)m_ppShaders[0];
+	for (int i = 0; i < Objects->m_nObjects; ++i)
+		if (m_pPlayer->m_xmOOBB.Intersects(Objects->m_ppObjects[i]->m_xmOOBB)) {
+
+			XMFLOAT3 xmf3Sub = Objects->m_ppObjects[i]->GetPosition();
+			xmf3Sub = Vector3::Subtract(m_pPlayer->GetPosition(), xmf3Sub);
+			xmf3Sub = Vector3::Normalize(xmf3Sub);
+
+			xmf3Sub.y = 0;
+			std::cout << "Ãæµ¹!";
+			m_pPlayer->Move(xmf3Sub, false);
+		}
+}
+
+
 void CScene::AnimateObjects(float fTimeElapsed)
 {
 	for (int i = 0; i < m_nShaders; i++)
@@ -262,6 +285,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		m_pLights->m_pLights[4].m_xmf3Position = Vector3::Add(m_pPlayer->GetPosition(), Vector3::Add(Vector3::ScalarProduct(m_pPlayer->GetLookVector(), -15.0f, false), XMFLOAT3(0.0f, 5.0f, 0.0f)));
 		m_pLights->m_pLights[4].m_xmf3Direction = m_pPlayer->GetLookVector();
 	}
+
+		CheckObjectByPlayerCollisions();
 }
 
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)

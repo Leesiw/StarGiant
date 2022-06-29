@@ -127,6 +127,8 @@ public:
 	UINT							m_nMaterials = 0; 
 	CMaterial						**m_ppMaterials = NULL;
 
+	BoundingOrientedBox				m_xmOOBB = BoundingOrientedBox();
+
 protected:
 	ID3D12Resource					*m_pd3dcbGameObject = NULL;
 
@@ -145,7 +147,7 @@ public:
 	virtual void ReleaseShaderVariables();
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
 
-	virtual void Animate(float fTimeElapsed) { }
+	virtual void Animate(float fTimeElapsed) { UpdateBoundingBox(); }
 	virtual void OnPrepareRender() { }
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
 
@@ -167,4 +169,7 @@ public:
 	void Rotate(XMFLOAT3 *pxmf3Axis, float fAngle);
 
 	void LoadGameObjectFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, char *pstrFileName);
+
+	void MakeBoundingBox();
+	void UpdateBoundingBox();
 };

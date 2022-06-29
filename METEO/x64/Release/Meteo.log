@@ -1,7 +1,9 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(513,5): warning MSB8028: 중간 디렉터리(x64\Release\)에 다른 프로젝트(LabProject07-3.vcxproj)에서 공유하는 파일이 포함되어 있습니다.  이로 인해 잘못된 정리 및 다시 빌드 동작이 수행될 수 있습니다.
+  Object.cpp
+  Scene.cpp
   코드를 생성하고 있습니다.
-  7 of 266 functions ( 2.6%) were compiled, the rest were copied from previous compilation.
-    2 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+  1 of 301 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
-  Meteo.vcxproj -> C:\Users\백 아울\Downloads\LabProject07-3\x64\Release\Meteo.exe
+  Meteo.vcxproj -> C:\Users\jhana\Desktop\하나\StarGiant\METEO\x64\Release\Meteo.exe
