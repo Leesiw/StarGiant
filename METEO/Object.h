@@ -127,6 +127,9 @@ public:
 	UINT							m_nMaterials = 0; 
 	CMaterial						**m_ppMaterials = NULL;
 
+	float							m_Speed{10.0};
+	float							m_RoateAngle{5.0};
+
 	BoundingOrientedBox				m_xmOOBB = BoundingOrientedBox();
 
 protected:
@@ -164,6 +167,7 @@ public:
 	void MoveStrafe(float fDistance = 1.0f);
 	void MoveUp(float fDistance = 1.0f);
 	void MoveForward(float fDistance = 1.0f);
+	void MoveMeteo(float fDistance = 1.0f);
 
 	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
 	void Rotate(XMFLOAT3 *pxmf3Axis, float fAngle);
@@ -172,4 +176,8 @@ public:
 
 	void MakeBoundingBox();
 	void UpdateBoundingBox();
+
+	void MakeSpeed();
+	void UpdateSpeed();
+	void UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch);
 };

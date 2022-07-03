@@ -257,7 +257,8 @@ bool CScene::ProcessInput(UCHAR *pKeysBuffer)
 void CScene::CheckObjectByPlayerCollisions()
 {
 	CObjectsShader* Objects = (CObjectsShader*)m_ppShaders[0];
-	for (int i = 0; i < Objects->m_nObjects; ++i)
+	for (int i = 0; i < Objects->m_nObjects; ++i) {
+
 		if (m_pPlayer->m_xmOOBB.Intersects(Objects->m_ppObjects[i]->m_xmOOBB)) {
 
 			XMFLOAT3 xmf3Sub = Objects->m_ppObjects[i]->GetPosition();
@@ -265,11 +266,21 @@ void CScene::CheckObjectByPlayerCollisions()
 			xmf3Sub = Vector3::Normalize(xmf3Sub);
 
 			xmf3Sub.y = 0;
-			std::cout << "충돌!";
+			std::cout << "충돌! ";
 			m_pPlayer->Move(xmf3Sub, false);
 		}
+	}
 }
 
+void CScene::MoveMeteo()
+{
+	CObjectsShader* Objects = (CObjectsShader*)m_ppShaders[0];
+	for (int i = 0; i < Objects->m_nObjects; ++i) {
+		Objects->m_ppObjects[i]->UpdateSpeed();
+		Objects->m_ppObjects[i]->UpdateRespawn(m_pPlayer->GetBox(), m_pPlayer->GetPosition());
+	}
+		
+}
 
 void CScene::AnimateObjects(float fTimeElapsed)
 {
@@ -287,6 +298,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	}
 
 		CheckObjectByPlayerCollisions();
+		MoveMeteo();
 }
 
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)

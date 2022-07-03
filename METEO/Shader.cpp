@@ -338,3 +338,6 @@ void CObjectsShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera 
 	}
 }
 
+//void CShader::AnimateObjects(float fTimeElapsed) {
+//
+//}

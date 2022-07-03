@@ -234,6 +234,13 @@ void CGameObject::MoveForward(float fDistance)
 	xmf3Position = Vector3::Add(xmf3Position, xmf3Look, fDistance);
 	CGameObject::SetPosition(xmf3Position);
 }
+void CGameObject::MoveMeteo(float fDistance)
+{
+	XMFLOAT3 xmf3Position = GetPosition();
+	XMFLOAT3 xmf3Look = (Vector3::Normalize(XMFLOAT3(-1.0, 0.0, -1.0)));
+	xmf3Position = Vector3::Add(xmf3Position, xmf3Look, fDistance);
+	CGameObject::SetPosition(xmf3Position);
+}
 
 void CGameObject::Rotate(float fPitch, float fYaw, float fRoll)
 {
@@ -308,4 +315,30 @@ void CGameObject::MakeBoundingBox()
 void CGameObject::UpdateBoundingBox()
 {
 	m_xmOOBB.Center.x = GetPosition().x;	m_xmOOBB.Center.y = GetPosition().y;	m_xmOOBB.Center.z = GetPosition().z;
+}
+
+
+
+void CGameObject::MakeSpeed()
+{
+}
+
+std::default_random_engine re;
+std::uniform_int_distribution<int>uid(1, 10);
+
+void CGameObject::UpdateSpeed()
+{//(float)uid(re))
+	float distance = m_RoateAngle / 10;
+
+	MoveMeteo(m_Speed/100);
+	Rotate(distance, distance, distance);
+}
+void CGameObject::UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch) {
+	if (!m_xmOOBB.Intersects(Player)) {
+		XMFLOAT3 After = GetPosition();
+		After.z = Switch.z + 50.f; //소환 위치 조정
+		After.x = Switch.x + 50.f;
+		SetPosition(After);
+	}
+
 }
