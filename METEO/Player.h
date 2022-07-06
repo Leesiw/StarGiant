@@ -46,6 +46,7 @@ public:
 	XMFLOAT3 GetRightVector() { return(m_xmf3Right); }
 
 	BoundingBox GetBox() { return Eyesightbox; }
+	void UpdateEyesightBox();
 
 	void SetFriction(float fFriction) { m_fFriction = fFriction; }
 	void SetGravity(const XMFLOAT3& xmf3Gravity) { m_xmf3Gravity = xmf3Gravity; }

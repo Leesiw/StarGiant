@@ -168,6 +168,12 @@ void CPlayer::Update(float fTimeElapsed)
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
 
 	UpdateBoundingBox();
+	UpdateEyesightBox();
+}
+
+void CPlayer::UpdateEyesightBox() {
+	Eyesightbox.Center.x = GetPosition().x;	Eyesightbox.Center.y = GetPosition().y;	Eyesightbox.Center.z = GetPosition().z;
+
 }
 
 CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
