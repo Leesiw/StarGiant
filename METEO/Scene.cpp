@@ -278,7 +278,7 @@ void CScene::MoveMeteo()
 	CObjectsShader* Objects = (CObjectsShader*)m_ppShaders[0];
 	for (int i = 0; i < Objects->m_nObjects; ++i) {
 		Objects->m_ppObjects[i]->UpdateSpeed();
-		Objects->m_ppObjects[i]->UpdateRespawn(m_pPlayer->GetBox(), m_pPlayer->GetPosition());
+		Objects->m_ppObjects[i]->UpdateRespawn(m_pPlayer->GetBox(), m_pPlayer->GetPosition(), m_pPlayer->GetLook());
 	}
 		
 }

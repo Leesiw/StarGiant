@@ -114,45 +114,45 @@ public:
 class CGameObject
 {
 public:
-	CGameObject(UINT nMaterials=1);
+	CGameObject(UINT nMaterials = 1);
 	virtual ~CGameObject();
 
 public:
 	char							m_pstrName[64] = { '\0' };
 
 	XMFLOAT4X4						m_xmf4x4World;
-	CMesh							*m_pMesh = NULL;
-	CShader							*m_pShader = NULL;
+	CMesh* m_pMesh = NULL;
+	CShader* m_pShader = NULL;
 
-	UINT							m_nMaterials = 0; 
-	CMaterial						**m_ppMaterials = NULL;
+	UINT							m_nMaterials = 0;
+	CMaterial** m_ppMaterials = NULL;
 
-	float							m_Speed{10.0};
-	float							m_RoateAngle{5.0};
-
+	float							m_Speed{ 10.0 };
+	float							m_RoateAngle{ 5.0 };
+	XMFLOAT3						m_xmLook{ -1.0, 0.0, -1.0 };
 	BoundingOrientedBox				m_xmOOBB = BoundingOrientedBox();
 
 protected:
-	ID3D12Resource					*m_pd3dcbGameObject = NULL;
+	ID3D12Resource* m_pd3dcbGameObject = NULL;
 
 public:
-	CB_GAMEOBJECT_INFO				*m_pcbMappedGameObject = NULL;
+	CB_GAMEOBJECT_INFO* m_pcbMappedGameObject = NULL;
 
 public:
-	void SetMesh(CMesh *pMesh);
-	void SetShader(CShader *pShader);
+	void SetMesh(CMesh* pMesh);
+	void SetShader(CShader* pShader);
 	void SetAlbedoColor(UINT nIndex, XMFLOAT4 xmf4Color);
 	void SetEmissionColor(UINT nIndex, XMFLOAT4 xmf4Color);
-	void SetMaterial(UINT nIndex, CMaterial *pMaterial);
+	void SetMaterial(UINT nIndex, CMaterial* pMaterial);
 	void SetMaterial(UINT nIndex, UINT nMaterial);
 
-	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void ReleaseShaderVariables();
-	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void Animate(float fTimeElapsed) { UpdateBoundingBox(); }
 	virtual void OnPrepareRender() { }
-	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 
 	virtual void ReleaseUploadBuffers();
 
@@ -167,17 +167,17 @@ public:
 	void MoveStrafe(float fDistance = 1.0f);
 	void MoveUp(float fDistance = 1.0f);
 	void MoveForward(float fDistance = 1.0f);
-	void MoveMeteo(float fDistance = 1.0f);
+	void MoveMeteo(XMFLOAT3 xmf3Look, float fDistance = 1.0f);
 
 	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
-	void Rotate(XMFLOAT3 *pxmf3Axis, float fAngle);
+	void Rotate(XMFLOAT3* pxmf3Axis, float fAngle);
 
-	void LoadGameObjectFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, char *pstrFileName);
+	void LoadGameObjectFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName);
 
 	void MakeBoundingBox();
 	void UpdateBoundingBox();
 
 	void MakeSpeed();
 	void UpdateSpeed();
-	void UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch);
+	void UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch, XMFLOAT3 m_xmf3Look);
 };

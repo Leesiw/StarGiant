@@ -234,11 +234,11 @@ void CGameObject::MoveForward(float fDistance)
 	xmf3Position = Vector3::Add(xmf3Position, xmf3Look, fDistance);
 	CGameObject::SetPosition(xmf3Position);
 }
-void CGameObject::MoveMeteo(float fDistance)
+void CGameObject::MoveMeteo(XMFLOAT3 xmf3Look, float fDistance)
 {
 	XMFLOAT3 xmf3Position = GetPosition();
-	XMFLOAT3 xmf3Look = (Vector3::Normalize(XMFLOAT3(-1.0, 0.0, -1.0)));
-	xmf3Position = Vector3::Add(xmf3Position, xmf3Look, fDistance);
+	xmf3Look.y = 0.0f;
+	xmf3Position = Vector3::Add(xmf3Position, xmf3Look, -fDistance);
 	CGameObject::SetPosition(xmf3Position);
 }
 
@@ -319,26 +319,31 @@ void CGameObject::UpdateBoundingBox()
 
 
 
+std::default_random_engine re;
+std::uniform_int_distribution<int>uid(1, 5);
+
 void CGameObject::MakeSpeed()
 {
+	m_Speed = (float)uid(re)*10;
+	m_RoateAngle = (float)uid(re);
 }
-
-std::default_random_engine re;
-std::uniform_int_distribution<int>uid(1, 10);
-
 void CGameObject::UpdateSpeed()
 {//(float)uid(re))
 	float distance = m_RoateAngle / 10;
 
-	MoveMeteo(m_Speed/100);
+	//MoveMeteo(m_Speed/100);
+	MoveMeteo(m_xmLook, m_Speed/100);
 	Rotate(distance, distance, distance);
 }
-void CGameObject::UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch) {
+void CGameObject::UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch, XMFLOAT3 m_xmf3Look) {
 	if (!m_xmOOBB.Intersects(Player)) {
 		XMFLOAT3 After = GetPosition();
-		After.z = Switch.z + 50.f; //소환 위치 조정
-		After.x = Switch.x + 50.f;
+		//After.z = Switch.z + 50.f; //소환 위치 조정
+		//After.x = Switch.x + 50.f;
+		After = Vector3::Add(Switch, m_xmf3Look, 50.0f);
+		After.y = Switch.x;
 		SetPosition(After);
+		m_xmLook = m_xmf3Look;
 	}
 
 }
