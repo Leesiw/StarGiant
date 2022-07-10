@@ -172,8 +172,10 @@ void CPlayer::Update(float fTimeElapsed)
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
 
 	UpdateBoundingBox();
+	UpdateEyesightBox();
 
 }
+
 
 CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
 {
@@ -246,7 +248,7 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Gunship.bin");
 
 	pGameObject->Rotate(15.0f, 0.0f, 0.0f);
-	pGameObject->SetScale(8.5f, 8.5f, 8.5f);
+	pGameObject->SetScale(5.5f, 5.5f, 5.5f);
 	SetChild(pGameObject, true);
 
 	OnInitialize();

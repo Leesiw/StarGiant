@@ -149,6 +149,8 @@ public:
 	XMFLOAT3					m_xmf3RotationAxis = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	float						m_fRotationSpeed = 0.0f;
 
+
+	bool coll = false;
 	BoundingOrientedBox				m_xmOOBB;
 	BoundingBox			aabb;
 
@@ -220,7 +222,10 @@ public:
 	void UpdateSpeed();
 	void UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch, XMFLOAT3 m_xmf3Look);
 	//===============================================================================
-	void turnturn(float fTimeElapsed);
+	void TurnSpeed();
+	void Replace(XMFLOAT3 Point);
+	void MoveToP(XMFLOAT3 Point,float fTimeElapsed);
+
 	//===============================================================================
 
 

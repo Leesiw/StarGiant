@@ -349,7 +349,8 @@ void CGameObject::UpdateSpeed()
 	Rotate(distance, distance, distance);
 }
 void CGameObject::UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch, XMFLOAT3 m_xmf3Look) {
-	if (!m_xmOOBB.Intersects(Player)) {
+
+
 		XMFLOAT3 After = GetPosition();
 		//After.z = Switch.z + 50.f; //소환 위치 조정
 		//After.x = Switch.x + 50.f;
@@ -357,23 +358,42 @@ void CGameObject::UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch, XMFLOAT3 m_
 		After.y = Switch.x;
 		SetPosition(After);
 		m_xmLook = m_xmf3Look;
-	}
+		std::cout << "리스폰";
+	
 
 }
 //=====================================================================
+std::random_device rdd;
+std::default_random_engine dre(rdd());
+std::uniform_real_distribution<float> urd(0, 180);
+std::uniform_real_distribution<float> urd_box(-150, 150);
 
-void CGameObject::turnturn(float fTimeElapsed)
+
+void CGameObject::Replace(XMFLOAT3 Point)
 {
-	//XMMATRIX xmmtxRotate = XMMatrixRotationZ(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
-	//m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_xmf4x4Transform);
+	SetPosition(Point.x + urd_box(dre), Point.y + urd_box(dre), Point.z + urd_box(dre));
 
-	Rotate(m_fxRotationSpeed * fTimeElapsed, m_fyRotationSpeed * fTimeElapsed, m_fzRotationSpeed * fTimeElapsed);
+
+}
+
+void CGameObject::MoveToP(XMFLOAT3 Point, float fTimeElapsed)
+{
+	SetMovingDirection(Point);
+	if (m_fMovingSpeed != 0.0f)  Move(m_xmf3MovingDirection, -m_fMovingSpeed * fTimeElapsed);
 }
 
 
-//
-//XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
-//m_ppGameObjects[1]->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_ppGameObjects[1]->m_xmf4x4Transform);
+void CGameObject::TurnSpeed()
+{
+	//XMMATRIX xmmtxRotate = XMMatrixRotationZ(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
+	//m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_xmf4x4Transform);
+	//SetRotationSpeed(rand() / 100);
+	m_fRotationSpeed = urd(dre);
+	std::cout << m_fRotationSpeed;
+	//Rotate(m_fxRotationSpeed * fTimeElapsed, m_fyRotationSpeed * fTimeElapsed, m_fzRotationSpeed * fTimeElapsed);
+}
+
+
 
 //=====================================================================
 

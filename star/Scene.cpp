@@ -62,6 +62,7 @@ void CScene::BuildDefaultLightsAndMaterials()
 	m_pLights[3].m_fTheta = (float)cos(XMConvertToRadians(30.0f));
 }
 
+
 void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
@@ -78,26 +79,24 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	meteo = new MeteoObject();
 	meteo->SetChild(meteoModel, true);
-	meteo->SetPosition(+130.0f, 0.0f, 160.0f);
+	meteo->SetPosition(+230.0f, 0.0f, 260.0f);
 	meteo->SetScale(20.0f, 20.0f, 20.0f);
 	//meteo->Rotate(0.0f, 90.0f, 0.0f);
 	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	meteo->SetRotationSpeed(50.0f);
-	meteo->SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 0.0f));
-	meteo->SetMovingSpeed(10.5f);
-
-
+	meteo->TurnSpeed();
+	meteo->SetMovingSpeed(20.0f);
 	m_ppGameObjects[0] = meteo;
 
+	CGameObject* meteoModel1 = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo.bin");
+
 	meteo = new MeteoObject();
-	meteo->SetChild(meteoModel, true);
-	meteo->SetPosition(-30.0f, 0.0f, 0.0f);
+	meteo->SetChild(meteoModel1, true);
+	meteo->SetPosition(-170.0f, -30.0f, 120.0f);
 	meteo->SetScale(10.0f, 10.0f, 10.0f);
-	//meteo->Rotate(0.0f, -90.0f, 0.0f);
 	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	meteo->SetRotationSpeed(50.0f);
-	meteo->SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 0.0f));
-	meteo->SetMovingSpeed(10.5f);
+
+	meteo->TurnSpeed();
+	meteo->SetMovingSpeed(40.5f);
 
 	m_ppGameObjects[1] = meteo;
 
@@ -107,26 +106,21 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	meteorite = new MeteoriteObject();
 	meteorite->SetChild(meteoriteModel, true);
-	meteorite->SetPosition(135.0f, 40.0f, 220.0f);
+	meteorite->SetPosition(-200.0f, 40.0f, 320.0f);
 	meteorite->SetScale(8.5f, 8.5f, 8.5f);
-	//meteorite->Rotate(0.0f, -90.0f, 0.0f);
 	meteorite->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	meteorite->SetRotationSpeed(50.0f);
-	meteorite->SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 0.0f));
-	meteorite->SetMovingSpeed(10.5f);
+	meteorite->TurnSpeed();
+	meteorite->SetMovingSpeed(100.5f);
 	m_ppGameObjects[2] = meteorite;
 
-
+	CGameObject* meteoriteModel1 = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteorite.bin");
 	meteorite = new MeteoriteObject();
-	meteorite->SetChild(meteoriteModel, true);
-	meteorite->SetPosition(95.0f, 50.0f, 50.0f);
+	meteorite->SetChild(meteoriteModel1, true);
+	meteorite->SetPosition(190.0f, -50.0f, 150.0f);
 	meteorite->SetScale(4.5f, 4.5f, 4.5f);
-	//meteorite->Rotate(0.0f, -90.0f, 0.0f);
 	meteorite->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	meteorite->SetRotationSpeed(50.0f);
-	meteorite->SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 0.0f));
-	meteorite->SetMovingSpeed(10.5f);
-
+	meteorite->TurnSpeed();
+	meteorite->SetMovingSpeed(100.5f);
 	m_ppGameObjects[3] = meteorite;
 
 
@@ -259,7 +253,13 @@ void CScene::CheckObjectByPlayerCollisions()
 		//if (m_pPlayer->m_pChild->m_xmOOBB.Intersects(m_ppGameObjects[i]->m_pChild->m_xmOOBB))
 		if (m_pPlayer->HierarchyIntersects(m_ppGameObjects[i]))
 		{
-			std::cout << "Ãæµ¹";
+			XMFLOAT3 xmf3Sub = m_ppGameObjects[i]->GetPosition();
+			xmf3Sub = Vector3::Subtract(m_pPlayer->GetPosition(), xmf3Sub);
+			xmf3Sub = Vector3::Normalize(xmf3Sub);
+
+			xmf3Sub.y = 0;
+			std::cout << "Ãæµ¹! ";
+			m_pPlayer->Move(xmf3Sub, false);
 		}
 
 		//m_ppGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppGameObjects[i]->m_pChild->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
@@ -299,13 +299,18 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	m_fElapsedTime = fTimeElapsed;
 	CheckObjectByPlayerCollisions();
 
+
+
 	//m_ppGameObjects[1]->turnturn(fTimeElapsed);
 	//MoveMeteo();
+	for (int i = 0; i < m_nGameObjects; i++) {
+		if (!m_pPlayer->GetBox().Intersects(m_ppGameObjects[i]->m_pChild->m_xmOOBB)) {
+			std::cout << "´«";
+			m_ppGameObjects[i]->Replace(m_pPlayer->GetPosition());
+		}
+	}
 
-
-
-
-	for (int i = 0; i < m_nGameObjects; i++) m_ppGameObjects[i]->Animate(fTimeElapsed, NULL);
+	for (int i = 0; i < m_nGameObjects; i++) {m_ppGameObjects[i]->Animate(fTimeElapsed, NULL); }
 
 
 
