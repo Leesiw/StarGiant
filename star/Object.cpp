@@ -145,6 +145,10 @@ void CGameObject::SetMaterial(int nMaterial, CMaterial *pMaterial)
 void CGameObject::Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent)
 {
 	UpdateBoundingBox();
+	
+	if (m_fRotationSpeed != 0.0f) Rotate(&m_xmf3RotationAxis, m_fRotationSpeed * fTimeElapsed);
+	//if (m_fMovingSpeed != 0.0f) Move(m_xmf3MovingDirection, m_fMovingSpeed * fTimeElapsed);
+
 	if (m_pSibling) m_pSibling->Animate(fTimeElapsed, pxmf4x4Parent);
 	if (m_pChild) m_pChild->Animate(fTimeElapsed, &m_xmf4x4World);
 }
@@ -358,7 +362,18 @@ void CGameObject::UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch, XMFLOAT3 m_
 }
 //=====================================================================
 
+void CGameObject::turnturn(float fTimeElapsed)
+{
+	//XMMATRIX xmmtxRotate = XMMatrixRotationZ(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
+	//m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_xmf4x4Transform);
 
+	Rotate(m_fxRotationSpeed * fTimeElapsed, m_fyRotationSpeed * fTimeElapsed, m_fzRotationSpeed * fTimeElapsed);
+}
+
+
+//
+//XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
+//m_ppGameObjects[1]->m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_ppGameObjects[1]->m_xmf4x4Transform);
 
 //=====================================================================
 

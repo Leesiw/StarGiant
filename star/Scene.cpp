@@ -78,20 +78,27 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	meteo = new MeteoObject();
 	meteo->SetChild(meteoModel, true);
-	meteo->OnInitialize();
 	meteo->SetPosition(+130.0f, 0.0f, 160.0f);
 	meteo->SetScale(20.0f, 20.0f, 20.0f);
-	meteo->Rotate(0.0f, 90.0f, 0.0f);
+	//meteo->Rotate(0.0f, 90.0f, 0.0f);
+	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	meteo->SetRotationSpeed(50.0f);
+	meteo->SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 0.0f));
+	meteo->SetMovingSpeed(10.5f);
 
 
 	m_ppGameObjects[0] = meteo;
 
 	meteo = new MeteoObject();
 	meteo->SetChild(meteoModel, true);
-	meteo->OnInitialize();
-	meteo->SetPosition(-75.0f, 0.0f, 80.0f);
+	meteo->SetPosition(-30.0f, 0.0f, 0.0f);
 	meteo->SetScale(10.0f, 10.0f, 10.0f);
-	meteo->Rotate(0.0f, -90.0f, 0.0f);
+	//meteo->Rotate(0.0f, -90.0f, 0.0f);
+	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	meteo->SetRotationSpeed(50.0f);
+	meteo->SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 0.0f));
+	meteo->SetMovingSpeed(10.5f);
+
 	m_ppGameObjects[1] = meteo;
 
 
@@ -100,19 +107,26 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	meteorite = new MeteoriteObject();
 	meteorite->SetChild(meteoriteModel, true);
-	meteorite->OnInitialize();
 	meteorite->SetPosition(135.0f, 40.0f, 220.0f);
 	meteorite->SetScale(8.5f, 8.5f, 8.5f);
-	meteorite->Rotate(0.0f, -90.0f, 0.0f);
+	//meteorite->Rotate(0.0f, -90.0f, 0.0f);
+	meteorite->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	meteorite->SetRotationSpeed(50.0f);
+	meteorite->SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 0.0f));
+	meteorite->SetMovingSpeed(10.5f);
 	m_ppGameObjects[2] = meteorite;
 
 
 	meteorite = new MeteoriteObject();
 	meteorite->SetChild(meteoriteModel, true);
-	meteorite->OnInitialize();
 	meteorite->SetPosition(95.0f, 50.0f, 50.0f);
 	meteorite->SetScale(4.5f, 4.5f, 4.5f);
-	meteorite->Rotate(0.0f, -90.0f, 0.0f);
+	//meteorite->Rotate(0.0f, -90.0f, 0.0f);
+	meteorite->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	meteorite->SetRotationSpeed(50.0f);
+	meteorite->SetMovingDirection(XMFLOAT3(1.0f, 0.0f, 0.0f));
+	meteorite->SetMovingSpeed(10.5f);
+
 	m_ppGameObjects[3] = meteorite;
 
 
@@ -284,7 +298,12 @@ void CScene::AnimateObjects(float fTimeElapsed)
 {
 	m_fElapsedTime = fTimeElapsed;
 	CheckObjectByPlayerCollisions();
-	MoveMeteo();
+
+	//m_ppGameObjects[1]->turnturn(fTimeElapsed);
+	//MoveMeteo();
+
+
+
 
 	for (int i = 0; i < m_nGameObjects; i++) m_ppGameObjects[i]->Animate(fTimeElapsed, NULL);
 

@@ -143,6 +143,12 @@ public:
 	float							m_RoateAngle{ 5.0 };
 	XMFLOAT3						m_xmLook{ -1.0, 0.0, -1.0 };
 
+	XMFLOAT3					m_xmf3MovingDirection = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	float						m_fMovingSpeed = 0.0f;
+	float						m_fMovingRange = 0.0f;
+	XMFLOAT3					m_xmf3RotationAxis = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	float						m_fRotationSpeed = 0.0f;
+
 	BoundingOrientedBox				m_xmOOBB;
 	BoundingBox			aabb;
 
@@ -180,6 +186,30 @@ public:
 	void SetPosition(XMFLOAT3 xmf3Position);
 	void SetScale(float x, float y, float z);
 
+	//===============================================================================
+
+	void SetMovingDirection(XMFLOAT3& xmf3MovingDirection) { m_xmf3MovingDirection = Vector3::Normalize(xmf3MovingDirection); }
+	void SetMovingSpeed(float fSpeed) { m_fMovingSpeed = fSpeed; }
+	void SetMovingRange(float fRange) { m_fMovingRange = fRange; }
+	void SetRotationAxis(XMFLOAT3& xmf3RotationAxis) { m_xmf3RotationAxis = Vector3::Normalize(xmf3RotationAxis); }
+	void SetRotationSpeed(float fSpeed) { m_fRotationSpeed = fSpeed; }
+
+
+
+
+	void CGameObject::Rotate(XMFLOAT3& xmf3RotationAxis, float fAngle)
+	{
+		XMFLOAT4X4 mtxRotate = Matrix4x4::RotationAxis(xmf3RotationAxis, fAngle);
+		m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
+	}
+	void CGameObject::Move(XMFLOAT3& vDirection, float fSpeed)
+	{
+		SetPosition(m_xmf4x4World._41 + vDirection.x * fSpeed, m_xmf4x4World._42 + vDirection.y * fSpeed, m_xmf4x4World._43 + vDirection.z * fSpeed);
+	}
+
+	//===============================================================================
+
+
 	void MoveStrafe(float fDistance = 1.0f);
 	void MoveUp(float fDistance = 1.0f);
 	void MoveForward(float fDistance = 1.0f);
@@ -190,6 +220,9 @@ public:
 	void UpdateSpeed();
 	void UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch, XMFLOAT3 m_xmf3Look);
 	//===============================================================================
+	void turnturn(float fTimeElapsed);
+	//===============================================================================
+
 
 	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
 	void Rotate(XMFLOAT3 *pxmf3Axis, float fAngle);
