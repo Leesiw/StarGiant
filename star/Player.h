@@ -44,7 +44,7 @@ public:
 	XMFLOAT3 GetUpVector() { return(m_xmf3Up); }
 	XMFLOAT3 GetRightVector() { return(m_xmf3Right); }
 
-	BoundingBox					Eyesightbox = BoundingBox(m_xmf3Position, XMFLOAT3(200.0f, 200.0f, 300.0f)); // 플레이어 시야 범위
+	BoundingBox					Eyesightbox = BoundingBox(m_xmf3Position, XMFLOAT3(500.0f, 500.0f, 500.0f)); // 플레이어 시야 범위
 	BoundingBox GetBox() { return Eyesightbox; }
 	void UpdateEyesightBox() {Eyesightbox.Center.x = GetPosition().x;	Eyesightbox.Center.y = GetPosition().y;	Eyesightbox.Center.z = GetPosition().z;};
 
