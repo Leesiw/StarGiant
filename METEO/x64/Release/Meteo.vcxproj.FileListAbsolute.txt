@@ -1,3 +1,0 @@
-C:\Users\백 아울\Downloads\LabProject07-3\x64\Release\Meteo.exe
-C:\Users\jhana\Desktop\하나\StarGiant\METEO\x64\Release\Meteo.exe
-C:\Users\백 아울\Desktop\StarGiant\METEO\x64\Release\Meteo.exe
