@@ -8,3 +8,4 @@ METEO/.vs/Meteo/v16/.suo
 *.db
 METEO/.vs/*
 METEO/x64/*
+METEO/Meteo.vcxproj.user
