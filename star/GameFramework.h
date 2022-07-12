@@ -7,6 +7,9 @@
 #include "Player.h"
 #include "Scene.h"
 
+class UILayer;
+
+
 class CGameFramework
 {
 public:
@@ -40,6 +43,9 @@ public:
 	void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
+
+
+	void UpdateUI();
 
 private:
 	HINSTANCE					m_hInstance;
@@ -87,5 +93,7 @@ private:
 	POINT						m_ptOldCursorPos;
 
 	_TCHAR						m_pszFrameRate[70];
+
+	UILayer* m_pUILayer = NULL;
 };
 

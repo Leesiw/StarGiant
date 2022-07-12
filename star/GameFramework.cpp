@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "GameFramework.h"
+#include "UILayer.h"
 
 CGameFramework::CGameFramework()
 {
@@ -395,6 +396,13 @@ void CGameFramework::OnDestroy()
 
 void CGameFramework::BuildObjects()
 {
+	if (!m_pUILayer)
+	{
+		m_pUILayer = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue);
+	}
+	m_pUILayer->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight);
+
+
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
 	m_pScene = new CScene();
@@ -419,6 +427,10 @@ void CGameFramework::BuildObjects()
 
 void CGameFramework::ReleaseObjects()
 {
+	if (m_pUILayer) m_pUILayer->ReleaseResources();
+	if (m_pUILayer) delete m_pUILayer;
+
+
 	if (m_pPlayer) m_pPlayer->Release();
 
 	if (m_pScene) m_pScene->ReleaseObjects();
@@ -501,6 +513,24 @@ void CGameFramework::MoveToNextFrame()
 	}
 }
 
+void CGameFramework::UpdateUI()
+{
+	vector<wstring> labels;
+
+	labels.push_back(L"테스트 중\n");
+	labels.push_back(m_pszFrameRate);
+	labels.push_back(L"\n테스트 중\n");
+
+
+	wstring uiText = L"";
+	for (auto s : labels)
+	{
+		uiText += s;
+	}
+	m_pUILayer->UpdateLabels(uiText);
+}
+
+
 //#define _WITH_PLAYER_TOP
 
 void CGameFramework::FrameAdvance()
@@ -510,6 +540,8 @@ void CGameFramework::FrameAdvance()
 	ProcessInput();
 
     AnimateObjects();
+
+	UpdateUI();
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
@@ -553,6 +585,8 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
+
+	m_pUILayer->Render(m_nSwapChainBufferIndex);
 
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
