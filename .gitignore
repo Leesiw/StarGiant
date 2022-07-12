@@ -11,4 +11,6 @@ METEO/x64/*
 METEO/Meteo.vcxproj.user
 star/.vs/*
 star/x64/*
+star/Release/*
 star/LabProject07-9-1.vcxproj.user
+
