@@ -28,6 +28,8 @@ protected:
 	float           			m_fMaxVelocityY;
 	float           			m_fFriction;
 
+	XMFLOAT3					m_xmf3Shift;
+
 	LPVOID						m_pPlayerUpdatedContext;
 	LPVOID						m_pCameraUpdatedContext;
 
@@ -39,6 +41,8 @@ public:
 
 	XMFLOAT3 GetPosition() { return(m_xmf3Position); }
 	XMFLOAT3 GetLookVector() { return(m_xmf3Look); }
+	
+	XMFLOAT3 GetShift() { return(m_xmf3Shift); }
 
 
 	XMFLOAT3 GetUpVector() { return(m_xmf3Up); }
