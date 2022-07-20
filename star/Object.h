@@ -219,7 +219,7 @@ public:
 	//===============================================================================
 	void MoveMeteo(XMFLOAT3 xmf3Look, float fDistance = 1.0f);
 	void MakeSpeed();
-	void UpdateSpeed();
+	void UpdateSpeed(float fTimeElapsed);
 	void UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch, XMFLOAT3 m_xmf3Look);
 	//===============================================================================
 	void TurnSpeed();

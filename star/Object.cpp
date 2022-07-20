@@ -340,12 +340,12 @@ void CGameObject::MakeSpeed()
 	m_Speed = (float)uid(re) * 10;
 	m_RoateAngle = (float)uid(re);
 }
-void CGameObject::UpdateSpeed()
+void CGameObject::UpdateSpeed(float fTimeElapsed)
 {//(float)uid(re))
-	float distance = m_RoateAngle / 10;
+	float distance = fTimeElapsed * m_RoateAngle / 10;
 
 	//MoveMeteo(m_Speed/100);
-	MoveMeteo(m_xmLook, m_Speed / 100);
+	MoveMeteo(m_xmLook, fTimeElapsed* m_Speed / 100);
 	Rotate(distance, distance, distance);
 }
 void CGameObject::UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch, XMFLOAT3 m_xmf3Look) {

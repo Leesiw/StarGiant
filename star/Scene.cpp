@@ -284,11 +284,10 @@ void CScene::CheckObjectByPlayerCollisions()
 	}
 }
 
-void CScene::MoveMeteo()
+void CScene::MoveMeteo(float fTimeElapsed)
 {
-
 	for (int i = 0; i < m_nGameObjects; ++i) {
-		m_ppGameObjects[i]->UpdateSpeed();
+		m_ppGameObjects[i]->UpdateSpeed(fTimeElapsed);
 		m_ppGameObjects[i]->UpdateRespawn(m_pPlayer->GetBox(), m_pPlayer->GetPosition(), m_pPlayer->GetLook());
 	}
 
@@ -302,7 +301,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 
 	//m_ppGameObjects[1]->turnturn(fTimeElapsed);
-	//MoveMeteo();
+	//MoveMeteo(m_GameTimer.GetTimeElapsed());
 	for (int i = 0; i < m_nGameObjects; i++) {
 		if (!m_pPlayer->GetBox().Intersects(m_ppGameObjects[i]->m_pChild->m_xmOOBB)) {
 			std::cout << "´«";
