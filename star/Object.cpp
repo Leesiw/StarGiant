@@ -363,8 +363,8 @@ void CGameObject::UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch, XMFLOAT3 m_
 
 }
 //=====================================================================
-std::random_device rdd;
-std::default_random_engine dre(rdd());
+std::random_device rd;
+std::default_random_engine dre(rd());
 std::uniform_real_distribution<float> urd(0, 180);
 std::uniform_real_distribution<float> urd_box(-150, 150);
 

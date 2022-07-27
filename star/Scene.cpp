@@ -13,6 +13,7 @@ CScene::~CScene()
 {
 }
 
+
 void CScene::BuildDefaultLightsAndMaterials()
 {
 	m_nLights = 4;
@@ -62,6 +63,14 @@ void CScene::BuildDefaultLightsAndMaterials()
 	m_pLights[3].m_fTheta = (float)cos(XMConvertToRadians(30.0f));
 }
 
+std::random_device rdd;
+std::default_random_engine dree(rdd());
+std::uniform_real_distribution<float> urdPos(-1000, 1000);
+std::uniform_real_distribution<float> urdScale(0, 10);
+
+
+
+
 
 void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
@@ -71,57 +80,113 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	BuildDefaultLightsAndMaterials();
 
-	m_nGameObjects = 4;
+	m_nGameObjects = 200;
 	m_ppGameObjects = new CGameObject*[m_nGameObjects];
+
 
 	CGameObject *meteoModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo.bin");
 	MeteoObject* meteo = NULL;
 
-	meteo = new MeteoObject();
-	meteo->SetChild(meteoModel, true);
-	meteo->SetPosition(+230.0f, 0.0f, 260.0f);
-	meteo->SetScale(20.0f, 20.0f, 20.0f);
-	//meteo->Rotate(0.0f, 90.0f, 0.0f);
-	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	meteo->TurnSpeed();
-	meteo->SetMovingSpeed(20.0f);
-	m_ppGameObjects[0] = meteo;
 
-	CGameObject* meteoModel1 = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo.bin");
+	for (int i = 0; i < 99; ++i) {
+		meteo = new MeteoObject();
+		meteo->SetChild(meteoModel, true);
+		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
+		meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+		meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+		meteo->TurnSpeed();
+		m_ppGameObjects[i] = meteo;
+	}
 
-	meteo = new MeteoObject();
-	meteo->SetChild(meteoModel1, true);
-	meteo->SetPosition(-170.0f, -30.0f, 120.0f);
-	meteo->SetScale(10.0f, 10.0f, 10.0f);
-	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	CGameObject* meteoModel1 = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteorite.bin");
 
-	meteo->TurnSpeed();
-	meteo->SetMovingSpeed(40.5f);
-
-	m_ppGameObjects[1] = meteo;
+	for (int i = 99; i < 200; ++i) {
+		meteo = new MeteoObject();
+		meteo->SetChild(meteoModel1, true);
+		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
+		meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+		meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+		meteo->TurnSpeed();
 
 
-	CGameObject *meteoriteModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteorite.bin");
-	MeteoriteObject* meteorite = NULL;
+		m_ppGameObjects[i] = meteo;
+	}
 
-	meteorite = new MeteoriteObject();
-	meteorite->SetChild(meteoriteModel, true);
-	meteorite->SetPosition(-200.0f, 40.0f, 320.0f);
-	meteorite->SetScale(8.5f, 8.5f, 8.5f);
-	meteorite->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	meteorite->TurnSpeed();
-	meteorite->SetMovingSpeed(100.5f);
-	m_ppGameObjects[2] = meteorite;
 
-	CGameObject* meteoriteModel1 = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteorite.bin");
-	meteorite = new MeteoriteObject();
-	meteorite->SetChild(meteoriteModel1, true);
-	meteorite->SetPosition(190.0f, -50.0f, 150.0f);
-	meteorite->SetScale(4.5f, 4.5f, 4.5f);
-	meteorite->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	meteorite->TurnSpeed();
-	meteorite->SetMovingSpeed(100.5f);
-	m_ppGameObjects[3] = meteorite;
+	//CGameObject *meteoModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo.bin");
+	//MeteoObject* meteo = NULL;
+
+	//meteo = new MeteoObject();
+	//meteo->SetChild(meteoModel, true);
+	//meteo->SetPosition(+230.0f, 0.0f, 260.0f);
+	//meteo->SetScale(20.0f, 20.0f, 20.0f);
+	////meteo->Rotate(0.0f, 90.0f, 0.0f);
+	//meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	//meteo->TurnSpeed();
+	//meteo->SetMovingSpeed(20.0f);
+	//m_ppGameObjects[0] = meteo;
+
+	//CGameObject* meteoModel1 = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo.bin");
+
+	//meteo = new MeteoObject();
+	//meteo->SetChild(meteoModel1, true);
+	//meteo->SetPosition(-170.0f, -30.0f, 120.0f);
+	//meteo->SetScale(10.0f, 10.0f, 10.0f);
+	//meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+
+	//meteo->TurnSpeed();
+	//meteo->SetMovingSpeed(40.5f);
+
+	//m_ppGameObjects[1] = meteo;
+
+
+	//CGameObject *meteoriteModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteorite.bin");
+	//MeteoriteObject* meteorite = NULL;
+
+	//meteorite = new MeteoriteObject();
+	//meteorite->SetChild(meteoriteModel, true);
+	//meteorite->SetPosition(-200.0f, 40.0f, 320.0f);
+	//meteorite->SetScale(8.5f, 8.5f, 8.5f);
+	//meteorite->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	//meteorite->TurnSpeed();
+	//meteorite->SetMovingSpeed(100.5f);
+	//m_ppGameObjects[2] = meteorite;
+
+	//CGameObject* meteoriteModel1 = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteorite.bin");
+	//meteorite = new MeteoriteObject();
+	//meteorite->SetChild(meteoriteModel1, true);
+	//meteorite->SetPosition(190.0f, -50.0f, 150.0f);
+	//meteorite->SetScale(4.5f, 4.5f, 4.5f);
+	//meteorite->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	//meteorite->TurnSpeed();
+	//meteorite->SetMovingSpeed(100.5f);
+	//m_ppGameObjects[3] = meteorite;
+
+	//
+	//meteorite = new MeteoriteObject();
+	//meteorite->SetChild(meteoriteModel1, true);
+	//meteorite->SetPosition(0.0f, -50.0f, 150.0f);
+	//meteorite->SetScale(4.5f, 4.5f, 4.5f);
+	//meteorite->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	//meteorite->TurnSpeed();
+	//meteorite->SetMovingSpeed(100.5f);
+	//m_ppGameObjects[4] = meteorite;
+
+	//
+	//for (int i = 5; i < 7; ++i) {
+	//	meteorite = new MeteoriteObject();
+	//	meteorite->SetChild(meteoriteModel1, true);
+	//	meteorite->SetPosition(0.0f, -50.0f + i*10, 150.0f);
+	//	meteorite->SetScale(4.5f, 4.5f, 4.5f);
+	//	meteorite->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	//	meteorite->TurnSpeed();
+	//	meteorite->SetMovingSpeed(100.5f);
+	//	m_ppGameObjects[i] = meteorite;
+	//}
+
+
+
+
 
 
 
@@ -296,7 +361,6 @@ void CScene::MoveMeteo(float fTimeElapsed)
 void CScene::AnimateObjects(float fTimeElapsed)
 {
 	m_fElapsedTime = fTimeElapsed;
-	CheckObjectByPlayerCollisions();
 
 
 
@@ -304,13 +368,14 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	//MoveMeteo(m_GameTimer.GetTimeElapsed());
 	for (int i = 0; i < m_nGameObjects; i++) {
 		if (!m_pPlayer->GetBox().Intersects(m_ppGameObjects[i]->m_pChild->m_xmOOBB)) {
-			std::cout << "´«";
-			m_ppGameObjects[i]->Replace(m_pPlayer->GetPosition());
+			//std::cout << "´«";
+			//m_ppGameObjects[i]->Replace(m_pPlayer->GetPosition());
 		}
 	}
 
 	for (int i = 0; i < m_nGameObjects; i++) {m_ppGameObjects[i]->Animate(fTimeElapsed, NULL); }
 
+	//CheckObjectByPlayerCollisions();
 
 
 	if (m_pLights)

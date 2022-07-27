@@ -150,6 +150,10 @@ public:
 	float						m_fRotationSpeed = 0.0f;
 
 
+	float						m_AccelSpeedXZ;
+	float GetAccelSpeedXZ() const { return(m_AccelSpeedXZ); }
+
+
 	bool coll = false;
 	BoundingOrientedBox				m_xmOOBB;
 	BoundingBox			aabb;
