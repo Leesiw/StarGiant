@@ -518,10 +518,18 @@ void CGameFramework::MoveToNextFrame()
 void CGameFramework::UpdateUI()
 {
 	vector<wstring> labels;
+	wchar_t position_ui[50];
+	_stprintf_s(position_ui, _countof(position_ui), _T("Position (%4f, %4f, %4f)\n"), m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPosition().z);
+	wchar_t velocity_ui[50];
+	_stprintf_s(velocity_ui, _countof(velocity_ui), _T("Velocity (%4f, %4f, %4f)\n"), m_pPlayer->GetVelocity().x, m_pPlayer->GetVelocity().y, m_pPlayer->GetVelocity().z);
+	wchar_t shift_ui[50];
+	_stprintf_s(shift_ui, _countof(shift_ui), _T("Shift (%4f, %4f, %4f)\n"), m_pPlayer->GetShift().x, m_pPlayer->GetShift().y, m_pPlayer->GetShift().z);
 
 	labels.push_back(L"테스트 중\n");
-	labels.push_back(m_pszFrameRate);
-	labels.push_back(L"\n테스트 중\n");
+	labels.push_back(position_ui);
+	labels.push_back(velocity_ui);
+	labels.push_back(shift_ui);
+	labels.push_back(L"테스트 중\n");
 
 
 	wstring uiText = L"";
@@ -608,9 +616,9 @@ void CGameFramework::FrameAdvance()
 	MoveToNextFrame();
 
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
-	size_t nLength = _tcslen(m_pszFrameRate);
-	XMFLOAT3 xmf3Position = m_pPlayer->GetPosition();
-	_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	//size_t nLength = _tcslen(m_pszFrameRate);
+	//XMFLOAT3 xmf3Position = m_pPlayer->GetPosition();
+	//_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 }
 
