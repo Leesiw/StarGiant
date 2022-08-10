@@ -362,8 +362,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 {
 	m_fElapsedTime = fTimeElapsed;
 
-
-
 	//m_ppGameObjects[1]->turnturn(fTimeElapsed);
 	//MoveMeteo(m_GameTimer.GetTimeElapsed());
 	for (int i = 0; i < m_nGameObjects; i++) {

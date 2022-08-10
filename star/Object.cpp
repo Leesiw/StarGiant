@@ -342,7 +342,7 @@ void CGameObject::MakeSpeed()
 }
 void CGameObject::UpdateSpeed(float fTimeElapsed)
 {//(float)uid(re))
-	float distance = fTimeElapsed * m_RoateAngle / 10;
+	float distance = fTimeElapsed * m_RoateAngle / 100;
 
 	//MoveMeteo(m_Speed/100);
 	MoveMeteo(m_xmLook, fTimeElapsed* m_Speed / 100);

@@ -95,7 +95,26 @@ void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 
 	//}
 }
-
+//void CPlayer::Move(DWORD dwDirection, float fDistance, float ftime, bool bUpdateVelocity = false)
+//{
+//	if (dwDirection)
+//	{
+//		//XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
+//		//가속도 최대크기를 정해놓고, 1) 항상 가속도는 줄어든다. 2) 최대크기 이상으로 커지지 않음 . 을 구현해야 
+//		//will.y = (1 - 0.5) * will.y + 0.5 * (will.y+will.velocity_y*game_framework.frame_time)
+//		//velocity_y -> distance를 뜻함... 
+//
+//		//m_xmf3Shift = Vector3::Add(XMFLOAT3(0, 0, 0), m_xmf3Shift, 0.95);
+//		if (dwDirection & DIR_FORWARD) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Look, fDistance);
+//		if (dwDirection & DIR_BACKWARD) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Look, -fDistance);
+//		if (dwDirection & DIR_RIGHT) Rotate(0.0f, 0.5f, 0.0f);
+//		if (dwDirection & DIR_LEFT) Rotate(0.0f, -0.5f, 0.0f);
+//		if (dwDirection & DIR_UP) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Up, fDistance);
+//		if (dwDirection & DIR_DOWN) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Up, -fDistance);
+//
+//		Move(m_xmf3Shift, bUpdateVelocity);
+//	}
+//}
 //void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 //{
 //	if (bUpdateVelocity)
