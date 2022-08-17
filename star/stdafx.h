@@ -26,6 +26,7 @@
 
 #include <fstream>
 #include <vector>
+#include <chrono>
 
 
 #include <dwrite.h>
@@ -34,6 +35,7 @@
 #include <dxgi1_6.h>
 
 using namespace std;
+using namespace chrono;
 
 #include <d3d12.h>
 #include <dxgi1_4.h>
