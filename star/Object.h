@@ -154,6 +154,9 @@ public:
 	float GetAccelSpeedXZ() const { return(m_AccelSpeedXZ); }
 
 
+
+	bool						m_bActive = true;
+
 	bool coll = false;
 	BoundingOrientedBox				m_xmOOBB;
 	BoundingBox			aabb;
@@ -257,6 +260,8 @@ public:
 	static CGameObject *LoadGeometryFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, char *pstrFileName);
 
 	static void PrintFrameInfo(CGameObject *pGameObject, CGameObject *pParent);
+
+	void SetActive(bool bActive) { m_bActive = bActive; }
 };
 
 class CRotatingObject : public CGameObject
@@ -348,4 +353,43 @@ public:
 
 public:
 	virtual void OnInitialize();
+};
+
+
+
+//===================================
+
+
+class CBulletObject : public CGameObject
+{
+public:
+	CBulletObject(float fEffectiveRange);
+	virtual ~CBulletObject();
+
+
+
+public:
+	virtual void Animate(float fElapsedTime);
+
+	float						m_fBulletEffectiveRange = 50.0f;
+	float						m_fMovingDistance = 0.0f;
+	float						m_fRotationAngle = 0.0f;
+	XMFLOAT3					m_xmf3FirePosition = XMFLOAT3(0.0f, 0.0f, 1.0f);
+
+	float						m_fElapsedTimeAfterFire = 0.0f;
+	float						m_fLockingDelayTime = 0.3f;
+	float						m_fLockingTime = 4.0f;
+	CGameObject* m_pLockedObject = NULL;
+
+
+
+	float						m_fRotationSpeed = 0.0f;
+
+
+	void SetRotationAxis(XMFLOAT3& xmf3RotationAxis) { m_xmf3RotationAxis = Vector3::Normalize(xmf3RotationAxis); }
+	void SetRotationSpeed(float fSpeed) { m_fRotationSpeed = fSpeed; }
+	void SetMovingSpeed(float fSpeed) { m_fMovingSpeed = fSpeed; }
+
+	void SetFirePosition(XMFLOAT3 xmf3FirePosition);
+	void Reset();
 };
