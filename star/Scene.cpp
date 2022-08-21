@@ -349,6 +349,28 @@ void CScene::CheckObjectByPlayerCollisions()
 	}
 }
 
+
+void CScene::CheckObjectByBulletCollisions()
+{
+	CBulletObject** ppBullets = ((CAirplanePlayer*)m_pPlayer)->m_ppBullets;
+	for (int i = 0; i < m_nGameObjects; ++i) 
+	{
+		for (int j = 0; j < BULLETS; j++)
+		{
+
+			m_ppGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
+			ppBullets[j]->m_pChild->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
+
+			if (m_ppGameObjects[i]->m_pChild->aabb.Intersects(ppBullets[j]->m_pChild->aabb)) {
+
+				m_ppGameObjects[i]->hp -= 1;
+				ppBullets[j]->Reset();
+			}
+
+		}
+	}
+}
+
 void CScene::MoveMeteo(float fTimeElapsed)
 {
 	for (int i = 0; i < m_nGameObjects; ++i) {
@@ -374,6 +396,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (int i = 0; i < m_nGameObjects; i++) {m_ppGameObjects[i]->Animate(fTimeElapsed, NULL); }
 
 	//CheckObjectByPlayerCollisions();
+	CheckObjectByBulletCollisions();
 
 
 	if (m_pLights)
@@ -397,7 +420,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < m_nGameObjects; i++)
 	{
-		if (m_ppGameObjects[i])
+		if (m_ppGameObjects[i]->hp>0)
 		{
 			m_ppGameObjects[i]->Animate(m_fElapsedTime, NULL);
 			m_ppGameObjects[i]->UpdateTransform(NULL);

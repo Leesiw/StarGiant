@@ -82,4 +82,6 @@ public:
 	LIGHTS						*m_pcbMappedLights = NULL;
 
 	float						m_fElapsedTime = 0.0f;
+
+	void CheckObjectByBulletCollisions();
 };

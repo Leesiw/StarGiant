@@ -162,6 +162,9 @@ public:
 	BoundingBox			aabb;
 
 
+	int					hp = 3;
+
+
 	void SetMesh(CMesh *pMesh);
 	void SetShader(CShader *pShader);
 	void SetShader(int nMaterial, CShader *pShader);
