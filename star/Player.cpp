@@ -309,10 +309,10 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	m_pCamera = ChangeCamera(/*SPACESHIP_CAMERA*/THIRD_PERSON_CAMERA, 0.0f);
 
 //	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Apache.bin");
-	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Gunship.bin");
+	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/ship.bin");
 
-	pGameObject->Rotate(15.0f, 0.0f, 0.0f);
-	pGameObject->SetScale(5.5f, 5.5f, 5.5f);
+	pGameObject->Rotate(0, -90.0f, 0.0f);
+	pGameObject->SetScale(15.5f, 15.5f, 15.5f);
 	SetChild(pGameObject, true);
 
 	OnInitialize();
