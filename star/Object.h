@@ -263,7 +263,7 @@ public:
 
 	void SetActive(bool bActive) { m_bActive = bActive; }
 };
-
+ 
 class CRotatingObject : public CGameObject
 {
 public:

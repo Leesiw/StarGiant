@@ -356,6 +356,13 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 			OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
             break;
         case WM_KEYDOWN:
+			switch (wParam)
+			{
+			case VK_CONTROL:
+				((CAirplanePlayer*)m_pPlayer)->FireBullet(m_pLockedObject);
+				m_pLockedObject = NULL;
+				break;
+			}
         case WM_KEYUP:
 			OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
 			break;

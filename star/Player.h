@@ -7,6 +7,8 @@
 #define DIR_UP					0x10
 #define DIR_DOWN				0x20
 
+#define BULLETS					50
+
 #include "Object.h"
 #include "Camera.h"
 
@@ -101,6 +103,13 @@ public:
 	CGameObject*				m_pMainRotorFrame = NULL;
 	CGameObject*				m_pTailRotorFrame = NULL;
 
+
+	CGameObject** m_BulletObjects = NULL;
+	CBulletObject* m_ppBullets[BULLETS];
+	void FireBullet(CGameObject* pLockedObject);
+	float						m_fBulletEffectiveRange = 150.0f;
+	CGameObject* pBullet;
+
 private:
 	virtual void OnInitialize();
 	virtual void Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent = NULL);
@@ -108,6 +117,7 @@ private:
 public:
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	virtual void OnPrepareRender();
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 };
 
 
