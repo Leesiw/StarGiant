@@ -384,6 +384,8 @@ public:
 	float						m_fLockingTime = 4.0f;
 	CGameObject* m_pLockedObject = NULL;
 
+	XMFLOAT4X4						m_xmf4x4Transform;
+
 
 
 	float						m_fRotationSpeed = 0.0f;
@@ -395,4 +397,6 @@ public:
 
 	void SetFirePosition(XMFLOAT3 xmf3FirePosition);
 	void Reset();
+
+
 };

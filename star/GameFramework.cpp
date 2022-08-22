@@ -313,6 +313,11 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				case VK_ESCAPE:
 					::PostQuitMessage(0);
 					break;
+				case '1':
+					SceneChange = true;
+					break;
+				case '2':
+					SceneChange = false;
 				case VK_RETURN:
 					break;
 				case VK_F1:
@@ -420,6 +425,17 @@ void CGameFramework::BuildObjects()
 	m_pScene->m_pPlayer = m_pPlayer = pAirplanePlayer;
 	m_pCamera = m_pPlayer->GetCamera();
 
+	////////////////////////////////////////
+	
+	m_TwiceScene = new CScene();
+	if (m_TwiceScene) m_TwiceScene->BuildObjects2(m_pd3dDevice, m_pd3dCommandList);
+	CAirplanePlayer* pTwicePlayer = new CAirplanePlayer( m_pd3dDevice, m_pd3dCommandList, m_TwiceScene->GetGraphicsRootSignature());
+	pTwicePlayer->SetPosition(XMFLOAT3(0.0f, 10.0f, 0.0f));
+	m_TwiceScene->m_pPlayer = m_TwicePlayer = pTwicePlayer;
+	m_TwiceCamera = m_TwicePlayer->GetCamera();
+
+	////////////////////////////////////////
+
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
@@ -428,6 +444,9 @@ void CGameFramework::BuildObjects()
 
 	if (m_pScene) m_pScene->ReleaseUploadBuffers();
 	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
+
+	if (m_TwiceScene) m_TwiceScene->ReleaseUploadBuffers();
+	if (m_TwicePlayer) m_TwicePlayer->ReleaseUploadBuffers();
 
 	m_GameTimer.Reset();
 }
@@ -439,9 +458,13 @@ void CGameFramework::ReleaseObjects()
 
 
 	if (m_pPlayer) m_pPlayer->Release();
+	if (m_TwicePlayer) m_pPlayer->Release();
 
 	if (m_pScene) m_pScene->ReleaseObjects();
 	if (m_pScene) delete m_pScene;
+
+	if (m_TwiceScene) m_pScene->ReleaseObjects();
+	if (m_TwiceScene) delete m_TwiceScene;
 }
 
 void CGameFramework::ProcessInput()
@@ -485,6 +508,7 @@ void CGameFramework::ProcessInput()
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+	//
 }
 
 void CGameFramework::AnimateObjects()
@@ -492,8 +516,10 @@ void CGameFramework::AnimateObjects()
 	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
 
 	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
+	if (m_TwiceScene) m_TwiceScene -> AnimateObjects(fTimeElapsed);
 
 	m_pPlayer->Animate(fTimeElapsed, NULL);
+	//
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -584,12 +610,14 @@ void CGameFramework::FrameAdvance()
 
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
-	if (m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera);
+	if (!SceneChange&&m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera);
+	if (SceneChange && m_TwiceScene) m_TwiceScene->Render(m_pd3dCommandList, m_pCamera);
 
 #ifdef _WITH_PLAYER_TOP
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
 	if (m_pPlayer) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
+	//if (m_TwicePlayer) m_TwicePlayer->Render(m_pd3dCommandList, m_pCamera);
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;

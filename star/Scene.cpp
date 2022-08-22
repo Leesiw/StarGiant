@@ -185,14 +185,28 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	//}
 
 
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+}
+void CScene::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
+
+	CMaterial::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+
+	BuildDefaultLightsAndMaterials();
+
+	m_nGameObjects = 1;
+	m_ppGameObjects = new CGameObject * [m_nGameObjects];
 
 
-
+	CGameObject* Model = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Untitled.bin");
+	Model->SetPosition(0.0f,0.0f,-110.0f);
+	Model->SetScale(100.0f,100.0f,100.0f);
+	m_ppGameObjects[0] = Model;
 
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
-
 void CScene::ReleaseObjects()
 {
 	if (m_pd3dGraphicsRootSignature) m_pd3dGraphicsRootSignature->Release();

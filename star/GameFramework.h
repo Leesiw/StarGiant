@@ -46,6 +46,8 @@ public:
 
 	CGameObject* m_pLockedObject = NULL;
 
+	bool SceneChange = false;
+
 	void UpdateUI();
 
 private:
@@ -88,8 +90,11 @@ private:
 	CGameTimer					m_GameTimer;
 
 	CScene						*m_pScene = NULL;
+	CScene						*m_TwiceScene = NULL;
 	CPlayer						*m_pPlayer = NULL;
+	CPlayer						*m_TwicePlayer = NULL;
 	CCamera						*m_pCamera = NULL;
+	CCamera						*m_TwiceCamera = NULL;
 
 	POINT						m_ptOldCursorPos;
 
