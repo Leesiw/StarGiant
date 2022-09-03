@@ -928,6 +928,13 @@ void CBulletObject::SetFirePosition(XMFLOAT3 xmf3FirePosition)
 
 void CBulletObject::Reset()
 {
+	m_xmf4x4Transform = {
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+	};
+
 	m_pLockedObject = NULL;
 	m_fElapsedTimeAfterFire = 0;
 	m_fMovingDistance = 0;
