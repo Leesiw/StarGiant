@@ -461,13 +461,6 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 
 	if (pBulletObject)
 	{
-		pBulletObject->m_xmf4x4Transform = {
-			1.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 1.0f
-		};
-
 		XMFLOAT3 xmf3Position = GetPosition();
 		XMFLOAT3 xmf3Direction = GetLook();
 		XMFLOAT3 xmf3FirePosition = Vector3::Add(xmf3Position, Vector3::ScalarProduct(xmf3Direction, 6.0f, false));
@@ -476,6 +469,7 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 		pBulletObject->m_xmf4x4World = m_xmf4x4World;
 
 		pBulletObject->Rotate(m_fPitch, m_fYaw, m_fRoll);
+		pBulletObject->m_fPitch = m_fPitch; pBulletObject->m_fYaw = m_fYaw; pBulletObject->m_fRoll = m_fRoll;
 		pBulletObject->SetFirePosition(xmf3FirePosition);
 		pBulletObject->SetMovingDirection(xmf3Direction);
 		pBulletObject->SetActive(true);

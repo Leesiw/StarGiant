@@ -390,6 +390,8 @@ public:
 
 	float						m_fRotationSpeed = 0.0f;
 
+	float m_fPitch, m_fYaw, m_fRoll;
+
 
 	void SetRotationAxis(XMFLOAT3& xmf3RotationAxis) { m_xmf3RotationAxis = Vector3::Normalize(xmf3RotationAxis); }
 	void SetRotationSpeed(float fSpeed) { m_fRotationSpeed = fSpeed; }
