@@ -28,6 +28,9 @@ CPlayer::CPlayer()
 	m_fRoll = 0.0f;
 	m_fYaw = 0.0f;
 
+	m_fFireDelayTime = 0.2f;
+	m_fFireWaitingTime = 0.0f;
+
 	m_pPlayerUpdatedContext = NULL;
 	m_pCameraUpdatedContext = NULL;
 }
@@ -234,6 +237,9 @@ void CPlayer::Update(float fTimeElapsed)
 	float fDeceleration = (m_fFriction * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+
+	if (m_fFireWaitingTime > 0.0f) 
+		m_fFireWaitingTime -= fTimeElapsed;
 
 	UpdateBoundingBox();
 	UpdateEyesightBox();
@@ -448,6 +454,8 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 			OnUpdateTransform();
 		}
 	*/
+	if (m_fFireWaitingTime > 0.0f)
+		return;
 
 	CBulletObject* pBulletObject = NULL;
 	for (int i = 0; i < BULLETS; i++)
@@ -475,6 +483,7 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 		pBulletObject->SetActive(true);
 
 
+		m_fFireWaitingTime = m_fFireDelayTime * 1.0f;
 
 		if (pLockedObject)
 		{

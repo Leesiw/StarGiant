@@ -30,6 +30,9 @@ protected:
 	float           			m_fMaxVelocityY;
 	float           			m_fFriction;
 
+	float						m_fFireDelayTime;
+	float						m_fFireWaitingTime;
+
 	XMFLOAT3					m_xmf3Shift;
 
 	LPVOID						m_pPlayerUpdatedContext;
