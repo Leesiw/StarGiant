@@ -144,10 +144,11 @@ void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 	else
 	{
 		m_xmf3Shift = Vector3::Add(XMFLOAT3(0, 0, 0), m_xmf3Shift, 0.95);
+		m_xmf3Velocity = Vector3::Add(XMFLOAT3(0, 0, 0), m_xmf3Velocity,0.97);
 		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
 		m_pCamera->Move(xmf3Shift);
 	}
-	m_xmf3Shift = xmf3Shift;
+
 	//if (bUpdateVelocity) m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, xmf3Shift);
 	//else m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
 }

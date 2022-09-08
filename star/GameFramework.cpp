@@ -509,7 +509,7 @@ void CGameFramework::ProcessInput()
 				else
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 			}
-			if (dwDirection) m_pPlayer->Move(dwDirection, 150.0f* m_GameTimer.GetTimeElapsed(), true); //1.5f
+			if (dwDirection) m_pPlayer->Move(dwDirection, 10.0f* m_GameTimer.GetTimeElapsed(), true); //1.5f
 			//if (dwDirection) m_pPlayer->Move(dwDirection, 20.0f, true);
 
 		}
