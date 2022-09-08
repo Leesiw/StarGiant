@@ -7,6 +7,9 @@
 #define DIR_UP					0x10
 #define DIR_DOWN				0x20
 
+#define DIR_STOP				0x40
+
+
 #define BULLETS					50
 
 #include "Object.h"

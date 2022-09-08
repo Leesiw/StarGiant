@@ -73,6 +73,9 @@ void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 		if (dwDirection & DIR_UP) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Up, fDistance);
 		if (dwDirection & DIR_DOWN) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Up, -fDistance);
 
+		if (dwDirection & DIR_STOP) SetVelocity({ 0,0,0 });
+
+
 		Move(m_xmf3Shift, bUpdateVelocity);
 	}
 
@@ -422,8 +425,8 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 		case THIRD_PERSON_CAMERA:
 			SetFriction(20.5f);
 			SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
-			SetMaxVelocityXZ(100.0f);
-			SetMaxVelocityY(100.0f);
+			SetMaxVelocityXZ(150.0f);
+			SetMaxVelocityY(150.0f);
 			m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.25f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 105.0f, -140.0f));
