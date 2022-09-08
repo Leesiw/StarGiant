@@ -389,7 +389,7 @@ void CGameObject::TurnSpeed()
 	//m_xmf4x4Transform = Matrix4x4::Multiply(xmmtxRotate, m_xmf4x4Transform);
 	//SetRotationSpeed(rand() / 100);
 	m_fRotationSpeed = urd(dre);
-	std::cout << m_fRotationSpeed;
+	//std::cout << m_fRotationSpeed;
 	//Rotate(m_fxRotationSpeed * fTimeElapsed, m_fyRotationSpeed * fTimeElapsed, m_fzRotationSpeed * fTimeElapsed);
 }
 
