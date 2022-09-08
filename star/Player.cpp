@@ -334,7 +334,7 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 		m_ppBullets[i]->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		m_ppBullets[i]->SetRotationSpeed(360.0f);
-		m_ppBullets[i]->SetMovingSpeed(120.0f);
+		m_ppBullets[i]->SetMovingSpeed(160.0f);
 		m_ppBullets[i]->SetActive(false);
 		m_ppBullets[i]->OnInitialize();
 
