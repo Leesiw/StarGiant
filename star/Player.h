@@ -51,7 +51,7 @@ public:
 	XMFLOAT3 GetLookVector() { return(m_xmf3Look); }
 	
 	XMFLOAT3 GetShift() { return(m_xmf3Shift); }
-
+	XMFLOAT3 GetRotate() { return(XMFLOAT3(m_fPitch, m_fYaw, m_fRoll)); }
 
 	XMFLOAT3 GetUpVector() { return(m_xmf3Up); }
 	XMFLOAT3 GetRightVector() { return(m_xmf3Right); }
