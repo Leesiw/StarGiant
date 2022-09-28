@@ -562,8 +562,8 @@ void CGameFramework::UpdateUI()
 	_stprintf_s(position_ui, _countof(position_ui), _T("Position (%4f, %4f, %4f)\n"), m_pPlayer->GetPosition().x, m_pPlayer->GetPosition().y, m_pPlayer->GetPosition().z);
 	wchar_t velocity_ui[50];
 	_stprintf_s(velocity_ui, _countof(velocity_ui), _T("Velocity (%4f, %4f, %4f)\n"), m_pPlayer->GetVelocity().x, m_pPlayer->GetVelocity().y, m_pPlayer->GetVelocity().z);
-	wchar_t shift_ui[50];
-	_stprintf_s(shift_ui, _countof(shift_ui), _T("Shift (%4f, %4f, %4f)\n"), m_pPlayer->GetShift().x, m_pPlayer->GetShift().y, m_pPlayer->GetShift().z);
+	wchar_t shift_ui[50] = L"AAA";
+	//_stprintf_s(shift_ui, _countof(shift_ui), _T("Shift (%4f, %4f, %4f)\n"), m_pPlayer->GetShift().x, m_pPlayer->GetShift().y, m_pPlayer->GetShift().z);
 
 	labels.push_back(L"테스트 중\n");
 	labels.push_back(position_ui);
