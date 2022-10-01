@@ -92,7 +92,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		meteo = new MeteoObject();
 		meteo->SetChild(meteoModel, true);
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
-		meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+		//meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+		meteo->SetScale(10, 10, 10);
+
 		meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		meteo->TurnSpeed();
 		m_ppGameObjects[i] = meteo;
@@ -338,6 +340,7 @@ void CScene::CheckObjectByPlayerCollisions()
 
 			xmf3Sub.y = 0;
 			std::cout << "충돌! ";
+
 			m_pPlayer->Move(xmf3Sub, false);
 		}
 
@@ -376,7 +379,7 @@ void CScene::CheckObjectByBulletCollisions()
 			ppBullets[j]->m_pChild->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
 
 			if (m_ppGameObjects[i]->m_pChild->aabb.Intersects(ppBullets[j]->m_pChild->aabb)) {
-
+				cout << "충돌\n";
 				m_ppGameObjects[i]->hp -= 1;
 				ppBullets[j]->Reset();
 			}
@@ -409,8 +412,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	for (int i = 0; i < m_nGameObjects; i++) {m_ppGameObjects[i]->Animate(fTimeElapsed, NULL); }
 
-	//CheckObjectByPlayerCollisions();
-	CheckObjectByBulletCollisions();
+	CheckObjectByPlayerCollisions();
+	//CheckObjectByBulletCollisions();
 
 
 	if (m_pLights)
