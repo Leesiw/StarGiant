@@ -90,7 +90,6 @@ void SESSION::send_move_packet(int c_id, DWORD dwDirection)
 	p.size = sizeof(CS_MOVE_PACKET);
 	p.type = SC_MOVE_PLAYER;
 	p.dwDirection = dwDirection;
-	cout << p.dwDirection << endl;
 	do_send(&p);
 }
 

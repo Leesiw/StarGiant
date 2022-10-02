@@ -573,7 +573,6 @@ void CGameFramework::ProcessInput()
 			}
 			*/
 			if (connect_server) {
-				//cout << "send dwDirection" << endl;
 				CS_MOVE_PACKET my_packet;
 				my_packet.size = sizeof(CS_MOVE_PACKET);
 				my_packet.type = CS_MOVE;
@@ -705,13 +704,11 @@ void CGameFramework::ProcessPacket(char* ptr)
 			//npc[other_id - NPC_START].y = my_packet->y;
 		}*/
 		DWORD dwDirection = (DWORD)my_packet->dwDirection;
-		cout << my_packet->dwDirection << endl;
 		if (dwDirection) m_pPlayer->Move(dwDirection, 150.0f * m_GameTimer.GetTimeElapsed(), true); //1.5f
 		break;
 	}
 	case SC_ATTACK_PLAYER:
 	{
-		cout << "attack" << endl;
 		SC_MOVE_PLAYER_PACKET* my_packet = reinterpret_cast<SC_MOVE_PLAYER_PACKET*>(ptr);
 		/*
 		int other_id = my_packet->id;
