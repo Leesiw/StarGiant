@@ -15,3 +15,7 @@ star/Release/*
 star/LabProject07-9-1.vcxproj.user
 star/.vs/LabProject07-9-1/v16/.suo
 
+Server/Server/x64/*
+Server/.vs/*
+Server/Server/Server.vcxproj.user
+Server/x64/*

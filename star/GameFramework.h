@@ -6,9 +6,9 @@
 #include "Timer.h"
 #include "Player.h"
 #include "Scene.h"
+#include "Server.h"
 
 class UILayer;
-
 
 class CGameFramework
 {
@@ -40,6 +40,11 @@ public:
 	void WaitForGpuComplete();
 	void MoveToNextFrame();
 
+	void RecvServer();
+	void ProcessData(char* net_buf, size_t io_byte);
+	void ProcessPacket(char* ptr);
+	void send_packet(void* packet);
+
 	void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
@@ -56,6 +61,8 @@ private:
 
 	int							m_nWndClientWidth;
 	int							m_nWndClientHeight;
+
+	int g_myid;
         
 	IDXGIFactory4				*m_pdxgiFactory = NULL;
 	IDXGISwapChain3				*m_pdxgiSwapChain = NULL;
@@ -101,5 +108,9 @@ private:
 	_TCHAR						m_pszFrameRate[70];
 
 	UILayer* m_pUILayer = NULL;
+
+	bool connect_server = false;
+	sf::Socket::Status status;
+	sf::TcpSocket socket;
 };
 

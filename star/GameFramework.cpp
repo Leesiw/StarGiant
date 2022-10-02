@@ -330,6 +330,60 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 					break;
 				case VK_F5:
 					break;
+				case 'M':	// server - move
+					if (!connect_server) {
+						status = socket.connect("127.0.0.1", PORT_NUM);
+						socket.setBlocking(false);
+
+						if (status != sf::Socket::Done) {
+							wcout << L"서버와 연결할 수 없습니다.\n";
+							connect_server = false;
+							break;
+						}
+					}
+					CS_LOGIN_PACKET my_packet;
+					my_packet.size = sizeof(CS_LOGIN_PACKET);
+					my_packet.type = CS_LOGIN;
+					my_packet.player_type = MOVE;
+					send_packet(&my_packet);
+					connect_server = true;
+					break;
+				case 'A':	// server - attack
+					if (!connect_server) {
+						status = socket.connect("127.0.0.1", PORT_NUM);
+						socket.setBlocking(false);
+
+						if (status != sf::Socket::Done) {
+							wcout << L"서버와 연결할 수 없습니다.\n";
+							connect_server = false;
+							break;
+						}
+					}
+					my_packet;
+					my_packet.size = sizeof(CS_LOGIN_PACKET);
+					my_packet.type = CS_LOGIN;
+					my_packet.player_type = ATTACK;
+					send_packet(&my_packet);
+					connect_server = true;
+					break;
+				case 'V':	// server  view
+					if (!connect_server) {
+						status = socket.connect("127.0.0.1", PORT_NUM);
+						socket.setBlocking(false);
+
+						if (status != sf::Socket::Done) {
+							wcout << L"서버와 연결할 수 없습니다.\n";
+							connect_server = false;
+							break;
+						}
+					}
+					my_packet;
+					my_packet.size = sizeof(CS_LOGIN_PACKET);
+					my_packet.type = CS_LOGIN;
+					my_packet.player_type = VIEW;
+					send_packet(&my_packet);
+					connect_server = true;
+					break;
 				default:
 					break;
 			}
@@ -364,8 +418,16 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 			switch (wParam)
 			{
 			case VK_CONTROL:
-				((CAirplanePlayer*)m_pPlayer)->FireBullet(m_pLockedObject);
-				m_pLockedObject = NULL;
+				if(connect_server) {
+					CS_ATTACK_PACKET my_packet;
+					my_packet.size = sizeof(CS_ATTACK_PACKET);
+					my_packet.type = CS_ATTACK;
+					send_packet(&my_packet);
+				}
+				else {
+					((CAirplanePlayer*)m_pPlayer)->FireBullet(m_pLockedObject);
+					m_pLockedObject = NULL;
+				}
 				break;
 
 			//case VK_SPACE:
@@ -502,14 +564,25 @@ void CGameFramework::ProcessInput()
 
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 		{
-			if (cxDelta || cyDelta)
+		/*	if (cxDelta || cyDelta)
 			{
 				if (pKeysBuffer[VK_RBUTTON] & 0xF0)
 					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
 				else
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 			}
-			if (dwDirection) m_pPlayer->Move(dwDirection, 150.0f* m_GameTimer.GetTimeElapsed(), true); //1.5f
+			*/
+			if (connect_server) {
+				//cout << "send dwDirection" << endl;
+				CS_MOVE_PACKET my_packet;
+				my_packet.size = sizeof(CS_MOVE_PACKET);
+				my_packet.type = CS_MOVE;
+				my_packet.dwDirection = dwDirection;
+				send_packet(&my_packet);
+			}
+			else {
+				if (dwDirection) m_pPlayer->Move(dwDirection, 150.0f * m_GameTimer.GetTimeElapsed(), true); //1.5f
+			}
 			//if (dwDirection) m_pPlayer->Move(dwDirection, 20.0f, true);
 
 		}
@@ -555,6 +628,127 @@ void CGameFramework::MoveToNextFrame()
 	}
 }
 
+
+
+void CGameFramework::RecvServer()
+{
+	char net_buf[50];
+	size_t	received;
+	auto recv_result = socket.receive(net_buf, BUF_SIZE, received);
+	if (recv_result == sf::Socket::Error)
+	{
+		wcout << L"Recv 에러!";
+		while (true);
+	}
+	if (recv_result != sf::Socket::NotReady) {
+		if (received > 0) ProcessData(net_buf, received);
+	}
+}
+
+
+
+void CGameFramework::ProcessData(char* net_buf, size_t io_byte)
+{
+	char* ptr = net_buf;
+	static size_t in_packet_size = 0;
+	static size_t saved_packet_size = 0;
+	static char packet_buffer[BUF_SIZE];
+
+	while (0 != io_byte) {
+		if (0 == in_packet_size) in_packet_size = ptr[0];
+		if (io_byte + saved_packet_size >= in_packet_size) {
+			memcpy(packet_buffer + saved_packet_size, ptr, in_packet_size - saved_packet_size);
+			ProcessPacket(packet_buffer);
+			ptr += in_packet_size - saved_packet_size;
+			io_byte -= in_packet_size - saved_packet_size;
+			in_packet_size = 0;
+			saved_packet_size = 0;
+		}
+		else {
+			memcpy(packet_buffer + saved_packet_size, ptr, io_byte);
+			saved_packet_size += io_byte;
+			io_byte = 0;
+		}
+	}
+}
+
+void CGameFramework::ProcessPacket(char* ptr)
+{
+	static bool first_time = true;
+	switch (ptr[1])
+	{
+	case SC_LOGIN_INFO:
+	{
+		SC_LOGIN_INFO_PACKET* packet = reinterpret_cast<SC_LOGIN_INFO_PACKET*>(ptr);
+		g_myid = packet->id;
+		//	avatar.m_x = packet->x;
+			//avatar.m_y = packet->y;
+	}
+
+	case SC_ADD_PLAYER:
+	{
+		break;
+	}
+	case SC_MOVE_PLAYER:
+	{
+		SC_MOVE_PLAYER_PACKET* my_packet = reinterpret_cast<SC_MOVE_PLAYER_PACKET*>(ptr);
+		/*
+		int other_id = my_packet->id;
+		if (other_id == g_myid) {
+
+		}
+		else if (other_id < MAX_USER) {
+
+		}
+		else {
+			//npc[other_id - NPC_START].x = my_packet->x;
+			//npc[other_id - NPC_START].y = my_packet->y;
+		}*/
+		DWORD dwDirection = (DWORD)my_packet->dwDirection;
+		cout << my_packet->dwDirection << endl;
+		if (dwDirection) m_pPlayer->Move(dwDirection, 150.0f * m_GameTimer.GetTimeElapsed(), true); //1.5f
+		break;
+	}
+	case SC_ATTACK_PLAYER:
+	{
+		cout << "attack" << endl;
+		SC_MOVE_PLAYER_PACKET* my_packet = reinterpret_cast<SC_MOVE_PLAYER_PACKET*>(ptr);
+		/*
+		int other_id = my_packet->id;
+		if (other_id == g_myid) {
+			avatar.move(my_packet->x, my_packet->y);
+			g_left_x = my_packet->x - 4;
+			g_top_y = my_packet->y - 4;
+		}
+		else if (other_id < MAX_USER) {
+			players[other_id].move(my_packet->x, my_packet->y);
+		}
+		else {
+			//npc[other_id - NPC_START].x = my_packet->x;
+			//npc[other_id - NPC_START].y = my_packet->y;
+		}*/
+		((CAirplanePlayer*)m_pPlayer)->FireBullet(m_pLockedObject);
+		m_pLockedObject = NULL;
+		break;
+	}
+
+	case SC_REMOVE_PLAYER:
+	{
+		break;
+	}
+	default:
+		printf("Unknown PACKET type [%d]\n", ptr[1]);
+	}
+}
+
+void CGameFramework::send_packet(void* packet)
+{
+	unsigned char* p = reinterpret_cast<unsigned char*>(packet);
+	size_t sent = 0;
+	socket.send(packet, p[0], sent);
+}
+
+
 void CGameFramework::UpdateUI()
 {
 	vector<wstring> labels;
@@ -590,6 +784,10 @@ void CGameFramework::FrameAdvance()
 	ProcessInput();
 
     AnimateObjects();
+
+	if (connect_server) {
+		RecvServer();
+	}
 
 	UpdateUI();
 
