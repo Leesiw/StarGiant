@@ -157,7 +157,7 @@ void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 void CPlayer::Rotate(float x, float y, float z)
 {
 	DWORD nCurrentCameraMode = m_pCamera->GetMode();
-	if ((nCurrentCameraMode == FIRST_PERSON_CAMERA) || (nCurrentCameraMode == THIRD_PERSON_CAMERA))
+	if ((nCurrentCameraMode == FIRST_PERSON_CAMERA) || (nCurrentCameraMode == THIRD_PERSON_CAMERA) || (nCurrentCameraMode == ATTACT_CAMERA))
 	{
 		if (x != 0.0f)
 		{
@@ -234,8 +234,11 @@ void CPlayer::Update(float fTimeElapsed)
 
 	DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	if (nCurrentCameraMode == ATTACT_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
+	if (nCurrentCameraMode == ATTACT_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
+
 	m_pCamera->RegenerateViewMatrix();
 
 	fLength = Vector3::Length(m_xmf3Velocity);
@@ -266,6 +269,9 @@ CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
 		case SPACESHIP_CAMERA:
 			pNewCamera = new CSpaceShipCamera(m_pCamera);
 			break;
+		case ATTACT_CAMERA:
+			pNewCamera = new CAttactCamera(m_pCamera);
+			break;
 	}
 	if (nCurrentCameraMode == SPACESHIP_CAMERA)
 	{
@@ -278,6 +284,7 @@ CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
 		m_fYaw = Vector3::Angle(XMFLOAT3(0.0f, 0.0f, 1.0f), m_xmf3Look);
 		if (m_xmf3Look.x < 0.0f) m_fYaw = -m_fYaw;
 	}
+
 	else if ((nNewCameraMode == SPACESHIP_CAMERA) && m_pCamera)
 	{
 		m_xmf3Right = m_pCamera->GetRightVector();
@@ -437,6 +444,21 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 			break;
+		//default:
+
+		case ATTACT_CAMERA:
+			SetFriction(2.0f);
+			SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
+			SetMaxVelocityXZ(0.0f);
+			SetMaxVelocityY(40.0f);
+			m_pCamera = OnChangeCamera(FIRST_PERSON_CAMERA, nCurrentCameraMode);
+			m_pCamera->SetTimeLag(0.0f);
+			m_pCamera->SetOffset(XMFLOAT3(0.0f, 10.0f, 10.0f));
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			break;
+
 		default:
 			break;
 	}
@@ -486,7 +508,8 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 
 
 
-		xmf3FirePosition = Vector3::Add(Vector3::ScalarProduct(xmf3Right, -40.0f, false), Vector3::Add(xmf3Position, Vector3::ScalarProduct(xmf3Direction, 80.0f, false)));
+		xmf3FirePosition = Vector3::Add(Vector3::ScalarProduct(xmf3Right, -40.0f, false), Vector3::Add(xmf3Position, Vector3::ScalarProduct(xmf3Direction, 70.0f, false)));
+		//xmf3FirePosition = Vector3::Add(Vector3::ScalarProduct(xmf3Right, -40.0f, false), Vector3::Add(xmf3Position, Vector3::ScalarProduct(xmf3Up, -10.0f, false)));
 		//xmf3FirePosition.x = xmf3FirePosition.x - 50;
 
 		cout << xmf3FirePosition.x;
