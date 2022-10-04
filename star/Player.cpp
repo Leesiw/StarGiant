@@ -341,14 +341,14 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 		CGameObject* pBulletMesh = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Missile.bin");
 
 		m_ppBullets[i] = new CBulletObject(m_fBulletEffectiveRange);
-		m_ppBullets[i]->SetScale(5.0f, 5.0f, 5.0f);
+		m_ppBullets[i]->SetScale(1.0f, 1.0f, 1.0f);
 		m_ppBullets[i]->SetChild(pBulletMesh, true);
 
 
 
 		m_ppBullets[i]->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-		m_ppBullets[i]->SetRotationSpeed(360.0f);
-		m_ppBullets[i]->SetMovingSpeed(160.0f);
+		//m_ppBullets[i]->SetRotationSpeed(360.0f);
+		m_ppBullets[i]->SetMovingSpeed(320.0f);
 		m_ppBullets[i]->SetActive(false);
 		m_ppBullets[i]->OnInitialize();
 
@@ -519,12 +519,12 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 		//xmf3FirePosition = Vector3::Add(Vector3::ScalarProduct(xmf3Right, -40.0f, false), Vector3::Add(xmf3Position, Vector3::ScalarProduct(xmf3Up, -10.0f, false)));
 		//xmf3FirePosition.x = xmf3FirePosition.x - 50;
 
-		cout <<"x,y,z" << xmf3FirePosition.x<<"\t"<< xmf3FirePosition.y << "\t"<< xmf3FirePosition.z;
+		//cout <<"x,y,z" << xmf3FirePosition.x<<"\t"<< xmf3FirePosition.y << "\t"<< xmf3FirePosition.z;
 
 
 	//	XMFLOAT3 xmf3FirePosition = Vector3::Add(xmf3Position, Vector3::ScalarProduct(xmf3Direction, 6.0f, false));
 
-		pBulletObject->m_xmf4x4Transform = m_xmf4x4Transform;
+		//pBulletObject->m_xmf4x4Transform = m_xmf4x4Transform;
 		//pBulletObject->m_xmf4x4World = m_xmf4x4World;
 
 		pBulletObject->Rotate(m_fPitch, m_fYaw, m_fRoll);

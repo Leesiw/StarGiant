@@ -96,7 +96,15 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	meteo->TurnSpeed();
 	m_ppGameObjects[0] = meteo;
 
-	for (int i = 1; i < 99; ++i) {
+	meteo = new MeteoObject();
+	meteo->SetChild(meteoModel, true);
+	meteo->SetPosition(0, 0, 0);
+	meteo->SetScale(10, 10, 10);
+	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	meteo->TurnSpeed();
+	m_ppGameObjects[1] = meteo;
+
+	for (int i = 2; i < 99; ++i) {
 		meteo = new MeteoObject();
 		meteo->SetChild(meteoModel, true);
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
@@ -378,31 +386,47 @@ int ant = 0;
 
 void CScene::CheckObjectByBulletCollisions()
 {
+
 	CBulletObject** ppBullets = ((CAirplanePlayer*)m_pPlayer)->m_ppBullets;
 	for (int i = 0; i < m_nGameObjects; ++i) 
 	{
 		for (int j = 0; j < BULLETS; j++)
 		{
 
+			ppBullets[j]->UpdateBoundingBox();
+
 
 			if (ppBullets[j]->m_bActive) {
+				//cout << ppBullets[0]->m_xmOOBB.Center.z;
+
 				if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i]))
 					cout << "Dd";
 				if (ant== 0) {
 					cout <<"\n"<< ppBullets[j]->GetPosition().z << "- dd\n";
 				
 				}
+				//m_ppGameObjects[i]->m_pChild->m_xmOOBB
+				
+				//cout<<"z다  : "<< m_ppGameObjects[0]->m_pChild->m_xmOOBB.Center.z;
+				//cout << "z다 : " << ppBullets[j]->m_pChild->m_xmOOBB.Center.z;
+
+
+
+
+				XMFLOAT3 hi = { 0,0,0 };
 
 				m_ppGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
-				ppBullets[j]->m_pChild->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(50.0f, 50.0f, 50.0f));
+				ppBullets[j]->m_pChild->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(20.0f, 20.0f, 20.0f));
 				if (ant == 0) {
-					cout << "\ny : " << ppBullets[j]->m_pChild->aabb.Center.y;
+					// cout << "\ny : " << ppBullets[j]->m_pChild->aabb.Center.x<< ppBullets[j]->m_pChild->aabb.Center.y<< ppBullets[j]->m_pChild->aabb.Center.z;
 					ant++;
 				}
 				if (m_ppGameObjects[i]->m_pChild->aabb.Intersects(ppBullets[j]->m_pChild->aabb)) {
-					cout << "충돌\n";
-					m_ppGameObjects[i]->hp -= 3;
-					ppBullets[j]->Reset();
+					//if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i])) {
+						cout << "충돌\n";
+						m_ppGameObjects[i]->hp -= 3;
+						ppBullets[j]->Reset();
+					//}
 				}
 			}
 		}
@@ -458,12 +482,14 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < m_nGameObjects; i++)
 	{
-		if (m_ppGameObjects[i]->hp>0)
+		if (m_ppGameObjects[i]->hp > 0)
 		{
 			m_ppGameObjects[i]->Animate(m_fElapsedTime, NULL);
 			m_ppGameObjects[i]->UpdateTransform(NULL);
 			m_ppGameObjects[i]->Render(pd3dCommandList, pCamera);
 		}
+		else
+			m_ppGameObjects[i]->SetPosition({ 0,0,0 });
 	}
 }
 
