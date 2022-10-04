@@ -250,6 +250,7 @@ void CPlayer::Update(float fTimeElapsed)
 		m_fFireWaitingTime -= fTimeElapsed;
 
 	UpdateBoundingBox();
+
 	UpdateEyesightBox();
 
 }
@@ -350,6 +351,8 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 		m_ppBullets[i]->SetMovingSpeed(160.0f);
 		m_ppBullets[i]->SetActive(false);
 		m_ppBullets[i]->OnInitialize();
+
+		m_ppBullets[i]->UpdateBoundingBox();
 	
 	}
 
@@ -384,7 +387,9 @@ void CAirplanePlayer::Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent)
 
 	for (int i = 0; i < BULLETS; i++)
 	{
-		if (m_ppBullets[i]->m_bActive) m_ppBullets[i]->Animate(fTimeElapsed);
+		if (m_ppBullets[i]->m_bActive) {
+			m_ppBullets[i]->Animate(fTimeElapsed);				
+		};
 	}
 
 	CPlayer::Animate(fTimeElapsed, pxmf4x4Parent);
@@ -508,11 +513,14 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 
 
 
-		xmf3FirePosition = Vector3::Add(Vector3::ScalarProduct(xmf3Right, -40.0f, false), Vector3::Add(xmf3Position, Vector3::ScalarProduct(xmf3Direction, 70.0f, false)));
+		//xmf3FirePosition = Vector3::Add(Vector3::ScalarProduct(xmf3Right, -40.0f, false), Vector3::Add(xmf3Position, Vector3::ScalarProduct(xmf3Direction, 70.0f, false)));
+		//xmf3Position = Vector3::Add(Vector3::ScalarProduct(xmf3Right, -40.0f, false), Vector3::Add(xmf3Position, Vector3::ScalarProduct(xmf3Direction, 70.0f, false)));
+
 		//xmf3FirePosition = Vector3::Add(Vector3::ScalarProduct(xmf3Right, -40.0f, false), Vector3::Add(xmf3Position, Vector3::ScalarProduct(xmf3Up, -10.0f, false)));
 		//xmf3FirePosition.x = xmf3FirePosition.x - 50;
 
-		cout << xmf3FirePosition.x;
+		cout <<"x,y,z" << xmf3FirePosition.x<<"\t"<< xmf3FirePosition.y << "\t"<< xmf3FirePosition.z;
+
 
 	//	XMFLOAT3 xmf3FirePosition = Vector3::Add(xmf3Position, Vector3::ScalarProduct(xmf3Direction, 6.0f, false));
 
@@ -524,6 +532,14 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 		pBulletObject->SetFirePosition(xmf3FirePosition);
 		pBulletObject->SetMovingDirection(xmf3Direction);
 		pBulletObject->SetActive(true);
+		pBulletObject->UpdateBoundingBox();
+
+		//for (int i = 0; i < BULLETS; i++)
+		//{
+		//	m_ppBullets[i]->UpdateBoundingBox();
+		//}
+
+	
 
 
 		m_fFireWaitingTime = m_fFireDelayTime * 1.0f;

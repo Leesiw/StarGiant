@@ -88,7 +88,15 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	MeteoObject* meteo = NULL;
 
 
-	for (int i = 0; i < 99; ++i) {
+	meteo = new MeteoObject();
+	meteo->SetChild(meteoModel, true);
+	meteo->SetPosition(-40, 0, 70);
+	meteo->SetScale(10, 10, 10);
+	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	meteo->TurnSpeed();
+	m_ppGameObjects[0] = meteo;
+
+	for (int i = 1; i < 99; ++i) {
 		meteo = new MeteoObject();
 		meteo->SetChild(meteoModel, true);
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
@@ -366,6 +374,7 @@ void CScene::CheckObjectByPlayerCollisions()
 	}
 }
 
+int ant = 0;
 
 void CScene::CheckObjectByBulletCollisions()
 {
@@ -375,15 +384,27 @@ void CScene::CheckObjectByBulletCollisions()
 		for (int j = 0; j < BULLETS; j++)
 		{
 
-			m_ppGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
-			ppBullets[j]->m_pChild->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
 
-			if (m_ppGameObjects[i]->m_pChild->aabb.Intersects(ppBullets[j]->m_pChild->aabb)) {
-				cout << "충돌\n";
-				m_ppGameObjects[i]->hp -= 1;
-				ppBullets[j]->Reset();
+			if (ppBullets[j]->m_bActive) {
+				if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i]))
+					cout << "Dd";
+				if (ant== 0) {
+					cout <<"\n"<< ppBullets[j]->GetPosition().z << "- dd\n";
+				
+				}
+
+				m_ppGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
+				ppBullets[j]->m_pChild->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(50.0f, 50.0f, 50.0f));
+				if (ant == 0) {
+					cout << "\ny : " << ppBullets[j]->m_pChild->aabb.Center.y;
+					ant++;
+				}
+				if (m_ppGameObjects[i]->m_pChild->aabb.Intersects(ppBullets[j]->m_pChild->aabb)) {
+					cout << "충돌\n";
+					m_ppGameObjects[i]->hp -= 3;
+					ppBullets[j]->Reset();
+				}
 			}
-
 		}
 	}
 }
@@ -413,7 +434,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (int i = 0; i < m_nGameObjects; i++) {m_ppGameObjects[i]->Animate(fTimeElapsed, NULL); }
 
 	//CheckObjectByPlayerCollisions();
-	//CheckObjectByBulletCollisions();
+	CheckObjectByBulletCollisions();
 
 
 	if (m_pLights)
