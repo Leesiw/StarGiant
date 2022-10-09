@@ -172,6 +172,7 @@ public:
 	void SetShader(CShader *pShader);
 	void SetShader(int nMaterial, CShader *pShader);
 	void SetMaterial(int nMaterial, CMaterial *pMaterial);
+	void SetOOBB();
 
 	void SetChild(CGameObject* pChild, bool bReferenceUpdate = false);
 

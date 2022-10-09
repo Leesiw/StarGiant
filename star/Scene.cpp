@@ -105,9 +105,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_ppGameObjects[1] = meteo;
 
 	for (int i = 2; i < 99; ++i) {
+		meteoModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo.bin");
 		meteo = new MeteoObject();
 		meteo->SetChild(meteoModel, true);
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
+		//meteo->SetOOBB();
 		//meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
 		meteo->SetScale(10, 10, 10);
 
@@ -119,9 +121,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	CGameObject* meteoModel1 = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteorite.bin");
 
 	for (int i = 99; i < 200; ++i) {
+		meteoModel1 = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteorite.bin");
 		meteo = new MeteoObject();
 		meteo->SetChild(meteoModel1, true);
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
+		//meteo->SetOOBB();
 		meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
 		meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		meteo->TurnSpeed();
@@ -457,7 +461,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	for (int i = 0; i < m_nGameObjects; i++) {m_ppGameObjects[i]->Animate(fTimeElapsed, NULL); }
 
-	//CheckObjectByPlayerCollisions();
+	CheckObjectByPlayerCollisions();
 	CheckObjectByBulletCollisions();
 
 

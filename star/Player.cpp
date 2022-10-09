@@ -66,38 +66,31 @@ void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 		//velocity_y -> distance¸¦ ¶æÇÔ... 
 
 		//m_xmf3Shift = Vector3::Add(XMFLOAT3(0, 0, 0), m_xmf3Shift, 0.95);
-		if (dwDirection & DIR_FORWARD) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Look, fDistance);
-		if (dwDirection & DIR_BACKWARD) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Look, -fDistance);
+
+		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
+		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+		if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
 		if (dwDirection & DIR_RIGHT) Rotate(0.0f, 0.5f, 0.0f);
 		if (dwDirection & DIR_LEFT) Rotate(0.0f, -0.5f, 0.0f);
-		if (dwDirection & DIR_UP) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Up, fDistance);
-		if (dwDirection & DIR_DOWN) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Up, -fDistance);
+		if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
+		if (dwDirection & DIR_DOWN) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
 
-		if (dwDirection & DIR_STOP) SetVelocity({ 0,0,0 });
-
-
-		Move(m_xmf3Shift, bUpdateVelocity);
+		Move(xmf3Shift, bUpdateVelocity);
 	}
+	//if(dwDirection) {
 
-
-	//if (dwDirection)
-	//{
-	//	XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
-
-
-	//	if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
-	//	if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
+	//	if (dwDirection & DIR_FORWARD) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Look, fDistance);
+	//	if (dwDirection & DIR_BACKWARD) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Look, -fDistance);
 	//	if (dwDirection & DIR_RIGHT) Rotate(0.0f, 0.5f, 0.0f);
-	////	if (dwDirection & DIR_RIGHT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
-
 	//	if (dwDirection & DIR_LEFT) Rotate(0.0f, -0.5f, 0.0f);
-	//	//if (dwDirection & DIR_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
+	//	if (dwDirection & DIR_UP) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Up, fDistance);
+	//	if (dwDirection & DIR_DOWN) m_xmf3Shift = Vector3::Add(m_xmf3Shift, m_xmf3Up, -fDistance);
 
-	//	if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
-	//	if (dwDirection & DIR_DOWN) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
+	//	if (dwDirection & DIR_STOP) SetVelocity({ 0,0,0 });
 
-	//	Move(xmf3Shift, bUpdateVelocity);
+	//	Move(m_xmf3Shift, bUpdateVelocity);
 
+	//}
 
 	//}
 }
@@ -143,8 +136,10 @@ void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 	}
 	else
 	{
-		m_xmf3Shift = Vector3::Add(XMFLOAT3(0, 0, 0), m_xmf3Shift, 0.95);
+		/*m_xmf3Shift = Vector3::Add(XMFLOAT3(0, 0, 0), m_xmf3Shift, 0.95);
 		m_xmf3Velocity = Vector3::Add(XMFLOAT3(0, 0, 0), m_xmf3Velocity,0.97);
+		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
+		m_pCamera->Move(xmf3Shift);*/
 		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
 		m_pCamera->Move(xmf3Shift);
 	}
@@ -251,7 +246,7 @@ void CPlayer::Update(float fTimeElapsed)
 
 	UpdateBoundingBox();
 
-	UpdateEyesightBox();
+	//UpdateEyesightBox();
 
 }
 

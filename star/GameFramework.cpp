@@ -581,7 +581,7 @@ void CGameFramework::ProcessInput()
 				send_packet(&my_packet);
 			}
 			else {
-				if (dwDirection) m_pPlayer->Move(dwDirection, 150.0f * m_GameTimer.GetTimeElapsed(), true); //1.5f
+				if (dwDirection) m_pPlayer->Move(dwDirection, 150.0f * m_GameTimer.GetTimeElapsed(), false); //1.5f
 			}
 			//if (dwDirection) m_pPlayer->Move(dwDirection, 20.0f, true);
 

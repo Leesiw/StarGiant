@@ -141,7 +141,11 @@ void CGameObject::SetMaterial(int nMaterial, CMaterial *pMaterial)
 	m_ppMaterials[nMaterial] = pMaterial;
 	if (m_ppMaterials[nMaterial]) m_ppMaterials[nMaterial]->AddRef();
 }
-
+void CGameObject::SetOOBB() {
+	m_xmOOBB.Center.x = m_xmf4x4Transform._41;
+	m_xmOOBB.Center.y = m_xmf4x4Transform._42;
+	m_xmOOBB.Center.z = m_xmf4x4Transform._43;
+}
 void CGameObject::Animate(float fTimeElapsed, XMFLOAT4X4 *pxmf4x4Parent)
 {
 	UpdateBoundingBox();
