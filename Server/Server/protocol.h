@@ -1,5 +1,13 @@
 #pragma once
-constexpr int MAX_USER = 10;
+#include <DirectXMath.h>
+
+using namespace DirectX;
+//using namespace DirectX::PackedVector;
+
+#define BULLETS					50
+#define METEOS					200
+
+constexpr int MAX_USER = 2;
 
 constexpr int PORT_NUM = 4000;
 constexpr int BUF_SIZE = 200;
@@ -9,27 +17,55 @@ constexpr int W_WIDTH = 8;
 constexpr int W_HEIGHT = 8;
 
 // Packet ID
-constexpr char CS_LOGIN = 0;
+constexpr char CS_CHANGE = 0;
 constexpr char CS_MOVE = 1;
 constexpr char CS_ATTACK = 2;
 
 constexpr char SC_LOGIN_INFO = 3;
 constexpr char SC_ADD_PLAYER = 4;
 constexpr char SC_REMOVE_PLAYER = 5;
-constexpr char SC_MOVE_PLAYER = 6;
-constexpr char SC_ATTACK_PLAYER = 7;
 
-// Player type
-constexpr char VIEW = 0; 
-constexpr char MOVE = 1; 
-constexpr char ATTACK = 2;
+constexpr char SC_METEO = 6;
+
+constexpr char SC_MOVE_PLAYER = 7;
+constexpr char SC_BULLET = 8;
+constexpr char SC_REMOVE_BULLET = 9;
+
+// Player type 
+constexpr char MOVE = 0;
+constexpr char ATTACK = 1;
 
 #pragma pack (push, 1)
-struct CS_LOGIN_PACKET {
+
+struct METEO_INFO {
+	float m_fRotationSpeed;
+	XMFLOAT4X4 m_xmf4x4Transform;
+};
+
+struct BULLET_INFO {
+	XMFLOAT3 pos;
+	XMFLOAT3 direction;
+	float pitch, yaw, roll;
+};
+
+struct LOGIN_INFO {
+	short	id;
+	char player_type;
+};
+
+struct PLAYER_INFO {
+	XMFLOAT3 pos;
+	XMFLOAT3 velocity;
+	XMFLOAT3 shift;
+
+	float           			m_fYaw;
+};
+
+//-----------------------------------------------------------------------
+
+struct CS_CHANGE_PACKET {
 	unsigned char size;
 	char	type;
-	char	name[NAME_SIZE];
-	char	player_type;
 };
 
 struct CS_MOVE_PACKET {
@@ -46,8 +82,8 @@ struct CS_ATTACK_PACKET {
 struct SC_LOGIN_INFO_PACKET {
 	unsigned char size;
 	char	type;
-	short	id;
-	short	x, y;
+
+	LOGIN_INFO	data;
 };
 
 struct SC_ADD_PLAYER_PACKET {
@@ -67,8 +103,28 @@ struct SC_REMOVE_PLAYER_PACKET {
 struct SC_MOVE_PLAYER_PACKET {
 	unsigned char size;
 	char	type;
+
+	PLAYER_INFO data;
+};
+
+struct SC_METEO_PACKET {
+	unsigned char size;
+	char	type;
+	METEO_INFO meteo[METEOS];
+};
+
+struct SC_BULLET_PACKET {
+	unsigned char size;
+	char	type;
+	BULLET_INFO data;
+};
+
+struct SC_REMOVE_BULLET_PACKET {
+	unsigned char size;
+	char	type;
 	short	id;
-	DWORD dwDirection;
+
+	int num;
 };
 
 #pragma pack (pop)
