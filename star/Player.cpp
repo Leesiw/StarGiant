@@ -545,3 +545,36 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 		}
 	}
 }
+
+void CAirplanePlayer::SetBulletFromServer(BULLET_INFO bulletInfo)
+{
+	if (m_fFireWaitingTime > 0.0f)
+		return;
+
+	CBulletObject* pBulletObject = NULL;
+	for (int i = 0; i < BULLETS; i++)
+	{
+		if (!m_ppBullets[i]->m_bActive)
+		{
+			pBulletObject = m_ppBullets[i];
+			break;
+		}
+	}
+
+	if (pBulletObject)
+	{
+		pBulletObject->Rotate(bulletInfo.pitch, bulletInfo.yaw, bulletInfo.roll);
+		pBulletObject->m_fPitch = bulletInfo.pitch; pBulletObject->m_fYaw = bulletInfo.yaw; pBulletObject->m_fRoll = bulletInfo.roll;
+		pBulletObject->SetFirePosition(bulletInfo.pos);
+		pBulletObject->SetMovingDirection(bulletInfo.direction);
+		pBulletObject->SetActive(true);
+		pBulletObject->UpdateBoundingBox();
+
+		m_fFireWaitingTime = m_fFireDelayTime * 1.0f;
+		/*
+		if (pLockedObject)
+		{
+			pBulletObject->m_pLockedObject = pLockedObject;
+		}*/
+	}
+}

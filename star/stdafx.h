@@ -20,13 +20,13 @@
 #include <iostream>
 #include <random>
 
-#include <string>
 #include <wrl.h>
 #include <shellapi.h>
 
 #include <fstream>
 #include <vector>
 #include <chrono>
+#include <thread>
 
 
 #include <dwrite.h>
@@ -47,7 +47,11 @@ using namespace chrono;
 
 #include <Mmsystem.h>
 
-
+#pragma comment (lib, "WS2_32.LIB")
+#pragma comment (lib, "MSWSock.LIB")
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include "..\Server\Server\protocol.h"
 
 #ifdef _DEBUG
 #include <dxgidebug.h>
@@ -57,6 +61,8 @@ using namespace DirectX;
 using namespace DirectX::PackedVector;
 
 using Microsoft::WRL::ComPtr;
+
+string	server_IP{ "127.0.0.1" };
 
 //#define _WITH_SWAPCHAIN_FULLSCREEN_STATE
 
@@ -92,10 +98,6 @@ inline bool IsZero(float fValue) { return((fabsf(fValue) < EPSILON)); }
 inline bool IsEqual(float fA, float fB) { return(::IsZero(fA - fB)); }
 inline float InverseSqrt(float fValue) { return 1.0f / sqrtf(fValue); }
 inline void Swap(float *pfS, float *pfT) { float fTemp = *pfS; *pfS = *pfT; *pfT = fTemp; }
-
-
-
-
 
 
 namespace Vector3

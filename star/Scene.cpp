@@ -386,6 +386,16 @@ void CScene::CheckObjectByPlayerCollisions()
 	}
 }
 
+void CScene::SetMeteoTransform(METEO_INFO meteo_info[])
+{
+	cout << "set meteo" << endl;
+	for (int i = 0; i < METEOS; ++i) {
+		m_ppGameObjects[i]->m_xmf4x4Transform = meteo_info[i].m_xmf4x4Transform;
+		//m_ppGameObjects[i]->SetPosition(meteo_info[i].pos.x, meteo_info[i].pos.x, meteo_info[i].pos.x);
+		m_ppGameObjects[i]->m_fRotationSpeed = meteo_info[i].m_fRotationSpeed;
+	}
+}
+
 int ant = 0;
 
 void CScene::CheckObjectByBulletCollisions()

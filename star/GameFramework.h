@@ -6,7 +6,6 @@
 #include "Timer.h"
 #include "Player.h"
 #include "Scene.h"
-#include "Server.h"
 
 class UILayer;
 
@@ -40,6 +39,8 @@ public:
 	void WaitForGpuComplete();
 	void MoveToNextFrame();
 
+	bool ConnectServer();
+
 	void RecvServer();
 	void ProcessData(char* net_buf, size_t io_byte);
 	void ProcessPacket(char* ptr);
@@ -63,6 +64,7 @@ private:
 	int							m_nWndClientHeight;
 
 	int g_myid;
+	char player_type;
         
 	IDXGIFactory4				*m_pdxgiFactory = NULL;
 	IDXGISwapChain3				*m_pdxgiSwapChain = NULL;
@@ -109,8 +111,8 @@ private:
 
 	UILayer* m_pUILayer = NULL;
 
-	bool connect_server = false;
-	sf::Socket::Status status;
-	sf::TcpSocket socket;
+	thread    NetworkThread{};
+	SOCKET sock;
+	bool isConnect = false;
 };
 

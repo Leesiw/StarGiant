@@ -65,6 +65,7 @@ public:
 	void SetMaxVelocityXZ(float fMaxVelocity) { m_fMaxVelocityXZ = fMaxVelocity; }
 	void SetMaxVelocityY(float fMaxVelocity) { m_fMaxVelocityY = fMaxVelocity; }
 	void SetVelocity(const XMFLOAT3& xmf3Velocity) { m_xmf3Velocity = xmf3Velocity; }
+	void SetShift(const XMFLOAT3& xmf3Shift) { m_xmf3Shift = xmf3Shift; }
 	void SetPosition(const XMFLOAT3& xmf3Position) { Move(XMFLOAT3(xmf3Position.x - m_xmf3Position.x, xmf3Position.y - m_xmf3Position.y, xmf3Position.z - m_xmf3Position.z), false); }
 
 	const XMFLOAT3& GetVelocity() const { return(m_xmf3Velocity); }
@@ -113,6 +114,7 @@ public:
 	CGameObject** m_BulletObjects = NULL;
 	CBulletObject* m_ppBullets[BULLETS];
 	void FireBullet(CGameObject* pLockedObject);
+	void SetBulletFromServer(BULLET_INFO bulletInfo);
 	float						m_fBulletEffectiveRange = 150.0f;
 	CGameObject* pBullet;
 

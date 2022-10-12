@@ -66,6 +66,8 @@ public:
 	void ReleaseUploadBuffers();
 	void CheckObjectByPlayerCollisions();
 
+	void SetMeteoTransform(METEO_INFO[]);
+
 	CPlayer						*m_pPlayer = NULL;
 
 public:
