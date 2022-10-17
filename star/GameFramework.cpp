@@ -368,11 +368,27 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 			break;
 		}
 		case WM_SIZE:
-			break;
+			break;        
+		case WM_RBUTTONDOWN:
+			printf("R¿Ã ¥≠∑»¥Ÿ.");
+
+			if (isConnect) {
+				CS_ATTACK_PACKET my_packet;
+				my_packet.size = sizeof(CS_ATTACK_PACKET);
+				my_packet.type = CS_ATTACK;
+				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+			}
+			else {
+				((CAirplanePlayer*)m_pPlayer)->FireBullet(m_pLockedObject);
+				m_pLockedObject = NULL;
+			}
 		case WM_LBUTTONDOWN:
-        case WM_RBUTTONDOWN:
+			printf("l¿Ã ¥≠∑»¥Ÿ.");
+
+
         case WM_LBUTTONUP:
         case WM_RBUTTONUP:
+
         case WM_MOUSEMOVE:
 			OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
             break;
@@ -533,14 +549,14 @@ void CGameFramework::ProcessInput()
 
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 		{
-		/*	if (cxDelta || cyDelta)
+			if (cxDelta || cyDelta)
 			{
 				if (pKeysBuffer[VK_RBUTTON] & 0xF0)
 					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
 				else
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 			}
-			*/
+			
 			if (isConnect) {
 				CS_MOVE_PACKET my_packet;
 				my_packet.size = sizeof(CS_MOVE_PACKET);

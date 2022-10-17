@@ -229,10 +229,11 @@ void CPlayer::Update(float fTimeElapsed)
 
 	DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
-	if (nCurrentCameraMode == ATTACT_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
-	if (nCurrentCameraMode == ATTACT_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
+
+
 
 	m_pCamera->RegenerateViewMatrix();
 
@@ -451,7 +452,7 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
 			SetMaxVelocityXZ(0.0f);
 			SetMaxVelocityY(40.0f);
-			m_pCamera = OnChangeCamera(FIRST_PERSON_CAMERA, nCurrentCameraMode);
+			m_pCamera = OnChangeCamera(ATTACT_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 10.0f, 10.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
