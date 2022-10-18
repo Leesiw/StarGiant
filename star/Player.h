@@ -43,6 +43,9 @@ protected:
 
 	CCamera						*m_pCamera = NULL;
 
+	PLAYER_INFO					player_info;
+	bool player_info_update = false;
+
 public:
 	CPlayer();
 	virtual ~CPlayer();
@@ -67,11 +70,15 @@ public:
 	void SetVelocity(const XMFLOAT3& xmf3Velocity) { m_xmf3Velocity = xmf3Velocity; }
 	void SetShift(const XMFLOAT3& xmf3Shift) { m_xmf3Shift = xmf3Shift; }
 	void SetPosition(const XMFLOAT3& xmf3Position) { Move(XMFLOAT3(xmf3Position.x - m_xmf3Position.x, xmf3Position.y - m_xmf3Position.y, xmf3Position.z - m_xmf3Position.z), false); }
+	void SetPlayerInfo(PLAYER_INFO p_info) { player_info = p_info;  player_info_update = true; }
+	void SetPlayerInfoUpdate(bool b) { player_info_update = b; }
 
 	const XMFLOAT3& GetVelocity() const { return(m_xmf3Velocity); }
 	float GetYaw() const { return(m_fYaw); }
 	float GetPitch() const { return(m_fPitch); }
 	float GetRoll() const { return(m_fRoll); }
+	PLAYER_INFO GetPlayerInfo() const { return(player_info); }
+	bool GetInfoUpdate() const { return(player_info_update);  }
 
 	CCamera *GetCamera() { return(m_pCamera); }
 	void SetCamera(CCamera *pCamera) { m_pCamera = pCamera; }

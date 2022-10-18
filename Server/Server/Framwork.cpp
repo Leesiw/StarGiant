@@ -186,7 +186,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_MOVE: {
 		CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
 		if (clients[c_id].type == MOVE) {
-			m_pPlayer->Move(p->dwDirection, 150.0f * fps.count(), false); //1.5f
+			m_pPlayer->SetdwDirection(p->dwDirection);
 		}
 		break;
 	}

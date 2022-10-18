@@ -47,8 +47,8 @@ void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
 		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
 		if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
-		if (dwDirection & DIR_RIGHT) Rotate(0.0f, 0.5f * fDistance, 0.0f);
-		if (dwDirection & DIR_LEFT) Rotate(0.0f, -0.5f * fDistance, 0.0f);
+		if (dwDirection & DIR_RIGHT) Rotate(0.0f, 0.5f, 0.0f);
+		if (dwDirection & DIR_LEFT) Rotate(0.0f, -0.5f, 0.0f);
 		if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
 		if (dwDirection & DIR_DOWN) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
 
@@ -107,6 +107,11 @@ void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 //		m_pCamera->Move(m_xmf3Shift);
 //	}
 //}
+
+void CPlayer::SetdwDirection(DWORD dw)
+{
+	dwDirection = dw;
+}
 
 void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 {
@@ -216,6 +221,11 @@ void CPlayer::Update(float fTimeElapsed)
 		m_fFireWaitingTime -= fTimeElapsed;
 
 	UpdateBoundingBox();
+
+	if (dwDirection) {
+		Move(dwDirection, 150.0f * fTimeElapsed, false);
+		dwDirection = NULL;
+	}
 
 	//UpdateEyesightBox();
 

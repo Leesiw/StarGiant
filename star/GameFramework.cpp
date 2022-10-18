@@ -570,6 +570,15 @@ void CGameFramework::ProcessInput()
 			//if (dwDirection) m_pPlayer->Move(dwDirection, 20.0f, true);
 
 		}
+		if (m_pPlayer->GetInfoUpdate()) {
+			PLAYER_INFO playerInfo = m_pPlayer->GetPlayerInfo();
+			m_pPlayer->SetPosition(playerInfo.pos);
+			m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
+			m_pPlayer->SetVelocity(playerInfo.velocity);
+			m_pPlayer->SetShift(playerInfo.shift);
+			m_pPlayer->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer->GetYaw(), 0.0f);
+			m_pPlayer->SetPlayerInfoUpdate(false);
+		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 	//
@@ -696,12 +705,16 @@ void CGameFramework::RecvServer()
 			float x = m_pPlayer->GetPosition().z;
 			PLAYER_INFO playerInfo;
 			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO));
+			m_pPlayer->SetPlayerInfo(playerInfo);
+			/*
 			m_pPlayer->SetPosition(playerInfo.pos);
+			m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
 			m_pPlayer->SetVelocity(playerInfo.velocity);
 			m_pPlayer->SetShift(playerInfo.shift);
 			m_pPlayer->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer->GetYaw(), 0.0f);
+			m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+			*/
 
-			//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 			//m_pPlayer->OnPrepareRender();
 			//cout << "회전 각도 " << playerInfo.m_fYaw - m_pPlayer->GetYaw() << endl;
 			break;
