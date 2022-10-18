@@ -173,12 +173,27 @@ void CPlayer::Rotate(float x, float y, float z)
 			if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
 		}
 		m_pCamera->Rotate(x, y, z);
+
+		if (x != 0.0f)
+		{
+			XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(x));
+			m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+			m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+		}
+
 		if (y != 0.0f)
 		{
 			XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
 			m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
 			m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
 		}
+		if (z != 0.0f)
+		{
+			XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Look), XMConvertToRadians(z));
+			m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+			m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+		}
+
 	}
 	else if (nCurrentCameraMode == SPACESHIP_CAMERA)
 	{
@@ -204,8 +219,9 @@ void CPlayer::Rotate(float x, float y, float z)
 	}
 
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
-	m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
-	m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
+	m_xmf3Right = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Up, m_xmf3Look));
+	m_xmf3Up = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Look, m_xmf3Right));
+
 }
 
 void CPlayer::Update(float fTimeElapsed)
