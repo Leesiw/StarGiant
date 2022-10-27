@@ -189,6 +189,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
 		if (clients[c_id].type == MOVE) {
 			m_pPlayer->SetdwDirection(p->dwDirection);
+			m_pPlayer->SetcxcyDelta(p->cxDelta, p->cyDelta, p->isRButton);
 		}
 		break;
 	}
@@ -281,6 +282,8 @@ void SESSION::send_move_packet(int c_id, CPlayer* m_pPlayer)
 	p.size = sizeof(SC_MOVE_PLAYER_PACKET);
 	p.type = SC_MOVE_PLAYER;
 	p.data.pos = m_pPlayer->GetPosition();
+	p.data.m_fPitch = m_pPlayer->GetPitch();
+	p.data.m_fRoll = m_pPlayer->GetRoll();
 	p.data.m_fYaw = m_pPlayer->GetYaw();
 	p.data.velocity = m_pPlayer->GetVelocity();
 	p.data.shift = m_pPlayer->GetShift();

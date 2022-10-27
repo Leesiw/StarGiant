@@ -58,6 +58,8 @@ struct PLAYER_INFO {
 	XMFLOAT3 velocity;
 	XMFLOAT3 shift;
 
+	float           			m_fPitch;
+	float           			m_fRoll;
 	float           			m_fYaw;
 };
 
@@ -72,6 +74,9 @@ struct CS_MOVE_PACKET {
 	unsigned char size;
 	char	type;
 	DWORD dwDirection;
+	float cxDelta;
+	float cyDelta;
+	bool isRButton;
 };
 
 struct CS_ATTACK_PACKET {

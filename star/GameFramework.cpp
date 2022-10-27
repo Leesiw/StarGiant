@@ -549,24 +549,28 @@ void CGameFramework::ProcessInput()
 
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 		{
-			if (cxDelta || cyDelta)
-			{
-				if (pKeysBuffer[VK_RBUTTON] & 0xF0) {
-					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-					
-				}
-				else
-					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
-			}
-			
 			if (isConnect) {
 				CS_MOVE_PACKET my_packet;
 				my_packet.size = sizeof(CS_MOVE_PACKET);
 				my_packet.type = CS_MOVE;
 				my_packet.dwDirection = dwDirection;
+				my_packet.cxDelta = cxDelta;
+				my_packet.cyDelta = cyDelta;
+				my_packet.isRButton = (pKeysBuffer[VK_RBUTTON] & 0xF0);
+
 				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 			}
 			else {
+				if (cxDelta || cyDelta)
+				{
+					if (pKeysBuffer[VK_RBUTTON] & 0xF0) {
+						m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
+
+					}
+					else
+						m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+				}
+
 				if (dwDirection) m_pPlayer->Move(dwDirection, 150.0f * m_GameTimer.GetTimeElapsed(), false); //1.5f
 			}
 			//if (dwDirection) m_pPlayer->Move(dwDirection, 20.0f, true);
@@ -578,7 +582,7 @@ void CGameFramework::ProcessInput()
 			m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
 			m_pPlayer->SetVelocity(playerInfo.velocity);
 			m_pPlayer->SetShift(playerInfo.shift);
-			m_pPlayer->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer->GetYaw(), 0.0f);
+			m_pPlayer->Rotate(playerInfo.m_fPitch - m_pPlayer->GetPitch(), playerInfo.m_fYaw - m_pPlayer->GetYaw(), playerInfo.m_fRoll - m_pPlayer->GetRoll());
 			m_pPlayer->SetPlayerInfoUpdate(false);
 		}
 	}
