@@ -45,6 +45,7 @@ public:
 
 
 	bool						m_bActive = true;
+	bool						mesh = false;
 
 	bool coll = false;
 	BoundingOrientedBox				boundingbox;	// 직접 크기 지정

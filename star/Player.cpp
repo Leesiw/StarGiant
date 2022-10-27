@@ -341,7 +341,12 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 //	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Apache.bin");
 	CGameObject *pGameObject = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/ship.bin");
-
+	/*
+	cout << pGameObject->m_pMesh->m_xmOOBB.Center.x << ", "
+		<< pGameObject->m_pMesh->m_xmOOBB.Center.y << ", " << pGameObject->m_pMesh->m_xmOOBB.Center.z << "| " <<
+		pGameObject->m_pMesh->m_xmOOBB.Extents.x << ", " << pGameObject->m_pMesh->m_xmOOBB.Extents.y << ", " << pGameObject->m_pMesh->m_xmOOBB.Extents.z
+		<< endl;
+		*/
 	pGameObject->Rotate(0, -90.0f, 0.0f);
 	pGameObject->SetScale(15.5f, 15.5f, 15.5f);
 	SetChild(pGameObject, true);

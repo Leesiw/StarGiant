@@ -38,6 +38,8 @@ void CScene::BuildObjects()
 	meteo->SetScale(10, 10, 10);
 	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 	meteo->TurnSpeed();
+	meteo->mesh = true;
+	meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 	m_ppGameObjects[0] = meteo;
 
 	meteo = new MeteoObject();
@@ -45,6 +47,8 @@ void CScene::BuildObjects()
 	meteo->SetScale(10, 10, 10);
 	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 	meteo->TurnSpeed();
+	meteo->mesh = true;
+	meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 	m_ppGameObjects[1] = meteo;
 
 	for (int i = 2; i < 99; ++i) {
@@ -56,19 +60,30 @@ void CScene::BuildObjects()
 
 		meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		meteo->TurnSpeed();
+		meteo->mesh = true;
+		meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		m_ppGameObjects[i] = meteo;
+		m_ppGameObjects[i]->UpdateTransform(NULL);
 	}
 
 	for (int i = 99; i < 200; ++i) {
 		meteo = new MeteoObject();
-		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
+		
 		//meteo->SetOOBB();
 		meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+		meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.000628f, -0.011224f, -0.003297f }, XMFLOAT3{ 0.057967f, 0.050386f, 0.055706f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+		//meteo->UpdateBoundingBox();
+		//meteo->boundingbox = meteo->m_xmOOBB;
+		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
 		meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+		meteo->mesh = true;
+		meteo->UpdateBoundingBox();
+		
 		meteo->TurnSpeed();
 
 
 		m_ppGameObjects[i] = meteo;
+		m_ppGameObjects[i]->UpdateTransform(NULL);
 	}
 
 
@@ -282,6 +297,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	for (int i = 0; i < m_nGameObjects; i++) { m_ppGameObjects[i]->Animate(fTimeElapsed, NULL); }
 
-	//CheckObjectByPlayerCollisions();
+	CheckObjectByPlayerCollisions();
 	//CheckObjectByBulletCollisions();
 }

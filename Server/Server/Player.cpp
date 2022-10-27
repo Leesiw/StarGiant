@@ -220,6 +220,7 @@ void CPlayer::Update(float fTimeElapsed)
 	if (m_fFireWaitingTime > 0.0f)
 		m_fFireWaitingTime -= fTimeElapsed;
 
+	OnPrepareRender();
 	UpdateBoundingBox();
 
 	if (dwDirection) {
@@ -246,6 +247,9 @@ void CPlayer::OnPrepareRender()
 
 CAirplanePlayer::CAirplanePlayer()
 {
+	Rotate(0, -90.0f, 0.0f);
+	SetScale(15.5f, 15.5f, 15.5f);;
+	
 	for (int i = 0; i < BULLETS; i++)
 	{
 		m_ppBullets[i] = new CBulletObject(m_fBulletEffectiveRange);

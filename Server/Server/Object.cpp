@@ -60,8 +60,10 @@ void CGameObject::MakeBoundingBox()
 
 void CGameObject::UpdateBoundingBox()
 {
-	boundingbox.Transform(m_xmOOBB, XMLoadFloat4x4(&m_xmf4x4World));
-	XMStoreFloat4(&m_xmOOBB.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBB.Orientation)));
+	if (mesh) {
+		boundingbox.Transform(m_xmOOBB, XMLoadFloat4x4(&m_xmf4x4World));
+		XMStoreFloat4(&m_xmOOBB.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBB.Orientation)));
+	}
 }
 
 bool CGameObject::HierarchyIntersects(CGameObject* pCollisionGameObject, bool isSecond)
@@ -333,7 +335,6 @@ void CHellicopterObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 //
 MeteoObject::MeteoObject()
 {
-	boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.0f, 0.0f, - 0.004253f }, XMFLOAT3{ 0.016793f, 0.016793f, 0.020887f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 }
 
 MeteoObject::~MeteoObject()
