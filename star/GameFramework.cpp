@@ -889,9 +889,9 @@ void CGameFramework::UpdateUI()
 	wchar_t shift_ui[50] = L"AAA";
 	//_stprintf_s(shift_ui, _countof(shift_ui), _T("Shift (%4f, %4f, %4f)\n"), m_pPlayer->GetShift().x, m_pPlayer->GetShift().y, m_pPlayer->GetShift().z);
 
-	labels.push_back(L"테스트 중\n");
-	labels.push_back(position_ui);
-	labels.push_back(velocity_ui);
+	//labels.push_back(L"테스트 중\n");
+	//labels.push_back(position_ui);
+	//labels.push_back(velocity_ui);
 	//labels.push_back(shift_ui);
 	if (isConnect) {
 		if (player_type == MOVE) {
