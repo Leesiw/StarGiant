@@ -413,8 +413,8 @@ void CScene::CheckObjectByBulletCollisions()
 			if (ppBullets[j]->m_bActive) {
 				//cout << ppBullets[0]->m_xmOOBB.Center.z;
 
-				if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i]))
-					cout << "Dd";
+				//if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i]))
+				//	cout << "Dd";
 				if (ant== 0) {
 					cout <<"\n"<< ppBullets[j]->GetPosition().z << "- dd\n";
 				
