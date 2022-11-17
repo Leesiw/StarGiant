@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include "Player.h"
 #include "Scene.h"
+#include "Enemy.h"
 
 class UILayer;
 
@@ -101,6 +102,8 @@ private:
 	CScene						*m_pScene = NULL;
 	CScene						*m_TwiceScene = NULL;
 	CPlayer						*m_pPlayer = NULL;
+	CEnemyObject				*m_Enemy = NULL;
+
 	CPlayer						*m_TwicePlayer = NULL;
 	CCamera						*m_pCamera = NULL;
 	CCamera						*m_TwiceCamera = NULL;

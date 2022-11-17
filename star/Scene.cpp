@@ -88,23 +88,26 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	MeteoObject* meteo = NULL;
 
 
-	meteo = new MeteoObject();
-	meteo->SetChild(meteoModel, true);
-	meteo->SetPosition(-40, 0, 70);
-	meteo->SetScale(10, 10, 10);
-	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	meteo->TurnSpeed();
-	m_ppGameObjects[0] = meteo;
+	CGameObject*enemyModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/ship.bin");
+	CEnemyObject* enemy = NULL;
+
+	//CEnemyShip* enemyship = new CEnemyShip(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+	//enemyship->SetPosition(XMFLOAT3(10.0f, 10.0f, 10.0f));
+	//enemyship->SetScale(10, 10, 10);
+	//enemy = enemyship;
+
 
 	meteo = new MeteoObject();
 	meteo->SetChild(meteoModel, true);
 	meteo->SetPosition(0, 0, 0);
 	meteo->SetScale(10, 10, 10);
-	meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-	meteo->TurnSpeed();
-	m_ppGameObjects[1] = meteo;
+	//meteo->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
+	//meteo->TurnSpeed();
+	m_ppGameObjects[0] = meteo;
 
-	for (int i = 2; i < 99; ++i) {
+
+
+	for (int i = 1; i < 99; ++i) {
 		meteoModel = CGameObject::LoadGeometryFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo.bin");
 		meteo = new MeteoObject();
 		meteo->SetChild(meteoModel, true);
@@ -205,6 +208,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	//	meteorite->SetMovingSpeed(100.5f);
 	//	m_ppGameObjects[i] = meteorite;
 	//}
+
 
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -449,10 +453,12 @@ void CScene::CheckObjectByBulletCollisions()
 
 void CScene::MoveMeteo(float fTimeElapsed)
 {
-	for (int i = 0; i < m_nGameObjects; ++i) {
+	/*for (int i = 0; i < m_nGameObjects; ++i) {
 		m_ppGameObjects[i]->UpdateSpeed(fTimeElapsed);
 		m_ppGameObjects[i]->UpdateRespawn(m_pPlayer->GetBox(), m_pPlayer->GetPosition(), m_pPlayer->GetLook());
-	}
+	}*/
+	m_enemy->UpdateSpeed(fTimeElapsed);
+	m_enemy->UpdateRespawn(m_pPlayer->GetBox(), m_pPlayer->GetPosition(), m_pPlayer->GetLook());
 
 }
 
@@ -461,7 +467,11 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	m_fElapsedTime = fTimeElapsed;
 
 	//m_ppGameObjects[1]->turnturn(fTimeElapsed);
-	//MoveMeteo(m_GameTimer.GetTimeElapsed());
+	if (m_enemy) {
+		m_enemy->Rotate(90.f);
+		std::cout << "ss";
+	}
+
 	for (int i = 0; i < m_nGameObjects; i++) {
 		if (!m_pPlayer->GetBox().Intersects(m_ppGameObjects[i]->m_pChild->m_xmOOBB)) {
 			//std::cout << "´«";

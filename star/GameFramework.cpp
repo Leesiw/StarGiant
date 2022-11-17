@@ -34,6 +34,8 @@ CGameFramework::CGameFramework()
 
 	m_pScene = NULL;
 	m_pPlayer = NULL;
+	m_Enemy = NULL;
+
 
 	_tcscpy_s(m_pszFrameRate, _T("MeteoProject ("));
 }
@@ -477,6 +479,15 @@ void CGameFramework::BuildObjects()
 	m_pScene->m_pPlayer = m_pPlayer = pAirplanePlayer;
 	m_pCamera = m_pPlayer->GetCamera();
 
+
+
+	/////////////////////////////////////////
+
+	CEnemyShip* enemyship = new CEnemyShip(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+	m_pScene->m_enemy = m_Enemy = enemyship;
+
+
+
 	////////////////////////////////////////
 	
 	m_TwiceScene = new CScene();
@@ -496,6 +507,7 @@ void CGameFramework::BuildObjects()
 
 	if (m_pScene) m_pScene->ReleaseUploadBuffers();
 	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
+	if (m_Enemy) m_Enemy->ReleaseUploadBuffers();
 
 	if (m_TwiceScene) m_TwiceScene->ReleaseUploadBuffers();
 	if (m_TwicePlayer) m_TwicePlayer->ReleaseUploadBuffers();
@@ -510,6 +522,11 @@ void CGameFramework::ReleaseObjects()
 
 
 	if (m_pPlayer) m_pPlayer->Release();
+	if (m_Enemy) m_Enemy->Release();
+
+
+
+
 	if (m_TwicePlayer) m_pPlayer->Release();
 
 	if (m_pScene) m_pScene->ReleaseObjects();
@@ -598,6 +615,8 @@ void CGameFramework::AnimateObjects()
 	if (m_TwiceScene) m_TwiceScene -> AnimateObjects(fTimeElapsed);
 
 	m_pPlayer->Animate(fTimeElapsed, NULL);
+	m_Enemy->Animate(fTimeElapsed);
+
 	//
 }
 
@@ -958,6 +977,8 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
 	if (m_pPlayer) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
+	if (m_Enemy) m_Enemy->Render(m_pd3dCommandList, NULL);
+
 	//if (m_TwicePlayer) m_TwicePlayer->Render(m_pd3dCommandList, m_pCamera);
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;

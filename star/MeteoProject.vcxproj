@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="..\Server\Server\protocol.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameFramework.h" />
     <ClInclude Include="MeteoProject.h" />
     <ClInclude Include="Mesh.h" />
@@ -156,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="GameFramework.cpp" />
     <ClCompile Include="MeteoProject.cpp" />
     <ClCompile Include="Mesh.cpp" />

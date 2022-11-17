@@ -280,7 +280,7 @@ void CGameObject::SetScale(float x, float y, float z)
 {
 	XMMATRIX mtxScale = XMMatrixScaling(x, y, z);
 	m_xmf4x4Transform = Matrix4x4::Multiply(mtxScale, m_xmf4x4Transform);
-
+	
 	UpdateTransform(NULL);
 }
 
@@ -358,7 +358,7 @@ void CGameObject::UpdateRespawn(BoundingBox Player, XMFLOAT3 Switch, XMFLOAT3 m_
 		XMFLOAT3 After = GetPosition();
 		//After.z = Switch.z + 50.f; //소환 위치 조정
 		//After.x = Switch.x + 50.f;
-		After = Vector3::Add(Switch, m_xmf3Look, 50.0f);
+		After = Vector3::Add(Switch, m_xmf3Look, 500.0f);
 		After.y = Switch.x;
 		SetPosition(After);
 		m_xmLook = m_xmf3Look;

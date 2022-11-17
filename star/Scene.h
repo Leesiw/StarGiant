@@ -6,6 +6,7 @@
 
 #include "Shader.h"
 #include "Player.h"
+#include "Enemy.h"
 
 #define MAX_LIGHTS			16 
 
@@ -69,6 +70,8 @@ public:
 	void SetMeteoTransform(METEO_INFO[]);
 
 	CPlayer						*m_pPlayer = NULL;
+	CEnemyObject				*m_enemy = NULL;
+
 
 public:
 	ID3D12RootSignature			*m_pd3dGraphicsRootSignature = NULL;
