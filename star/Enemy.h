@@ -24,7 +24,7 @@ public:
 	int hp;
 
 public:
-	void Fallowing(XMFLOAT3 pos);
+	void Fallowing(float fTimeElapsed, XMFLOAT3 Look);
 
 	virtual void OnPrepareRender();
 	virtual void Animate(float fElapsedTime);

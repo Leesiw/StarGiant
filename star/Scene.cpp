@@ -470,6 +470,10 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	if (m_enemy) {
 		m_enemy->Rotate(90.f);
 		std::cout << "ss";
+		if(m_enemy->GetPosition().x- m_pPlayer->GetPosition().x >=50.f|| m_enemy->GetPosition().x - m_pPlayer->GetPosition().x <= -50.f
+			|| m_enemy->GetPosition().y - m_pPlayer->GetPosition().y >= 50.f || m_enemy->GetPosition().y - m_pPlayer->GetPosition().y <= -50.f
+			|| m_enemy->GetPosition().z - m_pPlayer->GetPosition().z >= 50.f || m_enemy->GetPosition().z - m_pPlayer->GetPosition().z <= -50.f)
+			m_enemy->Fallowing(fTimeElapsed, m_pPlayer->GetLook());
 	}
 
 	for (int i = 0; i < m_nGameObjects; i++) {

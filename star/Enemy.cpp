@@ -19,10 +19,18 @@ CEnemyObject::~CEnemyObject()
 
 }
 
-void CEnemyObject::Fallowing(XMFLOAT3 pos)
+
+
+void CEnemyObject::Fallowing(float fTimeElapsed, XMFLOAT3 Look)
 {
 
-	MoveForward();
+	m_xmf3Position = Vector3::Add(m_xmf3Position, Look, -10.0);
+	//m_xmf3Position = Vector3::Add(m_xmf3Position, Vector3::mul(Look, -1.0));
+	CGameObject::SetPosition(m_xmf3Position);
+	//m_xmf3Position = Vector3::Add(m_xmf3Position, XMFLOAT3(0.f,0.f,-0.1f));
+
+	//this->MoveForward(10.0f);
+	CEnemyObject::Animate(fTimeElapsed);
 }
 
 void CEnemyObject::OnPrepareRender()
