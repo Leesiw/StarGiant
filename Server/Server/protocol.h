@@ -30,6 +30,7 @@ constexpr char SC_METEO = 6;
 constexpr char SC_MOVE_PLAYER = 7;
 constexpr char SC_BULLET = 8;
 constexpr char SC_REMOVE_BULLET = 9;
+constexpr char SC_BULLET_HIT = 10;
 
 // Player type 
 constexpr char MOVE = 0;
@@ -61,6 +62,11 @@ struct PLAYER_INFO {
 	float           			m_fPitch;
 	float           			m_fRoll;
 	float           			m_fYaw;
+};
+
+struct BULLET_HIT_INFO {
+	int meteo_id;
+	int bullet_id;
 };
 
 //-----------------------------------------------------------------------
@@ -130,6 +136,13 @@ struct SC_REMOVE_BULLET_PACKET {
 	short	id;
 
 	int num;
+};
+
+struct SC_BULLET_HIT_PACKET {
+	unsigned char size;
+	char	type;
+	
+	BULLET_HIT_INFO data;
 };
 
 #pragma pack (pop)

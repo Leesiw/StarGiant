@@ -760,6 +760,19 @@ void CGameFramework::RecvServer()
 		{
 			break;
 		}
+		case SC_BULLET_HIT:
+		{
+			char subBuf[sizeof(BULLET_HIT_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			BULLET_HIT_INFO bulletInfo;
+			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_HIT_INFO));
+			m_pScene->m_ppGameObjects[bulletInfo.meteo_id]->hp -= 3;
+			((CAirplanePlayer*)m_pPlayer)->m_ppBullets[bulletInfo.bullet_id]->Reset();
+			break;
+		}
 		default:
 			printf("Unknown PACKET type [%d]\n", type);
 		}

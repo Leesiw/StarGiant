@@ -1,6 +1,7 @@
 #pragma once
-#include "Player.h"
+#include "Session.h"
 
+extern array<SESSION, MAX_USER> clients;
 
 class CScene
 {

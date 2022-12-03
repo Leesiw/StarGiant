@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Scene.h"
 
-
 CScene::CScene()
 {
 }
@@ -233,44 +232,29 @@ void CScene::CheckObjectByBulletCollisions()
 	CBulletObject** ppBullets = ((CAirplanePlayer*)m_pPlayer)->m_ppBullets;
 	for (int i = 0; i < m_nGameObjects; ++i)
 	{
+		if (!m_ppGameObjects[i]->mesh) continue;
 		for (int j = 0; j < BULLETS; j++)
 		{
-
 			ppBullets[j]->UpdateBoundingBox();
-
-
 			if (ppBullets[j]->m_bActive) {
-				//cout << ppBullets[0]->m_xmOOBB.Center.z;
-
-				if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i]))
-					cout << "Dd";
-				if (ant == 0) {
-					cout << "\n" << ppBullets[j]->GetPosition().z << "- dd\n";
-
-				}
-				//m_ppGameObjects[i]->m_pChild->m_xmOOBB
-
-				//cout<<"z다  : "<< m_ppGameObjects[0]->m_pChild->m_xmOOBB.Center.z;
-				//cout << "z다 : " << ppBullets[j]->m_pChild->m_xmOOBB.Center.z;
-
-
-
-
-				XMFLOAT3 hi = { 0,0,0 };
-				/*
-				m_ppGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
-				ppBullets[j]->m_pChild->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(20.0f, 20.0f, 20.0f));
+				
+				m_ppGameObjects[i]->aabb = BoundingBox(m_ppGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
+				ppBullets[j]->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(20.0f, 20.0f, 20.0f));
 				if (ant == 0) {
 					// cout << "\ny : " << ppBullets[j]->m_pChild->aabb.Center.x<< ppBullets[j]->m_pChild->aabb.Center.y<< ppBullets[j]->m_pChild->aabb.Center.z;
 					ant++;
 				}
-				if (m_ppGameObjects[i]->m_pChild->aabb.Intersects(ppBullets[j]->m_pChild->aabb)) {
+				if (m_ppGameObjects[i]->aabb.Intersects(ppBullets[j]->aabb)) {
 					//if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i])) {
-					//cout << "충돌\n";
+					cout << "총알 운석 충돌" << i << endl;
 					m_ppGameObjects[i]->hp -= 3;
 					ppBullets[j]->Reset();
-					//}
-				}*/
+
+					for (auto& pl : clients) {
+						if (false == pl.in_use) continue;
+						pl.send_bullet_hit_packet(0, i, j);
+					}
+				}
 			}
 		}
 	}
@@ -301,5 +285,5 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (int i = 0; i < m_nGameObjects; i++) { m_ppGameObjects[i]->Animate(fTimeElapsed, NULL); }
 
 	CheckObjectByPlayerCollisions();
-	//CheckObjectByBulletCollisions();
+	CheckObjectByBulletCollisions();
 }
