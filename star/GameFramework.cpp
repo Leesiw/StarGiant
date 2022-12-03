@@ -597,8 +597,8 @@ void CGameFramework::ProcessInput()
 			PLAYER_INFO playerInfo = m_pPlayer->GetPlayerInfo();
 			m_pPlayer->SetPosition(playerInfo.pos);
 			m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
-			m_pPlayer->SetVelocity(playerInfo.velocity);
-			m_pPlayer->SetShift(playerInfo.shift);
+			//m_pPlayer->SetVelocity(playerInfo.velocity);
+			//m_pPlayer->SetShift(playerInfo.shift);
 			m_pPlayer->Rotate(playerInfo.m_fPitch - m_pPlayer->GetPitch(), playerInfo.m_fYaw - m_pPlayer->GetYaw(), playerInfo.m_fRoll - m_pPlayer->GetRoll());
 			m_pPlayer->SetPlayerInfoUpdate(false);
 		}

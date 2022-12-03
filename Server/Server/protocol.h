@@ -56,8 +56,8 @@ struct LOGIN_INFO {
 
 struct PLAYER_INFO {
 	XMFLOAT3 pos;
-	XMFLOAT3 velocity;
-	XMFLOAT3 shift;
+	//XMFLOAT3 velocity;
+	//XMFLOAT3 shift;
 
 	float           			m_fPitch;
 	float           			m_fRoll;

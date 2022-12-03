@@ -170,7 +170,7 @@ void CGameFramework::AnimateObjects(float fTimeElapsed)
 	if (m_TwiceScene) m_TwiceScene->AnimateObjects(fTimeElapsed);
 
 	m_pPlayer->Animate(fTimeElapsed, NULL);
-	//m_pPlayer->Update(fTimeElapsed);
+	m_pPlayer->Update(fTimeElapsed);
 
 	m_Enemy->Animate(fTimeElapsed);;
 	//

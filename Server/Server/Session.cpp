@@ -9,8 +9,8 @@ void SESSION::send_move_packet(int c_id, CPlayer* m_pPlayer)
 	p.data.m_fPitch = m_pPlayer->GetPitch();
 	p.data.m_fRoll = m_pPlayer->GetRoll();
 	p.data.m_fYaw = m_pPlayer->GetYaw();
-	p.data.velocity = m_pPlayer->GetVelocity();
-	p.data.shift = m_pPlayer->GetShift();
+	//p.data.velocity = m_pPlayer->GetVelocity();
+	//p.data.shift = m_pPlayer->GetShift();
 	do_send(&p);
 }
 
