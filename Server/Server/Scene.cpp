@@ -51,6 +51,7 @@ void CScene::BuildObjects()
 	meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 	m_ppGameObjects[1] = meteo;
 
+	// meteo
 	for (int i = 2; i < 99; ++i) {
 		meteo = new MeteoObject();
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
@@ -66,12 +67,14 @@ void CScene::BuildObjects()
 		m_ppGameObjects[i]->UpdateTransform(NULL);
 	}
 
+	// meteorite
 	for (int i = 99; i < 200; ++i) {
 		meteo = new MeteoObject();
 		
 		//meteo->SetOOBB();
-		meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
-		meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.000628f, -0.011224f, -0.003297f }, XMFLOAT3{ 0.057967f, 0.050386f, 0.055706f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+		//meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+		meteo->SetScale(5, 5, 5);
+		meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.000628f, -0.011224f, -0.003297f }, XMFLOAT3{ 2.89832f, 2.51931f, 2.78528f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		//meteo->UpdateBoundingBox();
 		//meteo->boundingbox = meteo->m_xmOOBB;
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
