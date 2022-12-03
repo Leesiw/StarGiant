@@ -246,7 +246,6 @@ void CScene::CheckObjectByBulletCollisions()
 				}
 				if (m_ppGameObjects[i]->aabb.Intersects(ppBullets[j]->aabb)) {
 					//if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i])) {
-					cout << "총알 운석 충돌" << i << endl;
 					m_ppGameObjects[i]->hp -= 3;
 					ppBullets[j]->Reset();
 

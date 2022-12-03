@@ -35,6 +35,8 @@ private:
 	CScene* m_TwiceScene = NULL;
 	CPlayer* m_pPlayer = NULL;
 	CPlayer* m_TwicePlayer = NULL;
+	CEnemyObject* m_Enemy = NULL;
+
 
 	POINT						m_ptOldCursorPos;
 
