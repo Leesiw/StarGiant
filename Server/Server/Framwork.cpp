@@ -4,6 +4,7 @@ CGameFramework::CGameFramework()
 {
 	m_pScene = NULL;
 	m_pPlayer = NULL;
+	m_Enemy = NULL;
 }
 
 CGameFramework::~CGameFramework()
@@ -130,6 +131,12 @@ void CGameFramework::BuildObjects()
 	m_pScene->m_pPlayer = m_pPlayer = pAirplanePlayer;
 	//m_pCamera = m_pPlayer->GetCamera();
 
+
+	/////////////////////////////////////////
+
+	CEnemyShip* enemyship = new CEnemyShip();
+	m_pScene->m_enemy = m_Enemy = enemyship;
+
 	////////////////////////////////////////
 
 	m_TwiceScene = new CScene();
@@ -145,6 +152,8 @@ void CGameFramework::BuildObjects()
 void CGameFramework::ReleaseObjects()
 {
 	if (m_pPlayer) m_pPlayer->Release();
+	if (m_Enemy) m_Enemy->Release();
+
 	if (m_TwicePlayer) m_pPlayer->Release();
 
 	if (m_pScene) m_pScene->ReleaseObjects();
@@ -161,7 +170,9 @@ void CGameFramework::AnimateObjects(float fTimeElapsed)
 	if (m_TwiceScene) m_TwiceScene->AnimateObjects(fTimeElapsed);
 
 	m_pPlayer->Animate(fTimeElapsed, NULL);
-	m_pPlayer->Update(fTimeElapsed);
+	//m_pPlayer->Update(fTimeElapsed);
+
+	m_Enemy->Animate(fTimeElapsed);;
 	//
 }
 

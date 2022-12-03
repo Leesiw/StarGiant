@@ -26,16 +26,13 @@ public:
 
 	virtual void OnPrepareRender();
 	virtual void Animate(float fElapsedTime);
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
-
-
 };
 
 
 class CEnemyShip : public CEnemyObject
 {
 public:
-	CEnemyShip(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	CEnemyShip();
 	virtual ~CEnemyShip();
 
 	CGameObject** m_BulletObjects = NULL;
@@ -48,5 +45,4 @@ public:
 public:
 	virtual void Animate(float fTimeElapsed);
 	virtual void OnPrepareRender();
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 };
