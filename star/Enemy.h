@@ -25,12 +25,19 @@ public:
 
 public:
 	void Fallowing(float fTimeElapsed, XMFLOAT3 Look);
-
+	void Rotate(float x, float y, float z);
+	void SetPosition(const XMFLOAT3& xmf3Position) {
+		m_xmf3Position = Vector3::Add(m_xmf3Position, XMFLOAT3(xmf3Position.x - m_xmf3Position.x, xmf3Position.y - m_xmf3Position.y, xmf3Position.z - m_xmf3Position.z));
+	}
 	virtual void OnPrepareRender();
 	virtual void Animate(float fElapsedTime);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 	
-	
+	float GetPitch() { return m_fPitch; }
+	float GetYaw() { return m_fYaw; }
+	float GetRoll() { return m_fRoll; }
+
+	void SetPYR(float pitch, float yaw, float roll);
 };
 
 

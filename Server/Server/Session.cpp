@@ -1,6 +1,6 @@
 #include "Session.h"
 
-void SESSION::send_move_packet(int c_id, CPlayer* m_pPlayer)
+void SESSION::send_move_packet(int c_id, CPlayer* m_pPlayer, CEnemyObject* m_pEnemy)	// 플레이어/적의 좌표 각도 전송
 {
 	SC_MOVE_PLAYER_PACKET p;
 	p.size = sizeof(SC_MOVE_PLAYER_PACKET);
@@ -12,6 +12,15 @@ void SESSION::send_move_packet(int c_id, CPlayer* m_pPlayer)
 	//p.data.velocity = m_pPlayer->GetVelocity();
 	//p.data.shift = m_pPlayer->GetShift();
 	do_send(&p);
+
+	SC_MOVE_PLAYER_PACKET e;
+	e.size = sizeof(SC_MOVE_PLAYER_PACKET);
+	e.type = SC_MOVE_ENEMY;
+	e.data.pos = m_pEnemy->GetPosition();
+	e.data.m_fPitch = m_pEnemy->GetPitch();
+	e.data.m_fRoll = m_pEnemy->GetRoll();
+	e.data.m_fYaw = m_pEnemy->GetYaw();
+	do_send(&e);
 }
 
 void SESSION::send_bullet_packet(int c_id, CPlayer* m_pPlayer)

@@ -457,8 +457,8 @@ void CScene::MoveMeteo(float fTimeElapsed)
 		m_ppGameObjects[i]->UpdateSpeed(fTimeElapsed);
 		m_ppGameObjects[i]->UpdateRespawn(m_pPlayer->GetBox(), m_pPlayer->GetPosition(), m_pPlayer->GetLook());
 	}*/
-	m_enemy->UpdateSpeed(fTimeElapsed);
-	m_enemy->UpdateRespawn(m_pPlayer->GetBox(), m_pPlayer->GetPosition(), m_pPlayer->GetLook());
+	//m_enemy->UpdateSpeed(fTimeElapsed);
+	//m_enemy->UpdateRespawn(m_pPlayer->GetBox(), m_pPlayer->GetPosition(), m_pPlayer->GetLook());
 
 }
 
@@ -467,6 +467,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	m_fElapsedTime = fTimeElapsed;
 
 	//m_ppGameObjects[1]->turnturn(fTimeElapsed);
+	/*
 	if (m_enemy) {
 		m_enemy->Rotate(90.f);
 		std::cout << "ss";
@@ -475,7 +476,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			|| m_enemy->GetPosition().z - m_pPlayer->GetPosition().z >= 50.f || m_enemy->GetPosition().z - m_pPlayer->GetPosition().z <= -50.f)
 			m_enemy->Fallowing(fTimeElapsed, m_pPlayer->GetLook());
 	}
-
+	*/
 	for (int i = 0; i < m_nGameObjects; i++) {
 		if (!m_pPlayer->GetBox().Intersects(m_ppGameObjects[i]->m_pChild->m_xmOOBB)) {
 			//std::cout << "´«";

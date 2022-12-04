@@ -28,9 +28,10 @@ constexpr char SC_REMOVE_PLAYER = 5;
 constexpr char SC_METEO = 6;
 
 constexpr char SC_MOVE_PLAYER = 7;
-constexpr char SC_BULLET = 8;
-constexpr char SC_REMOVE_BULLET = 9;
-constexpr char SC_BULLET_HIT = 10;
+constexpr char SC_MOVE_ENEMY = 8;
+constexpr char SC_BULLET = 9;
+constexpr char SC_REMOVE_BULLET = 10;
+constexpr char SC_BULLET_HIT = 11;
 
 // Player type 
 constexpr char MOVE = 0;

@@ -615,7 +615,7 @@ void CGameFramework::AnimateObjects()
 	if (m_TwiceScene) m_TwiceScene -> AnimateObjects(fTimeElapsed);
 
 	m_pPlayer->Animate(fTimeElapsed, NULL);
-	m_Enemy->Animate(fTimeElapsed);
+	//m_Enemy->Animate(fTimeElapsed);
 
 	//
 }
@@ -727,7 +727,6 @@ void CGameFramework::RecvServer()
 			DWORD recvByte{}, recvFlag{};
 			//recv(sock, subBuf, sizeof(subBuf), MSG_WAITALL);
 			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-			float x = m_pPlayer->GetPosition().z;
 			PLAYER_INFO playerInfo;
 			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO));
 			m_pPlayer->SetPlayerInfo(playerInfo);
@@ -742,6 +741,25 @@ void CGameFramework::RecvServer()
 
 			//m_pPlayer->OnPrepareRender();
 			//cout << "회전 각도 " << playerInfo.m_fYaw - m_pPlayer->GetYaw() << endl;
+			break;
+		}
+		case SC_MOVE_ENEMY:
+		{
+			char subBuf[sizeof(PLAYER_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+			float x = m_pPlayer->GetPosition().z;
+			PLAYER_INFO enemyInfo;
+			memcpy(&enemyInfo, &subBuf, sizeof(PLAYER_INFO));
+//			printf("enemy angle : %f %f %f\n", m_Enemy->GetPitch(),
+					//m_Enemy->GetYaw(), m_Enemy->GetRoll());
+			//printf("enemy pos : %f %f %f\n", enemyInfo.pos.x, enemyInfo.pos.y, enemyInfo.pos.z);
+			m_Enemy->SetPosition(enemyInfo.pos);
+			m_Enemy->m_pChild->Rotate(enemyInfo.m_fPitch - m_Enemy->GetPitch(), 
+				enemyInfo.m_fYaw - m_Enemy->GetYaw(),enemyInfo.m_fRoll - m_Enemy->GetRoll());	// 실제 Rotate
+			m_Enemy->SetPYR(enemyInfo.m_fPitch,
+				enemyInfo.m_fYaw, enemyInfo.m_fRoll);
 			break;
 		}
 		case SC_BULLET:

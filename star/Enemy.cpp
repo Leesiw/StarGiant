@@ -33,6 +33,32 @@ void CEnemyObject::Fallowing(float fTimeElapsed, XMFLOAT3 Look)
 	CEnemyObject::Animate(fTimeElapsed);
 }
 
+void CEnemyObject::Rotate(float x, float y, float z)
+{
+	if (x != 0.0f)
+	{
+		m_fPitch += x;
+		if (m_fPitch > 360.0f) m_fPitch -= 360.0f;
+		if (m_fPitch < 0.0f) m_fPitch += 360.0f;
+	}
+	if (y != 0.0f)
+	{
+		m_fYaw += y;
+		if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
+		if (m_fYaw < 0.0f) m_fYaw += 360.0f;
+	}
+	if (z != 0.0f)
+	{
+		m_fRoll += z;
+		if (m_fRoll > 360.0f) m_fRoll -= 360.0f;
+		if (m_fRoll < 0.0f) m_fRoll += 360.0f;
+	}
+
+	//m_xmf3Look = Vector3::Normalize(m_xmf3Look);
+	//m_xmf3Right = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Up, m_xmf3Look));
+	//m_xmf3Up = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Look, m_xmf3Right));
+}
+
 void CEnemyObject::OnPrepareRender()
 {
 	m_xmf4x4Transform._11 = m_xmf3Right.x; m_xmf4x4Transform._12 = m_xmf3Right.y; m_xmf4x4Transform._13 = m_xmf3Right.z;
@@ -51,6 +77,13 @@ void CEnemyObject::Animate(float fElapsedTime)
 void CEnemyObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	CGameObject::Render(pd3dCommandList, NULL);
+}
+
+void CEnemyObject::SetPYR(float pitch, float yaw, float roll)
+{
+	m_fPitch = pitch;
+	m_fYaw = yaw;
+	m_fRoll = roll;
 }
 
 
@@ -80,7 +113,7 @@ void CEnemyShip::FireBullet(CGameObject* pLockedObject)
 
 void CEnemyShip::Animate(float fTimeElapsed)
 {
-	m_xmf3Position = Vector3::Add(m_xmf3Position, XMFLOAT3(0.f,0.f,-0.1f));
+	//m_xmf3Position = Vector3::Add(m_xmf3Position, XMFLOAT3(0.f,0.f,-0.1f));
 
 	//this->MoveForward(10.0f);
 	CEnemyObject::Animate(fTimeElapsed);

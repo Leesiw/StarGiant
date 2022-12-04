@@ -172,8 +172,7 @@ void CGameFramework::AnimateObjects(float fTimeElapsed)
 	m_pPlayer->Animate(fTimeElapsed, NULL);
 	m_pPlayer->Update(fTimeElapsed);
 
-	m_Enemy->Animate(fTimeElapsed);;
-	//
+	m_Enemy->Animate(fTimeElapsed, m_pPlayer->GetPosition());
 }
 
 
@@ -234,7 +233,7 @@ void CGameFramework::ClientProcess()
 			AnimateObjects(fps.count());
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;
-				pl.send_move_packet(0, m_pPlayer);
+				pl.send_move_packet(0, m_pPlayer, m_Enemy);
 			}
 			fps = EndTime - EndTime;
 		}
