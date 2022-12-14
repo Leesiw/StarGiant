@@ -95,7 +95,7 @@ public:
 
 	CGameObject** m_BulletObjects = NULL;
 	CBulletObject* m_ppBullets[BULLETS];
-	void FireBullet(CGameObject* pLockedObject);
+	bool FireBullet(CGameObject* pLockedObject);
 	float						m_fBulletEffectiveRange = 150.0f;
 	CGameObject* pBullet;
 

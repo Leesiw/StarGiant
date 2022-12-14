@@ -76,7 +76,9 @@ void CEnemyObject::Animate(float fElapsedTime)
 
 void CEnemyObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
-	CGameObject::Render(pd3dCommandList, NULL);
+	if (m_bAppeared) {
+		CGameObject::Render(pd3dCommandList, NULL);
+	}
 }
 
 void CEnemyObject::SetPYR(float pitch, float yaw, float roll)
@@ -84,6 +86,11 @@ void CEnemyObject::SetPYR(float pitch, float yaw, float roll)
 	m_fPitch = pitch;
 	m_fYaw = yaw;
 	m_fRoll = roll;
+}
+
+void CEnemyObject::SetAppeared(bool appeared)
+{
+	m_bAppeared = appeared;
 }
 
 

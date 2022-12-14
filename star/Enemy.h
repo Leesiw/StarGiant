@@ -19,7 +19,7 @@ protected:
 	float           			m_fYaw = 0;
 	float           			m_fRoll = 0;
 
-
+	bool						m_bAppeared = true;
 public:
 	int hp;
 
@@ -38,6 +38,7 @@ public:
 	float GetRoll() { return m_fRoll; }
 
 	void SetPYR(float pitch, float yaw, float roll);
+	void SetAppeared(bool appeared);
 };
 
 

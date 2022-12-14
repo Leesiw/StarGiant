@@ -259,6 +259,33 @@ void CScene::CheckObjectByBulletCollisions()
 	}
 }
 
+void CScene::CheckEnemyByBulletCollisions()
+{
+
+	CBulletObject** ppBullets = ((CAirplanePlayer*)m_pPlayer)->m_ppBullets;
+
+	if (m_enemy && m_enemy->hp < 0) return;
+	for (int j = 0; j < BULLETS; j++)
+	{
+		if (ppBullets[j]->m_bActive) {
+			XMFLOAT3 pos = m_enemy->GetPosition();
+			pos.z += 130.0f;
+			m_enemy->aabb = BoundingBox(pos, XMFLOAT3(8.0f, 8.0f, 3.0f));
+			ppBullets[j]->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(20.0f, 20.0f, 50.0f));
+			//m_enemy->m_xmOOBB.Center.z += 130.0f;
+			if (m_enemy->aabb.Intersects(ppBullets[j]->aabb)) {
+				//if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i])) {
+				m_enemy->hp -= 3;
+				ppBullets[j]->Reset();
+				if (m_enemy->hp < 0) {
+					m_enemy->SetResetWaitingTime();
+				}
+			}
+		}
+	}
+
+}
+
 void CScene::MoveMeteo(float fTimeElapsed)
 {
 	for (int i = 0; i < m_nGameObjects; ++i) {
@@ -285,4 +312,5 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	CheckObjectByPlayerCollisions();
 	CheckObjectByBulletCollisions();
+	CheckEnemyByBulletCollisions();
 }

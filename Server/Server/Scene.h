@@ -24,6 +24,7 @@ public:
 
 
 	void CheckObjectByBulletCollisions();
+	void CheckEnemyByBulletCollisions();
 
 	CPlayer* m_pPlayer = NULL;
 	CEnemyObject* m_enemy = NULL;

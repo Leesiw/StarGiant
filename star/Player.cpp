@@ -571,8 +571,8 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 
 void CAirplanePlayer::SetBulletFromServer(BULLET_INFO bulletInfo)
 {
-	if (m_fFireWaitingTime > 0.0f)
-		return;
+	//if (m_fFireWaitingTime > 0.0f)
+		//return;
 
 	CBulletObject* pBulletObject = NULL;
 	for (int i = 0; i < BULLETS; i++)
@@ -593,7 +593,7 @@ void CAirplanePlayer::SetBulletFromServer(BULLET_INFO bulletInfo)
 		pBulletObject->SetActive(true);
 		pBulletObject->UpdateBoundingBox();
 
-		m_fFireWaitingTime = m_fFireDelayTime * 1.0f;
+		//m_fFireWaitingTime = m_fFireDelayTime * 1.0f;
 		/*
 		if (pLockedObject)
 		{

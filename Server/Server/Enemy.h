@@ -17,7 +17,8 @@ protected:
 	float           			m_fYaw = 0;
 	float           			m_fRoll = 0;
 
-
+	float						m_fResetWaitingTime = 0.0f;
+	float						m_fResetDelayTime = 2.0f;
 public:
 	int hp;
 
@@ -30,11 +31,13 @@ public:
 
 	virtual void OnPrepareRender();
 	virtual void Animate(float fElapsedTime);
-	void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
+	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
 
 	float GetPitch() { return m_fPitch; }
 	float GetYaw() { return m_fYaw; }
 	float GetRoll() { return m_fRoll; }
+
+	void SetResetWaitingTime();
 };
 
 
@@ -46,12 +49,16 @@ public:
 
 	CGameObject** m_BulletObjects = NULL;
 	CBulletObject* m_ppBullets[BULLETS];
-	void FireBullet(CGameObject* pLockedObject);
+	bool FireBullet(CGameObject* pLockedObject);
 	float						m_fBulletEffectiveRange = 150.0f;
 	CGameObject* pBullet;
+
+	float						m_fFireWaitingTime = 0.0f;
+	float						m_fFireDelayTime = 2.0f;
 
 
 public:
 	virtual void Animate(float fTimeElapsed);
+	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
 	virtual void OnPrepareRender();
 };

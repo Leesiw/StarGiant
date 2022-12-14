@@ -345,7 +345,7 @@ void CAirplanePlayer::OnPrepareRender()
 	CPlayer::OnPrepareRender();
 }
 
-void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
+bool CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 {
 	/*
 		if (pLockedObject)
@@ -355,7 +355,7 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 		}
 	*/
 	if (m_fFireWaitingTime > 0.0f)
-		return;
+		return false;
 
 	CBulletObject* pBulletObject = NULL;
 	for (int i = 0; i < BULLETS; i++)
@@ -416,4 +416,6 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 			pBulletObject->m_pLockedObject = pLockedObject;
 		}
 	}
+
+	return true;
 }

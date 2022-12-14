@@ -745,13 +745,13 @@ void CGameFramework::RecvServer()
 		}
 		case SC_MOVE_ENEMY:
 		{
-			char subBuf[sizeof(PLAYER_INFO)]{};
+			char subBuf[sizeof(ENEMY_INFO)]{};
 			WSABUF wsabuf{ sizeof(subBuf), subBuf };
 			DWORD recvByte{}, recvFlag{};
 			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
 			float x = m_pPlayer->GetPosition().z;
-			PLAYER_INFO enemyInfo;
-			memcpy(&enemyInfo, &subBuf, sizeof(PLAYER_INFO));
+			ENEMY_INFO enemyInfo;
+			memcpy(&enemyInfo, &subBuf, sizeof(ENEMY_INFO));
 //			printf("enemy angle : %f %f %f\n", m_Enemy->GetPitch(),
 					//m_Enemy->GetYaw(), m_Enemy->GetRoll());
 			//printf("enemy pos : %f %f %f\n", enemyInfo.pos.x, enemyInfo.pos.y, enemyInfo.pos.z);
@@ -760,6 +760,7 @@ void CGameFramework::RecvServer()
 				enemyInfo.m_fYaw - m_Enemy->GetYaw(),enemyInfo.m_fRoll - m_Enemy->GetRoll());	// ½ÇÁ¦ Rotate
 			m_Enemy->SetPYR(enemyInfo.m_fPitch,
 				enemyInfo.m_fYaw, enemyInfo.m_fRoll);
+			m_Enemy->SetAppeared(enemyInfo.appeared);
 			break;
 		}
 		case SC_BULLET:

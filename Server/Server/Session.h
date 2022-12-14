@@ -88,6 +88,8 @@ public:
 	}
 	void send_move_packet(int c_id, CPlayer* m_pPlayer, CEnemyObject* m_pEnemy);
 	void send_bullet_packet(int c_id, CPlayer* m_pPlayer);
+	void send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 player_pos);
 	void send_meteo_packet(int c_id, CGameObject* []);
 	void send_bullet_hit_packet(int c_id, int meteo_id, int bullet_id);
+
 };

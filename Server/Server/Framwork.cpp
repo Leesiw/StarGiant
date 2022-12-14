@@ -173,6 +173,13 @@ void CGameFramework::AnimateObjects(float fTimeElapsed)
 	m_pPlayer->Update(fTimeElapsed);
 
 	m_Enemy->Animate(fTimeElapsed, m_pPlayer->GetPosition());
+	if (((CEnemyShip*)m_Enemy)->FireBullet(NULL))
+	{
+		for (auto& pl : clients) {
+			if (false == pl.in_use) continue;
+			pl.send_bullet_packet(0, m_Enemy, m_pPlayer->GetPosition());
+		}
+	}
 }
 
 
@@ -206,10 +213,11 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_ATTACK: {
 		CS_ATTACK_PACKET* p = reinterpret_cast<CS_ATTACK_PACKET*>(packet);
 		if (clients[c_id].type == ATTACK) {
-			((CAirplanePlayer*)m_pPlayer)->FireBullet(m_pLockedObject);
-			for (auto& pl : clients) {
-				if (false == pl.in_use) continue;
-				pl.send_bullet_packet(0,m_pPlayer);
+			if (((CAirplanePlayer*)m_pPlayer)->FireBullet(m_pLockedObject)) {
+				for (auto& pl : clients) {
+					if (false == pl.in_use) continue;
+					pl.send_bullet_packet(0, m_pPlayer);
+				}
 			}
 			m_pLockedObject = NULL;
 		}
