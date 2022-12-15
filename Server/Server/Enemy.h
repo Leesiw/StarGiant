@@ -36,6 +36,7 @@ public:
 	float GetPitch() { return m_fPitch; }
 	float GetYaw() { return m_fYaw; }
 	float GetRoll() { return m_fRoll; }
+	XMFLOAT3 GetRotateLook(float x, float y, float z);
 
 	void SetResetWaitingTime();
 };

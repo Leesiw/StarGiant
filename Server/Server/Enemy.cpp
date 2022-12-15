@@ -76,6 +76,47 @@ void CEnemyObject::Rotate(float x, float y, float z)
 	m_xmf3Right = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Up, m_xmf3Look));
 	m_xmf3Up = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Look, m_xmf3Right));
 }
+XMFLOAT3 CEnemyObject::GetRotateLook(float x, float y, float z)
+{
+	if (x != 0.0f)
+	{
+		m_fPitch += x;
+		if (m_fPitch > 89.0f) { m_fPitch = 89.0f; }
+		if (m_fPitch < -89.0f) m_fPitch = -89.0f;
+	}
+	if (y != 0.0f)
+	{
+		m_fYaw += y;
+		if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
+		if (m_fYaw < 0.0f) m_fYaw += 360.0f;
+	}
+	if (z != 0.0f)
+	{
+		m_fRoll += z;
+		if (m_fRoll > 89.0f) { m_fRoll = 89.0f; }
+		if (m_fRoll < -89.0f) m_fRoll = -89.0f;
+	}
+
+	if (x != 0.0f)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(x));
+		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+	}
+
+	if (y != 0.0f)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
+		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+	}
+	if (z != 0.0f)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Look), XMConvertToRadians(z));
+		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+	}
+
+	return Vector3::Normalize(m_xmf3Look);
+}
+
 
 
 void CEnemyObject::OnPrepareRender()
@@ -108,7 +149,7 @@ void CEnemyObject::Animate(float fElapsedTime, XMFLOAT3 player_pos)
 	XMFLOAT3 xmf3Position = GetPosition();
 	XMVECTOR xmvPosition = XMLoadFloat3(&xmf3Position);
 
-	xmf3Position.z += 100.0;	// 플레이어와 Enemy 위치 차이 커버...
+	xmf3Position.z += 130.0;	// 플레이어와 Enemy 위치 차이 커버...
 
 	float x = player_pos.x - xmf3Position.x;
 	float y = player_pos.y - xmf3Position.y;

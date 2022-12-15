@@ -62,13 +62,23 @@ void SESSION::send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 play
 	XMFLOAT3 pos{};// = m_pEnemy->GetPosition();
 	//pos.z += 130.0f;
 
-	//pos.x = cos(m_pEnemy->GetYaw() + 180.0f);
-	//pos.z = sin(m_pEnemy->GetYaw() + 180.0f);
-	
-	//p.data.direction = pos;
-	p.data.direction = Vector3::Add(player_pos, pos, -1.0f);
-	//Vector3::ScalarProduct(m_pEnemy->GetLook(), -1.0f, true);
+	/*pos.x = cos(m_pEnemy->GetYaw() + 180.0f);
+	pos.z = sin(m_pEnemy->GetYaw() + 180.0f);*/
+	XMFLOAT3 T_Position = m_pEnemy->GetPosition();
+	T_Position.z += +120.0f;
+
+	/*pos.x =  T_Position.x;
+	pos.z =  T_Position.z;*/
+	//XMFLOAT3 Pos = Vector3::ScalarProduct(direction, 20.0f * fTimeElapsed);
+
+	float yaw = 180.0 + XMConvertToDegrees(atan2(player_pos.x - T_Position.x, player_pos.z - T_Position.z));
+
+	pos = m_pEnemy->GetRotateLook(0, yaw - m_pEnemy->GetYaw(), 0);
+	pos = XMFLOAT3{ -pos.x, -pos.y, -pos.z };
+
 	p.data.direction = pos;
+//	p.data.direction = Vector3::Add(player_pos, pos, -1.0f);///////////////////////////////////
+	//Vector3::ScalarProduct(m_pEnemy->GetLook(), -1.0f, true);
 	p.data.pos = m_pEnemy->GetPosition();
 	p.data.pos.z += 130.0;
 	p.data.pitch = m_pEnemy->GetPitch();
