@@ -49,6 +49,9 @@ public:
 
 	XMFLOAT3 GetPosition() { return(m_xmf3Position); }
 	XMFLOAT3 GetLookVector() { return(m_xmf3Look); }
+	XMFLOAT3 GetRealLookPosition() {
+		 return XMFLOAT3( m_xmf3Position.x + (m_xmf3Look.x*40.f),m_xmf3Position.y,m_xmf3Position.z );
+	}
 
 	XMFLOAT3 GetShift() { return(m_xmf3Shift); }
 	XMFLOAT3 GetRotate() { return(XMFLOAT3(m_fPitch, m_fYaw, m_fRoll)); }
@@ -95,7 +98,7 @@ public:
 
 	CGameObject** m_BulletObjects = NULL;
 	CBulletObject* m_ppBullets[BULLETS];
-	void FireBullet(CGameObject* pLockedObject);
+	bool FireBullet(CGameObject* pLockedObject);
 	float						m_fBulletEffectiveRange = 150.0f;
 	CGameObject* pBullet;
 

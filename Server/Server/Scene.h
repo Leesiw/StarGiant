@@ -1,6 +1,7 @@
 #pragma once
-#include "Player.h"
+#include "Session.h"
 
+extern array<SESSION, MAX_USER> clients;
 
 class CScene
 {
@@ -23,8 +24,10 @@ public:
 
 
 	void CheckObjectByBulletCollisions();
+	void CheckEnemyByBulletCollisions();
 
 	CPlayer* m_pPlayer = NULL;
+	CEnemyObject* m_enemy = NULL;
 
 public:
 	CGameObject** m_ppGameObjects = NULL;

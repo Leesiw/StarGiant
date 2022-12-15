@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Scene.h"
 
-
 CScene::CScene()
 {
 }
@@ -51,6 +50,7 @@ void CScene::BuildObjects()
 	meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 	m_ppGameObjects[1] = meteo;
 
+	// meteo
 	for (int i = 2; i < 99; ++i) {
 		meteo = new MeteoObject();
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
@@ -66,12 +66,14 @@ void CScene::BuildObjects()
 		m_ppGameObjects[i]->UpdateTransform(NULL);
 	}
 
+	// meteorite
 	for (int i = 99; i < 200; ++i) {
 		meteo = new MeteoObject();
 		
 		//meteo->SetOOBB();
-		meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
-		meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.000628f, -0.011224f, -0.003297f }, XMFLOAT3{ 0.057967f, 0.050386f, 0.055706f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+		//meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+		meteo->SetScale(5, 5, 5);
+		meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.000628f, -0.011224f, -0.003297f }, XMFLOAT3{ 2.89832f, 2.51931f, 2.78528f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		//meteo->UpdateBoundingBox();
 		//meteo->boundingbox = meteo->m_xmOOBB;
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
@@ -230,47 +232,58 @@ void CScene::CheckObjectByBulletCollisions()
 	CBulletObject** ppBullets = ((CAirplanePlayer*)m_pPlayer)->m_ppBullets;
 	for (int i = 0; i < m_nGameObjects; ++i)
 	{
+		if (!m_ppGameObjects[i]->mesh) continue;
 		for (int j = 0; j < BULLETS; j++)
 		{
-
 			ppBullets[j]->UpdateBoundingBox();
-
-
 			if (ppBullets[j]->m_bActive) {
-				//cout << ppBullets[0]->m_xmOOBB.Center.z;
-
-				if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i]))
-					cout << "Dd";
-				if (ant == 0) {
-					cout << "\n" << ppBullets[j]->GetPosition().z << "- dd\n";
-
-				}
-				//m_ppGameObjects[i]->m_pChild->m_xmOOBB
-
-				//cout<<"z다  : "<< m_ppGameObjects[0]->m_pChild->m_xmOOBB.Center.z;
-				//cout << "z다 : " << ppBullets[j]->m_pChild->m_xmOOBB.Center.z;
-
-
-
-
-				XMFLOAT3 hi = { 0,0,0 };
-				/*
-				m_ppGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
-				ppBullets[j]->m_pChild->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(20.0f, 20.0f, 20.0f));
+				
+				m_ppGameObjects[i]->aabb = BoundingBox(m_ppGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
+				ppBullets[j]->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(20.0f, 20.0f, 20.0f));
 				if (ant == 0) {
 					// cout << "\ny : " << ppBullets[j]->m_pChild->aabb.Center.x<< ppBullets[j]->m_pChild->aabb.Center.y<< ppBullets[j]->m_pChild->aabb.Center.z;
 					ant++;
 				}
-				if (m_ppGameObjects[i]->m_pChild->aabb.Intersects(ppBullets[j]->m_pChild->aabb)) {
+				if (m_ppGameObjects[i]->aabb.Intersects(ppBullets[j]->aabb)) {
 					//if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i])) {
-					//cout << "충돌\n";
 					m_ppGameObjects[i]->hp -= 3;
 					ppBullets[j]->Reset();
-					//}
-				}*/
+
+					for (auto& pl : clients) {
+						if (false == pl.in_use) continue;
+						pl.send_bullet_hit_packet(0, i, j);
+					}
+				}
 			}
 		}
 	}
+}
+
+void CScene::CheckEnemyByBulletCollisions()
+{
+
+	CBulletObject** ppBullets = ((CAirplanePlayer*)m_pPlayer)->m_ppBullets;
+
+	if (m_enemy && m_enemy->hp < 0) return;
+	for (int j = 0; j < BULLETS; j++)
+	{
+		if (ppBullets[j]->m_bActive) {
+			XMFLOAT3 pos = m_enemy->GetPosition();
+			pos.z += 130.0f;
+			m_enemy->aabb = BoundingBox(pos, XMFLOAT3(8.0f, 8.0f, 3.0f));
+			ppBullets[j]->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(20.0f, 20.0f, 50.0f));
+			//m_enemy->m_xmOOBB.Center.z += 130.0f;
+			if (m_enemy->aabb.Intersects(ppBullets[j]->aabb)) {
+				//if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i])) {
+				m_enemy->hp -= 3;
+				ppBullets[j]->Reset();
+				if (m_enemy->hp < 0) {
+					m_enemy->SetResetWaitingTime();
+				}
+			}
+		}
+	}
+
 }
 
 void CScene::MoveMeteo(float fTimeElapsed)
@@ -298,5 +311,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (int i = 0; i < m_nGameObjects; i++) { m_ppGameObjects[i]->Animate(fTimeElapsed, NULL); }
 
 	CheckObjectByPlayerCollisions();
-	//CheckObjectByBulletCollisions();
+	CheckObjectByBulletCollisions();
+	CheckEnemyByBulletCollisions();
 }

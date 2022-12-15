@@ -597,8 +597,8 @@ void CGameFramework::ProcessInput()
 			PLAYER_INFO playerInfo = m_pPlayer->GetPlayerInfo();
 			m_pPlayer->SetPosition(playerInfo.pos);
 			m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
-			m_pPlayer->SetVelocity(playerInfo.velocity);
-			m_pPlayer->SetShift(playerInfo.shift);
+			//m_pPlayer->SetVelocity(playerInfo.velocity);
+			//m_pPlayer->SetShift(playerInfo.shift);
 			m_pPlayer->Rotate(playerInfo.m_fPitch - m_pPlayer->GetPitch(), playerInfo.m_fYaw - m_pPlayer->GetYaw(), playerInfo.m_fRoll - m_pPlayer->GetRoll());
 			m_pPlayer->SetPlayerInfoUpdate(false);
 		}
@@ -615,7 +615,7 @@ void CGameFramework::AnimateObjects()
 	if (m_TwiceScene) m_TwiceScene -> AnimateObjects(fTimeElapsed);
 
 	m_pPlayer->Animate(fTimeElapsed, NULL);
-	m_Enemy->Animate(fTimeElapsed);
+	//m_Enemy->Animate(fTimeElapsed);
 
 	//
 }
@@ -727,7 +727,6 @@ void CGameFramework::RecvServer()
 			DWORD recvByte{}, recvFlag{};
 			//recv(sock, subBuf, sizeof(subBuf), MSG_WAITALL);
 			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-			float x = m_pPlayer->GetPosition().z;
 			PLAYER_INFO playerInfo;
 			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO));
 			m_pPlayer->SetPlayerInfo(playerInfo);
@@ -744,6 +743,26 @@ void CGameFramework::RecvServer()
 			//cout << "회전 각도 " << playerInfo.m_fYaw - m_pPlayer->GetYaw() << endl;
 			break;
 		}
+		case SC_MOVE_ENEMY:
+		{
+			char subBuf[sizeof(ENEMY_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+			float x = m_pPlayer->GetPosition().z;
+			ENEMY_INFO enemyInfo;
+			memcpy(&enemyInfo, &subBuf, sizeof(ENEMY_INFO));
+//			printf("enemy angle : %f %f %f\n", m_Enemy->GetPitch(),
+					//m_Enemy->GetYaw(), m_Enemy->GetRoll());
+			//printf("enemy pos : %f %f %f\n", enemyInfo.pos.x, enemyInfo.pos.y, enemyInfo.pos.z);
+			m_Enemy->SetPosition(enemyInfo.pos);
+			m_Enemy->m_pChild->Rotate(enemyInfo.m_fPitch - m_Enemy->GetPitch(), 
+				enemyInfo.m_fYaw - m_Enemy->GetYaw(),enemyInfo.m_fRoll - m_Enemy->GetRoll());	// 실제 Rotate
+			m_Enemy->SetPYR(enemyInfo.m_fPitch,
+				enemyInfo.m_fYaw, enemyInfo.m_fRoll);
+			m_Enemy->SetAppeared(enemyInfo.appeared);
+			break;
+		}
 		case SC_BULLET:
 		{
 			char subBuf[sizeof(BULLET_INFO)]{};
@@ -758,6 +777,19 @@ void CGameFramework::RecvServer()
 		}
 		case SC_REMOVE_PLAYER:
 		{
+			break;
+		}
+		case SC_BULLET_HIT:
+		{
+			char subBuf[sizeof(BULLET_HIT_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			BULLET_HIT_INFO bulletInfo;
+			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_HIT_INFO));
+			m_pScene->m_ppGameObjects[bulletInfo.meteo_id]->hp -= 3;
+			((CAirplanePlayer*)m_pPlayer)->m_ppBullets[bulletInfo.bullet_id]->Reset();
 			break;
 		}
 		default:

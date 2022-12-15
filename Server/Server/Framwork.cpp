@@ -4,6 +4,7 @@ CGameFramework::CGameFramework()
 {
 	m_pScene = NULL;
 	m_pPlayer = NULL;
+	m_Enemy = NULL;
 }
 
 CGameFramework::~CGameFramework()
@@ -130,6 +131,12 @@ void CGameFramework::BuildObjects()
 	m_pScene->m_pPlayer = m_pPlayer = pAirplanePlayer;
 	//m_pCamera = m_pPlayer->GetCamera();
 
+
+	/////////////////////////////////////////
+
+	CEnemyShip* enemyship = new CEnemyShip();
+	m_pScene->m_enemy = m_Enemy = enemyship;
+
 	////////////////////////////////////////
 
 	m_TwiceScene = new CScene();
@@ -145,6 +152,8 @@ void CGameFramework::BuildObjects()
 void CGameFramework::ReleaseObjects()
 {
 	if (m_pPlayer) m_pPlayer->Release();
+	if (m_Enemy) m_Enemy->Release();
+
 	if (m_TwicePlayer) m_pPlayer->Release();
 
 	if (m_pScene) m_pScene->ReleaseObjects();
@@ -162,7 +171,15 @@ void CGameFramework::AnimateObjects(float fTimeElapsed)
 
 	m_pPlayer->Animate(fTimeElapsed, NULL);
 	m_pPlayer->Update(fTimeElapsed);
-	//
+
+	m_Enemy->Animate(fTimeElapsed, m_pPlayer->GetPosition());
+	if (((CEnemyShip*)m_Enemy)->FireBullet(NULL))
+	{
+		for (auto& pl : clients) {
+			if (false == pl.in_use) continue;
+			pl.send_bullet_packet(0, m_Enemy, m_pPlayer->GetPosition());
+		}
+	}
 }
 
 
@@ -196,10 +213,11 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_ATTACK: {
 		CS_ATTACK_PACKET* p = reinterpret_cast<CS_ATTACK_PACKET*>(packet);
 		if (clients[c_id].type == ATTACK) {
-			((CAirplanePlayer*)m_pPlayer)->FireBullet(m_pLockedObject);
-			for (auto& pl : clients) {
-				if (false == pl.in_use) continue;
-				pl.send_bullet_packet(0,m_pPlayer);
+			if (((CAirplanePlayer*)m_pPlayer)->FireBullet(m_pLockedObject)) {
+				for (auto& pl : clients) {
+					if (false == pl.in_use) continue;
+					pl.send_bullet_packet(0, m_pPlayer);
+				}
 			}
 			m_pLockedObject = NULL;
 		}
@@ -223,7 +241,7 @@ void CGameFramework::ClientProcess()
 			AnimateObjects(fps.count());
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;
-				pl.send_move_packet(0, m_pPlayer);
+				pl.send_move_packet(0, m_pPlayer, m_Enemy);
 			}
 			fps = EndTime - EndTime;
 		}
@@ -275,59 +293,3 @@ void CGameFramework::disconnect(int c_id)
 //------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------
-
-void SESSION::send_move_packet(int c_id, CPlayer* m_pPlayer)
-{
-	SC_MOVE_PLAYER_PACKET p;
-	p.size = sizeof(SC_MOVE_PLAYER_PACKET);
-	p.type = SC_MOVE_PLAYER;
-	p.data.pos = m_pPlayer->GetPosition();
-	p.data.m_fPitch = m_pPlayer->GetPitch();
-	p.data.m_fRoll = m_pPlayer->GetRoll();
-	p.data.m_fYaw = m_pPlayer->GetYaw();
-	p.data.velocity = m_pPlayer->GetVelocity();
-	p.data.shift = m_pPlayer->GetShift();
-	do_send(&p);
-}
-
-void SESSION::send_bullet_packet(int c_id, CPlayer* m_pPlayer)
-{
-	
-	SC_BULLET_PACKET p;
-
-	p.size = sizeof(SC_BULLET_PACKET);
-	p.type = SC_BULLET;
-	
-	p.data.direction = m_pPlayer->GetLookVector();
-	p.data.pos = m_pPlayer->GetPosition();
-	p.data.pitch = m_pPlayer->GetPitch();
-	p.data.yaw = m_pPlayer->GetYaw();
-	p.data.roll = m_pPlayer->GetRoll();
-
-	char buf[sizeof(SC_BULLET_PACKET)];
-	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
-	WSABUF wsabuf{ sizeof(buf), buf };
-	DWORD sent_byte;
-
-	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
-
-}
-
-void SESSION::send_meteo_packet(int c_id, CGameObject* meteo[])
-{
-	SC_METEO_PACKET p;
-	p.size = sizeof(SC_METEO_PACKET);
-	p.type = SC_METEO;
-
-	for (int i = 0; i < METEOS; ++i) {
-		p.meteo[i].m_xmf4x4Transform = meteo[i]->m_xmf4x4Transform;
-		p.meteo[i].m_fRotationSpeed = meteo[i]->m_fRotationSpeed;
-	}
-	char buf[sizeof(SC_METEO_PACKET)];
-	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
-	WSABUF wsabuf{ sizeof(buf), buf };
-	DWORD sent_byte;
-
-	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
-
-}

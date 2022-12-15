@@ -28,8 +28,11 @@ constexpr char SC_REMOVE_PLAYER = 5;
 constexpr char SC_METEO = 6;
 
 constexpr char SC_MOVE_PLAYER = 7;
-constexpr char SC_BULLET = 8;
-constexpr char SC_REMOVE_BULLET = 9;
+constexpr char SC_MOVE_ENEMY = 8;
+constexpr char SC_BULLET = 9;
+constexpr char SC_REMOVE_BULLET = 10;
+constexpr char SC_BULLET_HIT = 11;
+constexpr char SC_ENEMY_DIE = 11;
 
 // Player type 
 constexpr char MOVE = 0;
@@ -55,12 +58,29 @@ struct LOGIN_INFO {
 
 struct PLAYER_INFO {
 	XMFLOAT3 pos;
-	XMFLOAT3 velocity;
-	XMFLOAT3 shift;
+	//XMFLOAT3 velocity;
+	//XMFLOAT3 shift;
 
 	float           			m_fPitch;
 	float           			m_fRoll;
 	float           			m_fYaw;
+};
+
+struct ENEMY_INFO {
+	XMFLOAT3 pos;
+	//XMFLOAT3 velocity;
+	//XMFLOAT3 shift;
+
+	float           			m_fPitch;
+	float           			m_fRoll;
+	float           			m_fYaw;
+
+	bool						appeared;
+};
+
+struct BULLET_HIT_INFO {
+	int meteo_id;
+	int bullet_id;
 };
 
 //-----------------------------------------------------------------------
@@ -112,6 +132,13 @@ struct SC_MOVE_PLAYER_PACKET {
 	PLAYER_INFO data;
 };
 
+struct SC_MOVE_ENEMY_PACKET {
+	unsigned char size;
+	char	type;
+
+	ENEMY_INFO data;
+};
+
 struct SC_METEO_PACKET {
 	unsigned char size;
 	char	type;
@@ -130,6 +157,13 @@ struct SC_REMOVE_BULLET_PACKET {
 	short	id;
 
 	int num;
+};
+
+struct SC_BULLET_HIT_PACKET {
+	unsigned char size;
+	char	type;
+	
+	BULLET_HIT_INFO data;
 };
 
 #pragma pack (pop)

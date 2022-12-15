@@ -151,20 +151,20 @@ void CPlayer::Rotate(float x, float y, float z)
 		if (x != 0.0f)
 		{
 			m_fPitch += x;
-			if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
-			if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
+			//if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
+			//if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
 		}
 		if (y != 0.0f)
 		{
 			m_fYaw += y;
-			if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
-			if (m_fYaw < 0.0f) m_fYaw += 360.0f;
+			//if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
+			//if (m_fYaw < 0.0f) m_fYaw += 360.0f;
 		}
 		if (z != 0.0f)
 		{
 			m_fRoll += z;
-			if (m_fRoll > +20.0f) { z -= (m_fRoll - 20.0f); m_fRoll = +20.0f; }
-			if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
+			//if (m_fRoll > +20.0f) { z -= (m_fRoll - 20.0f); m_fRoll = +20.0f; }
+			//if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
 		}
 		//m_pCamera->Rotate(x, y, z);
 
@@ -284,13 +284,14 @@ void CPlayer::OnPrepareRender()
 CAirplanePlayer::CAirplanePlayer()
 {
 	Rotate(0, -90.0f, 0.0f);
-	SetScale(15.5f, 15.5f, 15.5f);;
-	
+	// ½ÇÁ¦ extents 0.010000, 0.010000, 0.009904
+	SetScale(15.5f, 15.5f, 15.5f);
+
 	for (int i = 0; i < BULLETS; i++)
 	{
 		m_ppBullets[i] = new CBulletObject(m_fBulletEffectiveRange);
 		m_ppBullets[i]->SetScale(1.0f, 1.0f, 1.0f);
-
+		m_ppBullets[i]->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.000000f, 0.000000f, -0.004253f }, XMFLOAT3{ 0.016793f, 0.016793f, 0.020887f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		m_ppBullets[i]->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		//m_ppBullets[i]->SetRotationSpeed(360.0f);
 		m_ppBullets[i]->SetMovingSpeed(320.0f);
@@ -344,7 +345,7 @@ void CAirplanePlayer::OnPrepareRender()
 	CPlayer::OnPrepareRender();
 }
 
-void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
+bool CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 {
 	/*
 		if (pLockedObject)
@@ -354,7 +355,7 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 		}
 	*/
 	if (m_fFireWaitingTime > 0.0f)
-		return;
+		return false;
 
 	CBulletObject* pBulletObject = NULL;
 	for (int i = 0; i < BULLETS; i++)
@@ -415,4 +416,6 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 			pBulletObject->m_pLockedObject = pLockedObject;
 		}
 	}
+
+	return true;
 }
