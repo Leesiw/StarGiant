@@ -411,7 +411,7 @@ void CScene::CheckObjectByBulletCollisions()
 		for (int j = 0; j < BULLETS; j++)
 		{
 
-			ppBullets[j]->UpdateBoundingBox();
+			//ppBullets[j]->UpdateBoundingBox();
 
 
 			if (ppBullets[j]->m_bActive) {
@@ -427,8 +427,6 @@ void CScene::CheckObjectByBulletCollisions()
 				
 				//cout<<"z´Ù  : "<< m_ppGameObjects[0]->m_pChild->m_xmOOBB.Center.z;
 				//cout << "z´Ù : " << ppBullets[j]->m_pChild->m_xmOOBB.Center.z;
-
-
 
 
 				XMFLOAT3 hi = { 0,0,0 };
@@ -487,7 +485,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (int i = 0; i < m_nGameObjects; i++) {m_ppGameObjects[i]->Animate(fTimeElapsed, NULL); }
 
 	//CheckObjectByPlayerCollisions();
-	//CheckObjectByBulletCollisions();
+	CheckObjectByBulletCollisions();
 
 
 	if (m_pLights)
