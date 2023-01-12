@@ -12,6 +12,7 @@ METEO/Meteo.vcxproj.user
 star/.vs/*
 star/x64/*
 star/Release/*
+LabProject07-9-7(Animation)/x64/*
 star/LabProject07-9-1.vcxproj.user
 star/.vs/LabProject07-9-1/v16/.suo
 
@@ -48,3 +49,6 @@ star/include/SFML/Network/Mesh.obj
 star/include/SFML/Network/GameFramework.obj
 star/include/SFML/Network/Camera.obj
 star/Playerdasf.cpp
+LabProject07-9-7(Animation)/.vs/LabProject07-9-7(Animation)/FileContentIndex/366d2249-6c88-4d52-b982-03fd1427e3c5.vsidx
+LabProject07-9-7(Animation)/.vs/LabProject07-9-7(Animation)/FileContentIndex/read.lock
+LabProject07-9-7(Animation)/.vs/LabProject07-9-7(Animation)/v17/.suo
