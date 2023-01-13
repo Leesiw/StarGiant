@@ -323,3 +323,118 @@
 
 5. ToDo
  - 발표 PPT 수정, 기획서 완성
+
+2023-01-13
+------------
+1. 기획발표
+ - 지적사항
+  * 소재 : 우주에 뜬금없는 용
+  * 맵 : 방대한 공간과 무한한 이동자유가 핵심인 우주에 왠 좁은 통로??  우주를 배경으로 삼은 이유가 무었인가?????
+
+2. 진행상황
+ - 없음
+
+3. ToDo
+ - 방학동안에 중점연구과제가 들어가 있는 스테이지 1 구현
+ - LUA 연동
+   * 게임서버프로그래밍에서 LUA연동을 배움
+   * LUA로 조종되는 보스는 서버에서 조종하는 것이고, 클라이언트는 서버에서 시키는 대로 보스를 이동시키고, 하라는 애니메이션을 플레이하고, 던져 주는 대사를 읊는다.
+   * LUA 스크립트
+    - FSM (Finite State Machine) 유한상태 기계로 구현하여야 한다.
+    - enum STATE {STATE_IDLE, STATE_SLEEPING, STATE_ MOVING, STATE_CHASING, STATE_FIGHTING, STATE_POLYMORPH };
+    - enum CURRENT_ANIMATION { ANIM_IDLE, ANIM_SLEEPING< ANIM_MOVE, ANIM_PYUNGTA, ANIM_FIREBALL, ANIM_SPELL_CASTING };
+    - struct LOCATION { float x, float y, float z}
+    - class BOSS_AI {
+         LOCATION location;
+         LOCATION target_location;
+         enum STATE next_job;
+         int chase_target;
+         float velocity;
+         int    HP;
+         int    MAXHP;
+         std::chrono::system_clock::timepoint last_move_time;
+         enum  STATE  curr_state;
+         enum  CURRENT_ANIMATION  curr_ani;
+         public:
+             void do_ai(std::chrono::system_clock::time_point current_time)
+             {
+                 switch STATE:
+                       case STATE_IDLE : if (curr_ani != ANIM_IDLE) send_animation(ANIM_IDLE); break;
+                       case STATE_SLEEPING :  
+                              if (curr_anum != ANIM_SLEEPING) send animation(ANIM_SLEEP);
+                              break;
+                       case STATE_MOVING :
+                              if (location == target_location) if (next_job == STATE_MOVING) target_location = get_random_location();
+                                                                               else { curr_state == next_job; break; }
+                              LOCATION dir = target_location - location;
+                              normalize_vector(&dir);
+                              auto curr_time = std::chrono::system_clock::now();
+                              float duration = last_move_time - curr_time;
+                              dir = dir * velocity * duration;
+                              curr_location += dir;
+                              send_move(curr_location);
+                              if (curr_num != ANIM_MOVING) { curr_anum = ANIM_MOVING; send_animation(ANIM_MOVING);
+                              last_move_time = curr_time;
+                              break;
+                     case STATE_FIGHTING:
+                              // 목표가 가까이 있는가? 있으면 브레스의 쿨타임이 되었는가? 되었으면 브레스 뿜기, 안되있으면 평타 쿨타임이 되었는가? 되었으면 평타, 아니면 아무것도 안함
+                              // 목표가 멀면 상태를 STATE_CHASING 으로 하고, chase_target을 목표로 한다.
+             } 
+           void event_hit_by_player(int player_id)
+            {
+                if (curr_state == STATE_FIGHTING) return;
+                curr_state = STATE_FIGHTING;
+                fightint_target = player_id;
+            }
+            void event_player_move(int player_id, LOCATION &loc)
+            {
+               if (curr_state != STATE_IDLE) return;
+               if (curr_location - loc < SIGHT_RANGE) {  curr_state = STATE_FIGHTING; fighting_target = player_id)
+                }
+            }
+    * 위에서 : send_animation, send_move 같은 클라이언트에 보내는 API는 서버프로그래머가 만들어 주어야 한다.
+    * do_ai, event_hit_by_player, event_player_move 같은 함수는 서버프로그램이 호출해 주어야 한다.
+
+ - 3000동접
+   * 게임서버프로그래밍 수업을 들으면 됨
+   * IOCP와 멀티쓰레드프로그래밍 사용 필요. 하지만 MMORPG가 아니고 MO게임이기 때문에 멀티쓰레드 의존성은 떨어짐.
+   * 동접 테스트가 필요 (3000명을 동시에 접속시켜서 게임을 플레이하는 스트레스 테스트 프로그램의 제작 필요) <= 게임서버프로그래밍 과목에서 배움
+ - GOD RAYS
+   * 다른 말로 Light Shift
+   * 구현방법이 두가지
+    - 조명을 뭉개기  => 단순히 광원 텍스쳐를 크게 만든 것, 너무 쉬워 보임 => 포트폴리오의 수준이 크게 떨어질 위험성이 있음
+    - 그림자 만들때 끼워넣기. => 그래도 뭔가 한것 같고, 포트폴리오에서 DX12에 대한 이해가 높다는 것을 어필할 수 있을 것 같음.
+    - 알고리즘 정리해 오기 ( Resource들과 필요한 렌더링 파라미터, 각 쉐이딩 단계별 입력 출력)
+ - 컨텐츠 구현
+  * 서버프로그래머와 스크립트 담당은 컨텐츠 구현을 먼저 하자 (수업을 들어야 구현할 수 있기 때문)
+  * 실내모드 구현
+    - 실외모드 버튼을 누르면 그래픽이 실외 모드로 전환, 실내모드 버튼을 누르면 다시 실내모드로
+    - 실외모드 : 지금까지 구현한 것, 
+          야옹호 : 우주선 10X10X10미터 구형
+          운석 : 야옹호와 비슷한 크기(랜덤하게 변함),  랜덤한 간격으로 출현해서, 랜덤한 위치에서 랜덤한 방향으로 랜덤한 속도로 이동
+          적 우주선 : 야옹호와 비슷한크기
+               - 36마리가 존재, 10초마다 9마리씩 출현 : 야옹호 앞에 랜덤한 위치에 출현
+               - 야옹호를 공격
+                 - TYPE_A : 미사일 발사, 발사 간격, 잔탄 수 (무한 탄창??), 미사일 속도, 미사일 회전 반경 (야옹호를 추적하기 위한), 미사일 연료 (추적 가능 시간)
+                            미사일이 다 떨어지면? 미사일 데미지, 근접 신관 유무?
+                - TYPE_B : 레이저 발사 : 발사 간격, 데미지, 조준 실력 (1000발중에 몇발을 명중시킬 것인가?), 명중 보정 (야옹호가 가속이나 방향전환을 했을때 명중률이 얼마나 떨어지는가?)
+                - TYPE_C : 플라이마 캐논 발사 : 발사간격이 레이저보다 길고, 위력이 강하다.
+     - 실내모드 : 
+            - 원룸에 책상이 4개 있고, 하나는 이동 책상, 나머지는 공격 책상
+            - 고양이 외계인을 조종해서 원하는 책상에 앉는다.
+            
+
+4. 다음미팅
+ - 2월 6일 월요일 오후 3시 학교
+ - GODRAY 알고리즘 작성 => (2월 6일 부터는 구현에 들어갈 예정)
+ - 실내모드 구현
+   * 우주선 모델에 고양이들을 넣어서 이동시키는 것 까지 구현. 의자에 앉는 것 도
+   * 3개의 클라이언트로 게임을 시작하면 화면에 고양이 3마리가 나와서 이동하고 의자에 앉고 한다.
+ - 실외 모드 구현 (위에 적힌대로 구현)
+   * 운석들 구현 (서버 동기화)
+   * SKY_BOX 넣고
+   * 적우주선 출현 및 이동 (전투는 다음에 구현)
+ - 작업일지를 매주 (또는 2주마다) 작성
+   * 내가 할일, 한일을 멤버 마다 적을 것
+   * 졸작을 정말 우리가 했다. 나중에 포트폴리오에도 포함.
+
