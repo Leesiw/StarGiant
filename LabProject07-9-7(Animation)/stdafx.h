@@ -24,6 +24,8 @@
 
 #include <fstream>
 #include <vector>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 
@@ -36,6 +38,13 @@ using namespace std;
 #include <DirectXCollision.h>
 
 #include <Mmsystem.h>
+
+//¼­¹ö
+#pragma comment (lib, "WS2_32.LIB")
+#pragma comment (lib, "MSWSock.LIB")
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include "..\Server\Server\protocol.h"
 
 #ifdef _DEBUG
 #include <dxgidebug.h>

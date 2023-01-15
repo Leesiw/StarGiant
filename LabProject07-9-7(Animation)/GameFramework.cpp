@@ -36,6 +36,19 @@ CGameFramework::CGameFramework()
 
 CGameFramework::~CGameFramework()
 {
+	if (isConnect)
+	{
+		/*
+		CS_LOGOUT_PACKET packet{};
+		packet.size = sizeof(packet);
+		packet.type = CS_PACKET_LOGOUT;
+		send(g_socket, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);*/
+
+		if (NetworkThread.joinable())
+			NetworkThread.join();
+		closesocket(sock);
+		WSACleanup();
+	}
 }
 
 bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
@@ -52,6 +65,8 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	CoInitialize(NULL);
 
 	BuildObjects();
+	isConnect = ConnectServer();
+	NetworkThread = thread{ &CGameFramework::RecvServer, this };
 
 	return(true);
 }
@@ -470,14 +485,27 @@ void CGameFramework::ProcessInput()
 
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 		{
-			if (cxDelta || cyDelta)
-			{
-				if (pKeysBuffer[VK_RBUTTON] & 0xF0)
-					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-				else
-					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+			if (isConnect) {
+				CS_MOVE_PACKET my_packet;
+				my_packet.size = sizeof(CS_MOVE_PACKET);
+				my_packet.type = CS_MOVE;
+				my_packet.dwDirection = dwDirection;
+				my_packet.cxDelta = cxDelta;
+				my_packet.cyDelta = cyDelta;
+				my_packet.isRButton = (pKeysBuffer[VK_RBUTTON] & 0xF0);
+
+				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 			}
-			if (dwDirection) m_pPlayer->Move(dwDirection, 12.25f, true);
+			else {
+				if (cxDelta || cyDelta)
+				{
+					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
+						m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
+					else
+						m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+				}
+				if (dwDirection) m_pPlayer->Move(dwDirection, 12.25f, true);
+			}
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
@@ -595,3 +623,155 @@ void CGameFramework::FrameAdvance()
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 }
 
+
+// 서버
+bool CGameFramework::ConnectServer()
+{
+	if (!isConnect) {
+
+		WSADATA wsa;
+		if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+			return false;
+
+		// socket 생성
+		sock = socket(AF_INET, SOCK_STREAM, 0);
+		if (sock == INVALID_SOCKET)
+			return false;
+
+		// connect
+		SOCKADDR_IN server_address{};
+		server_address.sin_family = AF_INET;
+		server_address.sin_port = htons(PORT_NUM);
+		inet_pton(AF_INET, "127.0.0.1", &(server_address.sin_addr.s_addr));
+
+		if (connect(sock, reinterpret_cast<SOCKADDR*>(&server_address), sizeof(server_address)) == SOCKET_ERROR)
+			return false;
+		return true;
+	}
+	return true;
+}
+
+void CGameFramework::RecvServer()
+{
+	while (isConnect) {
+		char buf[2];
+		WSABUF wsabuf{ sizeof(buf), buf };
+		DWORD recvByte{ 0 }, recvFlag{ 0 };
+		//recv(sock, buf, sizeof(buf), MSG_WAITALL);
+		int error_code = WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+		//if (error_code == SOCKET_ERROR) error_display("RecvSizeType");
+
+		UCHAR size{ static_cast<UCHAR>(buf[0]) };
+		UCHAR type{ static_cast<UCHAR>(buf[1]) };
+		switch (type)
+		{
+		case SC_LOGIN_INFO:
+		{
+			char subBuf[sizeof(LOGIN_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			LOGIN_INFO loginInfo;
+			memcpy(&loginInfo, &subBuf, sizeof(LOGIN_INFO));
+			g_myid = loginInfo.id;
+			player_type = loginInfo.player_type;
+			break;
+		}
+
+		case SC_METEO:
+		{
+			char subBuf[sizeof(METEO_INFO) * METEOS]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			//recv(sock, subBuf, sizeof(subBuf), MSG_WAITALL);
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			METEO_INFO meteoInfo[METEOS];
+			memcpy(&meteoInfo, &subBuf, sizeof(METEO_INFO) * METEOS);
+
+			//m_pScene->SetMeteoTransform(meteoInfo);
+			break;
+		}
+		case SC_ADD_PLAYER:
+		{
+			break;
+		}
+		case SC_MOVE_PLAYER:
+		{
+			char subBuf[sizeof(PLAYER_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			//recv(sock, subBuf, sizeof(subBuf), MSG_WAITALL);
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+			PLAYER_INFO playerInfo;
+			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO));
+			//m_pPlayer->SetPlayerInfo(playerInfo);
+			
+			m_pPlayer->SetPosition(playerInfo.pos);
+			//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
+			//m_pPlayer->SetVelocity(playerInfo.velocity);
+			//m_pPlayer->SetShift(playerInfo.shift);
+			m_pPlayer->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer->GetYaw(), 0.0f);
+			//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+		
+
+			//m_pPlayer->OnPrepareRender();
+			//cout << "회전 각도 " << playerInfo.m_fYaw - m_pPlayer->GetYaw() << endl;
+			break;
+		}
+		case SC_MOVE_ENEMY:
+		{
+			char subBuf[sizeof(ENEMY_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+			float x = m_pPlayer->GetPosition().z;
+			ENEMY_INFO enemyInfo;
+			memcpy(&enemyInfo, &subBuf, sizeof(ENEMY_INFO));
+			//			printf("enemy angle : %f %f %f\n", m_Enemy->GetPitch(),
+								//m_Enemy->GetYaw(), m_Enemy->GetRoll());
+						//printf("enemy pos : %f %f %f\n", enemyInfo.pos.x, enemyInfo.pos.y, enemyInfo.pos.z);
+			/*
+			m_Enemy->SetPosition(enemyInfo.pos);
+			m_Enemy->m_pChild->Rotate(enemyInfo.m_fPitch - m_Enemy->GetPitch(),
+				enemyInfo.m_fYaw - m_Enemy->GetYaw(), enemyInfo.m_fRoll - m_Enemy->GetRoll());	// 실제 Rotate
+			m_Enemy->SetPYR(enemyInfo.m_fPitch,
+				enemyInfo.m_fYaw, enemyInfo.m_fRoll);
+			m_Enemy->SetAppeared(enemyInfo.appeared);*/
+			break;
+		}
+		case SC_BULLET:
+		{
+			char subBuf[sizeof(BULLET_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			BULLET_INFO bulletInfo;
+			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_INFO));
+			((CAirplanePlayer*)m_pPlayer)->SetBulletFromServer(bulletInfo);
+			break;
+		}
+		case SC_REMOVE_PLAYER:
+		{
+			break;
+		}
+		case SC_BULLET_HIT:
+		{
+			char subBuf[sizeof(BULLET_HIT_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			BULLET_HIT_INFO bulletInfo;
+			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_HIT_INFO));
+			//m_pScene->m_ppGameObjects[bulletInfo.meteo_id]->hp -= 3;
+			((CAirplanePlayer*)m_pPlayer)->m_ppBullets[bulletInfo.bullet_id]->Reset();
+			break;
+		}
+		default:
+			printf("Unknown PACKET type [%d]\n", type);
+		}
+	}
+}

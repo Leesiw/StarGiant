@@ -34,6 +34,10 @@ public:
     void AnimateObjects();
     void FrameAdvance();
 
+	// 서버
+	bool ConnectServer();
+	void RecvServer();
+
 	void WaitForGpuComplete();
 	void MoveToNextFrame();
 
@@ -85,5 +89,13 @@ private:
 	POINT						m_ptOldCursorPos;
 
 	_TCHAR						m_pszFrameRate[70];
+
+	// 서버
+	int g_myid;
+	char player_type;
+
+	thread    NetworkThread{};
+	SOCKET sock;
+	bool isConnect = false;
 };
 

@@ -323,6 +323,35 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 	}
 }
 
+void CAirplanePlayer::SetBulletFromServer(BULLET_INFO bulletInfo)
+{
+	CBulletObject* pBulletObject = NULL;
+	for (int i = 0; i < BULLETS; i++)
+	{
+		if (!m_ppBullets[i]->m_bActive)
+		{
+			pBulletObject = m_ppBullets[i];
+			break;
+		}
+	}
+
+	if (pBulletObject)
+	{
+		pBulletObject->Rotate(bulletInfo.pitch, bulletInfo.yaw, bulletInfo.roll);
+		pBulletObject->m_fPitch = bulletInfo.pitch; pBulletObject->m_fYaw = bulletInfo.yaw; pBulletObject->m_fRoll = bulletInfo.roll;
+		pBulletObject->SetFirePosition(bulletInfo.pos);
+		pBulletObject->SetMovingDirection(bulletInfo.direction);
+		pBulletObject->SetActive(true);
+		//pBulletObject->UpdateBoundingBox();
+
+		/*
+		if (pLockedObject)
+		{
+			pBulletObject->m_pLockedObject = pLockedObject;
+		}*/
+	}
+}
+
 void CAirplanePlayer::OnPrepareAnimate()
 {
 	m_pMainRotorFrame = FindFrame("Top_Rotor");

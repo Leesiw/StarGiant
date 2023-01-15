@@ -237,7 +237,7 @@ void CGameFramework::ClientProcess()
 		//cout << fps.count() << endl;
 		StartTime = chrono::system_clock::now();
 
-		if (fps.count() > 0.01f) {
+		if (fps.count() > 0.03f) {
 			AnimateObjects(fps.count());
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;
