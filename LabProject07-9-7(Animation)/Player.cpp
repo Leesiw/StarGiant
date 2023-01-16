@@ -243,6 +243,9 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 	SetChild(pModel->m_pModelRootObject, true);
 
+	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pModel);
+	m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	m_pSkinnedAnimationController->SetCallbackKeys(0, 1);
 
 	for (int i = 0; i < BULLETS; i++)
 	{
@@ -257,17 +260,12 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 		m_ppBullets[i]->SetMovingSpeed(300.0f);
 		m_ppBullets[i]->SetActive(false);
 
-		m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pBulletMesh);
-		m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-		m_pSkinnedAnimationController->SetCallbackKeys(0, 1);
+		//오브젝트 설정시 각각의 skinnedAnimationcontroller을 설정해주어야하는 거엿다.  
+		m_ppBullets[i]->m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pBulletMesh);
+		m_ppBullets[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_ppBullets[i]->m_pSkinnedAnimationController->SetCallbackKeys(0, 1);
 
 	}
-
-
-	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pModel);
-	m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_pSkinnedAnimationController->SetCallbackKeys(0, 1); 
-
 
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -390,7 +388,15 @@ void CAirplanePlayer::OnPrepareRender()
 
 void CAirplanePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
-	for (int i = 0; i < BULLETS; i++) if (m_ppBullets[i]->m_bActive) { m_ppBullets[i]->Render(pd3dCommandList, pCamera); std::cout << "b랜더 "; };
+	for (int i = 0; i < BULLETS; i++)
+		if (m_ppBullets[i]->m_bActive)
+		{
+			m_ppBullets[i]->Render(pd3dCommandList, pCamera); 
+			std::cout << "b랜더 x: "	<< m_ppBullets[i]->m_xmf4x4World._41
+						<< "  y: "<< m_ppBullets[i]->m_xmf4x4World._42
+						<<"  z:  " << m_ppBullets[i]->m_xmf4x4World._43 << std::endl;
+		};
+
 	CPlayer::Render(pd3dCommandList, pCamera);
 
 }
