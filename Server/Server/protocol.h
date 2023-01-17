@@ -5,9 +5,10 @@ using namespace DirectX;
 //using namespace DirectX::PackedVector;
 
 #define BULLETS					50
-#define METEOS					200
+#define METEOS					10
+#define ENEMIES					36
 
-constexpr int MAX_USER = 2;
+constexpr int MAX_USER = 3;
 
 constexpr int PORT_NUM = 4000;
 constexpr int BUF_SIZE = 200;
@@ -26,23 +27,30 @@ constexpr char SC_ADD_PLAYER = 4;
 constexpr char SC_REMOVE_PLAYER = 5;
 
 constexpr char SC_METEO = 6;
+constexpr char SC_METEO_SPAWN = 7;
 
-constexpr char SC_MOVE_PLAYER = 7;
-constexpr char SC_MOVE_ENEMY = 8;
-constexpr char SC_BULLET = 9;
-constexpr char SC_REMOVE_BULLET = 10;
-constexpr char SC_BULLET_HIT = 11;
-constexpr char SC_ENEMY_DIE = 11;
+constexpr char SC_MOVE_PLAYER = 9;
+constexpr char SC_MOVE_ENEMY = 10;
+constexpr char SC_BULLET = 11;
+constexpr char SC_BULLET_HIT = 12;
+constexpr char SC_ENEMY_DIE = 13;
 
 // Player type 
-constexpr char MOVE = 0;
-constexpr char ATTACK = 1;
+constexpr char INSIDE = 0;
+constexpr char MOVE = 1;
+constexpr char ATTACK = 2;
 
 #pragma pack (push, 1)
 
 struct METEO_INFO {
-	float m_fRotationSpeed;
-	XMFLOAT4X4 m_xmf4x4Transform;
+	XMFLOAT3 pos;
+};
+
+struct NEW_METEO_INFO {
+	short	id;
+	short	model_id;
+	XMFLOAT3 size;
+	// 방향/속도?
 };
 
 struct BULLET_INFO {
@@ -56,17 +64,24 @@ struct LOGIN_INFO {
 	char player_type;
 };
 
-struct PLAYER_INFO {
-	XMFLOAT3 pos;
-	//XMFLOAT3 velocity;
-	//XMFLOAT3 shift;
+struct INPUT_INFO {
+	DWORD dwDirection;
+	float cxDelta;
+	float cyDelta;
+	bool isRButton;
+};
 
-	float           			m_fPitch;
-	float           			m_fRoll;
+struct PLAYER_INFO {
+	short id;
+
+	XMFLOAT3					pos;
 	float           			m_fYaw;
 };
 
+
 struct ENEMY_INFO {
+	short id;
+
 	XMFLOAT3 pos;
 	//XMFLOAT3 velocity;
 	//XMFLOAT3 shift;
@@ -93,10 +108,8 @@ struct CS_CHANGE_PACKET {
 struct CS_MOVE_PACKET {
 	unsigned char size;
 	char	type;
-	DWORD dwDirection;
-	float cxDelta;
-	float cyDelta;
-	bool isRButton;
+
+	INPUT_INFO	data;
 };
 
 struct CS_ATTACK_PACKET {

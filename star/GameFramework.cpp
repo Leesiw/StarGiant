@@ -570,10 +570,10 @@ void CGameFramework::ProcessInput()
 				CS_MOVE_PACKET my_packet;
 				my_packet.size = sizeof(CS_MOVE_PACKET);
 				my_packet.type = CS_MOVE;
-				my_packet.dwDirection = dwDirection;
-				my_packet.cxDelta = cxDelta;
-				my_packet.cyDelta = cyDelta;
-				my_packet.isRButton = (pKeysBuffer[VK_RBUTTON] & 0xF0);
+				my_packet.data.dwDirection = dwDirection;
+				my_packet.data.cxDelta = cxDelta;
+				my_packet.data.cyDelta = cyDelta;
+				my_packet.data.isRButton = (pKeysBuffer[VK_RBUTTON] & 0xF0);
 
 				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 			}
@@ -599,7 +599,7 @@ void CGameFramework::ProcessInput()
 			m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
 			//m_pPlayer->SetVelocity(playerInfo.velocity);
 			//m_pPlayer->SetShift(playerInfo.shift);
-			m_pPlayer->Rotate(playerInfo.m_fPitch - m_pPlayer->GetPitch(), playerInfo.m_fYaw - m_pPlayer->GetYaw(), playerInfo.m_fRoll - m_pPlayer->GetRoll());
+			m_pPlayer->Rotate(0, playerInfo.m_fYaw - m_pPlayer->GetYaw(), 0);
 			m_pPlayer->SetPlayerInfoUpdate(false);
 		}
 	}

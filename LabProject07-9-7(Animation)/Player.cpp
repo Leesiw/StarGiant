@@ -232,6 +232,16 @@ void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamer
 	if (nCameraMode == THIRD_PERSON_CAMERA) CGameObject::Render(pd3dCommandList, pCamera);
 }
 
+void CPlayer::UpdateOnServer()
+{
+	if (!is_update) {
+		SetPosition(player_info.pos);
+		Rotate(0, player_info.m_fYaw - m_fYaw, 0);
+		m_pCamera->Update(player_info.pos, 0);
+		is_update = true;
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 
 CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext)

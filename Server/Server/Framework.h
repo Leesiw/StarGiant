@@ -27,18 +27,12 @@ public:
 	int get_new_client_id();
 	void disconnect(int c_id);
 	CGameObject* m_pLockedObject = NULL;
-
-	bool SceneChange = false;
-
 private:
 	CScene* m_pScene = NULL;
-	CScene* m_TwiceScene = NULL;
-	CPlayer* m_pPlayer = NULL;
-	CPlayer* m_TwicePlayer = NULL;
-	CEnemyObject* m_Enemy = NULL;
 
-
-	POINT						m_ptOldCursorPos;
+	CAirplanePlayer* m_pSpaceship = NULL;
+	CPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
+	//CEnemyObject* m_Enemy = NULL;
 
 	std::chrono::duration<double> fps;
 	std::chrono::system_clock::time_point prev_process_time;

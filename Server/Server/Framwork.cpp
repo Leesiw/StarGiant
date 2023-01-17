@@ -3,8 +3,8 @@
 CGameFramework::CGameFramework()
 {
 	m_pScene = NULL;
-	m_pPlayer = NULL;
-	m_Enemy = NULL;
+	//m_pSpaceship = NULL;
+	//m_Enemy = NULL;
 }
 
 CGameFramework::~CGameFramework()
@@ -74,8 +74,6 @@ void CGameFramework::Init() {
 					h_iocp, client_id, 0);
 				clients[client_id].do_recv();
 				clients[client_id].send_login_info_packet();
-			
-				clients[client_id].send_meteo_packet(client_id, m_pScene->m_ppGameObjects);
 				c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 			}
 			else {
@@ -128,58 +126,43 @@ void CGameFramework::BuildObjects()
 	pAirplanePlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 	pAirplanePlayer->mesh = true;
 	pAirplanePlayer->boundingbox = BoundingOrientedBox{ XMFLOAT3(-0.000000f, -0.000000f, -0.000096f), XMFLOAT3(15.5f, 15.5f, 3.90426f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
-	m_pScene->m_pPlayer = m_pPlayer = pAirplanePlayer;
+	m_pScene->m_pSpaceship = m_pSpaceship = pAirplanePlayer;
 	//m_pCamera = m_pPlayer->GetCamera();
 
 
 	/////////////////////////////////////////
 
-	CEnemyShip* enemyship = new CEnemyShip();
-	m_pScene->m_enemy = m_Enemy = enemyship;
+	//CEnemyShip* enemyship = new CEnemyShip();
+	//m_pScene->m_enemy = m_Enemy = enemyship;
 
 	////////////////////////////////////////
-
-	m_TwiceScene = new CScene();
-	if (m_TwiceScene) m_TwiceScene->BuildObjects2();
-	CAirplanePlayer* pTwicePlayer = new CAirplanePlayer();
-	pTwicePlayer->SetPosition(XMFLOAT3(0.0f, 10.0f, 0.0f));
-	m_TwiceScene->m_pPlayer = m_TwicePlayer = pTwicePlayer;
-	//m_TwiceCamera = m_TwicePlayer->GetCamera();
 
 	////////////////////////////////////////
 }
 
 void CGameFramework::ReleaseObjects()
 {
-	if (m_pPlayer) m_pPlayer->Release();
-	if (m_Enemy) m_Enemy->Release();
-
-	if (m_TwicePlayer) m_pPlayer->Release();
-
 	if (m_pScene) m_pScene->ReleaseObjects();
 	if (m_pScene) delete m_pScene;
-
-	if (m_TwiceScene) m_pScene->ReleaseObjects();
-	if (m_TwiceScene) delete m_TwiceScene;
 }
 
 void CGameFramework::AnimateObjects(float fTimeElapsed)
 {
 	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
 
-	if (m_TwiceScene) m_TwiceScene->AnimateObjects(fTimeElapsed);
+	m_pSpaceship->Animate(fTimeElapsed);
+	m_pSpaceship->Update(fTimeElapsed);
 
-	m_pPlayer->Animate(fTimeElapsed, NULL);
-	m_pPlayer->Update(fTimeElapsed);
-
-	m_Enemy->Animate(fTimeElapsed, m_pPlayer->GetPosition());
+	//m_Enemy->Animate(fTimeElapsed, m_pSpaceship->GetPosition());
+	/*
 	if (((CEnemyShip*)m_Enemy)->FireBullet(NULL))
 	{
 		for (auto& pl : clients) {
 			if (false == pl.in_use) continue;
-			pl.send_bullet_packet(0, m_Enemy, m_pPlayer->GetPosition());
+			pl.send_bullet_packet(0, m_Enemy, m_pSpaceship->GetPosition());
 		}
 	}
+	*/
 }
 
 
@@ -205,21 +188,19 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_MOVE: {
 		CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
 		if (clients[c_id].type == MOVE) {
-			m_pPlayer->SetdwDirection(p->dwDirection);
-			m_pPlayer->SetcxcyDelta(p->cxDelta, p->cyDelta, p->isRButton);
+			m_pSpaceship->SetInputInfo(p->data);
 		}
 		break;
 	}
 	case CS_ATTACK: {
 		CS_ATTACK_PACKET* p = reinterpret_cast<CS_ATTACK_PACKET*>(packet);
 		if (clients[c_id].type == ATTACK) {
-			if (((CAirplanePlayer*)m_pPlayer)->FireBullet(m_pLockedObject)) {
+			if (((CAirplanePlayer*)m_pSpaceship)->FireBullet(1)) {
 				for (auto& pl : clients) {
 					if (false == pl.in_use) continue;
-					pl.send_bullet_packet(0, m_pPlayer);
+					pl.send_bullet_packet(0, m_pSpaceship);
 				}
 			}
-			m_pLockedObject = NULL;
 		}
 		break;
 	}
@@ -241,28 +222,13 @@ void CGameFramework::ClientProcess()
 			AnimateObjects(fps.count());
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;
-				pl.send_move_packet(0, m_pPlayer, m_Enemy);
+				pl.send_move_packet(0, m_pSpaceship);
 			}
 			fps = EndTime - EndTime;
 		}
 		EndTime = chrono::system_clock::now();
 	}
 }
-
-//#define _WITH_PLAYER_TOP
-
-void CGameFramework::FrameAdvance()
-{
-
-	//AnimateObjects();
-
-	//m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
-	//size_t nLength = _tcslen(m_pszFrameRate);
-	//XMFLOAT3 xmf3Position = m_pPlayer->GetPosition();
-	//_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);
-}
-
-
 
 int CGameFramework::get_new_client_id()
 {

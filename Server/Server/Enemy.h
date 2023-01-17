@@ -1,4 +1,5 @@
 #pragma once
+/*
 #include "Object.h"
 
 class CEnemyObject : public CGameObject
@@ -63,3 +64,4 @@ public:
 	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
 	virtual void OnPrepareRender();
 };
+*/

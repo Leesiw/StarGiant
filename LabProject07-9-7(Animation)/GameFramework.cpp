@@ -489,10 +489,10 @@ void CGameFramework::ProcessInput()
 				CS_MOVE_PACKET my_packet;
 				my_packet.size = sizeof(CS_MOVE_PACKET);
 				my_packet.type = CS_MOVE;
-				my_packet.dwDirection = dwDirection;
-				my_packet.cxDelta = cxDelta;
-				my_packet.cyDelta = cyDelta;
-				my_packet.isRButton = (pKeysBuffer[VK_RBUTTON] & 0xF0);
+				my_packet.data.dwDirection = dwDirection;
+				my_packet.data.cxDelta = cxDelta;
+				my_packet.data.cyDelta = cyDelta;
+				my_packet.data.isRButton = (pKeysBuffer[VK_RBUTTON] & 0xF0);
 
 				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 			}
@@ -507,6 +507,10 @@ void CGameFramework::ProcessInput()
 				if (dwDirection) m_pPlayer->Move(dwDirection, 12.25f, true);
 			}
 		}
+	}
+
+	if (isConnect) {
+		m_pPlayer->UpdateOnServer();
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 }
@@ -702,17 +706,15 @@ void CGameFramework::RecvServer()
 			char subBuf[sizeof(PLAYER_INFO)]{};
 			WSABUF wsabuf{ sizeof(subBuf), subBuf };
 			DWORD recvByte{}, recvFlag{};
-			//recv(sock, subBuf, sizeof(subBuf), MSG_WAITALL);
 			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
 			PLAYER_INFO playerInfo;
 			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO));
-			//m_pPlayer->SetPlayerInfo(playerInfo);
-			
-			m_pPlayer->SetPosition(playerInfo.pos);
+			m_pPlayer->SetPlayerInfo(playerInfo);
+			//m_pPlayer->SetPosition(playerInfo.pos);
 			//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
 			//m_pPlayer->SetVelocity(playerInfo.velocity);
 			//m_pPlayer->SetShift(playerInfo.shift);
-			m_pPlayer->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer->GetYaw(), 0.0f);
+			//m_pPlayer->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer->GetYaw(), 0.0f);
 			//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 		
 

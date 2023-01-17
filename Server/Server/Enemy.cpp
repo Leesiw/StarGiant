@@ -1,3 +1,4 @@
+/*
 #include "stdafx.h"
 #include "Enemy.h"
 #include <cmath>
@@ -168,7 +169,7 @@ void CEnemyObject::Animate(float fElapsedTime, XMFLOAT3 player_pos)
 	
 	
 	//float yaw = 180.0 + XMConvertToDegrees(atan2(xmf3ToPlayer.x, xmf3ToPlayer.z));
-	*/
+	
 	Rotate(0, yaw - m_fYaw, 0);//roll - m_fRoll);
 
 
@@ -330,3 +331,4 @@ void CEnemyShip::OnPrepareRender()
 	CEnemyObject::OnPrepareRender();
 }
 
+*/

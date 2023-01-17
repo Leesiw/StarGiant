@@ -19,21 +19,18 @@ public:
 	bool ProcessInput(UCHAR* pKeysBuffer);
 	void AnimateObjects(float fTimeElapsed);
 
-	void ReleaseUploadBuffers();
 	void CheckObjectByPlayerCollisions();
-
-
 	void CheckObjectByBulletCollisions();
 	void CheckEnemyByBulletCollisions();
 
-	CPlayer* m_pPlayer = NULL;
-	CEnemyObject* m_enemy = NULL;
+	CAirplanePlayer* m_pSpaceship = NULL;
+	CPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
+	//CEnemyObject* m_enemy = NULL;
 
 public:
-	CGameObject** m_ppGameObjects = NULL;
-	int							m_nGameObjects = 0;
+	CMeteoObject**				m_ppMeteoObjects = NULL;
+	int							m_nMeteoObjects = 0;
 
 	float						m_fElapsedTime = 0.0f;
-
 };
 
