@@ -76,6 +76,43 @@ void SESSION::send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 play
 }
 */
 
+void SESSION::send_spawn_meteo_packet(int c_id, short id, CMeteoObject* meteo)
+{
+	SC_SPAWN_METEO_PACKET p;
+	p.size = sizeof(SC_SPAWN_METEO_PACKET);
+	p.type = SC_SPAWN_METEO;
+
+	p.data.id = id;
+	p.data.model_id = meteo->GetModelID();
+	p.data.scale = meteo->GetScale();
+
+	char buf[sizeof(SC_SPAWN_METEO_PACKET)];
+	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
+	WSABUF wsabuf{ sizeof(buf), buf };
+	DWORD sent_byte;
+
+	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
+}
+
+void SESSION::send_spawn_all_meteo_packet(int c_id, CMeteoObject* meteo[])
+{
+	SC_SPAWN_ALL_METEO_PACKET p;
+	p.size = sizeof(SC_SPAWN_ALL_METEO_PACKET);
+	p.type = SC_SPAWN_METEO;
+
+	for (int i = 0; i < METEOS; ++i) {
+		p.data[i].model_id = meteo[i]->GetModelID();
+		p.data[i].scale = meteo[i]->GetScale();
+	}
+
+	char buf[sizeof(SC_SPAWN_ALL_METEO_PACKET)];
+	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
+	WSABUF wsabuf{ sizeof(buf), buf };
+	DWORD sent_byte;
+
+	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
+}
+
 void SESSION::send_meteo_packet(int c_id, CMeteoObject* meteo[])
 {
 	SC_METEO_PACKET p;

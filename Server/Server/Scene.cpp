@@ -170,6 +170,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			//std::cout << "´«";
 			//m_ppGameObjects[i]->Replace(m_pPlayer->GetPosition());
 		//}
+
 	}
 
 	for (int i = 0; i < m_nMeteoObjects; i++) { m_ppMeteoObjects[i]->Animate(fTimeElapsed, NULL); }

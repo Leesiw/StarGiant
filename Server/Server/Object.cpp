@@ -154,8 +154,9 @@ void CMeteoObject::OnInitialize()
 
 void CMeteoObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 {
-
-	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
+	XMFLOAT3 xmf3Position = GetPosition();
+	xmf3Position = Vector3::Add(xmf3Position, m_xmf3MovingDirection, 100.0 * fTimeElapsed);
+	CGameObject::SetPosition(xmf3Position);
 }
 
 //============================================

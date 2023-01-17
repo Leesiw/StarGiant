@@ -74,6 +74,7 @@ void CGameFramework::Init() {
 					h_iocp, client_id, 0);
 				clients[client_id].do_recv();
 				clients[client_id].send_login_info_packet();
+				clients[client_id].send_spawn_all_meteo_packet(0, m_pScene->m_ppMeteoObjects);
 				c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 			}
 			else {
@@ -181,7 +182,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		swap(clients[0].type, clients[1].type);
 		for (auto& pl : clients) {
 			if (false == pl.in_use) continue;
-			pl.send_login_info_packet();
+			//pl.send_login_info_packet();
 		}
 		break;
 	}

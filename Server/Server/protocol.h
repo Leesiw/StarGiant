@@ -23,11 +23,12 @@ constexpr char CS_MOVE = 1;
 constexpr char CS_ATTACK = 2;
 
 constexpr char SC_LOGIN_INFO = 3;
-constexpr char SC_ADD_PLAYER = 4;
-constexpr char SC_REMOVE_PLAYER = 5;
+constexpr char SC_CHANGE = 4;
+constexpr char SC_ADD_PLAYER = 5;
+constexpr char SC_REMOVE_PLAYER = 6;
 
-constexpr char SC_METEO = 6;
-constexpr char SC_METEO_SPAWN = 7;
+constexpr char SC_METEO = 7;
+constexpr char SC_SPAWN_METEO = 8;
 
 constexpr char SC_MOVE_PLAYER = 9;
 constexpr char SC_MOVE_ENEMY = 10;
@@ -46,10 +47,10 @@ struct METEO_INFO {
 	XMFLOAT3 pos;
 };
 
-struct NEW_METEO_INFO {
+struct SPAWN_METEO_INFO {
 	short	id;
 	short	model_id;
-	XMFLOAT3 size;
+	XMFLOAT3 scale;
 	// 방향/속도?
 };
 
@@ -138,6 +139,13 @@ struct SC_REMOVE_PLAYER_PACKET {
 	short	id;
 };
 
+struct SC_CHANGE_PACKET {
+	unsigned char size;
+	char	type;
+
+	LOGIN_INFO	data;
+};
+
 struct SC_MOVE_PLAYER_PACKET {
 	unsigned char size;
 	char	type;
@@ -150,6 +158,18 @@ struct SC_MOVE_ENEMY_PACKET {
 	char	type;
 
 	ENEMY_INFO data;
+};
+
+struct SC_SPAWN_METEO_PACKET {
+	unsigned char size;
+	char	type;
+	SPAWN_METEO_INFO data;
+};
+
+struct SC_SPAWN_ALL_METEO_PACKET {
+	unsigned char size;
+	char	type;
+	SPAWN_METEO_INFO data[10];
 };
 
 struct SC_METEO_PACKET {

@@ -14,7 +14,6 @@ public:
 	void BuildObjects();
 	void BuildObjects2();
 	void ReleaseObjects();
-	void MoveMeteo(float fTimeElapsed);
 
 	bool ProcessInput(UCHAR* pKeysBuffer);
 	void AnimateObjects(float fTimeElapsed);

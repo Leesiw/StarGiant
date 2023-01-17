@@ -682,7 +682,30 @@ void CGameFramework::RecvServer()
 			player_type = loginInfo.player_type;
 			break;
 		}
+		case SC_SPAWN_METEO:
+		{
+			if (size == sizeof(SC_SPAWN_METEO_PACKET))
+			{
+				char subBuf[sizeof(SPAWN_METEO_INFO)]{};
+				WSABUF wsabuf{ sizeof(subBuf), subBuf };
+				DWORD recvByte{}, recvFlag{};
+				WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
 
+				SPAWN_METEO_INFO m_info;
+				memcpy(&m_info, &subBuf, sizeof(SPAWN_METEO_INFO));
+			}
+			else
+			{
+				char subBuf[sizeof(SPAWN_METEO_INFO[METEOS])]{};
+				WSABUF wsabuf{ sizeof(subBuf), subBuf };
+				DWORD recvByte{}, recvFlag{};
+				WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+				SPAWN_METEO_INFO m_info[METEOS];
+				memcpy(&m_info, &subBuf, sizeof(SPAWN_METEO_INFO[METEOS]));
+			}
+			break;
+		}
 		case SC_METEO:
 		{
 			char subBuf[sizeof(METEO_INFO) * METEOS]{};
