@@ -62,6 +62,7 @@ public:
 	short GetModelID() { return model_id; }
 	void SetMovingSpeed(float fSpeed) { m_fMovingSpeed = fSpeed; }
 	void SetMovingDirection(XMFLOAT3& xmf3MovingDirection) { m_xmf3MovingDirection = Vector3::Normalize(xmf3MovingDirection); }
+	XMFLOAT3 GetMovingDirection() { return m_xmf3MovingDirection; }
 	virtual void SetScale(float x, float y, float z);
 	XMFLOAT3 GetScale() { return m_xmf3Scale; }
 

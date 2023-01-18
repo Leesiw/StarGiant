@@ -5,7 +5,7 @@ using namespace DirectX;
 //using namespace DirectX::PackedVector;
 
 #define BULLETS					50
-#define METEOS					10
+#define METEOS					20
 #define ENEMIES					36
 
 constexpr int MAX_USER = 3;

@@ -20,7 +20,7 @@ void CScene::Init()
 std::random_device rdd;
 std::default_random_engine dree(rdd());
 std::uniform_real_distribution<float> urdPos(-500, 500);
-std::uniform_real_distribution<float> urdScale(8, 12);
+std::uniform_real_distribution<float> urdScale(5, 8);
 std::uniform_int_distribution<short>	urdModelID(0, 1);
 
 void CScene::BuildObjects()
@@ -29,7 +29,7 @@ void CScene::BuildObjects()
 	CMeteoObject* meteo = NULL;
 
 
-	for (int i = 0; i < 10; ++i) {
+	for (int i = 0; i < METEOS; ++i) {
 		meteo = new CMeteoObject();
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
 		meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
@@ -38,10 +38,12 @@ void CScene::BuildObjects()
 		//meteo->SetModelId(id);
 		//meteo->mesh = true;
 		if (i <  METEOS/2) {
-			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		}
 		else {
-			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.000628f, -0.011224f, -0.003297f }, XMFLOAT3{ 2.89832f, 2.51931f, 2.78528f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.000628f, -0.011224f, -0.003297f }, XMFLOAT3{ 2.89832f, 2.51931f, 2.78528f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		}
 		m_ppMeteoObjects[i] = meteo;
 		m_ppMeteoObjects[i]->UpdateTransform(NULL);
@@ -63,20 +65,30 @@ bool CScene::ProcessInput(UCHAR* pKeysBuffer)
 
 void CScene::CheckMeteoByPlayerCollisions()
 {
+	m_pSpaceship->OnPrepareRender();
+	m_pSpaceship->UpdateTransform();
 	m_pSpaceship->UpdateBoundingBox();
+
 	for (int i = 0; i < METEOS; ++i) {
-		//if (m_pPlayer->m_pChild->m_xmOOBB.Intersects(m_ppGameObjects[i]->m_pChild->m_xmOOBB))
+		
 		m_ppMeteoObjects[i]->UpdateBoundingBox();
+		
 		if (m_pSpaceship->HierarchyIntersects(m_ppMeteoObjects[i]))
 		{
-			XMFLOAT3 xmf3Sub = m_ppMeteoObjects[i]->GetPosition();
-			xmf3Sub = Vector3::Subtract(m_pSpaceship->GetPosition(), xmf3Sub);
-			xmf3Sub = Vector3::Normalize(xmf3Sub);
+			XMFLOAT3 vel1 = m_pSpaceship->GetVelocity();
+			XMFLOAT3 vel2 = m_ppMeteoObjects[i]->GetMovingDirection();
+			float m1 = 1.0f; float m2 = 5.0f;
+			float finalVelX1 = ((m1 - m2) / (m1 + m2)) * vel1.x + ((2.f * m2) / (m1 + m2)) * vel2.x;
+			float finalVelY1 = ((m1 - m2) / (m1 + m2)) * vel1.y + ((2.f * m2) / (m1 + m2)) * vel2.y;
+			float finalVelZ1 = ((m1 - m2) / (m1 + m2)) * vel1.z + ((2.f * m2) / (m1 + m2)) * vel2.z;
+			float finalVelX2 = ((2.f * m1) / (m1 + m2)) * vel1.x + ((m2 - m1) / (m1 + m2)) * vel2.x;
+			float finalVelY2 = ((2.f * m1) / (m1 + m2)) * vel1.y + ((m2 - m1) / (m1 + m2)) * vel2.y;
+			float finalVelZ2 = ((2.f * m1) / (m1 + m2)) * vel1.z + ((m2 - m1) / (m1 + m2)) * vel2.z;
 
-			xmf3Sub.y = 0;
-			//std::cout << "Ãæµ¹! ";
+			m_pSpaceship->SetVelocity(XMFLOAT3(finalVelX1, finalVelY1, finalVelZ1));
+			m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(finalVelX2, finalVelY2, finalVelZ2));
 
-			m_pSpaceship->Move(xmf3Sub, false);
+			m_pSpaceship->Move(m_pSpaceship->GetVelocity(), true);
 		}
 
 		//m_ppGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppGameObjects[i]->m_pChild->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
@@ -110,7 +122,7 @@ void CScene::CheckObjectByBulletCollisions()
 		if (!m_ppMeteoObjects[i]->mesh) continue;
 		for (int j = 0; j < BULLETS; j++)
 		{
-			ppBullets[j]->UpdateBoundingBox();
+			//ppBullets[j]->UpdateBoundingBox();
 			if (ppBullets[j]->m_bActive) {
 				
 				m_ppMeteoObjects[i]->aabb = BoundingBox(m_ppMeteoObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
@@ -171,8 +183,18 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		//}
 
 	}
-
-	for (int i = 0; i < METEOS; i++) { m_ppMeteoObjects[i]->Animate(fTimeElapsed, NULL); }
+	
+	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
+	for (int i = 0; i < METEOS; i++) { 
+		XMFLOAT3 m_pos = m_ppMeteoObjects[i]->GetPosition();
+		float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
+		if (dist > 1000) {
+			m_ppMeteoObjects[i]->SetPosition(urdPos(dree) + p_pos.x, urdPos(dree) + p_pos.y, urdPos(dree) + p_pos.z);
+			//m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+			m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(urdPos(dree), urdPos(dree), urdPos(dree)));
+		}
+		m_ppMeteoObjects[i]->Animate(fTimeElapsed, NULL); 
+	}
 
 	CheckMeteoByPlayerCollisions();
 	CheckObjectByBulletCollisions();

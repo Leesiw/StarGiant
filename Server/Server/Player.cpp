@@ -210,9 +210,6 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 			m_fFireWaitingTime[i] -= fTimeElapsed;
 	}
 
-	OnPrepareRender();
-	UpdateBoundingBox();
-
 	if (input_info.cxDelta || input_info.cyDelta)
 	{
 		if (input_info.isRButton) {

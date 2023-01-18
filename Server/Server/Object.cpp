@@ -24,10 +24,8 @@ void CGameObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 
 void CGameObject::UpdateBoundingBox()
 {
-	//if (mesh) {
-		boundingbox.Transform(m_xmOOBB, XMLoadFloat4x4(&m_xmf4x4World));
-		XMStoreFloat4(&m_xmOOBB.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBB.Orientation)));
-	//}
+	boundingbox.Transform(m_xmOOBB, XMLoadFloat4x4(&m_xmf4x4World));
+	XMStoreFloat4(&m_xmOOBB.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBB.Orientation)));
 }
 
 bool CGameObject::HierarchyIntersects(CGameObject* pCollisionGameObject, bool isSecond)
