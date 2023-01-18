@@ -175,6 +175,24 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_ppHierarchicalGameObjects[12]->SetScale(3.0f, 3.0f, 3.0f);
 	if (pMeteoModel) delete pMeteoModel;
 
+	for (int i = 0; i < METEOS / 2; ++i) {
+		CLoadedModelInfo* pMeteoModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
+		m_ppMeteorObjects[i] = new CMeteorObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMeteoModel, 1);
+		m_ppMeteorObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_ppMeteorObjects[i]->SetPosition(330.0f + i* 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
+		m_ppMeteorObjects[i]->SetScale(3.0f, 3.0f, 3.0f);
+		if (pMeteoModel) delete pMeteoModel;
+	}
+
+	for (int i = METEOS/2; i < METEOS; ++i) {
+		CLoadedModelInfo* pMeteoModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
+		m_ppMeteorObjects[i] = new CMeteorObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMeteoModel, 1);
+		m_ppMeteorObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_ppMeteorObjects[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
+		m_ppMeteorObjects[i]->SetScale(3.0f, 3.0f, 3.0f);
+		if (pMeteoModel) delete pMeteoModel;
+	}
+
 	m_nShaders = 1;
 	m_ppShaders = new CShader*[m_nShaders];
 
@@ -217,6 +235,12 @@ void CScene::ReleaseObjects()
 	{
 		for (int i = 0; i < m_nHierarchicalGameObjects; i++) if (m_ppHierarchicalGameObjects[i]) m_ppHierarchicalGameObjects[i]->Release();
 		delete[] m_ppHierarchicalGameObjects;
+	}
+
+	if (m_ppMeteorObjects)
+	{
+		for (int i = 0; i < METEOS; i++) if (m_ppMeteorObjects[i]) m_ppMeteorObjects[i]->Release();
+		delete[] m_ppMeteorObjects;
 	}
 
 	ReleaseShaderVariables();
@@ -447,6 +471,7 @@ void CScene::ReleaseUploadBuffers()
 	for (int i = 0; i < m_nShaders; i++) m_ppShaders[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nHierarchicalGameObjects; i++) m_ppHierarchicalGameObjects[i]->ReleaseUploadBuffers();
+	for (int i = 0; i < METEOS; i++) m_ppMeteorObjects[i]->ReleaseUploadBuffers();
 }
 
 void CScene::RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info)
@@ -649,6 +674,16 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 			m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
 			if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
 			m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
+		}
+	}
+
+	for (int i = 0; i < METEOS; i++)
+	{
+		if (m_ppMeteorObjects[i])
+		{
+			m_ppMeteorObjects[i]->Animate(m_fElapsedTime);
+			if (!m_ppMeteorObjects[i]->m_pSkinnedAnimationController) m_ppMeteorObjects[i]->UpdateTransform(NULL);
+			m_ppMeteorObjects[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
 }
