@@ -111,9 +111,11 @@ void CPlayer::Update(float fTimeElapsed)
 	Move(xmf3Velocity, false);
 
 	fLength = Vector3::Length(m_xmf3Velocity);
-	float fDeceleration = (m_fFriction * fTimeElapsed);
-	if (fDeceleration > fLength) fDeceleration = fLength;
-	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+	if (fLength > 100.0) {	// 최소 속도 지정
+		float fDeceleration = (m_fFriction * fTimeElapsed);
+		if (fDeceleration > fLength) fDeceleration = fLength;
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+	}
 }
 
 void CPlayer::OnPrepareRender()
