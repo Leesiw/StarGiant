@@ -693,6 +693,8 @@ void CGameFramework::RecvServer()
 
 				SPAWN_METEO_INFO m_info;
 				memcpy(&m_info, &subBuf, sizeof(SPAWN_METEO_INFO));
+
+				m_pScene->RespawnMeteor(m_pd3dDevice, m_pd3dCommandList, m_info);
 			}
 			else
 			{
@@ -703,6 +705,12 @@ void CGameFramework::RecvServer()
 
 				SPAWN_METEO_INFO m_info[METEOS];
 				memcpy(&m_info, &subBuf, sizeof(SPAWN_METEO_INFO[METEOS]));
+
+				for (int i = 0; i < METEOS; ++i)
+				{
+					m_info[i].id = i;
+					m_pScene->RespawnMeteor(m_pd3dDevice, m_pd3dCommandList, m_info[i]);
+				}
 			}
 			break;
 		}
@@ -717,7 +725,7 @@ void CGameFramework::RecvServer()
 			METEO_INFO meteoInfo[METEOS];
 			memcpy(&meteoInfo, &subBuf, sizeof(METEO_INFO) * METEOS);
 
-			//m_pScene->SetMeteoTransform(meteoInfo);
+			m_pScene->TransformMeteor(meteoInfo);
 			break;
 		}
 		case SC_ADD_PLAYER:

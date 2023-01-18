@@ -25,8 +25,6 @@ std::uniform_int_distribution<short>	urdModelID(0, 1);
 
 void CScene::BuildObjects()
 {
-	m_ppMeteoObjects = new CMeteoObject * [METEOS];
-
 	// meteo
 	CMeteoObject* meteo = NULL;
 
@@ -35,11 +33,11 @@ void CScene::BuildObjects()
 		meteo = new CMeteoObject();
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
 		meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
-		
-		short id = urdModelID(dree);
-		meteo->SetModelId(id);
+		meteo->SetMovingDirection(XMFLOAT3(urdPos(dree), urdPos(dree), urdPos(dree)));
+		//short id = urdModelID(dree);
+		//meteo->SetModelId(id);
 		//meteo->mesh = true;
-		if (id) {
+		if (i <  METEOS/2) {
 			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		}
 		else {
@@ -63,11 +61,12 @@ bool CScene::ProcessInput(UCHAR* pKeysBuffer)
 	return(false);
 }
 
-void CScene::CheckObjectByPlayerCollisions()
+void CScene::CheckMeteoByPlayerCollisions()
 {
-
-	for (int i = 0; i < m_nMeteoObjects; ++i) {
+	m_pSpaceship->UpdateBoundingBox();
+	for (int i = 0; i < METEOS; ++i) {
 		//if (m_pPlayer->m_pChild->m_xmOOBB.Intersects(m_ppGameObjects[i]->m_pChild->m_xmOOBB))
+		m_ppMeteoObjects[i]->UpdateBoundingBox();
 		if (m_pSpaceship->HierarchyIntersects(m_ppMeteoObjects[i]))
 		{
 			XMFLOAT3 xmf3Sub = m_ppMeteoObjects[i]->GetPosition();
@@ -106,7 +105,7 @@ void CScene::CheckObjectByBulletCollisions()
 {
 
 	CBulletObject** ppBullets = m_pSpaceship->m_ppBullets;
-	for (int i = 0; i < m_nMeteoObjects; ++i)
+	for (int i = 0; i < METEOS; ++i)
 	{
 		if (!m_ppMeteoObjects[i]->mesh) continue;
 		for (int j = 0; j < BULLETS; j++)
@@ -165,7 +164,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	//m_ppGameObjects[1]->turnturn(fTimeElapsed);
 	//MoveMeteo(m_GameTimer.GetTimeElapsed());
-	for (int i = 0; i < m_nMeteoObjects; i++) {
+	for (int i = 0; i < METEOS; i++) {
 		//if (!m_pSpaceship->GetBox().Intersects(m_ppGameObjects[i]->m_xmOOBB)) {
 			//std::cout << "´«";
 			//m_ppGameObjects[i]->Replace(m_pPlayer->GetPosition());
@@ -173,9 +172,9 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	}
 
-	for (int i = 0; i < m_nMeteoObjects; i++) { m_ppMeteoObjects[i]->Animate(fTimeElapsed, NULL); }
+	for (int i = 0; i < METEOS; i++) { m_ppMeteoObjects[i]->Animate(fTimeElapsed, NULL); }
 
-	CheckObjectByPlayerCollisions();
+	CheckMeteoByPlayerCollisions();
 	CheckObjectByBulletCollisions();
-	CheckEnemyByBulletCollisions();
+	//CheckEnemyByBulletCollisions();
 }

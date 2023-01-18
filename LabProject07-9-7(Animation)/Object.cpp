@@ -862,6 +862,12 @@ CTexture *CGameObject::FindReplicatedTexture(_TCHAR *pstrTextureName)
 	return(NULL);
 }
 
+void CGameObject::ResetScale()
+{
+	m_xmf4x4ToParent = Matrix4x4::Identity();
+	m_xmf4x4World = Matrix4x4::Identity();
+}
+
 int ReadIntegerFromFile(FILE *pInFile)
 {
 	int nValue = 0;

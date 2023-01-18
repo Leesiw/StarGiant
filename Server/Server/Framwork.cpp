@@ -224,6 +224,7 @@ void CGameFramework::ClientProcess()
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;
 				pl.send_move_packet(0, m_pSpaceship);
+				pl.send_meteo_packet(0, m_pScene->m_ppMeteoObjects);
 			}
 			fps = EndTime - EndTime;
 		}

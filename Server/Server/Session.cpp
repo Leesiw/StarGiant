@@ -120,9 +120,12 @@ void SESSION::send_meteo_packet(int c_id, CMeteoObject* meteo[])
 	p.type = SC_METEO;
 
 	for (int i = 0; i < METEOS; ++i) {
-		p.meteo->pos = meteo[i]->GetPosition();
+		p.meteo[i].pos = meteo[i]->GetPosition();
 	}
-
+	for (int i = 0; i < METEOS; ++i)
+	{
+		//printf("meteo %d : %f %f %f\n", i, p.meteo[i].pos.x, meteo[i].pos.y, meteo[i].pos.z);
+	}
 	char buf[sizeof(SC_METEO_PACKET)];
 	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
 	WSABUF wsabuf{ sizeof(buf), buf };

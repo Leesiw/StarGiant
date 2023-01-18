@@ -18,7 +18,7 @@ public:
 	bool ProcessInput(UCHAR* pKeysBuffer);
 	void AnimateObjects(float fTimeElapsed);
 
-	void CheckObjectByPlayerCollisions();
+	void CheckMeteoByPlayerCollisions();
 	void CheckObjectByBulletCollisions();
 	void CheckEnemyByBulletCollisions();
 
@@ -27,8 +27,7 @@ public:
 	//CEnemyObject* m_enemy = NULL;
 
 public:
-	CMeteoObject**				m_ppMeteoObjects = NULL;
-	int							m_nMeteoObjects = 0;
+	CMeteoObject*				m_ppMeteoObjects[METEOS];
 
 	float						m_fElapsedTime = 0.0f;
 };

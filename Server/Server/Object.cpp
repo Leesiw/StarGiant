@@ -24,10 +24,10 @@ void CGameObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 
 void CGameObject::UpdateBoundingBox()
 {
-	if (mesh) {
+	//if (mesh) {
 		boundingbox.Transform(m_xmOOBB, XMLoadFloat4x4(&m_xmf4x4World));
 		XMStoreFloat4(&m_xmOOBB.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBB.Orientation)));
-	}
+	//}
 }
 
 bool CGameObject::HierarchyIntersects(CGameObject* pCollisionGameObject, bool isSecond)
@@ -156,7 +156,8 @@ void CMeteoObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 {
 	XMFLOAT3 xmf3Position = GetPosition();
 	xmf3Position = Vector3::Add(xmf3Position, m_xmf3MovingDirection, 100.0 * fTimeElapsed);
-	CGameObject::SetPosition(xmf3Position);
+	SetPosition(xmf3Position);
+	//printf("pos : %f, %f, %f\n", xmf3Position.x, xmf3Position.y, xmf3Position.z);
 }
 
 //============================================

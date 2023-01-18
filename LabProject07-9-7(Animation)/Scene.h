@@ -68,6 +68,10 @@ public:
 
 	CPlayer								*m_pPlayer = NULL;
 
+	// ¼­¹ö
+	void RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info);
+	void TransformMeteor(METEO_INFO[]);
+
 protected:
 	ID3D12RootSignature					*m_pd3dGraphicsRootSignature = NULL;
 
@@ -106,6 +110,8 @@ public:
 
 	int									m_nHierarchicalGameObjects = 0;
 	CGameObject							**m_ppHierarchicalGameObjects = NULL;
+
+	CGameObject							*m_ppMeteorObjects[METEOS];
 
 	int									m_nShaders = 0;
 	CShader								**m_ppShaders = NULL;

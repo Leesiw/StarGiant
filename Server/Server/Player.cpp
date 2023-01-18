@@ -226,7 +226,7 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 	}
 
 	if (input_info.dwDirection) {
-		Move(input_info.dwDirection, 500.0f * fTimeElapsed, true);
+		Move(input_info.dwDirection, 800.0f * fTimeElapsed, true);
 		input_info.dwDirection = NULL;
 	}
 

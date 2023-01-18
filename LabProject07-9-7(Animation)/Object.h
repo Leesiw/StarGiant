@@ -401,6 +401,8 @@ public:
 
 	UINT GetMeshType() { return((m_pMesh) ? m_pMesh->GetType() : 0x00); }
 
+	void ResetScale();
+
 public:
 	CAnimationController 			*m_pSkinnedAnimationController = NULL;
 

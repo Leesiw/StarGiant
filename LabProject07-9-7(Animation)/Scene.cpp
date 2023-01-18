@@ -449,6 +449,26 @@ void CScene::ReleaseUploadBuffers()
 	for (int i = 0; i < m_nHierarchicalGameObjects; i++) m_ppHierarchicalGameObjects[i]->ReleaseUploadBuffers();
 }
 
+void CScene::RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info)
+{
+	if (m_ppMeteorObjects[m_info.id])
+	{
+		m_ppMeteorObjects[m_info.id]->ResetScale();
+		m_ppMeteorObjects[m_info.id]->SetScale(m_info.scale.x, m_info.scale.y, m_info.scale.z);
+	}
+}
+
+void CScene::TransformMeteor(METEO_INFO m_info[])
+{
+	for(int i = 0; i < METEOS; ++i)
+	{
+		//printf("meteo %d : %f %f %f\n", i, m_info[i].pos.x, m_info[i].pos.y, m_info[i].pos.z);
+		if (m_ppMeteorObjects[i]) {
+			m_ppMeteorObjects[i]->SetPosition(m_info[i].pos);
+		}
+	}
+}
+
 void CScene::CreateCbvSrvDescriptorHeaps(ID3D12Device *pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
