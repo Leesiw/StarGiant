@@ -344,6 +344,15 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				((CAirplanePlayer*)m_pPlayer)->FireBullet(NULL);
 				std::cout << "ÃÑ¾Ë";
 				break;
+			case VK_SPACE:
+				if (((CTerrainPlayer*)m_pPlayer)->motion != 2) {
+					((CTerrainPlayer*)m_pPlayer)->motion = 2;
+				}
+				else
+					((CTerrainPlayer*)m_pPlayer)->motion = 0;
+
+				std::cout << "¾É±â";
+				break;
 			
 				default:
 					break;

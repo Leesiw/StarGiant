@@ -44,6 +44,9 @@ protected:
 
 	PLAYER_INFO					player_info;
 	bool						is_update;
+
+public:
+	int motion;
 public:
 	CPlayer();
 	virtual ~CPlayer();

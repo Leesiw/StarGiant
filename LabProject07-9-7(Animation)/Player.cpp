@@ -499,10 +499,16 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	CLoadedModelInfo* pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Doggy_V2.bin", NULL);
 	SetChild(pAngrybotModel->m_pModelRootObject, true);
 
-	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 2, pAngrybotModel);
+	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 4, pAngrybotModel);
 	m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_pSkinnedAnimationController->SetTrackAnimationSet(1, 1);
+	m_pSkinnedAnimationController->SetTrackAnimationSet(2, 2);
+	m_pSkinnedAnimationController->SetTrackAnimationSet(3, 3);
+
 	m_pSkinnedAnimationController->SetTrackEnable(1, false);
+	m_pSkinnedAnimationController->SetTrackEnable(2, false);
+	m_pSkinnedAnimationController->SetTrackEnable(3, false);
+
 
 	m_pSkinnedAnimationController->SetCallbackKeys(1, 2);
 #ifdef _WITH_SOUND_RESOURCE
@@ -628,6 +634,9 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 	{
 		m_pSkinnedAnimationController->SetTrackEnable(0, false);
 		m_pSkinnedAnimationController->SetTrackEnable(1, true);
+		m_pSkinnedAnimationController->SetTrackEnable(2, false);
+		m_pSkinnedAnimationController->SetTrackEnable(3, false);
+
 	}
 
 	CPlayer::Move(dwDirection, fDistance, bUpdateVelocity);
@@ -642,9 +651,22 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 		float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 		if (::IsZero(fLength))
 		{
-			m_pSkinnedAnimationController->SetTrackEnable(0, true);
-			m_pSkinnedAnimationController->SetTrackEnable(1, false);
-			m_pSkinnedAnimationController->SetTrackPosition(1, 0.0f);
+
+			if (motion == 2) {
+				m_pSkinnedAnimationController->SetTrackEnable(0, false);
+				m_pSkinnedAnimationController->SetTrackEnable(1, false);
+				m_pSkinnedAnimationController->SetTrackEnable(2, false);
+				m_pSkinnedAnimationController->SetTrackEnable(3, true);
+
+			}
+			else {
+				m_pSkinnedAnimationController->SetTrackEnable(0, true);
+				m_pSkinnedAnimationController->SetTrackEnable(1, false);
+				m_pSkinnedAnimationController->SetTrackEnable(2, false);
+				m_pSkinnedAnimationController->SetTrackEnable(3, false);
+				m_pSkinnedAnimationController->SetTrackPosition(1, 0.0f);
+				m_pSkinnedAnimationController->SetTrackPosition(2, 0.0f);
+			}
 		}
 	}
 }
