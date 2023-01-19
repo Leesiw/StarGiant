@@ -494,25 +494,24 @@ void CGameFramework::ProcessInput()
 
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 		{
+			if (cxDelta || cyDelta)
+			{
+				if (pKeysBuffer[VK_RBUTTON] & 0xF0)
+					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
+				else
+					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+			}
+
 			if (isConnect) {
 				CS_MOVE_PACKET my_packet;
 				my_packet.size = sizeof(CS_MOVE_PACKET);
 				my_packet.type = CS_MOVE;
 				my_packet.data.dwDirection = dwDirection;
-				my_packet.data.cxDelta = cxDelta;
-				my_packet.data.cyDelta = cyDelta;
-				my_packet.data.isRButton = (pKeysBuffer[VK_RBUTTON] & 0xF0);
+				my_packet.data.yaw = m_pPlayer->GetYaw();
 
 				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 			}
 			else {
-				if (cxDelta || cyDelta)
-				{
-					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
-						m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-					else
-						m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
-				}
 				if (dwDirection) m_pPlayer->Move(dwDirection, 12.25f, true);
 			}
 		}
@@ -743,13 +742,15 @@ void CGameFramework::RecvServer()
 		}
 		case SC_MOVE_PLAYER:
 		{
-			char subBuf[sizeof(PLAYER_INFO)]{};
+			char subBuf[sizeof(PLAYER_INFO[4])]{};
 			WSABUF wsabuf{ sizeof(subBuf), subBuf };
 			DWORD recvByte{}, recvFlag{};
 			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-			PLAYER_INFO playerInfo;
-			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO));
-			m_pPlayer->SetPlayerInfo(playerInfo);
+			PLAYER_INFO playerInfo[4];
+			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO[4]));
+			// 이후 수정 필요
+			m_pPlayer->SetPlayerInfo(playerInfo[0]);
+
 			//m_pPlayer->SetPosition(playerInfo.pos);
 			//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
 			//m_pPlayer->SetVelocity(playerInfo.velocity);

@@ -39,9 +39,11 @@ void CGameFramework::Init() {
 	a_over._comp_type = OP_ACCEPT;
 	AcceptEx(server, c_socket, a_over._send_buf, 0, addr_size + 16, addr_size + 16, 0, &a_over._over);
 
-	clients[0].type = MOVE;
-	clients[1].type = ATTACK;
-	
+
+	for (auto& pl : clients) {
+		pl.type = PlayerType::INSIDE;
+	}
+
 	ClientProcessThread = thread{ &CGameFramework::ClientProcess, this };
 
 	while (true) {
@@ -129,7 +131,11 @@ void CGameFramework::BuildObjects()
 	pAirplanePlayer->boundingbox = BoundingOrientedBox{ XMFLOAT3(-0.000000f, -0.000000f, -0.000096f), XMFLOAT3(15.5f, 15.5f, 3.90426f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	m_pScene->m_pSpaceship = m_pSpaceship = pAirplanePlayer;
 	//m_pCamera = m_pPlayer->GetCamera();
-
+	for (int i = 0; i < 3; ++i) {
+		CTerrainPlayer* pPlayer = new CTerrainPlayer();
+		pPlayer->SetPosition(XMFLOAT3(i * 100.0f, 0.0f, 0.0f));
+		m_ppPlayers[i] = pPlayer;
+	}
 
 	/////////////////////////////////////////
 
@@ -153,6 +159,11 @@ void CGameFramework::AnimateObjects(float fTimeElapsed)
 
 	m_pSpaceship->Animate(fTimeElapsed);
 	m_pSpaceship->Update(fTimeElapsed);
+
+	for (int i = 0; i < 3; ++i)
+	{
+		m_ppPlayers[i]->Update(fTimeElapsed);
+	}
 
 	//m_Enemy->Animate(fTimeElapsed, m_pSpaceship->GetPosition());
 	/*
@@ -179,23 +190,48 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	switch (packet[1]) {
 	case CS_CHANGE: {
 		CS_CHANGE_PACKET* p = reinterpret_cast<CS_CHANGE_PACKET*>(packet);
-		swap(clients[0].type, clients[1].type);
-		for (auto& pl : clients) {
-			if (false == pl.in_use) continue;
-			//pl.send_login_info_packet();
+		if (p->player_type == PlayerType::INSIDE)
+		{
+			clients[c_id].type = PlayerType::INSIDE;
+
+			for (auto& pl : clients) {
+				if (false == pl.in_use) continue;
+				pl.send_change_packet(c_id, p->player_type);
+			}
+		}
+		else 
+		{
+			bool exists = std::any_of(std::begin(clients), std::end(clients),
+				[&](SESSION pl) {
+				return pl.type == p->player_type;
+			});
+
+			if (!exists) {
+				clients[c_id].type = p->player_type;
+
+				for (auto& pl : clients) {
+					if (false == pl.in_use) continue;
+					pl.send_change_packet(c_id, p->player_type);
+				}
+			}
 		}
 		break;
 	}
 	case CS_MOVE: {
 		CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
-		if (clients[c_id].type == MOVE) {
+		if (clients[c_id].type == PlayerType::INSIDE) {
+			// 플레이어 이동
+			m_ppPlayers[c_id]->SetInputInfo(p->data);
+		}
+		else if (clients[c_id].type == PlayerType::MOVE) {
 			m_pSpaceship->SetInputInfo(p->data);
 		}
 		break;
 	}
 	case CS_ATTACK: {
 		CS_ATTACK_PACKET* p = reinterpret_cast<CS_ATTACK_PACKET*>(packet);
-		if (clients[c_id].type == ATTACK) {
+		/*
+		if (clients[c_id].type == PlayerType::ATTACK) {
 			if (((CAirplanePlayer*)m_pSpaceship)->FireBullet(1)) {
 				for (auto& pl : clients) {
 					if (false == pl.in_use) continue;
@@ -203,6 +239,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 				}
 			}
 		}
+		*/
 		break;
 	}
 	}
@@ -223,7 +260,7 @@ void CGameFramework::ClientProcess()
 			AnimateObjects(fps.count());
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;
-				pl.send_move_packet(0, m_pSpaceship);
+				pl.send_move_packet(0, m_ppPlayers, m_pSpaceship);
 				pl.send_meteo_packet(0, m_pScene->m_ppMeteoObjects);
 			}
 			fps = EndTime - EndTime;

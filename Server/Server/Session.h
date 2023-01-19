@@ -45,7 +45,7 @@ class SESSION {
 public:
 	bool in_use;
 	int _id;
-	char type;	// ����/����
+	PlayerType type;	// ����/����
 	SOCKET _socket;
 	char	_name[NAME_SIZE];
 
@@ -86,7 +86,8 @@ public:
 		p.type = SC_LOGIN_INFO;
 		do_send(&p);
 	}
-	void send_move_packet(int c_id, CPlayer* m_pPlayer);
+	void send_change_packet(int c_id, PlayerType p_type);
+	void send_move_packet(int c_id, CTerrainPlayer* m_pPlayer[], CAirplanePlayer* m_pSpaceship);
 	void send_bullet_packet(int c_id, CPlayer* m_pPlayer);
 	//void send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 player_pos);
 	void send_spawn_meteo_packet(int c_id, short id, CMeteoObject* meteo);

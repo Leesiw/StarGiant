@@ -36,10 +36,11 @@ constexpr char SC_BULLET = 11;
 constexpr char SC_BULLET_HIT = 12;
 constexpr char SC_ENEMY_DIE = 13;
 
-// Player type 
-constexpr char INSIDE = 0;
-constexpr char MOVE = 1;
-constexpr char ATTACK = 2;
+
+enum class PlayerType : char
+{
+	INSIDE, MOVE, ATTACK1, ATTACK2, ATTACK3
+};
 
 #pragma pack (push, 1)
 
@@ -62,14 +63,12 @@ struct BULLET_INFO {
 
 struct LOGIN_INFO {
 	short	id;
-	char player_type;
+	PlayerType player_type;
 };
 
 struct INPUT_INFO {
 	DWORD dwDirection;
-	float cxDelta;
-	float cyDelta;
-	bool isRButton;
+	float yaw;
 };
 
 struct PLAYER_INFO {
@@ -104,6 +103,8 @@ struct BULLET_HIT_INFO {
 struct CS_CHANGE_PACKET {
 	unsigned char size;
 	char	type;
+
+	PlayerType player_type;
 };
 
 struct CS_MOVE_PACKET {
@@ -150,7 +151,7 @@ struct SC_MOVE_PLAYER_PACKET {
 	unsigned char size;
 	char	type;
 
-	PLAYER_INFO data;
+	PLAYER_INFO data[4];
 };
 
 struct SC_MOVE_ENEMY_PACKET {

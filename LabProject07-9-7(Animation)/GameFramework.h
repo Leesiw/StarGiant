@@ -92,7 +92,7 @@ private:
 
 	// ¼­¹ö
 	int g_myid;
-	char player_type;
+	PlayerType player_type;
 
 	thread    NetworkThread{};
 	SOCKET sock;

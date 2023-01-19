@@ -212,17 +212,7 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 			m_fFireWaitingTime[i] -= fTimeElapsed;
 	}
 
-	if (input_info.cxDelta || input_info.cyDelta)
-	{
-		if (input_info.isRButton) {
-			Rotate(input_info.cyDelta, 0.0f, -input_info.cxDelta);
-		}
-		else {
-			Rotate(input_info.cyDelta, input_info.cxDelta, 0.0f);
-		}
-		input_info.cxDelta = NULL;
-		input_info.cyDelta = NULL;
-	}
+	Rotate(0, input_info.yaw - m_fYaw, 0);
 
 	if (input_info.dwDirection) {
 		Move(input_info.dwDirection, 800.0f * fTimeElapsed, true);
@@ -251,11 +241,25 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 	if (dwDirection)
 	{
 		walk = true;
+
+		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
+		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+		if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
+		if (dwDirection & DIR_RIGHT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
+		if (dwDirection & DIR_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
+
+		CPlayer::Move(xmf3Shift, bUpdateVelocity);
 	}
 
-	CPlayer::Move(dwDirection, fDistance, bUpdateVelocity);
+	//CPlayer::Move(dwDirection, fDistance, bUpdateVelocity);
 }
 
 void CTerrainPlayer::Update(float fTimeElapsed)
 {
+	Rotate(0, input_info.yaw - m_fYaw, 0);
+
+	if (input_info.dwDirection) {
+		Move(input_info.dwDirection, 400.0f * fTimeElapsed, false);
+		input_info.dwDirection = NULL;
+	}
 }
