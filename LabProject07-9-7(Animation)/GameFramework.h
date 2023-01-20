@@ -90,6 +90,15 @@ private:
 
 	_TCHAR						m_pszFrameRate[70];
 
+	// 내부 
+	CScene* m_pInsideScene = NULL;
+	CPlayer* m_pInsidePlayer = NULL;
+	CCamera* m_pInsideCamera = NULL;
+
+	bool b_Inside;
+	// 
+	
+
 	// 서버
 	int g_myid;
 	PlayerType player_type;

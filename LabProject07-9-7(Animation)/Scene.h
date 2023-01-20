@@ -52,10 +52,13 @@ public:
 
 	void BuildDefaultLightsAndMaterials();
 	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+	void BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap);
+	//앞 씬이랑 같은거 쓸거같은데 덮어씌기로 앞 씬의 값이 사라짐. 공유하게 쓰려고 핸들을 받게만듬.(고유 씬만의 디스크립터 설명수정이 필요할시 이걸 없애고 수정해야할거같음) 
 	void ReleaseObjects();
 
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
 	ID3D12RootSignature *GetGraphicsRootSignature() { return(m_pd3dGraphicsRootSignature); }
+	ID3D12DescriptorHeap* GetDescriptor() { return(m_pd3dCbvSrvDescriptorHeap); }
 
 
 	void CheckObjectByBulletCollisions();

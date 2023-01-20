@@ -31,6 +31,9 @@ CGameFramework::CGameFramework()
 	m_pScene = NULL;
 	m_pPlayer = NULL;
 
+	m_pInsideScene = NULL;
+	m_pInsidePlayer = NULL;
+
 	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
 }
 
@@ -353,9 +356,10 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 				std::cout << "¾É±â";
 				break;
-			
-				default:
-					break;
+			case VK_TAB:
+				b_Inside = !b_Inside;
+				std::cout << "ÀüÈ¯";
+				break;
 			}
 			break;
 		default:
@@ -431,13 +435,17 @@ void CGameFramework::BuildObjects()
 
 	m_pScene = new CScene();
 	if (m_pScene) m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+	m_pInsideScene = new CScene();
+	if (m_pInsideScene) m_pInsideScene->BuildInsideObjects(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetDescriptor());
+	
 
 #ifdef _WITH_TERRAIN_PLAYER
-	CTerrainPlayer *pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain);
-	//CAirplanePlayer* pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL);
+	CTerrainPlayer *pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pInsideScene->GetGraphicsRootSignature(), m_pInsideScene->m_pTerrain);
 	pPlayer->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
 	pPlayer->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
-
+	CAirplanePlayer* pAirPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain);
+	pAirPlayer->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
+	pAirPlayer->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
 #else
 	CAirplanePlayer *pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL);
 	pPlayer->SetPosition(XMFLOAT3(425.0f, 240.0f, 640.0f));
@@ -445,6 +453,8 @@ void CGameFramework::BuildObjects()
 
 	m_pScene->m_pPlayer = m_pPlayer = pPlayer;
 	m_pCamera = m_pPlayer->GetCamera();
+	m_pInsideScene->m_pPlayer = m_pInsidePlayer = pPlayer;
+	m_pInsideCamera = m_pInsidePlayer->GetCamera();
 
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -453,7 +463,9 @@ void CGameFramework::BuildObjects()
 	WaitForGpuComplete();
 
 	if (m_pScene) m_pScene->ReleaseUploadBuffers();
+	if (m_pInsideScene) m_pInsideScene->ReleaseUploadBuffers();
 	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
+	if (m_pInsidePlayer) m_pInsidePlayer->ReleaseUploadBuffers();
 
 	m_GameTimer.Reset();
 }
@@ -461,9 +473,12 @@ void CGameFramework::BuildObjects()
 void CGameFramework::ReleaseObjects()
 {
 	if (m_pPlayer) m_pPlayer->Release();
+	if (m_pInsidePlayer) m_pInsidePlayer->Release();
 
 	if (m_pScene) m_pScene->ReleaseObjects();
 	if (m_pScene) delete m_pScene;
+	if (m_pInsideScene) m_pInsideScene->ReleaseObjects();
+	if (m_pInsideScene) delete m_pInsideScene;
 }
 
 void CGameFramework::ProcessInput()
@@ -521,6 +536,7 @@ void CGameFramework::ProcessInput()
 		m_pPlayer->UpdateOnServer();
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+	//m_pInsidePlayer->Update(m_GameTimer.GetTimeElapsed());
 }
 
 void CGameFramework::AnimateObjects()
@@ -528,8 +544,10 @@ void CGameFramework::AnimateObjects()
 	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
 
 	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
+	if (m_pInsideScene) m_pInsideScene->AnimateObjects(fTimeElapsed);
 
 	m_pPlayer->Animate(fTimeElapsed);
+	m_pInsidePlayer->Animate(fTimeElapsed);
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -592,12 +610,14 @@ void CGameFramework::FrameAdvance()
 
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
-	if (m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera);
+	if (m_pScene&&!b_Inside) m_pScene->Render(m_pd3dCommandList, m_pCamera);
+	if (m_pInsideScene&&b_Inside) m_pInsideScene->Render(m_pd3dCommandList, m_pInsideCamera);
 
 #ifdef _WITH_PLAYER_TOP
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
-	if (m_pPlayer) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
+	if (m_pPlayer && !b_Inside) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
+	if (m_pInsidePlayer && b_Inside) m_pInsidePlayer->Render(m_pd3dCommandList, m_pInsideCamera);
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
