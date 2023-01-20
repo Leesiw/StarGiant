@@ -82,7 +82,7 @@ void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 	}
 }
 
-void CPlayer::Rotate(float x, float y, float z)
+void CPlayer::Rotate(float x, float y, float z, int mode)
 {
 	DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if ((nCurrentCameraMode == FIRST_PERSON_CAMERA) || (nCurrentCameraMode == THIRD_PERSON_CAMERA))
@@ -93,12 +93,13 @@ void CPlayer::Rotate(float x, float y, float z)
 			if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
 			if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
 		}
-		if (y != 0.0f)
+		if (y != 0.0f && mode == 0)
 		{
 			m_fYaw += y;
 			if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
 			if (m_fYaw < 0.0f) m_fYaw += 360.0f;
 		}
+
 		if (z != 0.0f)
 		{
 			m_fRoll += z;

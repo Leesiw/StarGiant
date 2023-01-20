@@ -440,10 +440,10 @@ void CGameFramework::BuildObjects()
 	
 
 #ifdef _WITH_TERRAIN_PLAYER
-	CTerrainPlayer *pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pInsideScene->GetGraphicsRootSignature(), m_pInsideScene->m_pTerrain);
+	CTerrainPlayer *pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain);
 	pPlayer->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
 	pPlayer->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
-	CAirplanePlayer* pAirPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain);
+	CAirplanePlayer* pAirPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pInsideScene->GetGraphicsRootSignature(), m_pInsideScene->m_pTerrain);
 	pAirPlayer->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
 	pAirPlayer->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
 #else
@@ -451,7 +451,7 @@ void CGameFramework::BuildObjects()
 	pPlayer->SetPosition(XMFLOAT3(425.0f, 240.0f, 640.0f));
 #endif
 
-	m_pScene->m_pPlayer = m_pPlayer = pPlayer;
+	m_pScene->m_pPlayer = m_pPlayer = pAirPlayer;
 	m_pCamera = m_pPlayer->GetCamera();
 	m_pInsideScene->m_pPlayer = m_pInsidePlayer = pPlayer;
 	m_pInsideCamera = m_pInsidePlayer->GetCamera();
@@ -511,10 +511,18 @@ void CGameFramework::ProcessInput()
 		{
 			if (cxDelta || cyDelta)
 			{
-				if (pKeysBuffer[VK_RBUTTON] & 0xF0)
-					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-				else
-					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+				if (b_Inside) {
+					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
+						m_pInsidePlayer->Rotate(cyDelta, 0.0f, -cxDelta, 1);
+					else
+						m_pInsidePlayer->Rotate(cyDelta, cxDelta, 0.0f, 1);
+				}
+				else {
+					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
+						m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
+					else
+						m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+				}
 			}
 
 			if (isConnect) {
@@ -527,7 +535,9 @@ void CGameFramework::ProcessInput()
 				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 			}
 			else {
-				if (dwDirection) m_pPlayer->Move(dwDirection, 12.25f, true);
+				//이동 부분 분할할지 모르겠어서 우선 여따 같이넣어둠 
+				if (dwDirection&&!b_Inside) m_pPlayer->Move(dwDirection, 20.25f, true);
+				if (dwDirection&& b_Inside) m_pInsidePlayer->Move(dwDirection, 10.25f, true);
 			}
 		}
 	}
@@ -535,8 +545,8 @@ void CGameFramework::ProcessInput()
 	if (isConnect) {
 		m_pPlayer->UpdateOnServer();
 	}
-	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
-	//m_pInsidePlayer->Update(m_GameTimer.GetTimeElapsed());
+	if(!b_Inside) m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+	else m_pInsidePlayer->Update(m_GameTimer.GetTimeElapsed());
 }
 
 void CGameFramework::AnimateObjects()
