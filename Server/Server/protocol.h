@@ -58,7 +58,6 @@ struct SPAWN_METEO_INFO {
 struct BULLET_INFO {
 	XMFLOAT3 pos;
 	XMFLOAT3 direction;
-	float pitch, yaw, roll;
 };
 
 struct LOGIN_INFO {

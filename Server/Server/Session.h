@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Player.h"
-#include "Enemy.h"
 #include "stdafx.h"
 
 #include <iostream>
@@ -88,7 +87,7 @@ public:
 	}
 	void send_change_packet(int c_id, PlayerType p_type);
 	void send_move_packet(int c_id, CTerrainPlayer* m_pPlayer[], CAirplanePlayer* m_pSpaceship);
-	void send_bullet_packet(int c_id, CPlayer* m_pPlayer);
+	void send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction);
 	//void send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 player_pos);
 	void send_spawn_meteo_packet(int c_id, short id, CMeteoObject* meteo);
 	void send_spawn_all_meteo_packet(int c_id, CMeteoObject* meteo[]);

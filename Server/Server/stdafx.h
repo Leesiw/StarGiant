@@ -30,6 +30,12 @@ using namespace std;
 
 #pragma comment(lib, "ws2_32") // ws2_32.lib 링크
 
+static std::random_device rdd;
+static std::default_random_engine dree(rdd());
+static std::uniform_real_distribution<float> urdPos(-500, 500);
+static std::uniform_real_distribution<float> urdScale(5, 8);
+static std::uniform_int_distribution<int> urdEnemyAI(0, 100);
+
 /*
 // 소켓 함수 오류 출력 후 종료
 void err_quit(const char* msg)

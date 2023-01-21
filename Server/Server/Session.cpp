@@ -27,18 +27,15 @@ void SESSION::send_move_packet(int c_id, CTerrainPlayer* m_pPlayer[], CAirplaneP
 	do_send(&p);
 }
 
-void SESSION::send_bullet_packet(int c_id, CPlayer* m_pPlayer)
+void SESSION::send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction)
 {
 	SC_BULLET_PACKET p;
 
 	p.size = sizeof(SC_BULLET_PACKET);
 	p.type = SC_BULLET;
 
-	p.data.direction = m_pPlayer->GetLookVector();
-	p.data.pos = m_pPlayer->GetPosition();
-	p.data.pitch = m_pPlayer->GetPitch();
-	p.data.yaw = m_pPlayer->GetYaw();
-	p.data.roll = m_pPlayer->GetRoll();
+	p.data.direction = direction;
+	p.data.pos = pos;
 
 	char buf[sizeof(SC_BULLET_PACKET)];
 	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));

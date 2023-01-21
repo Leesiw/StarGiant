@@ -1,53 +1,67 @@
 #pragma once
-/*
 #include "Object.h"
+#include "Session.h"
 
-class CEnemyObject : public CGameObject
+enum class EnemyState : char
+{
+	IDLE, MOVE, ATTACK, AVOID
+};
+
+extern array<SESSION, MAX_USER> clients;
+
+class CEnemy : public CGameObject
 {
 public:
-	CEnemyObject();
-	virtual ~CEnemyObject();
+	CEnemy();
+	virtual ~CEnemy();
 protected:
-	XMFLOAT3					m_xmf3Position;
-	XMFLOAT3					m_xmf3Right;
-	XMFLOAT3					m_xmf3Up;
-	XMFLOAT3					m_xmf3Look;
-
-
 	float           			m_fPitch = 0;
 	float           			m_fYaw = 0;
 	float           			m_fRoll = 0;
 
-	float						m_fResetWaitingTime = 0.0f;
-	float						m_fResetDelayTime = 2.0f;
+	float						m_fCoolTime = 2.0f;
+	float						m_fCoolTimeRemaining = 0.0f;
+
+	float						m_fAttackRange = 300.0f;
 public:
 	int hp;
+	EnemyState state;
 
 public:
-	void Fallowing(float fTimeElapsed, XMFLOAT3 Look);
-	void Rotate(float x, float y, float z);
-	void SetPosition(const XMFLOAT3& xmf3Position) {
-		m_xmf3Position = Vector3::Add(m_xmf3Position, XMFLOAT3(xmf3Position.x - m_xmf3Position.x, xmf3Position.y - m_xmf3Position.y, xmf3Position.z - m_xmf3Position.z));
-	}
+	virtual void AI(float fTimeElapsed, XMFLOAT3& player_pos);
+	virtual void MoveAI(float fTimeElapsed, XMFLOAT3& player_pos);
+	virtual void AttackAI();
+	virtual void AvoidAI();
 
-	virtual void OnPrepareRender();
+	void Rotate(float x, float y, float z);
+
 	virtual void Animate(float fElapsedTime);
 	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
 
 	float GetPitch() { return m_fPitch; }
 	float GetYaw() { return m_fYaw; }
 	float GetRoll() { return m_fRoll; }
-	XMFLOAT3 GetRotateLook(float x, float y, float z);
 
-	void SetResetWaitingTime();
+	void ResetCoolTime() { m_fCoolTimeRemaining = m_fCoolTime; }
 };
 
 
-class CEnemyShip : public CEnemyObject
+class CLaserEnemy : public CEnemy
 {
 public:
-	CEnemyShip();
-	virtual ~CEnemyShip();
+	CLaserEnemy();
+	virtual ~CLaserEnemy();
+
+public:
+	virtual void Animate(float fTimeElapsed);
+	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
+};
+
+class CMissileEnemy : public CEnemy
+{
+public:
+	CMissileEnemy();
+	virtual ~CMissileEnemy();
 
 	CGameObject** m_BulletObjects = NULL;
 	CBulletObject* m_ppBullets[BULLETS];
@@ -55,13 +69,17 @@ public:
 	float						m_fBulletEffectiveRange = 150.0f;
 	CGameObject* pBullet;
 
-	float						m_fFireWaitingTime = 0.0f;
-	float						m_fFireDelayTime = 2.0f;
-
-
 public:
 	virtual void Animate(float fTimeElapsed);
 	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
-	virtual void OnPrepareRender();
 };
-*/
+
+class CPlasmaCannonEnemy : public CEnemy
+{
+public:
+	CPlasmaCannonEnemy();
+	virtual ~CPlasmaCannonEnemy();
+public:
+	virtual void Animate(float fTimeElapsed);
+	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
+};

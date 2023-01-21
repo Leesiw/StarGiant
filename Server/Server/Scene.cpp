@@ -17,12 +17,6 @@ void CScene::Init()
 {
 }
 
-std::random_device rdd;
-std::default_random_engine dree(rdd());
-std::uniform_real_distribution<float> urdPos(-500, 500);
-std::uniform_real_distribution<float> urdScale(5, 8);
-std::uniform_int_distribution<short>	urdModelID(0, 1);
-
 void CScene::BuildObjects()
 {
 	// meteo
