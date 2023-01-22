@@ -4,7 +4,7 @@
 
 enum class EnemyState : char
 {
-	IDLE, MOVE, ATTACK, AVOID
+	IDLE, MOVE, AIMING, ATTACK, AVOID
 };
 
 extern array<SESSION, MAX_USER> clients;
@@ -22,7 +22,12 @@ protected:
 	float						m_fCoolTime = 2.0f;
 	float						m_fCoolTimeRemaining = 0.0f;
 
+	float						m_fMoveTime = 1.0f;
+	float						m_fMoveTimeRemaining = 0.0f;
+
 	float						m_fAttackRange = 300.0f;
+
+	short						m_sAvoidNum = 0;
 public:
 	int hp;
 	EnemyState state;
@@ -30,8 +35,10 @@ public:
 public:
 	virtual void AI(float fTimeElapsed, XMFLOAT3& player_pos);
 	virtual void MoveAI(float fTimeElapsed, XMFLOAT3& player_pos);
-	virtual void AttackAI();
-	virtual void AvoidAI();
+	virtual void AimingAI(float fTimeElapsed, XMFLOAT3& player_pos);
+	virtual void AttackAI(float fTimeElapsed, XMFLOAT3& player_pos);
+	virtual void Attack(float fTimeElapsed, XMFLOAT3& player_pos);
+	virtual void AvoidAI(float fTimeElapsed);
 
 	void Rotate(float x, float y, float z);
 
