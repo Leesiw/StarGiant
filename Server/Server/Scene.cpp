@@ -7,6 +7,10 @@
 
 CScene::CScene()
 {
+	for (int i = 0; i < ENEMIES; ++i)
+	{
+		m_ppEnemies[i] = NULL;
+	}
 }
 
 CScene::~CScene()
@@ -164,6 +168,16 @@ void CScene::CheckEnemyByBulletCollisions()
 	*/
 }
 
+void CScene::SpawnEnemy()
+{
+	for (int i = 0; i < ENEMIES; ++i)
+	{
+		m_ppEnemies;
+		// 적 종류 랜덤 생성
+		// 플레이어 우주선 앞 쪽에 랜덤으로 배치
+	}
+}
+
 void CScene::AnimateObjects(float fTimeElapsed)
 {
 	m_fElapsedTime = fTimeElapsed;
@@ -179,7 +193,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	}
 	
 	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
-	for (int i = 0; i < METEOS; i++) { 
+	for (int i = 0; i < METEOS; ++i) 
+	{ 
 		XMFLOAT3 m_pos = m_ppMeteoObjects[i]->GetPosition();
 		float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
 		if (dist > 1000) {
@@ -188,6 +203,11 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(urdPos(dree), urdPos(dree), urdPos(dree)));
 		}
 		m_ppMeteoObjects[i]->Animate(fTimeElapsed, NULL); 
+	}
+
+	for (int i = 0; i < ENEMIES; ++i)
+	{
+		if (m_ppEnemies[i]) { m_ppEnemies[i]->Animate(fTimeElapsed, m_pSpaceship->GetPosition()); }
 	}
 
 	CheckMeteoByPlayerCollisions();

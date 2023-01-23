@@ -37,6 +37,9 @@ private:
 	std::chrono::duration<double> fps;
 	std::chrono::system_clock::time_point prev_process_time;
 
+	float m_fEnemySpawnTime = 10.0f;
+	float m_fEnemySpawnTimeRemaining = 0.0f;
+
 	_TCHAR						m_pszFrameRate[70];
 
 	thread ClientProcessThread{};

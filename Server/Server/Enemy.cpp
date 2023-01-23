@@ -37,6 +37,14 @@ void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 			else 
 			{
 				state = EnemyState::AVOID;
+				if (urdEnemyAI(dree) > 50)
+				{
+					m_bAvoidDir = true;
+				}
+				else
+				{
+					m_bAvoidDir = false;
+				}
 			}
 		}
 		break;
@@ -77,8 +85,6 @@ void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
 		xmvMovingDirection = XMVector3Normalize(XMVectorLerp(xmvMovingDirection, xmvToPlayer, 0.25f));
 		XMStoreFloat3(&xmf3MovingDirection, xmvMovingDirection);
 
-		XMFLOAT3 xmf3Position = GetPosition();
-
 		// 일단 yaw 만 회전하도록
 		XMFLOAT3 xmf3RotateDir = xmf3MovingDirection;
 		xmf3RotateDir.y = 0.0f;
@@ -96,6 +102,8 @@ void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
 	{
 		state = EnemyState::IDLE;
 	}
+
+	SendPos();
 }
 
 void CEnemy::AimingAI(float fTimeElapsed, XMFLOAT3& player_pos)
@@ -123,6 +131,8 @@ void CEnemy::AimingAI(float fTimeElapsed, XMFLOAT3& player_pos)
 	}
 
 	Rotate(0, fRotationAngle, 0);
+
+	SendPos();
 }
 
 void CEnemy::AttackAI(float fTimeElapsed, XMFLOAT3& player_pos)
@@ -155,24 +165,42 @@ void CEnemy::Attack(float fTimeElapsed, XMFLOAT3& player_pos)
 {
 	for (auto& pl : clients)
 	{
-		pl.send_bullet_packet(0, GetPosition(), GetLook());
+		XMFLOAT3 pos = GetPosition();
+		XMFLOAT3 xmfToPlayer = Vector3::Subtract(pos, player_pos);
+		pl.send_bullet_packet(0, pos, xmfToPlayer);
 	}
 }
 
 void CEnemy::AvoidAI(float fTimeElapsed)
 {
-	if (m_sAvoidNum < 5)
+	if (m_fAvoidTime > 2.0f)
 	{
-		CGameObject::MoveStrafe(fTimeElapsed * 500.f);
+		m_fAvoidTime = 0.0f;
+		state = EnemyState::IDLE;
+	}
+
+	if (m_bAvoidDir)
+	{
+		if (m_fAvoidTime < 1.0f) {
+			CGameObject::MoveStrafe(fTimeElapsed * 500.f);
+		}
+		else {
+			CGameObject::MoveStrafe(fTimeElapsed * -500.f);
+		}
 	}
 	else
 	{
-		CGameObject::MoveStrafe(fTimeElapsed * -500.f);
-		if (m_sAvoidNum == 10)
-		{
-			state = EnemyState::IDLE;
+		if (m_fAvoidTime < 1.0f) {
+			CGameObject::MoveStrafe(fTimeElapsed * -500.f);
+		}
+		else {
+			CGameObject::MoveStrafe(fTimeElapsed * 500.f);
 		}
 	}
+
+	m_fAvoidTime += fTimeElapsed;
+
+	SendPos();
 }
 
 void CEnemy::Rotate(float x, float y, float z)
@@ -205,30 +233,30 @@ void CEnemy::Animate(float fElapsedTime)
 
 void CEnemy::Animate(float fTimeElapsed, XMFLOAT3 player_pos)
 {
+	AI(fTimeElapsed, player_pos);
 }
 
-//-------------------------------------------------------------------------------------
-
-CLaserEnemy::CLaserEnemy()
+void CEnemy::SendPos()
 {
-}
-
-CLaserEnemy::~CLaserEnemy()
-{
-}
-
-void CLaserEnemy::Animate(float fTimeElapsed)
-{
-}
-
-void CLaserEnemy::Animate(float fTimeElapsed, XMFLOAT3 player_pos)
-{
+	for (auto& pl : clients)
+	{
+		ENEMY_INFO info;
+		info.id = id;
+		info.m_fYaw = m_fYaw;
+		info.pos = GetPosition();
+		pl.send_enemy_packet(0, info);
+	}
 }
 
 //-------------------------------------------------------------------------------------
 
 CMissileEnemy::CMissileEnemy()
 {
+	hp = 10;			
+	m_fCoolTime = 2.0f;		// 공격 간격
+	m_fMoveTime = 1.0f;		// 사거리 안으로 들어가려 움직이는 시간
+	m_fAttackRange = 300.0f;	// 사거리
+	damage = 3;
 }
 
 CMissileEnemy::~CMissileEnemy()
@@ -250,8 +278,36 @@ void CMissileEnemy::Animate(float fTimeElapsed, XMFLOAT3 player_pos)
 
 //-------------------------------------------------------------------------------------
 
+CLaserEnemy::CLaserEnemy()
+{
+	hp = 10;
+	m_fCoolTime = 2.0f;		// 공격 간격
+	m_fMoveTime = 1.0f;		// 사거리 안으로 들어가려 움직이는 시간
+	m_fAttackRange = 300.0f;	// 사거리
+	damage = 3;
+}
+
+CLaserEnemy::~CLaserEnemy()
+{
+}
+
+void CLaserEnemy::Animate(float fTimeElapsed)
+{
+}
+
+void CLaserEnemy::Animate(float fTimeElapsed, XMFLOAT3 player_pos)
+{
+}
+
+//-------------------------------------------------------------------------------------
+
 CPlasmaCannonEnemy::CPlasmaCannonEnemy()
 {
+	hp = 10;
+	m_fCoolTime = 2.0f;		// 공격 간격
+	m_fMoveTime = 1.0f;		// 사거리 안으로 들어가려 움직이는 시간
+	m_fAttackRange = 300.0f;	// 사거리
+	damage = 3;
 }
 
 CPlasmaCannonEnemy::~CPlasmaCannonEnemy()

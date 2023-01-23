@@ -1,5 +1,6 @@
 #pragma once
 #include "Session.h"
+#include "Enemy.h"
 
 extern array<SESSION, MAX_USER> clients;
 
@@ -22,9 +23,11 @@ public:
 	void CheckObjectByBulletCollisions();
 	void CheckEnemyByBulletCollisions();
 
+	void SpawnEnemy();
+
 	CAirplanePlayer* m_pSpaceship = NULL;
 	CPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
-	//CEnemyObject* m_enemy = NULL;
+	CEnemy* m_ppEnemies[ENEMIES];
 
 public:
 	CMeteoObject*				m_ppMeteoObjects[METEOS];

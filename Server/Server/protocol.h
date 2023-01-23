@@ -31,11 +31,10 @@ constexpr char SC_METEO = 7;
 constexpr char SC_SPAWN_METEO = 8;
 
 constexpr char SC_MOVE_PLAYER = 9;
-constexpr char SC_MOVE_ENEMY = 10;
+constexpr char SC_MOVE_INFO = 10;
 constexpr char SC_BULLET = 11;
 constexpr char SC_BULLET_HIT = 12;
 constexpr char SC_ENEMY_DIE = 13;
-
 
 enum class PlayerType : char
 {
@@ -82,14 +81,10 @@ struct ENEMY_INFO {
 	short id;
 
 	XMFLOAT3 pos;
-	//XMFLOAT3 velocity;
-	//XMFLOAT3 shift;
 
-	float           			m_fPitch;
-	float           			m_fRoll;
+	//float           			m_fPitch;
+	//float           			m_fRoll;
 	float           			m_fYaw;
-
-	bool						appeared;
 };
 
 struct BULLET_HIT_INFO {

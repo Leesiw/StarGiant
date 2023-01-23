@@ -27,9 +27,14 @@ protected:
 
 	float						m_fAttackRange = 300.0f;
 
-	short						m_sAvoidNum = 0;
+	float						m_fAvoidTime = 0.0f;
+	bool						m_bAvoidDir;		// true면 오른쪽, false면 왼쪽
+
+	short						damage;
 public:
-	int hp;
+	short id;
+
+	short hp;
 	EnemyState state;
 
 public:
@@ -50,18 +55,8 @@ public:
 	float GetRoll() { return m_fRoll; }
 
 	void ResetCoolTime() { m_fCoolTimeRemaining = m_fCoolTime; }
-};
 
-
-class CLaserEnemy : public CEnemy
-{
-public:
-	CLaserEnemy();
-	virtual ~CLaserEnemy();
-
-public:
-	virtual void Animate(float fTimeElapsed);
-	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
+	void SendPos();
 };
 
 class CMissileEnemy : public CEnemy
@@ -81,7 +76,20 @@ public:
 	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
 };
 
-class CPlasmaCannonEnemy : public CEnemy
+class CLaserEnemy : public CEnemy
+{
+public:
+	CLaserEnemy();
+	virtual ~CLaserEnemy();
+
+	float m_fHitProbability;		// 명중 확률
+	float m_fAvoidReductionRate;	// 상대 가속/방향 전환 시 명중률 떨어지는 정도
+public:
+	virtual void Animate(float fTimeElapsed);
+	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
+};
+
+class CPlasmaCannonEnemy : public CLaserEnemy
 {
 public:
 	CPlasmaCannonEnemy();

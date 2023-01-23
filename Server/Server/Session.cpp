@@ -27,6 +27,25 @@ void SESSION::send_move_packet(int c_id, CTerrainPlayer* m_pPlayer[], CAirplaneP
 	do_send(&p);
 }
 
+void SESSION::send_enemy_packet(int c_id, ENEMY_INFO& enemy_info)
+{
+	SC_MOVE_ENEMY_PACKET p;
+
+	p.size = sizeof(SC_MOVE_ENEMY_PACKET);
+	p.type = SC_MOVE_INFO;
+
+	p.data.id = enemy_info.id;
+	p.data.m_fYaw = enemy_info.m_fYaw;
+	p.data.pos = enemy_info.pos;
+
+	char buf[sizeof(SC_MOVE_ENEMY_PACKET)];
+	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
+	WSABUF wsabuf{ sizeof(buf), buf };
+	DWORD sent_byte;
+
+	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
+}
+
 void SESSION::send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction)
 {
 	SC_BULLET_PACKET p;

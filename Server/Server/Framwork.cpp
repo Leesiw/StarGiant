@@ -155,6 +155,13 @@ void CGameFramework::ReleaseObjects()
 
 void CGameFramework::AnimateObjects(float fTimeElapsed)
 {
+	m_fEnemySpawnTimeRemaining -= fTimeElapsed;
+	if (m_fEnemySpawnTimeRemaining < 0.0f)
+	{
+		m_pScene->SpawnEnemy();// Àû ½ºÆù
+		m_fEnemySpawnTimeRemaining = m_fEnemySpawnTime;
+	}
+
 	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
 
 	m_pSpaceship->Animate(fTimeElapsed);
@@ -164,6 +171,7 @@ void CGameFramework::AnimateObjects(float fTimeElapsed)
 	{
 		m_ppPlayers[i]->Update(fTimeElapsed);
 	}
+
 
 	//m_Enemy->Animate(fTimeElapsed, m_pSpaceship->GetPosition());
 	/*
