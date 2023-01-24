@@ -27,18 +27,24 @@ constexpr char SC_CHANGE = 4;
 constexpr char SC_ADD_PLAYER = 5;
 constexpr char SC_REMOVE_PLAYER = 6;
 
-constexpr char SC_METEO = 7;
-constexpr char SC_SPAWN_METEO = 8;
+constexpr char SC_SPAWN_METEO = 7;
+constexpr char SC_METEO = 8;
 
 constexpr char SC_MOVE_PLAYER = 9;
 constexpr char SC_MOVE_INFO = 10;
 constexpr char SC_BULLET = 11;
 constexpr char SC_BULLET_HIT = 12;
-constexpr char SC_ENEMY_DIE = 13;
+constexpr char SC_SPAWN_ENEMY = 13;
+constexpr char SC_ENEMY_DIE = 14;
 
 enum class PlayerType : char
 {
 	INSIDE, MOVE, ATTACK1, ATTACK2, ATTACK3
+};
+
+enum class EnemyType : char
+{
+	MISSILE, LASER, PLASMACANNON 
 };
 
 #pragma pack (push, 1)
@@ -76,6 +82,12 @@ struct PLAYER_INFO {
 	float           			m_fYaw;
 };
 
+struct SPAWN_ENEMY_INFO {
+	short id;
+
+	EnemyType type;
+	XMFLOAT3 pos;
+};
 
 struct ENEMY_INFO {
 	short id;
@@ -153,6 +165,13 @@ struct SC_MOVE_ENEMY_PACKET {
 	char	type;
 
 	ENEMY_INFO data;
+};
+
+struct SC_SPAWN_ENEMY_PACKET {
+	unsigned char size;
+	char	type;
+
+	SPAWN_ENEMY_INFO data;
 };
 
 struct SC_SPAWN_METEO_PACKET {

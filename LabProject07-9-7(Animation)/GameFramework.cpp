@@ -723,6 +723,27 @@ void CGameFramework::RecvServer()
 			player_type = loginInfo.player_type;
 			break;
 		}
+		case SC_CHANGE:
+		{
+			char subBuf[sizeof(LOGIN_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			LOGIN_INFO l_info;
+			memcpy(&l_info, &subBuf, sizeof(LOGIN_INFO));
+
+			// 정보에 따라 카메라/씬 전환 (MOVE : 3인칭 우주선 외부, ATTACK1/2/3 : 1인칭 공격 모드, INSIDE : 우주선 내부 3인칭)
+			break;
+		}
+		case SC_ADD_PLAYER:
+		{
+			break;
+		}
+		case SC_REMOVE_PLAYER:
+		{
+			break;
+		}
 		case SC_SPAWN_METEO:
 		{
 			if (size == sizeof(SC_SPAWN_METEO_PACKET))
@@ -760,17 +781,12 @@ void CGameFramework::RecvServer()
 			char subBuf[sizeof(METEO_INFO) * METEOS]{};
 			WSABUF wsabuf{ sizeof(subBuf), subBuf };
 			DWORD recvByte{}, recvFlag{};
-			//recv(sock, subBuf, sizeof(subBuf), MSG_WAITALL);
 			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
 
 			METEO_INFO meteoInfo[METEOS];
 			memcpy(&meteoInfo, &subBuf, sizeof(METEO_INFO) * METEOS);
 
 			m_pScene->TransformMeteor(meteoInfo);
-			break;
-		}
-		case SC_ADD_PLAYER:
-		{
 			break;
 		}
 		case SC_MOVE_PLAYER:
@@ -781,7 +797,7 @@ void CGameFramework::RecvServer()
 			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
 			PLAYER_INFO playerInfo[4];
 			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO[4]));
-			// 이후 수정 필요
+			// 클라 플레이어 추가한 후 수정 필요 > PLAYER_INFO[0~2]는 우주선 내부 플레이어 정보, PLAYER_INFO[3]은 우주선 정보
 			m_pPlayer->SetPlayerInfo(playerInfo[0]);
 
 			//m_pPlayer->SetPosition(playerInfo.pos);
@@ -805,6 +821,8 @@ void CGameFramework::RecvServer()
 			float x = m_pPlayer->GetPosition().z;
 			ENEMY_INFO enemyInfo;
 			memcpy(&enemyInfo, &subBuf, sizeof(ENEMY_INFO));
+			// 클라 적 추가 후 수정 필요
+
 			//			printf("enemy angle : %f %f %f\n", m_Enemy->GetPitch(),
 								//m_Enemy->GetYaw(), m_Enemy->GetRoll());
 						//printf("enemy pos : %f %f %f\n", enemyInfo.pos.x, enemyInfo.pos.y, enemyInfo.pos.z);
@@ -826,11 +844,8 @@ void CGameFramework::RecvServer()
 
 			BULLET_INFO bulletInfo;
 			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_INFO));
+
 			((CAirplanePlayer*)m_pPlayer)->SetBulletFromServer(bulletInfo);
-			break;
-		}
-		case SC_REMOVE_PLAYER:
-		{
 			break;
 		}
 		case SC_BULLET_HIT:
@@ -844,6 +859,40 @@ void CGameFramework::RecvServer()
 			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_HIT_INFO));
 			//m_pScene->m_ppGameObjects[bulletInfo.meteo_id]->hp -= 3;
 			((CAirplanePlayer*)m_pPlayer)->m_ppBullets[bulletInfo.bullet_id]->Reset();
+			break;
+		}
+		case SC_SPAWN_ENEMY:
+		{
+			char subBuf[sizeof(SPAWN_ENEMY_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			SPAWN_ENEMY_INFO spawnInfo;
+			memcpy(&spawnInfo, &subBuf, sizeof(SPAWN_ENEMY_INFO));
+
+			// 적 배열에 적을 추가한다
+			switch (spawnInfo.type) {
+			case EnemyType::MISSILE:
+			{
+				// m_ppEnemies[spawnInfo.id] = new CEnemy > 혹은 처음부터 다 생성해 놓고 모델만 바꿔주기 > bool 멤버 변수를 통해 그릴지 말지를 결정.
+				// 해당 적 타입의 모델 붙이기
+				break;
+			}
+			case EnemyType::LASER:
+			{
+				break;
+			}
+			case EnemyType::PLASMACANNON:
+			{
+				break;
+			}
+			}
+			// m_ppEnemies[
+			break;
+		}
+		case SC_ENEMY_DIE:
+		{
 			break;
 		}
 		default:

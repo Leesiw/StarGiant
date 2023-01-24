@@ -346,14 +346,14 @@ void CAirplanePlayer::SetBulletFromServer(BULLET_INFO bulletInfo)
 
 	if (pBulletObject)
 	{
-		/*
-		pBulletObject->Rotate(bulletInfo.pitch, bulletInfo.yaw, bulletInfo.roll);
-		pBulletObject->m_fPitch = bulletInfo.pitch; pBulletObject->m_fYaw = bulletInfo.yaw; pBulletObject->m_fRoll = bulletInfo.roll;
+		
+		//pBulletObject->Rotate(bulletInfo.pitch, bulletInfo.yaw, bulletInfo.roll);
+		//pBulletObject->m_fPitch = bulletInfo.pitch; pBulletObject->m_fYaw = bulletInfo.yaw; pBulletObject->m_fRoll = bulletInfo.roll;
 		pBulletObject->SetFirePosition(bulletInfo.pos);
 		pBulletObject->SetMovingDirection(bulletInfo.direction);
 		pBulletObject->SetActive(true);
 		//pBulletObject->UpdateBoundingBox();
-		*/
+
 		/*
 		if (pLockedObject)
 		{
