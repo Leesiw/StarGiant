@@ -348,13 +348,16 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				std::cout << "ÃÑ¾Ë";
 				break;
 			case VK_SPACE:
-				if (((CTerrainPlayer*)m_pPlayer)->motion != 2) {
-					((CTerrainPlayer*)m_pPlayer)->motion = 2;
+				if (((CTerrainPlayer*)m_pInsidePlayer)->motion != 2) {
+					((CTerrainPlayer*)m_pInsidePlayer)->motion = 2;
+					std::cout << "¾É±â";
 				}
 				else
-					((CTerrainPlayer*)m_pPlayer)->motion = 0;
+				{
+					std::cout << "¼­±â";
+					((CTerrainPlayer*)m_pInsidePlayer)->motion = 0;
+				}
 
-				std::cout << "¾É±â";
 				break;
 			case VK_TAB:
 				b_Inside = !b_Inside;
