@@ -793,7 +793,7 @@ void CGameFramework::RecvServer()
 			//cout << "회전 각도 " << playerInfo.m_fYaw - m_pPlayer->GetYaw() << endl;
 			break;
 		}
-		case SC_MOVE_ENEMY:
+		case SC_MOVE_INFO:
 		{
 			char subBuf[sizeof(ENEMY_INFO)]{};
 			WSABUF wsabuf{ sizeof(subBuf), subBuf };
