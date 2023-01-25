@@ -193,6 +193,31 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		if (pMeteoModel) delete pMeteoModel;
 	}
 
+	for (int i = 0; i < ENEMIES / 3; ++i) {
+		CLoadedModelInfo* pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AlienDestroyer.bin", NULL);
+		m_ppEnemies[i] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
+		m_ppEnemies[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_ppEnemies[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
+		m_ppEnemies[i]->SetScale(3.0f, 3.0f, 3.0f);
+		if (pEnemyModel) delete pEnemyModel;
+	}
+	for (int i = ENEMIES / 3; i < ENEMIES / 3 * 2; ++i) {
+		CLoadedModelInfo* pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/BioTorpedo.bin", NULL);
+		m_ppEnemies[i] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
+		m_ppEnemies[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_ppEnemies[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
+		m_ppEnemies[i]->SetScale(3.0f, 3.0f, 3.0f);
+		if (pEnemyModel) delete pEnemyModel;
+	}
+	for (int i = ENEMIES / 3 * 2; i < ENEMIES; ++i) {
+		CLoadedModelInfo* pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AlienFighter.bin", NULL);
+		m_ppEnemies[i] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
+		m_ppEnemies[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_ppEnemies[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
+		m_ppEnemies[i]->SetScale(3.0f, 3.0f, 3.0f);
+		if (pEnemyModel) delete pEnemyModel;
+	}
+
 	m_nShaders = 1;
 	m_ppShaders = new CShader*[m_nShaders];
 
@@ -316,6 +341,12 @@ void CScene::ReleaseObjects()
 	{
 		for (int i = 0; i < METEOS; i++) if (m_ppMeteorObjects[i]) m_ppMeteorObjects[i]->Release();
 		delete[] m_ppMeteorObjects;
+	}
+
+	if (m_ppEnemies)
+	{
+		for (int i = 0; i < ENEMIES; i++) if (m_ppEnemies[i]) m_ppEnemies[i]->Release();
+		delete[] m_ppEnemies;
 	}
 
 	ReleaseShaderVariables();
@@ -759,6 +790,16 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 			m_ppMeteorObjects[i]->Animate(m_fElapsedTime);
 			if (!m_ppMeteorObjects[i]->m_pSkinnedAnimationController) m_ppMeteorObjects[i]->UpdateTransform(NULL);
 			m_ppMeteorObjects[i]->Render(pd3dCommandList, pCamera);
+		}
+	}
+
+	for (int i = 0; i < ENEMIES; i++)
+	{
+		if (m_ppEnemies[i])
+		{
+			m_ppEnemies[i]->Animate(m_fElapsedTime);
+			if (!m_ppEnemies[i]->m_pSkinnedAnimationController) m_ppEnemies[i]->UpdateTransform(NULL);
+			m_ppEnemies[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
 }

@@ -1487,10 +1487,11 @@ CEagleObject::~CEagleObject()
 {
 }
 
+//============================================================================================
 CMeteorObject::CMeteorObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
 {
 	CLoadedModelInfo* pMeteorModel = pModel;
-	if (!pMeteorModel) pMeteorModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Monster.bin", NULL);
+	if (!pMeteorModel) pMeteorModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
 
 	SetChild(pMeteorModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pMeteorModel);
@@ -1499,6 +1500,21 @@ CMeteorObject::CMeteorObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 CMeteorObject::~CMeteorObject()
 {
 }
+
+//============================================================================================
+CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
+{
+	CLoadedModelInfo* pEnemyModel = pModel;
+	if (!pEnemyModel) pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
+
+	SetChild(pEnemyModel->m_pModelRootObject, true);
+	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pEnemyModel);
+}
+
+CEnemyObject::~CEnemyObject()
+{
+}
+
 
 //============================================================================================
 CInsideShipObject::CInsideShipObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
@@ -1586,5 +1602,4 @@ void CBulletObject::Reset()
 
 	m_bActive = false;
 }
-
 

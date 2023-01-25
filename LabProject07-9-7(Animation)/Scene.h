@@ -114,7 +114,12 @@ public:
 	int									m_nHierarchicalGameObjects = 0;
 	CGameObject							**m_ppHierarchicalGameObjects = NULL;
 
+
+
 	CGameObject							*m_ppMeteorObjects[METEOS];
+
+	CGameObject							*m_ppEnemies[ENEMIES];
+
 
 	int									m_nShaders = 0;
 	CShader								**m_ppShaders = NULL;
