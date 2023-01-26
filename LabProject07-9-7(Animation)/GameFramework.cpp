@@ -789,6 +789,19 @@ void CGameFramework::RecvServer()
 			m_pScene->TransformMeteor(meteoInfo);
 			break;
 		}
+		case SC_METEO_DIRECTION:
+		{
+			char subBuf[sizeof(METEO_DIRECTION_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			METEO_DIRECTION_INFO meteoInfo;
+			memcpy(&meteoInfo, &subBuf, sizeof(METEO_DIRECTION_INFO));
+
+			m_pScene->m_ppMeteorObjects[meteoInfo.id]->m_xmf3MovingDirection = meteoInfo.dir;
+			break;
+		}
 		case SC_MOVE_PLAYER:
 		{
 			char subBuf[sizeof(PLAYER_INFO[4])]{};
@@ -798,7 +811,7 @@ void CGameFramework::RecvServer()
 			PLAYER_INFO playerInfo[4];
 			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO[4]));
 			// 클라 플레이어 추가한 후 수정 필요 > PLAYER_INFO[0~2]는 우주선 내부 플레이어 정보, PLAYER_INFO[3]은 우주선 정보
-			m_pPlayer->SetPlayerInfo(playerInfo[0]);
+			m_pPlayer->SetPlayerInfo(playerInfo[3]);
 
 			//m_pPlayer->SetPosition(playerInfo.pos);
 			//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());

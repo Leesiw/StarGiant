@@ -1501,6 +1501,15 @@ CMeteorObject::~CMeteorObject()
 {
 }
 
+void CMeteorObject::Animate(float fTimeElapsed)
+{
+	XMFLOAT3 xmf3Position = GetPosition();
+	xmf3Position = Vector3::Add(xmf3Position, m_xmf3MovingDirection, 100.0 * fTimeElapsed);
+	SetPosition(xmf3Position);
+
+	CGameObject::Animate(fTimeElapsed);
+}
+
 //============================================================================================
 CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
 {

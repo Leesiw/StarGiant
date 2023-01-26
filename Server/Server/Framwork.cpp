@@ -41,7 +41,7 @@ void CGameFramework::Init() {
 
 
 	for (auto& pl : clients) {
-		pl.type = PlayerType::INSIDE;
+		pl.type = PlayerType::MOVE;//INSIDE;
 	}
 
 	ClientProcessThread = thread{ &CGameFramework::ClientProcess, this };
@@ -259,21 +259,23 @@ void CGameFramework::ClientProcess()
 	auto StartTime = chrono::system_clock::now();
 	auto EndTime = chrono::system_clock::now();
 
+	short num = 0;
 	while (true) {
-		fps += EndTime - StartTime;
-		//cout << fps.count() << endl;
-		StartTime = chrono::system_clock::now();
+		EndTime = chrono::system_clock::now();
+		fps = EndTime - StartTime;
 
-		if (fps.count() > 0.03f) {
+		if (fps.count() > 0.0333333) {
+			++num;
+			StartTime = chrono::system_clock::now();
 			AnimateObjects(fps.count());
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;
 				pl.send_move_packet(0, m_ppPlayers, m_pSpaceship);
-				pl.send_meteo_packet(0, m_pScene->m_ppMeteoObjects);
+				if (!(num = num % 10)) {
+					pl.send_meteo_packet(0, m_pScene->m_ppMeteoObjects);
+				}
 			}
-			fps = EndTime - EndTime;
 		}
-		EndTime = chrono::system_clock::now();
 	}
 }
 

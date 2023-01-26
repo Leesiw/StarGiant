@@ -28,14 +28,15 @@ constexpr char SC_ADD_PLAYER = 5;
 constexpr char SC_REMOVE_PLAYER = 6;
 
 constexpr char SC_SPAWN_METEO = 7;
-constexpr char SC_METEO = 8;
+constexpr char SC_METEO_DIRECTION = 8;
+constexpr char SC_METEO = 9;
 
-constexpr char SC_MOVE_PLAYER = 9;
-constexpr char SC_MOVE_INFO = 10;
-constexpr char SC_BULLET = 11;
-constexpr char SC_BULLET_HIT = 12;
-constexpr char SC_SPAWN_ENEMY = 13;
-constexpr char SC_ENEMY_DIE = 14;
+constexpr char SC_MOVE_PLAYER = 10;
+constexpr char SC_MOVE_INFO = 11;
+constexpr char SC_BULLET = 12;
+constexpr char SC_BULLET_HIT = 13;
+constexpr char SC_SPAWN_ENEMY = 14;
+constexpr char SC_ENEMY_DIE = 15;
 
 enum class PlayerType : char
 {
@@ -53,10 +54,17 @@ struct METEO_INFO {
 	XMFLOAT3 pos;
 };
 
+struct METEO_DIRECTION_INFO {
+	short id;
+	XMFLOAT3 dir;
+};
+
 struct SPAWN_METEO_INFO {
 	short	id;
-	short	model_id;
+
+	XMFLOAT3 pos;
 	XMFLOAT3 scale;
+	XMFLOAT3 direction;
 	// 방향/속도?
 };
 
@@ -180,10 +188,16 @@ struct SC_SPAWN_METEO_PACKET {
 	SPAWN_METEO_INFO data;
 };
 
+struct SC_METEO_DIRECTION_PACKET {
+	unsigned char size;
+	char	type;
+	METEO_DIRECTION_INFO data;
+};
+
 struct SC_SPAWN_ALL_METEO_PACKET {
 	unsigned char size;
 	char	type;
-	SPAWN_METEO_INFO data[10];
+	SPAWN_METEO_INFO data[METEOS];
 };
 
 struct SC_METEO_PACKET {

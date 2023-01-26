@@ -58,6 +58,8 @@ public:
 
 	XMFLOAT3						m_xmf3Scale;
 
+	int coll_time;
+
 	void SetModelId(short id) { model_id = id; }
 	short GetModelID() { return model_id; }
 	void SetMovingSpeed(float fSpeed) { m_fMovingSpeed = fSpeed; }

@@ -33,7 +33,8 @@ using namespace std;
 static std::random_device rdd;
 static std::default_random_engine dree(rdd());
 static std::uniform_real_distribution<float> urdPos(-500, 500);
-static std::uniform_real_distribution<float> urdScale(5, 8);
+static std::uniform_real_distribution<float> urdScale(10, 15);
+static std::uniform_real_distribution<float> urdScale2(3, 5);
 static std::uniform_int_distribution<int> urdEnemyAI(0, 100);
 
 /*

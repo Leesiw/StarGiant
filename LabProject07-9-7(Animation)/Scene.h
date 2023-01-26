@@ -116,7 +116,7 @@ public:
 
 
 
-	CGameObject							*m_ppMeteorObjects[METEOS];
+	CMeteorObject							*m_ppMeteorObjects[METEOS];
 
 	CGameObject							*m_ppEnemies[ENEMIES];
 

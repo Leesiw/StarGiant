@@ -198,7 +198,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppEnemies[i] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
 		m_ppEnemies[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_ppEnemies[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
-		m_ppEnemies[i]->SetScale(3.0f, 3.0f, 3.0f);
+		m_ppEnemies[i]->SetScale(5.0f, 5.0f, 5.0f);
 		if (pEnemyModel) delete pEnemyModel;
 	}
 	for (int i = ENEMIES / 3; i < ENEMIES / 3 * 2; ++i) {
@@ -206,7 +206,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppEnemies[i] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
 		m_ppEnemies[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_ppEnemies[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
-		m_ppEnemies[i]->SetScale(3.0f, 3.0f, 3.0f);
+		m_ppEnemies[i]->SetScale(30.0f, 30.0f, 30.0f);
 		if (pEnemyModel) delete pEnemyModel;
 	}
 	for (int i = ENEMIES / 3 * 2; i < ENEMIES; ++i) {
@@ -214,7 +214,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppEnemies[i] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
 		m_ppEnemies[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_ppEnemies[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
-		m_ppEnemies[i]->SetScale(3.0f, 3.0f, 3.0f);
+		m_ppEnemies[i]->SetScale(10.0f, 10.0f, 10.0f);
 		if (pEnemyModel) delete pEnemyModel;
 	}
 
@@ -586,6 +586,8 @@ void CScene::RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	{
 		m_ppMeteorObjects[m_info.id]->ResetScale();
 		m_ppMeteorObjects[m_info.id]->SetScale(m_info.scale.x, m_info.scale.y, m_info.scale.z);
+		m_ppMeteorObjects[m_info.id]->SetPosition(m_info.pos);
+		m_ppMeteorObjects[m_info.id]->m_xmf3MovingDirection = m_info.direction;
 	}
 }
 
@@ -593,7 +595,6 @@ void CScene::TransformMeteor(METEO_INFO m_info[])
 {
 	for(int i = 0; i < METEOS; ++i)
 	{
-		//printf("meteo %d : %f %f %f\n", i, m_info[i].pos.x, m_info[i].pos.y, m_info[i].pos.z);
 		if (m_ppMeteorObjects[i]) {
 			m_ppMeteorObjects[i]->SetPosition(m_info[i].pos);
 		}
