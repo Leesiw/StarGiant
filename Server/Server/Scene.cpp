@@ -210,8 +210,15 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		//if (fabs(sub.x) > 1000.0f || fabs(sub.y) > 1000.0f || fabs(sub.z) > 1000.0f) {
 		if (dist > 1000.0f){
 
+			m_ppMeteoObjects[i]->m_xmf4x4ToParent = Matrix4x4::Identity();
+			
 			m_ppMeteoObjects[i]->SetPosition(urdPos(dree) + p_pos.x, urdPos(dree) + p_pos.y, urdPos(dree) + p_pos.z);
-			//m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+			if (i < METEOS / 2) {
+				m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+			}
+			else {
+				m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
+			}
 			m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(urdPos(dree), urdPos(dree), urdPos(dree)));
 			
 			for (auto& pl : clients) {
