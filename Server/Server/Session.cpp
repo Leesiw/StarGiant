@@ -146,6 +146,14 @@ void SESSION::send_spawn_all_meteo_packet(int c_id, CMeteoObject* meteo[])
 	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
 }
 
+void SESSION::send_all_enemy_packet(int c_id, ENEMY_INFO e_info[], bool alive[])
+{
+	for (int i = 0; i < ENEMIES; ++i) {
+		if (alive[i]) {
+			send_enemy_packet(c_id, e_info[i]);
+		}
+	}
+}
 
 void SESSION::send_meteo_direction_packet(int c_id, short id, CMeteoObject* meteo)
 {

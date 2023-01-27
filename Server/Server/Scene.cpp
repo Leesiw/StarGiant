@@ -48,6 +48,19 @@ void CScene::BuildObjects()
 		m_ppMeteoObjects[i] = meteo;
 		m_ppMeteoObjects[i]->UpdateTransform(NULL);
 	}
+
+	for (int i = 0; i < ENEMIES / 3; ++i) {
+		m_ppEnemies[i] = new CLaserEnemy;
+		m_ppEnemies[i]->id = i;
+	}
+	for (int i = ENEMIES / 3; i < ENEMIES / 3 * 2; ++i) {
+		m_ppEnemies[i] = new CPlasmaCannonEnemy;
+		m_ppEnemies[i]->id = i;
+	}
+	for (int i = ENEMIES / 3 * 2; i < ENEMIES; ++i) {
+		m_ppEnemies[i] = new CMissileEnemy;
+		m_ppEnemies[i]->id = i;
+	}
 }
 
 void CScene::ReleaseObjects()
@@ -179,11 +192,32 @@ void CScene::CheckEnemyByBulletCollisions()
 
 void CScene::SpawnEnemy()
 {
-	for (int i = 0; i < ENEMIES; ++i)
+	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
+	for (int i = 0; i < 9; ++i)
 	{
-		m_ppEnemies;
-		// 적 종류 랜덤 생성
-		// 플레이어 우주선 앞 쪽에 랜덤으로 배치
+		int enemy_num = ENEMIES / 3;
+		int type = urdEnemyType(dree) * enemy_num;
+
+		for (int j = type; j < type + enemy_num; ++j) {
+			if (!m_ppEnemies[j]->GetisAlive()) {
+				XMFLOAT3 random_pos{ urdPos(dree), urdPos(dree), urdPos(dree) / 5.f };
+				if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x; }
+				if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; }
+				if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; }
+				m_ppEnemies[j]->SetisAlive(true);
+				m_ppEnemies[j]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
+
+				for (auto& pl : clients) {
+					ENEMY_INFO e_info;
+					e_info.id = j;
+					e_info.m_fYaw = m_ppEnemies[j]->GetYaw();
+					e_info.pos = m_ppEnemies[j]->GetPosition();
+					pl.send_enemy_packet(0, e_info);
+				}
+	
+				break;
+			}
+		}
 	}
 }
 
@@ -208,11 +242,15 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
 		//XMFLOAT3 sub = Vector3::Subtract(m_pos, p_pos);
 		//if (fabs(sub.x) > 1000.0f || fabs(sub.y) > 1000.0f || fabs(sub.z) > 1000.0f) {
-		if (dist > 1000.0f){
+		if (dist > 2000.0f){
 
 			m_ppMeteoObjects[i]->m_xmf4x4ToParent = Matrix4x4::Identity();
-			
-			m_ppMeteoObjects[i]->SetPosition(urdPos(dree) + p_pos.x, urdPos(dree) + p_pos.y, urdPos(dree) + p_pos.z);
+			XMFLOAT3 random_pos{ urdPos(dree) , urdPos(dree), urdPos(dree)};
+			if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x; }
+			if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; }
+			if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; }
+			m_ppMeteoObjects[i]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
+
 			if (i < METEOS / 2) {
 				m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
 			}
@@ -231,7 +269,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	for (int i = 0; i < ENEMIES; ++i)
 	{
-		//if (m_ppEnemies[i]) { m_ppEnemies[i]->Animate(fTimeElapsed, m_pSpaceship->GetPosition()); }
+		if (m_ppEnemies[i]->GetisAlive()) { m_ppEnemies[i]->Animate(fTimeElapsed, m_pSpaceship->GetPosition()); }
 	}
 
 	CheckMeteoByPlayerCollisions();

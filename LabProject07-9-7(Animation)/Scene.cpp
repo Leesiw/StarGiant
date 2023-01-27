@@ -796,7 +796,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < ENEMIES; i++)
 	{
-		if (m_ppEnemies[i])
+		if (m_ppEnemies[i] && m_ppEnemies[i]->isAlive)
 		{
 			m_ppEnemies[i]->Animate(m_fElapsedTime);
 			if (!m_ppEnemies[i]->m_pSkinnedAnimationController) m_ppEnemies[i]->UpdateTransform(NULL);

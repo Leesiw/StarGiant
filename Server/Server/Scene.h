@@ -27,10 +27,11 @@ public:
 
 	CAirplanePlayer* m_pSpaceship = NULL;
 	CPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
-	CEnemy* m_ppEnemies[ENEMIES];
 
 public:
 	CMeteoObject*				m_ppMeteoObjects[METEOS];
+	CEnemy*						m_ppEnemies[ENEMIES];
+	short						m_sEnemyNum;
 
 	float						m_fElapsedTime = 0.0f;
 };

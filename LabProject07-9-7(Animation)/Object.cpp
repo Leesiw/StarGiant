@@ -1513,6 +1513,8 @@ void CMeteorObject::Animate(float fTimeElapsed)
 //============================================================================================
 CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
 {
+	isAlive = false;
+
 	CLoadedModelInfo* pEnemyModel = pModel;
 	if (!pEnemyModel) pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
 
@@ -1522,6 +1524,30 @@ CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 CEnemyObject::~CEnemyObject()
 {
+}
+
+void CEnemyObject::Rotate(float x, float y, float z)
+{
+	if (x != 0.0f)
+	{
+		m_fPitch += x;
+		if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
+		if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
+	}
+	if (y != 0.0f)
+	{
+		m_fYaw += y;
+		if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
+		if (m_fYaw < 0.0f) m_fYaw += 360.0f;
+	}
+	if (z != 0.0f)
+	{
+		m_fRoll += z;
+		if (m_fRoll > +20.0f) { z -= (m_fRoll - 20.0f); m_fRoll = +20.0f; }
+		if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
+	}
+
+	CGameObject::Rotate(x, y, z);
 }
 
 

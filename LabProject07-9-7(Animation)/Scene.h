@@ -118,7 +118,7 @@ public:
 
 	CMeteorObject							*m_ppMeteorObjects[METEOS];
 
-	CGameObject							*m_ppEnemies[ENEMIES];
+	CEnemyObject							*m_ppEnemies[ENEMIES];
 
 
 	int									m_nShaders = 0;

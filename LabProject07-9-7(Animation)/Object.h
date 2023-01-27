@@ -595,8 +595,14 @@ public:
 class CEnemyObject : public CGameObject
 {
 public:
+	bool isAlive;
+
+	float m_fPitch, m_fYaw, m_fRoll;
+
 	CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks);
 	virtual ~CEnemyObject();
+
+	virtual void Rotate(float x, float y, float z);
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

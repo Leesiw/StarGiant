@@ -77,6 +77,19 @@ void CGameFramework::Init() {
 				clients[client_id].do_recv();
 				clients[client_id].send_login_info_packet();
 				clients[client_id].send_spawn_all_meteo_packet(0, m_pScene->m_ppMeteoObjects);
+
+				ENEMY_INFO e_info[ENEMIES];
+				bool Alive[ENEMIES];
+				for (int i = 0; i < ENEMIES; ++i) {
+					Alive[i] = m_pScene->m_ppEnemies[i]->GetisAlive();
+					if (Alive[i]) {
+						e_info[i].id = i;
+						e_info[i].m_fYaw = m_pScene->m_ppEnemies[i]->GetYaw();
+						e_info[i].pos = m_pScene->m_ppEnemies[i]->GetPosition();
+					}
+				}
+				clients[client_id].send_all_enemy_packet(0, e_info, Alive);
+
 				c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 			}
 			else {

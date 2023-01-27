@@ -813,11 +813,11 @@ void CGameFramework::RecvServer()
 			// 클라 플레이어 추가한 후 수정 필요 > PLAYER_INFO[0~2]는 우주선 내부 플레이어 정보, PLAYER_INFO[3]은 우주선 정보
 			m_pPlayer->SetPlayerInfo(playerInfo[3]);
 
-			//m_pPlayer->SetPosition(playerInfo.pos);
+			//m_pPlayer->SetPosition(playerInfo[3].pos);
 			//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
-			//m_pPlayer->SetVelocity(playerInfo.velocity);
+			//m_pPlayer->SetVelocity(playerInfo[3].velocity);
 			//m_pPlayer->SetShift(playerInfo.shift);
-			//m_pPlayer->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer->GetYaw(), 0.0f);
+			//m_pPlayer->Rotate(0.0f, playerInfo[3].m_fYaw - m_pPlayer->GetYaw(), 0.0f);
 			//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 		
 
@@ -834,6 +834,13 @@ void CGameFramework::RecvServer()
 			float x = m_pPlayer->GetPosition().z;
 			ENEMY_INFO enemyInfo;
 			memcpy(&enemyInfo, &subBuf, sizeof(ENEMY_INFO));
+
+			if (!m_pScene->m_ppEnemies[enemyInfo.id]->isAlive) {
+				m_pScene->m_ppEnemies[enemyInfo.id]->isAlive = true;
+			}
+			m_pScene->m_ppEnemies[enemyInfo.id]->SetPosition(enemyInfo.pos);
+			m_pScene->m_ppEnemies[enemyInfo.id]->Rotate(0, enemyInfo.m_fYaw - m_pScene->m_ppEnemies[enemyInfo.id]->m_fYaw, 0.0f);
+
 			// 클라 적 추가 후 수정 필요
 
 			//			printf("enemy angle : %f %f %f\n", m_Enemy->GetPitch(),

@@ -32,10 +32,11 @@ using namespace std;
 
 static std::random_device rdd;
 static std::default_random_engine dree(rdd());
-static std::uniform_real_distribution<float> urdPos(-500, 500);
+static std::uniform_real_distribution<float> urdPos(300, 1000);
 static std::uniform_real_distribution<float> urdScale(10, 15);
 static std::uniform_real_distribution<float> urdScale2(3, 5);
 static std::uniform_int_distribution<int> urdEnemyAI(0, 100);
+static std::uniform_int_distribution<int> urdEnemyType(0, 2);
 
 /*
 // 소켓 함수 오류 출력 후 종료

@@ -31,6 +31,8 @@ protected:
 	bool						m_bAvoidDir;		// true면 오른쪽, false면 왼쪽
 
 	short						damage;
+
+	bool						isAlive;
 public:
 	short id;
 
@@ -38,6 +40,9 @@ public:
 	EnemyState state;
 
 public:
+	bool GetisAlive() { return isAlive; }
+	void SetisAlive(bool i_a) { isAlive = i_a; }
+
 	virtual void AI(float fTimeElapsed, XMFLOAT3& player_pos);
 	virtual void MoveAI(float fTimeElapsed, XMFLOAT3& player_pos);
 	virtual void AimingAI(float fTimeElapsed, XMFLOAT3& player_pos);

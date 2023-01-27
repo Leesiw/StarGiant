@@ -8,6 +8,8 @@ CEnemy::CEnemy()
 	
 	hp = 10;
 	state = EnemyState::IDLE;
+
+	isAlive = false;
 }
 
 CEnemy::~CEnemy()
@@ -16,6 +18,9 @@ CEnemy::~CEnemy()
 
 void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 {
+	if (m_fCoolTimeRemaining > 0.0f) {
+		m_fCoolTimeRemaining -= fTimeElapsed;
+	}
 	XMFLOAT3 pos = GetPosition();
 	float dist;
 	switch (state)
@@ -23,7 +28,7 @@ void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 	case EnemyState::IDLE:
 		// 플레이어와의 거리
 		dist = Vector3::Length(Vector3::Subtract(pos, player_pos));
-		if (dist < m_fAttackRange)	// 사거리 충족 안되면 이동
+		if (dist > m_fAttackRange)	// 사거리 충족 안되면 이동
 		{
 			state = EnemyState::MOVE;
 			m_fMoveTimeRemaining = m_fMoveTime;
@@ -32,7 +37,8 @@ void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 		{
 			if (urdEnemyAI(dree) > 90)
 			{
-				state = EnemyState::ATTACK;
+				//state = EnemyState::ATTACK;
+				state = EnemyState::AVOID;
 			}
 			else 
 			{
@@ -66,8 +72,8 @@ void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
 {
 	// 테스트 필요
-
-	float fDistance = 500.0 * fTimeElapsed;
+	
+	float fDistance = 300.0 * fTimeElapsed;
 	XMFLOAT3 xmf3MovingDirection = GetLook();
 
 	m_fMoveTimeRemaining -= fTimeElapsed;
@@ -75,28 +81,29 @@ void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
 	if (m_fMoveTimeRemaining > 0.0)
 	{
 		XMFLOAT3 xmf3Position = GetPosition();
-		XMVECTOR xmvPosition = XMLoadFloat3(&xmf3Position);
+		XMFLOAT3 xmf3Look = GetLook();
+		XMFLOAT3 ToPlayer = Vector3::Subtract(xmf3Position, player_pos);
 
-		XMVECTOR xmvPlayerPosition = XMLoadFloat3(&player_pos);
-		XMVECTOR xmvToPlayer = xmvPlayerPosition - xmvPosition;
-		xmvToPlayer = XMVector3Normalize(xmvToPlayer);
+		xmf3Look = Vector3::Normalize(xmf3Look);
+		ToPlayer = Vector3::Normalize(ToPlayer);
+		double a = xmf3Look.x * ToPlayer.z - xmf3Look.z * ToPlayer.x;
+		double angle = asin(a);
 
-		XMVECTOR xmvMovingDirection = XMLoadFloat3(&xmf3MovingDirection);
-		xmvMovingDirection = XMVector3Normalize(XMVectorLerp(xmvMovingDirection, xmvToPlayer, 0.25f));
-		XMStoreFloat3(&xmf3MovingDirection, xmvMovingDirection);
+		angle = XMConvertToDegrees(angle);
+		double rotate_angle = fTimeElapsed * 30.0f;
 
-		// 일단 yaw 만 회전하도록
-		XMFLOAT3 xmf3RotateDir = xmf3MovingDirection;
-		xmf3RotateDir.y = 0.0f;
-		xmf3RotateDir = Vector3::Normalize(xmf3RotateDir);
+		if (fabs(angle) > rotate_angle) {
+			if (angle < 0) { Rotate(0, -rotate_angle, 0); }
+			else{ Rotate(0, rotate_angle, 0); }
+		}
 
-		float fDotProduct = Vector3::DotProduct(XMFLOAT3(0.0f, 1.0f, 0.0f), xmf3RotateDir);
-		float fRotationAngle = (fabsf(fDotProduct - 1.0f) < numeric_limits<float>::epsilon()) ? 0.0f : (float)XMConvertToDegrees(acos(fDotProduct));
-		Rotate(0, fRotationAngle, 0);
+		MoveForward(fTimeElapsed * 100.0f);
+		float y_dist = xmf3Position.y - player_pos.y;
 
-		XMFLOAT3 xmf3Movement = Vector3::ScalarProduct(xmf3MovingDirection, fDistance, false);
-		xmf3Position = Vector3::Add(xmf3Position, xmf3Movement);
-		SetPosition(xmf3Position);
+		if (fabs(y_dist) > fTimeElapsed * 100.0f) {
+			if (y_dist < 0) { MoveUp(fTimeElapsed * 100.0f); }
+			else { MoveUp(-fTimeElapsed * 100.0f); }
+		}
 	}
 	else
 	{
@@ -104,6 +111,7 @@ void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
 	}
 
 	SendPos();
+	
 }
 
 void CEnemy::AimingAI(float fTimeElapsed, XMFLOAT3& player_pos)
@@ -121,7 +129,7 @@ void CEnemy::AimingAI(float fTimeElapsed, XMFLOAT3& player_pos)
 	xmfToPlayer = Vector3::Normalize(xmfToPlayer);
 
 	XMFLOAT3 xmf3RotationAxis = Vector3::CrossProduct(xmfToPlayer, xmf3RotateDir, true);
-	float fDotProduct = Vector3::DotProduct(XMFLOAT3(0.0f, 1.0f, 0.0f), xmf3RotateDir);
+	float fDotProduct = Vector3::DotProduct(GetLook(), xmf3RotateDir);
 	
 	float fRotationAngle = (fabsf(fDotProduct - 1.0f) < numeric_limits<float>::epsilon()) ? 0.0f : (float)XMConvertToDegrees(acos(fDotProduct));
 
@@ -173,34 +181,34 @@ void CEnemy::Attack(float fTimeElapsed, XMFLOAT3& player_pos)
 
 void CEnemy::AvoidAI(float fTimeElapsed)
 {
-	if (m_fAvoidTime > 2.0f)
+	if (m_fAvoidTime > 1.0f)
 	{
 		m_fAvoidTime = 0.0f;
 		state = EnemyState::IDLE;
 	}
-
+	/*
 	if (m_bAvoidDir)
 	{
-		if (m_fAvoidTime < 1.0f) {
-			CGameObject::MoveStrafe(fTimeElapsed * 500.f);
+		if (m_fAvoidTime < 0.5f) {
+			CGameObject::MoveStrafe(fTimeElapsed * 100.f);
 		}
 		else {
-			CGameObject::MoveStrafe(fTimeElapsed * -500.f);
+			CGameObject::MoveStrafe(fTimeElapsed * -100.f);
 		}
 	}
 	else
 	{
-		if (m_fAvoidTime < 1.0f) {
-			CGameObject::MoveStrafe(fTimeElapsed * -500.f);
+		if (m_fAvoidTime < 0.5f) {
+			CGameObject::MoveStrafe(fTimeElapsed * -100.f);
 		}
 		else {
-			CGameObject::MoveStrafe(fTimeElapsed * 500.f);
+			CGameObject::MoveStrafe(fTimeElapsed * 100.f);
 		}
 	}
-
+	*/
 	m_fAvoidTime += fTimeElapsed;
 
-	SendPos();
+	//SendPos();
 }
 
 void CEnemy::Rotate(float x, float y, float z)
@@ -257,6 +265,8 @@ CMissileEnemy::CMissileEnemy()
 	m_fMoveTime = 1.0f;		// 사거리 안으로 들어가려 움직이는 시간
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 3;
+
+	isAlive = false;
 }
 
 CMissileEnemy::~CMissileEnemy()
@@ -274,6 +284,7 @@ void CMissileEnemy::Animate(float fTimeElapsed)
 
 void CMissileEnemy::Animate(float fTimeElapsed, XMFLOAT3 player_pos)
 {
+	CEnemy::Animate(fTimeElapsed, player_pos);
 }
 
 //-------------------------------------------------------------------------------------
@@ -285,6 +296,8 @@ CLaserEnemy::CLaserEnemy()
 	m_fMoveTime = 1.0f;		// 사거리 안으로 들어가려 움직이는 시간
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 3;
+
+	isAlive = false;
 }
 
 CLaserEnemy::~CLaserEnemy()
@@ -297,6 +310,7 @@ void CLaserEnemy::Animate(float fTimeElapsed)
 
 void CLaserEnemy::Animate(float fTimeElapsed, XMFLOAT3 player_pos)
 {
+	CEnemy::Animate(fTimeElapsed, player_pos);
 }
 
 //-------------------------------------------------------------------------------------
@@ -308,6 +322,8 @@ CPlasmaCannonEnemy::CPlasmaCannonEnemy()
 	m_fMoveTime = 1.0f;		// 사거리 안으로 들어가려 움직이는 시간
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 3;
+
+	isAlive = false;
 }
 
 CPlasmaCannonEnemy::~CPlasmaCannonEnemy()
@@ -320,4 +336,5 @@ void CPlasmaCannonEnemy::Animate(float fTimeElapsed)
 
 void CPlasmaCannonEnemy::Animate(float fTimeElapsed, XMFLOAT3 player_pos)
 {
+	CEnemy::Animate(fTimeElapsed, player_pos);
 }
