@@ -96,6 +96,9 @@ public:
 	virtual void OnPrepareRender();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 
+	virtual void UpdateBoundingBox() { aabb.Center = m_xmf3Position; }
+	bool HierarchyIntersects(CSkinnedMesh* pCollisionGameObject, bool isSecond = false);
+
 	//¼­¹ö 
 	void SetPlayerInfo(PLAYER_INFO p_info) { player_info = p_info; is_update = false; }
 	void UpdateOnServer();
@@ -152,5 +155,6 @@ public:
 	virtual void Move(ULONG nDirection, float fDistance, bool bVelocity = false);
 
 	virtual void Update(float fTimeElapsed);
+
 };
 

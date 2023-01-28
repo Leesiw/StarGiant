@@ -233,6 +233,18 @@ void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamer
 	if (nCameraMode == THIRD_PERSON_CAMERA) CGameObject::Render(pd3dCommandList, pCamera);
 }
 
+bool CPlayer::HierarchyIntersects(CSkinnedMesh* pCollisionGameObject, bool isSecond) 
+{
+	//if (OOBB.Intersects(pCollisionGameObject->m_xmOOBB) && pCollisionGameObject)
+	//	return true;
+	//if (isSecond)
+	//	return false;
+
+	return this->HierarchyIntersects(pCollisionGameObject, true);
+}
+
+
+
 void CPlayer::UpdateOnServer()
 {
 	if (!is_update) {
@@ -534,6 +546,8 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	//SetPosition(XMFLOAT3(310.0f, pTerrain->GetHeight(310.0f, 590.0f), 590.0f));
 	SetPosition(XMFLOAT3(310.0f, pTerrain->GetHeight(310.0f, 590.0f), 590.0f));
 
+	aabb = BoundingBox(GetPosition(), XMFLOAT3(5.0f, 5.0f, 5.0f));
+
 	if (pAngrybotModel) delete pAngrybotModel;
 }
 
@@ -599,7 +613,7 @@ void CTerrainPlayer::OnPlayerUpdateCallback(float fTimeElapsed)
 	XMFLOAT3 xmf3PlayerPosition = GetPosition();
 	int z = (int)(xmf3PlayerPosition.z / xmf3Scale.z);
 	bool bReverseQuad = ((z % 2) != 0);
-	float fHeight = pTerrain->GetHeight(xmf3PlayerPosition.x, xmf3PlayerPosition.z, bReverseQuad) + 0.0f;
+	/*float fHeight = pTerrain->GetHeight(xmf3PlayerPosition.x, xmf3PlayerPosition.z, bReverseQuad) + 0.0f;
 	if (xmf3PlayerPosition.y < fHeight)
 	{
 		XMFLOAT3 xmf3PlayerVelocity = GetVelocity();
@@ -607,7 +621,13 @@ void CTerrainPlayer::OnPlayerUpdateCallback(float fTimeElapsed)
 		SetVelocity(xmf3PlayerVelocity);
 		xmf3PlayerPosition.y = fHeight;
 		SetPosition(xmf3PlayerPosition);
-	}
+	}*/
+	XMFLOAT3 xmf3PlayerVelocity = GetVelocity();
+	xmf3PlayerVelocity.y = 0.0f;
+	SetVelocity(xmf3PlayerVelocity);
+	xmf3PlayerPosition.y = 228.0f;
+	SetPosition(xmf3PlayerPosition);
+
 }
 
 void CTerrainPlayer::OnCameraUpdateCallback(float fTimeElapsed)
@@ -671,4 +691,5 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 			}
 		}
 	}
+	UpdateBoundingBox(); // ³ªÁß¿¡ ¾À ÀüÃ¼ boundingbox¾÷µ« ¹­¾î¼­ ÇÔ¼ö¸¸µé±â 
 }

@@ -79,6 +79,7 @@ public:
 	virtual void ReleaseShaderVariables() { }
 
 	virtual void ReleaseUploadBuffers();
+	XMFLOAT3 GetPosition() { return XMFLOAT3(m_pxmf3Positions->x, m_pxmf3Positions->y, m_pxmf3Positions->z); };
 
 	virtual void OnPreRender(ID3D12GraphicsCommandList *pd3dCommandList, void *pContext);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, int nSubSet);

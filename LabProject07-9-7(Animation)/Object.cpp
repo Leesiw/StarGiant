@@ -1559,8 +1559,8 @@ CInsideShipObject::CInsideShipObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 
 	SetChild(pMeteorModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pModel);
-	m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_pSkinnedAnimationController->SetCallbackKeys(0, 1);
+	//m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	//m_pSkinnedAnimationController->SetCallbackKeys(0, 1);
 
 }
 

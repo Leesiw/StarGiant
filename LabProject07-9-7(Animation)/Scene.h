@@ -62,6 +62,7 @@ public:
 
 
 	void CheckObjectByBulletCollisions();
+	void CheckMEByObjectCollisions(); // 내부건물 - 플레이어 충돌체크 (데모) 
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
     void AnimateObjects(float fTimeElapsed);
@@ -134,4 +135,8 @@ public:
 
 	ID3D12Resource						*m_pd3dcbLights = NULL;
 	LIGHTS								*m_pcbMappedLights = NULL;
+
+	//임시 내부 바운딩박스 
+	BoundingBox xm_MapAABB;
+	bool b_Inside = false;
 };
