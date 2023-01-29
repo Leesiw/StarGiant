@@ -5,7 +5,7 @@ CEnemy::CEnemy()
 {
 	m_xmf4x4ToParent = Matrix4x4::Identity();
 	m_xmf4x4World = Matrix4x4::Identity();
-	
+	m_fSpeed = 0.f;
 	hp = 10;
 	state = EnemyState::IDLE;
 
@@ -30,15 +30,45 @@ void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 		dist = Vector3::Length(Vector3::Subtract(pos, player_pos));
 		if (dist > m_fAttackRange)	// 사거리 충족 안되면 이동
 		{
+			switch (urdEnemyAI(dree) % 4) {
+			case 0:
+			{
+				m_xmf3Destination.x = urdPos2(dree);
+				m_xmf3Destination.z = urdPos3(dree);
+				break;
+			}
+			case 1:
+			{
+				m_xmf3Destination.x = -urdPos2(dree);
+				m_xmf3Destination.z = urdPos3(dree);
+				break;
+			}
+			case 2:
+			{
+				m_xmf3Destination.x = urdPos3(dree);
+				m_xmf3Destination.z = -urdPos2(dree);
+				break;
+			}
+			case 3:
+			{
+				m_xmf3Destination.x = urdPos3(dree);
+				m_xmf3Destination.z = urdPos2(dree);
+				break;
+			}
+			}
+
+			m_xmf3Destination.y = urdPos3(dree);
+			//m_xmf3Destination.x += player_pos.x;
+			//m_xmf3Destination.y += player_pos.y;
+			//m_xmf3Destination.z += player_pos.z;
 			state = EnemyState::MOVE;
 			m_fMoveTimeRemaining = m_fMoveTime;
 		}
 		else
 		{
-			if (urdEnemyAI(dree) > 90)
+			if (urdEnemyAI(dree) > 10)
 			{
-				//state = EnemyState::ATTACK;
-				state = EnemyState::AVOID;
+				state = EnemyState::ATTACK;
 			}
 			else 
 			{
@@ -71,43 +101,67 @@ void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 
 void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
 {
-	// 테스트 필요
-	
-	float fDistance = 300.0 * fTimeElapsed;
+
 	XMFLOAT3 xmf3MovingDirection = GetLook();
 
-	m_fMoveTimeRemaining -= fTimeElapsed;
+	//m_fMoveTimeRemaining -= fTimeElapsed;
 
-	if (m_fMoveTimeRemaining > 0.0)
+	XMFLOAT3 xmf3Position = GetPosition();
+
+	m_xmf3Destination.x += player_pos.x;
+	m_xmf3Destination.y += player_pos.y;
+	m_xmf3Destination.z += player_pos.z;
+
+	float dist = Vector3::Length(Vector3::Subtract(xmf3Position, m_xmf3Destination));
+	if (dist > m_fAttackRange) {
+		if (m_fSpeed < 500.f) {
+			m_fSpeed += 100.f * fTimeElapsed;
+		}
+	}
+	else {
+		if (m_fSpeed > -0.01f) {
+			m_fSpeed -= 100.f * fTimeElapsed;
+		}
+	}
+
+	if (dist > 50.f)
 	{
-		XMFLOAT3 xmf3Position = GetPosition();
 		XMFLOAT3 xmf3Look = GetLook();
-		XMFLOAT3 ToPlayer = Vector3::Subtract(xmf3Position, player_pos);
-
+		XMFLOAT3 ToDestination = Vector3::Subtract(xmf3Position, m_xmf3Destination);
+		
 		xmf3Look = Vector3::Normalize(xmf3Look);
-		ToPlayer = Vector3::Normalize(ToPlayer);
-		double a = xmf3Look.x * ToPlayer.z - xmf3Look.z * ToPlayer.x;
+		ToDestination = Vector3::Normalize(ToDestination);
+		double a = xmf3Look.x * ToDestination.z - xmf3Look.z * ToDestination.x;
 		double angle = asin(a);
 
 		angle = XMConvertToDegrees(angle);
-		double rotate_angle = fTimeElapsed * 30.0f;
+		double rotate_angle = fTimeElapsed * 180.0f;
 
 		if (fabs(angle) > rotate_angle) {
 			if (angle < 0) { Rotate(0, -rotate_angle, 0); }
 			else{ Rotate(0, rotate_angle, 0); }
 		}
-
-		MoveForward(fTimeElapsed * 100.0f);
-		float y_dist = xmf3Position.y - player_pos.y;
-
-		if (fabs(y_dist) > fTimeElapsed * 100.0f) {
-			if (y_dist < 0) { MoveUp(fTimeElapsed * 100.0f); }
-			else { MoveUp(-fTimeElapsed * 100.0f); }
+		else {
+			Rotate(0, angle, 0);
+			MoveForward(fTimeElapsed * m_fSpeed);
 		}
+		//Rotate(0, angle / 50.0f, 0);
+
+		
+
+		float y_dist = -m_xmf3Destination.y + xmf3Position.y;
+
+		if (fabs(y_dist) > fTimeElapsed * m_fSpeed) {
+			if (y_dist < 0) { MoveUp(fTimeElapsed * m_fSpeed); }
+			else { MoveUp(-fTimeElapsed * m_fSpeed); }
+		}
+		m_xmf3Destination.x -= player_pos.x;
+		m_xmf3Destination.y -= player_pos.y;
+		m_xmf3Destination.z -= player_pos.z;
 	}
 	else
 	{
-		state = EnemyState::IDLE;
+		state = EnemyState::AIMING;
 	}
 
 	SendPos();
@@ -122,23 +176,24 @@ void CEnemy::AimingAI(float fTimeElapsed, XMFLOAT3& player_pos)
 
 	XMFLOAT3 xmfToPlayer = Vector3::Subtract(xmf3Position, player_pos);
 
-	// 일단 yaw 만 회전하도록
-	xmf3RotateDir.y = 0.0f;
-	xmf3RotateDir = Vector3::Normalize(xmf3RotateDir);
-	xmfToPlayer.y = 0.0f;
+	XMFLOAT3 xmf3Look = GetLook();
+
+	xmf3Look = Vector3::Normalize(xmf3Look);
 	xmfToPlayer = Vector3::Normalize(xmfToPlayer);
+	double a = xmf3Look.x * xmfToPlayer.z - xmf3Look.z * xmfToPlayer.x;
+	double angle = asin(a);
 
-	XMFLOAT3 xmf3RotationAxis = Vector3::CrossProduct(xmfToPlayer, xmf3RotateDir, true);
-	float fDotProduct = Vector3::DotProduct(GetLook(), xmf3RotateDir);
-	
-	float fRotationAngle = (fabsf(fDotProduct - 1.0f) < numeric_limits<float>::epsilon()) ? 0.0f : (float)XMConvertToDegrees(acos(fDotProduct));
+	angle = XMConvertToDegrees(angle);
+	double rotate_angle = fTimeElapsed * 90.0f;
 
-	if (fRotationAngle == 0.0f)
-	{
+	if (fabs(angle) > rotate_angle) {
+		if (angle < 0) { Rotate(0, -rotate_angle, 0); }
+		else { Rotate(0, rotate_angle, 0); }
+	}
+	else {
+		Rotate(0, angle, 0);
 		state = EnemyState::ATTACK;
 	}
-
-	Rotate(0, fRotationAngle, 0);
 
 	SendPos();
 }
@@ -147,18 +202,21 @@ void CEnemy::AttackAI(float fTimeElapsed, XMFLOAT3& player_pos)
 {
 	if (m_fCoolTimeRemaining <= 0.0f)
 	{
+		printf("attack\n");
+		// 플레이어 쪽이 아닌 반대 쪽을 보고 있는지 체크
 		XMFLOAT3 xmf3RotateDir = GetLook();
 		XMFLOAT3 xmf3Position = GetPosition();
 		XMFLOAT3 xmfToPlayer = Vector3::Subtract(xmf3Position, player_pos);
+		XMFLOAT3 xmf3Look = GetLook();
 
-		// 플레이어 쪽이 아닌 반대 쪽을 보고 있는지 체크
-		xmf3RotateDir.y = 0.0f;
-		xmf3RotateDir = Vector3::Normalize(xmf3RotateDir);
-		xmfToPlayer.y = 0.0f;
+		xmf3Look = Vector3::Normalize(xmf3Look);
 		xmfToPlayer = Vector3::Normalize(xmfToPlayer);
+		double a = xmf3Look.x * xmfToPlayer.z - xmf3Look.z * xmfToPlayer.x;
+		double angle = asin(a);
 
-		XMFLOAT3 xmf3RotationAxis = Vector3::CrossProduct(xmfToPlayer, xmf3RotateDir, true);
-		if (xmf3RotationAxis.y < 0.0) {
+		angle = XMConvertToDegrees(angle);
+
+		if (fabs(angle) > 20.f) {
 			state = EnemyState::AIMING;
 		}
 		else {
