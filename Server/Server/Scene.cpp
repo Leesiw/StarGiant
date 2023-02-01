@@ -257,7 +257,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			else {
 				m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
 			}
-			m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(urdPos(dree), urdPos(dree), urdPos(dree)));
+			m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(urdPos3(dree), urdPos3(dree), urdPos3(dree)));
 			
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;

@@ -113,13 +113,13 @@ void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
 	m_xmf3Destination.z += player_pos.z;
 
 	float dist = Vector3::Length(Vector3::Subtract(xmf3Position, m_xmf3Destination));
-	if (dist > m_fAttackRange) {
+	if (dist > 100.0f) {
 		if (m_fSpeed < 500.f) {
 			m_fSpeed += 100.f * fTimeElapsed;
 		}
 	}
 	else {
-		if (m_fSpeed > -0.01f) {
+		if (m_fSpeed > 10.f) {
 			m_fSpeed -= 100.f * fTimeElapsed;
 		}
 	}
@@ -202,7 +202,7 @@ void CEnemy::AttackAI(float fTimeElapsed, XMFLOAT3& player_pos)
 {
 	if (m_fCoolTimeRemaining <= 0.0f)
 	{
-		printf("attack\n");
+		//printf("attack\n");
 		// 플레이어 쪽이 아닌 반대 쪽을 보고 있는지 체크
 		XMFLOAT3 xmf3RotateDir = GetLook();
 		XMFLOAT3 xmf3Position = GetPosition();
