@@ -70,7 +70,7 @@ public:
 
 	void ReleaseUploadBuffers();
 
-	CPlayer								*m_pPlayer = NULL;
+	CPlayer								*m_pPlayer[3] = {};
 
 	// ¼­¹ö
 	void RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info);

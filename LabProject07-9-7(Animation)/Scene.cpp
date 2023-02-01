@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "Scene.h"
 
+int g_myid;
+
 ID3D12DescriptorHeap *CScene::m_pd3dCbvSrvDescriptorHeap = NULL;
 
 D3D12_CPU_DESCRIPTOR_HANDLE	CScene::m_d3dCbvCPUDescriptorStartHandle;
@@ -696,9 +698,9 @@ void CScene::CheckObjectByBulletCollisions()
 	for (int i = 0; i < m_nHierarchicalGameObjects; ++i)
 	{
 		m_ppHierarchicalGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppHierarchicalGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
-				m_pPlayer->m_pChild->aabb = BoundingBox(m_pPlayer->GetPosition(), XMFLOAT3(5.0f, 5.0f, 5.0f));
+				m_pPlayer[g_myid]->m_pChild->aabb = BoundingBox(m_pPlayer[g_myid]->GetPosition(), XMFLOAT3(5.0f, 5.0f, 5.0f));
 
-				if (m_ppHierarchicalGameObjects[i]->m_pChild->aabb.Intersects(m_pPlayer->m_pChild->aabb)) {
+				if (m_ppHierarchicalGameObjects[i]->m_pChild->aabb.Intersects(m_pPlayer[g_myid]->m_pChild->aabb)) {
 					cout << i<< " - 충돌\n";
 				}
 		
@@ -725,16 +727,16 @@ void CScene::CheckMEByObjectCollisions()
 		}
 	}*/
 	if (b_Inside) {
-		if (!m_pPlayer->aabb.Intersects(xm_MapAABB))
+		if (!m_pPlayer[g_myid]->aabb.Intersects(xm_MapAABB))
 		{
 			std::cout << "안쪽" << std::endl;
-			XMFLOAT3 xmf3Sub = Vector3::Subtract(m_pPlayer->GetPosition(),xm_MapAABB.Center);
+			XMFLOAT3 xmf3Sub = Vector3::Subtract(m_pPlayer[g_myid]->GetPosition(),xm_MapAABB.Center);
 			xmf3Sub = Vector3::Normalize(xmf3Sub);
 
 			float fLen = 15.0f; //지금 속력만큼으로 바꿔놔야... 함 
 			xmf3Sub = Vector3::ScalarProduct(XMFLOAT3(-xmf3Sub.x, -xmf3Sub.y, -xmf3Sub.z), fLen, false);
 			xmf3Sub = XMFLOAT3(xmf3Sub.x, 0.0f, xmf3Sub.z);
-			m_pPlayer->Move(xmf3Sub, true);
+			m_pPlayer[g_myid]->Move(xmf3Sub, true);
 
 		}
 
@@ -765,8 +767,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	if (m_pLights)
 	{
-		m_pLights[1].m_xmf3Position = m_pPlayer->GetPosition();
-		m_pLights[1].m_xmf3Direction = m_pPlayer->GetLookVector();
+		m_pLights[1].m_xmf3Position = m_pPlayer[g_myid]->GetPosition();
+		m_pLights[1].m_xmf3Direction = m_pPlayer[g_myid]->GetLookVector();
 	}
 }
 

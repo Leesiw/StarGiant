@@ -3,9 +3,12 @@
 #define FRAME_BUFFER_WIDTH		640
 #define FRAME_BUFFER_HEIGHT		480
 
+
 #include "Timer.h"
 #include "Player.h"
 #include "Scene.h"
+
+extern int g_myid;
 
 class CGameFramework
 {
@@ -83,7 +86,7 @@ private:
 	CGameTimer					m_GameTimer;
 
 	CScene						*m_pScene = NULL;
-	CPlayer						*m_pPlayer = NULL;
+	CPlayer						*m_pPlayer[3] = {};
 	CCamera						*m_pCamera = NULL;
 
 	POINT						m_ptOldCursorPos;
@@ -92,7 +95,7 @@ private:
 
 	// 내부 
 	CScene* m_pInsideScene = NULL;
-	CPlayer* m_pInsidePlayer = NULL;
+	CPlayer* m_pInsidePlayer[3] = {};
 	CCamera* m_pInsideCamera = NULL;
 
 	bool b_Inside;
@@ -100,11 +103,12 @@ private:
 	
 
 	// 서버
-	int g_myid;
 	PlayerType player_type;
 
 	thread    NetworkThread{};
 	SOCKET sock;
 	bool isConnect = false;
+
+
 };
 
