@@ -365,8 +365,22 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				if (b_Inside)m_pInsideScene->CheckSitCollisions();
 				break;
 			case VK_TAB:
-				b_Inside = !b_Inside;
-				std::cout << "씬 전환";
+				if (!isConnect) {
+					b_Inside = !b_Inside;
+					std::cout << "씬 전환";
+				}
+				break;
+			case 'X':
+				CS_CHANGE_PACKET my_packet;
+				my_packet.size = sizeof(CS_CHANGE_PACKET);
+				my_packet.type = CS_CHANGE;
+				if (player_type != PlayerType::INSIDE) {
+					my_packet.player_type = PlayerType::INSIDE;
+				}
+				else {
+					my_packet.player_type = PlayerType::MOVE;
+				}
+				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 				break;
 			}
 			break;
@@ -469,7 +483,7 @@ void CGameFramework::BuildObjects()
 	for (int i = 0; i < m_pScene->m_nScenePlayer; ++i) {
 		m_pScene->m_pPlayer[i] = m_pPlayer[i] = pAirPlayer[i];
 	}
-	m_pCamera = m_pPlayer[g_myid]->GetCamera();
+	m_pCamera = m_pPlayer[0]->GetCamera();
 	for (int i = 0; i < m_pInsideScene->m_nScenePlayer; ++i) {
 		m_pInsideScene->m_pPlayer[i] = m_pInsidePlayer[i] = pPlayer[i];
 	}
@@ -549,8 +563,12 @@ void CGameFramework::ProcessInput()
 				my_packet.size = sizeof(CS_MOVE_PACKET);
 				my_packet.type = CS_MOVE;
 				my_packet.data.dwDirection = dwDirection;
-				my_packet.data.yaw = m_pPlayer[g_myid]->GetYaw();
-
+				if(player_type == PlayerType::INSIDE){
+					my_packet.data.yaw = m_pInsidePlayer[g_myid]->GetYaw();
+				}
+				else {
+					my_packet.data.yaw = m_pPlayer[0]->GetYaw();
+				}
 				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 			}
 			else {
@@ -562,7 +580,8 @@ void CGameFramework::ProcessInput()
 	}
 
 	if (isConnect) {
-		for (int i = 0; i < 3; ++i)m_pPlayer[i]->UpdateOnServer();
+		m_pPlayer[0]->UpdateOnServer();
+		for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->UpdateOnServer();
 	}
 	if(!b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Update(m_GameTimer.GetTimeElapsed());
 	else for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Update(m_GameTimer.GetTimeElapsed());
@@ -681,7 +700,7 @@ void CGameFramework::FrameAdvance()
 	size_t nLength = _tcslen(m_pszFrameRate);
 	XMFLOAT3 xmf3Position;
 	if(b_Inside) xmf3Position = m_pInsidePlayer[g_myid]->GetPosition();
-	else xmf3Position = m_pPlayer[g_myid]->GetPosition();
+	else xmf3Position = m_pPlayer[0]->GetPosition();
 	_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 }
@@ -738,7 +757,17 @@ void CGameFramework::RecvServer()
 			LOGIN_INFO loginInfo;
 			memcpy(&loginInfo, &subBuf, sizeof(LOGIN_INFO));
 			g_myid = loginInfo.id;
+			m_pInsideCamera = m_pInsidePlayer[g_myid]->GetCamera();
 			player_type = loginInfo.player_type;
+
+			player_type = loginInfo.player_type;
+			if (player_type == PlayerType::INSIDE) {
+				b_Inside = true;
+			}
+			else {
+				b_Inside = false;
+			}
+
 			break;
 		}
 		case SC_CHANGE:
@@ -750,7 +779,24 @@ void CGameFramework::RecvServer()
 
 			LOGIN_INFO l_info;
 			memcpy(&l_info, &subBuf, sizeof(LOGIN_INFO));
-
+			if (l_info.id == g_myid) {
+				player_type = l_info.player_type;
+				if (player_type == PlayerType::INSIDE) {
+					b_Inside = true;
+				}
+				else {
+					b_Inside = false;
+				}
+			}
+			// 여기서 온 정보에 따라 해당 캐릭터가 특정 자리에 앉게 하거나 일어나게 한다
+			if (l_info.player_type == PlayerType::INSIDE) {
+				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = 0;
+			}
+			else {
+				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = 2;
+			}
+			
+			
 			// 정보에 따라 카메라/씬 전환 (MOVE : 3인칭 우주선 외부, ATTACK1/2/3 : 1인칭 공격 모드, INSIDE : 우주선 내부 3인칭)
 			break;
 		}
@@ -822,22 +868,29 @@ void CGameFramework::RecvServer()
 		}
 		case SC_MOVE_PLAYER:
 		{
-			char subBuf[sizeof(PLAYER_INFO[4])]{};
+			char subBuf[sizeof(PLAYER_INFO)]{};
 			WSABUF wsabuf{ sizeof(subBuf), subBuf };
 			DWORD recvByte{}, recvFlag{};
 			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-			PLAYER_INFO playerInfo[4];
-			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO[4]));
+			PLAYER_INFO playerInfo;
+			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO));
 			// 클라 플레이어 추가한 후 수정 필요 > PLAYER_INFO[0~2]는 우주선 내부 플레이어 정보, PLAYER_INFO[3]은 우주선 정보
-			m_pPlayer[g_myid]->SetPlayerInfo(playerInfo[3]);
-
-			//m_pPlayer->SetPosition(playerInfo[3].pos);
-			//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
-			//m_pPlayer->SetVelocity(playerInfo[3].velocity);
-			//m_pPlayer->SetShift(playerInfo.shift);
-			//m_pPlayer->Rotate(0.0f, playerInfo[3].m_fYaw - m_pPlayer->GetYaw(), 0.0f);
-			//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
-		
+			
+			if (playerInfo.id == 3) { //id가 3이면 우주선
+				m_pPlayer[0]->SetPlayerInfo(playerInfo);
+				//m_pPlayer[0]->SetPosition(playerInfo.pos);
+				//m_pPlayer[0]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[0]->GetYaw(), 0.0f);
+				//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
+				//m_pPlayer->SetVelocity(playerInfo[3].velocity);
+				//m_pPlayer->SetShift(playerInfo.shift);
+				//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+				//m_pPlayer[g_myid]->SetPlayerInfo(playerInfo[3]);
+			}
+			else { // 그 외는 내부 플레이어
+				m_pInsidePlayer[playerInfo.id]->SetPlayerInfo(playerInfo);
+				//m_pInsidePlayer[playerInfo.id]->SetPosition(playerInfo.pos);
+				//m_pInsidePlayer[playerInfo.id]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[playerInfo.id]->GetYaw(), 0.0f);
+			}
 
 			//m_pPlayer->OnPrepareRender();
 			//cout << "회전 각도 " << playerInfo.m_fYaw - m_pPlayer->GetYaw() << endl;
@@ -849,7 +902,6 @@ void CGameFramework::RecvServer()
 			WSABUF wsabuf{ sizeof(subBuf), subBuf };
 			DWORD recvByte{}, recvFlag{};
 			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-			float x = m_pPlayer[g_myid]->GetPosition().z;
 			ENEMY_INFO enemyInfo;
 			memcpy(&enemyInfo, &subBuf, sizeof(ENEMY_INFO));
 
@@ -883,7 +935,7 @@ void CGameFramework::RecvServer()
 			BULLET_INFO bulletInfo;
 			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_INFO));
 
-			((CAirplanePlayer*)m_pPlayer[g_myid])->SetBulletFromServer(bulletInfo);
+			((CAirplanePlayer*)m_pPlayer[0])->SetBulletFromServer(bulletInfo);
 			break;
 		}
 		case SC_BULLET_HIT:

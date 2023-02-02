@@ -207,7 +207,7 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 {
 	CPlayer::Update(fTimeElapsed);
 
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < MAX_USER; ++i) {
 		if (m_fFireWaitingTime[i] > 0.0f)
 			m_fFireWaitingTime[i] -= fTimeElapsed;
 	}
@@ -230,6 +230,20 @@ void CAirplanePlayer::OnPrepareRender()
 // 
 CTerrainPlayer::CTerrainPlayer()
 {
+	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
+
+	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_fMaxVelocityXZ = 0.0f;
+	m_fMaxVelocityY = 0.0f;
+	m_fFriction = 0.0f;
+
+	m_fPitch = 0.0f;
+	m_fRoll = 0.0f;
+	m_fYaw = 0.0f;
 }
 
 CTerrainPlayer::~CTerrainPlayer()
@@ -240,7 +254,6 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 {
 	if (dwDirection)
 	{
-		walk = true;
 
 		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
 		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
@@ -256,10 +269,18 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 
 void CTerrainPlayer::Update(float fTimeElapsed)
 {
-	Rotate(0, input_info.yaw - m_fYaw, 0);
-
+	//if (input_info.yaw != 0) {
+		Rotate(0, input_info.yaw - m_fYaw, 0);
+	//}
 	if (input_info.dwDirection) {
-		Move(input_info.dwDirection, 400.0f * fTimeElapsed, false);
+		
+		//OnPrepareRender();
+		//UpdateTransform();
+		Move(input_info.dwDirection, 100.0f * fTimeElapsed, false);
 		input_info.dwDirection = NULL;
+		walk = true;
+	}
+	else {
+		walk = false;
 	}
 }

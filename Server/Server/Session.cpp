@@ -10,18 +10,15 @@ void SESSION::send_change_packet(int c_id, PlayerType p_type)
 	do_send(&p);
 }
 
-void SESSION::send_move_packet(int c_id, CTerrainPlayer* m_pPlayer[], CAirplanePlayer* m_pSpaceship)	// 플레이어 좌표 각도 전송
+void SESSION::send_move_packet(int c_id, CPlayer* m_pPlayer)	// 플레이어 좌표 각도 전송
 {
 	SC_MOVE_PLAYER_PACKET p;
 	p.size = sizeof(SC_MOVE_PLAYER_PACKET);
 	p.type = SC_MOVE_PLAYER;
-	for (int i = 0; i < 3; ++i) {
-		p.data[i].pos = m_pPlayer[i]->GetPosition();
-		p.data[i].m_fYaw = m_pPlayer[i]->GetYaw();
-	}
+	p.data.id = c_id;
+	p.data.pos = m_pPlayer->GetPosition();
+	p.data.m_fYaw = m_pPlayer->GetYaw();
 
-	p.data[3].pos = m_pSpaceship->GetPosition();
-	p.data[3].m_fYaw = m_pSpaceship->GetYaw();
 	//p.data.velocity = m_pPlayer->GetVelocity();
 	//p.data.shift = m_pPlayer->GetShift();
 	do_send(&p);

@@ -165,7 +165,7 @@ struct SC_MOVE_PLAYER_PACKET {
 	unsigned char size;
 	char	type;
 
-	PLAYER_INFO data[4];
+	PLAYER_INFO data;
 };
 
 struct SC_MOVE_ENEMY_PACKET {

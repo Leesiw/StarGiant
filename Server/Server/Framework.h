@@ -31,7 +31,7 @@ private:
 	CScene* m_pScene = NULL;
 
 	CAirplanePlayer* m_pSpaceship = NULL;
-	CTerrainPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
+	CTerrainPlayer* m_ppPlayers[MAX_USER] = { NULL, NULL, NULL };
 	//CEnemyObject* m_Enemy = NULL;
 
 	std::chrono::duration<double> fps;

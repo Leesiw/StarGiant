@@ -43,7 +43,7 @@ protected:
 
 
 	PLAYER_INFO					player_info;
-	bool						is_update;
+	bool						is_update = false;
 
 public:
 	int motion;

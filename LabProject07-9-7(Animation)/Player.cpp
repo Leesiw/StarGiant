@@ -93,7 +93,7 @@ void CPlayer::Rotate(float x, float y, float z, int mode)
 			if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
 			if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
 		}
-		if (y != 0.0f && mode == 0)
+		if (y != 0.0f) // && mode == 0) > 서버 클라 연동 시 회전 정보 필요
 		{
 			m_fYaw += y;
 			if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
@@ -250,7 +250,7 @@ void CPlayer::UpdateOnServer()
 	if (!is_update) {
 		SetPosition(player_info.pos);
 		Rotate(0, player_info.m_fYaw - m_fYaw, 0);
-		m_pCamera->Update(player_info.pos, 0);
+		//m_pCamera->Update(player_info.pos, 0);
 		is_update = true;
 	}
 }

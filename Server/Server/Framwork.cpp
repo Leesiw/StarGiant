@@ -41,7 +41,7 @@ void CGameFramework::Init() {
 
 
 	for (auto& pl : clients) {
-		pl.type = PlayerType::MOVE;//INSIDE;
+		pl.type = PlayerType::INSIDE;
 	}
 
 	ClientProcessThread = thread{ &CGameFramework::ClientProcess, this };
@@ -144,9 +144,9 @@ void CGameFramework::BuildObjects()
 	pAirplanePlayer->boundingbox = BoundingOrientedBox{ XMFLOAT3(-0.000000f, -0.000000f, -0.000096f), XMFLOAT3(15.5f, 15.5f, 3.90426f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	m_pScene->m_pSpaceship = m_pSpaceship = pAirplanePlayer;
 	//m_pCamera = m_pPlayer->GetCamera();
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < MAX_USER; ++i) {
 		CTerrainPlayer* pPlayer = new CTerrainPlayer();
-		pPlayer->SetPosition(XMFLOAT3(i * 100.0f, 0.0f, 0.0f));
+		pPlayer->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 250.0f, 640.0f));
 		m_ppPlayers[i] = pPlayer;
 	}
 
@@ -180,9 +180,15 @@ void CGameFramework::AnimateObjects(float fTimeElapsed)
 	m_pSpaceship->Animate(fTimeElapsed);
 	m_pSpaceship->Update(fTimeElapsed);
 
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < MAX_USER; ++i)
 	{
 		m_ppPlayers[i]->Update(fTimeElapsed);
+		if (clients[i].in_use  && clients[i].type == PlayerType::INSIDE) {
+			for (auto& pl : clients) {
+				if (!pl.in_use) continue;
+				pl.send_move_packet(i, m_ppPlayers[i]);
+			}
+		}
 	}
 
 
@@ -283,7 +289,7 @@ void CGameFramework::ClientProcess()
 			AnimateObjects(fps.count());
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;
-				pl.send_move_packet(0, m_ppPlayers, m_pSpaceship);
+				pl.send_move_packet(3, m_pSpaceship);
 				if (!(num = num % 10)) {
 					pl.send_meteo_packet(0, m_pScene->m_ppMeteoObjects);
 				}
