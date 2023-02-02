@@ -93,6 +93,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	BuildDefaultLightsAndMaterials();
 
+	m_nScenePlayer = 1;
+
 	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	XMFLOAT3 xmf3Scale(8.0f, 2.0f, 8.0f);
@@ -248,6 +250,8 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 
 	BuildDefaultLightsAndMaterials();
 
+	m_nScenePlayer = 3;
+
 	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	XMFLOAT3 xmf3Scale(8.0f, 2.0f, 8.0f);
@@ -257,7 +261,7 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_nHierarchicalGameObjects = 1;
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 
-	//비행기 내부 넣을자리 -> bin파일 읽기 오류뜨고잇음. 바꾸고 넣을것. 
+	//비행기 내부 
 	CLoadedModelInfo* pInsideModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InsideShip.bin", NULL);
 	m_ppHierarchicalGameObjects[0] = new CInsideShipObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pInsideModel, 1);
 	m_ppHierarchicalGameObjects[0]->SetPosition(425.0f, 250.f - 30.0f, 590.0f);

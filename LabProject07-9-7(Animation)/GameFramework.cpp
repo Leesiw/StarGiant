@@ -453,21 +453,21 @@ void CGameFramework::BuildObjects()
 	}
 
 	CAirplanePlayer* pAirPlayer[3];
-	for (int i = 0; i < 3; ++i) {
-		pAirPlayer[i]= new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pInsideScene->GetGraphicsRootSignature(), m_pInsideScene->m_pTerrain);
-		pAirPlayer[i]->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
-		pAirPlayer[i]->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
-	}
+		pAirPlayer[0]= new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pInsideScene->GetGraphicsRootSignature(), m_pInsideScene->m_pTerrain);
+		pAirPlayer[0]->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
+		pAirPlayer[0]->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
+
+
 #else
 	CAirplanePlayer *pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL);
 	pPlayer->SetPosition(XMFLOAT3(425.0f, 240.0f, 640.0f));
 #endif
 
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < m_pScene->m_nScenePlayer; ++i) {
 		m_pScene->m_pPlayer[i] = m_pPlayer[i] = pAirPlayer[i];
 	}
 	m_pCamera = m_pPlayer[g_myid]->GetCamera();
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < m_pInsideScene->m_nScenePlayer; ++i) {
 		m_pInsideScene->m_pPlayer[i] = m_pInsidePlayer[i] = pPlayer[i];
 	}
 	m_pInsideCamera = m_pInsidePlayer[g_myid]->GetCamera();
@@ -480,8 +480,8 @@ void CGameFramework::BuildObjects()
 
 	if (m_pScene) m_pScene->ReleaseUploadBuffers();
 	if (m_pInsideScene) m_pInsideScene->ReleaseUploadBuffers();
-	if (m_pPlayer) for(int i=0; i<3; ++i)m_pPlayer[i]->ReleaseUploadBuffers();
-	if (m_pInsidePlayer)for (int i = 0; i < 3; ++i) m_pInsidePlayer[i]->ReleaseUploadBuffers();
+	if (m_pPlayer) for(int i=0; i< m_pScene->m_nScenePlayer; ++i)m_pPlayer[i]->ReleaseUploadBuffers();
+	if (m_pInsidePlayer)for (int i = 0; i < m_pInsideScene->m_nScenePlayer; ++i) m_pInsidePlayer[i]->ReleaseUploadBuffers();
 
 	m_GameTimer.Reset();
 }
@@ -535,9 +535,9 @@ void CGameFramework::ProcessInput()
 				}
 				else {
 					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
-						m_pPlayer[g_myid]->Rotate(cyDelta, 0.0f, -cxDelta);
+						m_pPlayer[0]->Rotate(cyDelta, 0.0f, -cxDelta);
 					else
-						m_pPlayer[g_myid]->Rotate(cyDelta, cxDelta, 0.0f);
+						m_pPlayer[0]->Rotate(cyDelta, cxDelta, 0.0f);
 				}
 			}
 
@@ -552,7 +552,7 @@ void CGameFramework::ProcessInput()
 			}
 			else {
 				//이동 부분 분할할지 모르겠어서 우선 여따 같이넣어둠 
-				if (dwDirection&&!b_Inside) m_pPlayer[g_myid]->Move(dwDirection, 20.25f, true);
+				if (dwDirection&&!b_Inside) m_pPlayer[0]->Move(dwDirection, 20.25f, true);
 				if (dwDirection&& b_Inside) m_pInsidePlayer[g_myid]->Move(dwDirection, 10.25f, true);
 			}
 		}
@@ -561,7 +561,7 @@ void CGameFramework::ProcessInput()
 	if (isConnect) {
 		for (int i = 0; i < 3; ++i)m_pPlayer[i]->UpdateOnServer();
 	}
-	if(!b_Inside) for (int i = 0; i < 3; ++i)m_pPlayer[i]->Update(m_GameTimer.GetTimeElapsed());
+	if(!b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Update(m_GameTimer.GetTimeElapsed());
 	else for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Update(m_GameTimer.GetTimeElapsed());
 }
 
@@ -572,7 +572,7 @@ void CGameFramework::AnimateObjects()
 	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
 	if (m_pInsideScene) m_pInsideScene->AnimateObjects(fTimeElapsed);
 
-	for (int i = 0; i < 3; ++i)m_pPlayer[i]->Animate(fTimeElapsed);
+	for (int i = 0; i < 1; ++i)m_pPlayer[i]->Animate(fTimeElapsed);
 	for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Animate(fTimeElapsed);
 }
 
@@ -642,7 +642,7 @@ void CGameFramework::FrameAdvance()
 #ifdef _WITH_PLAYER_TOP
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
-	if (m_pPlayer && !b_Inside) for (int i = 0; i < 3; ++i)m_pPlayer[i]->Render(m_pd3dCommandList, m_pCamera);
+	if (m_pPlayer && !b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Render(m_pd3dCommandList, m_pCamera);
 	if (m_pInsidePlayer && b_Inside)for (int i = 0; i < 3; ++i) m_pInsidePlayer[i]->Render(m_pd3dCommandList, m_pInsideCamera);
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
