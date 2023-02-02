@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "Scene.h"
 
+int g_myid;
+
 ID3D12DescriptorHeap *CScene::m_pd3dCbvSrvDescriptorHeap = NULL;
 
 D3D12_CPU_DESCRIPTOR_HANDLE	CScene::m_d3dCbvCPUDescriptorStartHandle;
@@ -90,6 +92,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	CMaterial::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature); 
 
 	BuildDefaultLightsAndMaterials();
+
+	m_nScenePlayer = 1;
 
 	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -235,7 +239,7 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 1, 76); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot() // ¾Æ·¡³»¿ëÀº ÀÌ ÇÔ¼öÀÇ ºÎºÐÀÌ´Ù
+	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 1, 76); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot() // ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½Îºï¿½ï¿½Ì´ï¿½
 
 	m_d3dCbvCPUDescriptorNextHandle = m_d3dCbvCPUDescriptorStartHandle = descriptor_heap->GetCPUDescriptorHandleForHeapStart();
 	m_d3dCbvGPUDescriptorNextHandle = m_d3dCbvGPUDescriptorStartHandle = descriptor_heap->GetGPUDescriptorHandleForHeapStart();
@@ -246,6 +250,8 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 
 	BuildDefaultLightsAndMaterials();
 
+	m_nScenePlayer = 3;
+
 	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	XMFLOAT3 xmf3Scale(8.0f, 2.0f, 8.0f);
@@ -255,7 +261,7 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_nHierarchicalGameObjects = 1;
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 
-	//ºñÇà±â ³»ºÎ ³ÖÀ»ÀÚ¸® -> binÆÄÀÏ ÀÐ±â ¿À·ù¶ß°íÀÕÀ½. ¹Ù²Ù°í ³ÖÀ»°Í. 
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 
 	CLoadedModelInfo* pInsideModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InsideShip.bin", NULL);
 	m_ppHierarchicalGameObjects[0] = new CInsideShipObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pInsideModel, 1);
 	m_ppHierarchicalGameObjects[0]->SetPosition(425.0f, 250.f - 30.0f, 590.0f);
@@ -263,7 +269,7 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 
 	if (pInsideModel) delete pInsideModel;
 
-	//ÀÓÀÇ·Î ¼³Á¤ÇÏ´Â ¹Ù¿îµù¹Ú½º (ÀÌÈÄ ³»ºÎ Height¸ÊÀ» ¸¸µé¾î¼­ Ãæµ¹°Ë»ç·Î ¹Ù²Ù°í½ÍÀ½) 
+	//ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ù¿ï¿½ï¿½ï¿½Ú½ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Heightï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½î¼­ ï¿½æµ¹ï¿½Ë»ï¿½ï¿½ ï¿½Ù²Ù°ï¿½ï¿½ï¿½ï¿½) 
 	b_Inside = true;
 	xm_MapAABB = BoundingBox(XMFLOAT3(m_ppHierarchicalGameObjects[0]->GetPosition().x, m_ppHierarchicalGameObjects[0]->GetPosition().y, m_ppHierarchicalGameObjects[0]->GetPosition().z+90.f), XMFLOAT3(125.f, 100.0f, 110.0f));
 	xm_SitAABB[0] = BoundingBox(XMFLOAT3(417.f,224.f,737.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //LEFT
@@ -530,7 +536,7 @@ ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevic
 
 void CScene::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
-	UINT ncbElementBytes = ((sizeof(LIGHTS) + 255) & ~255); //256ÀÇ ¹è¼ö
+	UINT ncbElementBytes = ((sizeof(LIGHTS) + 255) & ~255); //256ï¿½ï¿½ ï¿½ï¿½ï¿½
 	m_pd3dcbLights = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
 
 	m_pd3dcbLights->Map(0, NULL, (void **)&m_pcbMappedLights);
@@ -697,14 +703,14 @@ bool CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 
 void CScene::CheckObjectByBulletCollisions()
 {
-	//¸Þ½¬ »ý¼ºµÉ¶§ ¹Ù¿îµù ¹Ú½º ¸¸µå´Â°É·Î ¼öÁ¤ÇØ¾ßµÈ´Ù
+	//ï¿½Þ½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½É¶ï¿½ ï¿½Ù¿ï¿½ï¿½ ï¿½Ú½ï¿½ ï¿½ï¿½ï¿½ï¿½Â°É·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ßµÈ´ï¿½
 	for (int i = 0; i < m_nHierarchicalGameObjects; ++i)
 	{
 		m_ppHierarchicalGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppHierarchicalGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
-				m_pPlayer->m_pChild->aabb = BoundingBox(m_pPlayer->GetPosition(), XMFLOAT3(5.0f, 5.0f, 5.0f));
+				m_pPlayer[g_myid]->m_pChild->aabb = BoundingBox(m_pPlayer[g_myid]->GetPosition(), XMFLOAT3(5.0f, 5.0f, 5.0f));
 
-				if (m_ppHierarchicalGameObjects[i]->m_pChild->aabb.Intersects(m_pPlayer->m_pChild->aabb)) {
-					cout << i<< " - Ãæµ¹\n";
+				if (m_ppHierarchicalGameObjects[i]->m_pChild->aabb.Intersects(m_pPlayer[g_myid]->m_pChild->aabb)) {
+					cout << i<< " - ï¿½æµ¹\n";
 				}
 		
 	}
@@ -730,31 +736,31 @@ void CScene::CheckMEByObjectCollisions()
 		}
 	}*/
 	if (b_Inside) {
-		//³»ºÎ º® °Ë»ç
-		if (!m_pPlayer->aabb.Intersects(xm_MapAABB))
+		//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ë»ï¿½
+		if (!m_pPlayer[g_myid]->aabb.Intersects(xm_MapAABB))
 		{
-			//std::cout << "¾ÈÂÊ" << std::endl;
-			XMFLOAT3 xmf3Sub = Vector3::Subtract(m_pPlayer->GetPosition(),xm_MapAABB.Center);
+			std::cout << "ï¿½ï¿½ï¿½ï¿½" << std::endl;
+			XMFLOAT3 xmf3Sub = Vector3::Subtract(m_pPlayer[g_myid]->GetPosition(),xm_MapAABB.Center);
 			xmf3Sub = Vector3::Normalize(xmf3Sub);
 
-			float fLen = 15.0f; //Áö±Ý ¼Ó·Â¸¸Å­À¸·Î ¹Ù²ã³ö¾ß... ÇÔ 
+			float fLen = 15.0f; //ï¿½ï¿½ï¿½ï¿½ ï¿½Ó·Â¸ï¿½Å­ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½ï¿½ï¿½ï¿½... ï¿½ï¿½ 
 			xmf3Sub = Vector3::ScalarProduct(XMFLOAT3(-xmf3Sub.x, -xmf3Sub.y, -xmf3Sub.z), fLen, false);
 			xmf3Sub = XMFLOAT3(xmf3Sub.x, 0.0f, xmf3Sub.z);
-			m_pPlayer->Move(xmf3Sub, true);
+			m_pPlayer[g_myid]->Move(xmf3Sub, true);
 
 		}
-		//ÀÌº¥Æ® °Ë»ç 
+		//ï¿½Ìºï¿½Æ® ï¿½Ë»ï¿½ 
 		for (int i = 0; i < 4; i++) {
 			if (m_pPlayer->aabb.Intersects(xm_SitAABB[i])) 
 			{
-				/*->±¸°£Ãæµ¹ÁßÀÏ¶§¸¦ ±â·ÏÇÏ°í
-					FÅ°°¡ ±¸°£Ãæµ¹ »óÅÂÀÏ‹š ´­·ÈÀ»°æ¿ì¿¡ Ä«¸Þ¶ó º¯È¯½ÃÅ°±â
+				/*->ï¿½ï¿½ï¿½ï¿½ï¿½æµ¹ï¿½ï¿½ï¿½Ï¶ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï°ï¿½
+					FÅ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½æµ¹ ï¿½ï¿½ï¿½ï¿½ï¿½Ï‹ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì¿¡ Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½È¯ï¿½ï¿½Å°ï¿½ï¿½
 
-					ÀÌ¶§, Ä«¸Þ¶ó°¡ ¾ÉÀ»¶§ µ¹¾Æ°¡´Â ¹æÇâ(4°¡Áö)À» ÀÎÀÚ·Î ¹Þ¾Æ´Ù°¡
-					case¹®À¸·Î ¼³Á¤ÇØÁÖ°í½ÍÀ½.
-					Ä«¸Þ¶ó ¹«ºù ÀÌÈÄ ¾À1ÀÇ Æ¯Á¤À§Ä¡·Î ½µ ¹Ù²ð¿¹Á¤. 
-					++ º®Ãæµ¹À» Ä«¸Þ¶óµµ Àû¿ëÇÏµµ·Ï ÇÒ °Í. ¹Ù±ùÀ¸·Î ¶ÙÃÄ³ª°¡´Â Ä«¸Þ¶ó Á¶Á¾ÇØ¾ßÇÔ */
-				std::cout << i << " - ¹øÂ° ÀÇÀÚ Ãæµ¹Áß " << std::endl;
+					ï¿½Ì¶ï¿½, Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Æ°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(4ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½ ï¿½ï¿½ï¿½Ú·ï¿½ ï¿½Þ¾Æ´Ù°ï¿½
+					caseï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö°ï¿½ï¿½ï¿½ï¿½.
+					Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½1ï¿½ï¿½ Æ¯ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ ï¿½Ù²ï¿½ï¿½ï¿½. 
+					++ ï¿½ï¿½ï¿½æµ¹ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½. ï¿½Ù±ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½ */
+				std::cout << i << " - ï¿½ï¿½Â° ï¿½ï¿½ï¿½ï¿½ ï¿½æµ¹ï¿½ï¿½ " << std::endl;
 			}
 		}
 
@@ -785,8 +791,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	if (m_pLights)
 	{
-		m_pLights[1].m_xmf3Position = m_pPlayer->GetPosition();
-		m_pLights[1].m_xmf3Direction = m_pPlayer->GetLookVector();
+		m_pLights[1].m_xmf3Position = m_pPlayer[g_myid]->GetPosition();
+		m_pLights[1].m_xmf3Direction = m_pPlayer[g_myid]->GetLookVector();
 	}
 }
 

@@ -53,7 +53,7 @@ public:
 	void BuildDefaultLightsAndMaterials();
 	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	void BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap);
-	//¾Õ ¾ÀÀÌ¶û °°Àº°Å ¾µ°Å°°Àºµ¥ µ¤¾î¾º±â·Î ¾Õ ¾ÀÀÇ °ªÀÌ »ç¶óÁü. °øÀ¯ÇÏ°Ô ¾²·Á°í ÇÚµéÀ» ¹Þ°Ô¸¸µë.(°íÀ¯ ¾À¸¸ÀÇ µð½ºÅ©¸³ÅÍ ¼³¸í¼öÁ¤ÀÌ ÇÊ¿äÇÒ½Ã ÀÌ°É ¾ø¾Ö°í ¼öÁ¤ÇØ¾ßÇÒ°Å°°À½) 
+	//ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Å°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½î¾ºï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½. ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Úµï¿½ï¿½ï¿½ ï¿½Þ°Ô¸ï¿½ï¿½ï¿½.(ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å©ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½Ò½ï¿½ ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½Ö°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½Ò°Å°ï¿½ï¿½ï¿½) 
 	void ReleaseObjects();
 
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
@@ -62,7 +62,7 @@ public:
 
 
 	void CheckObjectByBulletCollisions();
-	void CheckMEByObjectCollisions(); // ³»ºÎ°Ç¹° - ÇÃ·¹ÀÌ¾î Ãæµ¹Ã¼Å© (µ¥¸ð) 
+	void CheckMEByObjectCollisions(); // ï¿½ï¿½ï¿½Î°Ç¹ï¿½ - ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½æµ¹Ã¼Å© (ï¿½ï¿½ï¿½ï¿½) 
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
     void AnimateObjects(float fTimeElapsed);
@@ -70,9 +70,9 @@ public:
 
 	void ReleaseUploadBuffers();
 
-	CPlayer								*m_pPlayer = NULL;
+	CPlayer								*m_pPlayer[3] = {};
 
-	// ¼­¹ö
+	// ï¿½ï¿½ï¿½ï¿½
 	void RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info);
 	void TransformMeteor(METEO_INFO[]);
 
@@ -136,10 +136,13 @@ public:
 	ID3D12Resource						*m_pd3dcbLights = NULL;
 	LIGHTS								*m_pcbMappedLights = NULL;
 
-	//ÀÌº¥Æ® ¹Ù¿îµù ¹Ú½º 
+
+	//ï¿½Ìºï¿½Æ® ï¿½Ù¿ï¿½ï¿½ ï¿½Ú½ï¿½ 
 	BoundingBox xm_SitAABB[4];
 
-	//ÀÓ½Ã ³»ºÎ ¹Ù¿îµù¹Ú½º 
+	int m_nScenePlayer = 1;
+
+	//ï¿½Ó½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¿ï¿½ï¿½ï¿½Ú½ï¿½ 
 	BoundingBox xm_MapAABB;
 	bool b_Inside = false;
 };

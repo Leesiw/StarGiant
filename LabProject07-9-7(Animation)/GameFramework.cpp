@@ -29,10 +29,12 @@ CGameFramework::CGameFramework()
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
 
 	m_pScene = NULL;
-	m_pPlayer = NULL;
+	for (int i = 0; i < 3; ++i)
+		m_pPlayer[i] = NULL;
 
 	m_pInsideScene = NULL;
-	m_pInsidePlayer = NULL;
+	for(int i=0; i<3; ++i)
+		m_pInsidePlayer[i] = NULL;
 
 	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
 }
@@ -338,24 +340,24 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			case VK_F1:
 			case VK_F2:
 			case VK_F3:
-				m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
+				m_pCamera = m_pPlayer[g_myid]->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
 				break;
 			case VK_F9:
 				ChangeSwapChainState();
 				break;
 			case VK_CONTROL:
-				((CAirplanePlayer*)m_pPlayer)->FireBullet(NULL);
+				((CAirplanePlayer*)m_pPlayer[g_myid])->FireBullet(NULL);
 				std::cout << "총알";
 				break;
 			case VK_SPACE:
-				if (((CTerrainPlayer*)m_pInsidePlayer)->motion != 2) {
-					((CTerrainPlayer*)m_pInsidePlayer)->motion = 2;
+				if (((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion != 2) {
+					((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = 2;
 					std::cout << "앉기";
 				}
 				else
 				{
 					std::cout << "서기";
-					((CTerrainPlayer*)m_pInsidePlayer)->motion = 0;
+					((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = 0;
 				}
 
 				break;
@@ -443,21 +445,32 @@ void CGameFramework::BuildObjects()
 	
 
 #ifdef _WITH_TERRAIN_PLAYER
-	CTerrainPlayer *pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain);
-	pPlayer->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
-	pPlayer->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
-	CAirplanePlayer* pAirPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pInsideScene->GetGraphicsRootSignature(), m_pInsideScene->m_pTerrain);
-	pAirPlayer->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
-	pAirPlayer->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
+	CTerrainPlayer* pPlayer[3];
+	for (int i = 0; i < 3; ++i) {
+		pPlayer[i] = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain);
+		pPlayer[i]->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 250.0f, 640.0f));
+		pPlayer[i]->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
+	}
+
+	CAirplanePlayer* pAirPlayer[3];
+		pAirPlayer[0]= new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pInsideScene->GetGraphicsRootSignature(), m_pInsideScene->m_pTerrain);
+		pAirPlayer[0]->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
+		pAirPlayer[0]->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
+
+
 #else
 	CAirplanePlayer *pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL);
 	pPlayer->SetPosition(XMFLOAT3(425.0f, 240.0f, 640.0f));
 #endif
 
-	m_pScene->m_pPlayer = m_pPlayer = pAirPlayer;
-	m_pCamera = m_pPlayer->GetCamera();
-	m_pInsideScene->m_pPlayer = m_pInsidePlayer = pPlayer;
-	m_pInsideCamera = m_pInsidePlayer->GetCamera();
+	for (int i = 0; i < m_pScene->m_nScenePlayer; ++i) {
+		m_pScene->m_pPlayer[i] = m_pPlayer[i] = pAirPlayer[i];
+	}
+	m_pCamera = m_pPlayer[g_myid]->GetCamera();
+	for (int i = 0; i < m_pInsideScene->m_nScenePlayer; ++i) {
+		m_pInsideScene->m_pPlayer[i] = m_pInsidePlayer[i] = pPlayer[i];
+	}
+	m_pInsideCamera = m_pInsidePlayer[g_myid]->GetCamera();
 
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -467,16 +480,16 @@ void CGameFramework::BuildObjects()
 
 	if (m_pScene) m_pScene->ReleaseUploadBuffers();
 	if (m_pInsideScene) m_pInsideScene->ReleaseUploadBuffers();
-	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
-	if (m_pInsidePlayer) m_pInsidePlayer->ReleaseUploadBuffers();
+	if (m_pPlayer) for(int i=0; i< m_pScene->m_nScenePlayer; ++i)m_pPlayer[i]->ReleaseUploadBuffers();
+	if (m_pInsidePlayer)for (int i = 0; i < m_pInsideScene->m_nScenePlayer; ++i) m_pInsidePlayer[i]->ReleaseUploadBuffers();
 
 	m_GameTimer.Reset();
 }
 
 void CGameFramework::ReleaseObjects()
 {
-	if (m_pPlayer) m_pPlayer->Release();
-	if (m_pInsidePlayer) m_pInsidePlayer->Release();
+	if (m_pPlayer) for (int i = 0; i < 3; ++i)m_pPlayer[i]->Release();
+	if (m_pInsidePlayer) for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Release();
 
 	if (m_pScene) m_pScene->ReleaseObjects();
 	if (m_pScene) delete m_pScene;
@@ -516,15 +529,15 @@ void CGameFramework::ProcessInput()
 			{
 				if (b_Inside) {
 					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
-						m_pInsidePlayer->Rotate(cyDelta, 0.0f, -cxDelta, 1);
+						m_pInsidePlayer[g_myid]->Rotate(cyDelta, 0.0f, -cxDelta, 1);
 					else
-						m_pInsidePlayer->Rotate(cyDelta, cxDelta, 0.0f, 1);
+						m_pInsidePlayer[g_myid]->Rotate(cyDelta, cxDelta, 0.0f, 1);
 				}
 				else {
 					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
-						m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
+						m_pPlayer[0]->Rotate(cyDelta, 0.0f, -cxDelta);
 					else
-						m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+						m_pPlayer[0]->Rotate(cyDelta, cxDelta, 0.0f);
 				}
 			}
 
@@ -533,23 +546,23 @@ void CGameFramework::ProcessInput()
 				my_packet.size = sizeof(CS_MOVE_PACKET);
 				my_packet.type = CS_MOVE;
 				my_packet.data.dwDirection = dwDirection;
-				my_packet.data.yaw = m_pPlayer->GetYaw();
+				my_packet.data.yaw = m_pPlayer[g_myid]->GetYaw();
 
 				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 			}
 			else {
 				//이동 부분 분할할지 모르겠어서 우선 여따 같이넣어둠 
-				if (dwDirection&&!b_Inside) m_pPlayer->Move(dwDirection, 20.25f, true);
-				if (dwDirection&& b_Inside) m_pInsidePlayer->Move(dwDirection, 10.25f, true);
+				if (dwDirection&&!b_Inside) m_pPlayer[0]->Move(dwDirection, 20.25f, true);
+				if (dwDirection&& b_Inside) m_pInsidePlayer[g_myid]->Move(dwDirection, 10.25f, true);
 			}
 		}
 	}
 
 	if (isConnect) {
-		m_pPlayer->UpdateOnServer();
+		for (int i = 0; i < 3; ++i)m_pPlayer[i]->UpdateOnServer();
 	}
-	if(!b_Inside) m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
-	else m_pInsidePlayer->Update(m_GameTimer.GetTimeElapsed());
+	if(!b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Update(m_GameTimer.GetTimeElapsed());
+	else for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Update(m_GameTimer.GetTimeElapsed());
 }
 
 void CGameFramework::AnimateObjects()
@@ -559,8 +572,8 @@ void CGameFramework::AnimateObjects()
 	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
 	if (m_pInsideScene) m_pInsideScene->AnimateObjects(fTimeElapsed);
 
-	m_pPlayer->Animate(fTimeElapsed);
-	m_pInsidePlayer->Animate(fTimeElapsed);
+	for (int i = 0; i < 1; ++i)m_pPlayer[i]->Animate(fTimeElapsed);
+	for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Animate(fTimeElapsed);
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -629,8 +642,8 @@ void CGameFramework::FrameAdvance()
 #ifdef _WITH_PLAYER_TOP
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
-	if (m_pPlayer && !b_Inside) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
-	if (m_pInsidePlayer && b_Inside) m_pInsidePlayer->Render(m_pd3dCommandList, m_pInsideCamera);
+	if (m_pPlayer && !b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Render(m_pd3dCommandList, m_pCamera);
+	if (m_pInsidePlayer && b_Inside)for (int i = 0; i < 3; ++i) m_pInsidePlayer[i]->Render(m_pd3dCommandList, m_pInsideCamera);
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
@@ -664,8 +677,8 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	size_t nLength = _tcslen(m_pszFrameRate);
 	XMFLOAT3 xmf3Position;
-	if(b_Inside) xmf3Position = m_pInsidePlayer->GetPosition();
-	else xmf3Position = m_pPlayer->GetPosition();
+	if(b_Inside) xmf3Position = m_pInsidePlayer[g_myid]->GetPosition();
+	else xmf3Position = m_pPlayer[g_myid]->GetPosition();
 	_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 }
@@ -813,7 +826,7 @@ void CGameFramework::RecvServer()
 			PLAYER_INFO playerInfo[4];
 			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO[4]));
 			// 클라 플레이어 추가한 후 수정 필요 > PLAYER_INFO[0~2]는 우주선 내부 플레이어 정보, PLAYER_INFO[3]은 우주선 정보
-			m_pPlayer->SetPlayerInfo(playerInfo[3]);
+			m_pPlayer[g_myid]->SetPlayerInfo(playerInfo[3]);
 
 			//m_pPlayer->SetPosition(playerInfo[3].pos);
 			//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
@@ -833,7 +846,7 @@ void CGameFramework::RecvServer()
 			WSABUF wsabuf{ sizeof(subBuf), subBuf };
 			DWORD recvByte{}, recvFlag{};
 			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-			float x = m_pPlayer->GetPosition().z;
+			float x = m_pPlayer[g_myid]->GetPosition().z;
 			ENEMY_INFO enemyInfo;
 			memcpy(&enemyInfo, &subBuf, sizeof(ENEMY_INFO));
 
@@ -867,7 +880,7 @@ void CGameFramework::RecvServer()
 			BULLET_INFO bulletInfo;
 			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_INFO));
 
-			((CAirplanePlayer*)m_pPlayer)->SetBulletFromServer(bulletInfo);
+			((CAirplanePlayer*)m_pPlayer[g_myid])->SetBulletFromServer(bulletInfo);
 			break;
 		}
 		case SC_BULLET_HIT:
