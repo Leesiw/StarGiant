@@ -625,7 +625,7 @@ void CTerrainPlayer::OnPlayerUpdateCallback(float fTimeElapsed)
 	XMFLOAT3 xmf3PlayerVelocity = GetVelocity();
 	xmf3PlayerVelocity.y = 0.0f;
 	SetVelocity(xmf3PlayerVelocity);
-	xmf3PlayerPosition.y = 228.0f;
+	xmf3PlayerPosition.y = 224.0f;
 	SetPosition(xmf3PlayerPosition);
 
 }

@@ -136,6 +136,9 @@ public:
 	ID3D12Resource						*m_pd3dcbLights = NULL;
 	LIGHTS								*m_pcbMappedLights = NULL;
 
+	//이벤트 바운딩 박스 
+	BoundingBox xm_SitAABB[4];
+
 	//임시 내부 바운딩박스 
 	BoundingBox xm_MapAABB;
 	bool b_Inside = false;

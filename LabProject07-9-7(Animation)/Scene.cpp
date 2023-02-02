@@ -266,6 +266,11 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	//임의로 설정하는 바운딩박스 (이후 내부 Height맵을 만들어서 충돌검사로 바꾸고싶음) 
 	b_Inside = true;
 	xm_MapAABB = BoundingBox(XMFLOAT3(m_ppHierarchicalGameObjects[0]->GetPosition().x, m_ppHierarchicalGameObjects[0]->GetPosition().y, m_ppHierarchicalGameObjects[0]->GetPosition().z+90.f), XMFLOAT3(125.f, 100.0f, 110.0f));
+	xm_SitAABB[0] = BoundingBox(XMFLOAT3(417.f,224.f,737.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //LEFT
+	xm_SitAABB[1] = BoundingBox(XMFLOAT3(505.f,224.f,676.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //UP
+	xm_SitAABB[2] = BoundingBox(XMFLOAT3(416.f,224.f,620.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //RIGHT
+	xm_SitAABB[3] = BoundingBox(XMFLOAT3(404.f,224.f,677.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //CENTER
+	
 	for (int i = 0; i < METEOS; ++i) {
 		m_ppMeteorObjects[i] = NULL;
 	}
@@ -725,9 +730,10 @@ void CScene::CheckMEByObjectCollisions()
 		}
 	}*/
 	if (b_Inside) {
+		//내부 벽 검사
 		if (!m_pPlayer->aabb.Intersects(xm_MapAABB))
 		{
-			std::cout << "안쪽" << std::endl;
+			//std::cout << "안쪽" << std::endl;
 			XMFLOAT3 xmf3Sub = Vector3::Subtract(m_pPlayer->GetPosition(),xm_MapAABB.Center);
 			xmf3Sub = Vector3::Normalize(xmf3Sub);
 
@@ -736,6 +742,20 @@ void CScene::CheckMEByObjectCollisions()
 			xmf3Sub = XMFLOAT3(xmf3Sub.x, 0.0f, xmf3Sub.z);
 			m_pPlayer->Move(xmf3Sub, true);
 
+		}
+		//이벤트 검사 
+		for (int i = 0; i < 4; i++) {
+			if (m_pPlayer->aabb.Intersects(xm_SitAABB[i])) 
+			{
+				/*->구간충돌중일때를 기록하고
+					F키가 구간충돌 상태일떄 눌렸을경우에 카메라 변환시키기
+
+					이때, 카메라가 앉을때 돌아가는 방향(4가지)을 인자로 받아다가
+					case문으로 설정해주고싶음.
+					카메라 무빙 이후 씬1의 특정위치로 슉 바뀔예정. 
+					++ 벽충돌을 카메라도 적용하도록 할 것. 바깥으로 뛰쳐나가는 카메라 조종해야함 */
+				std::cout << i << " - 번째 의자 충돌중 " << std::endl;
+			}
 		}
 
 	}

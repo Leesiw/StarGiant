@@ -269,6 +269,7 @@ public:
 
 	CAnimationSets					*m_pAnimationSets = NULL;
 
+
 public:
 	void PrepareSkinning();
 };
