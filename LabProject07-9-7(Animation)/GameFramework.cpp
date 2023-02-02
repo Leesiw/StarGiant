@@ -361,9 +361,12 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				}
 
 				break;
+			case 0x46: //F키 
+				if (b_Inside)m_pInsideScene->CheckSitCollisions();
+				break;
 			case VK_TAB:
 				b_Inside = !b_Inside;
-				std::cout << "전환";
+				std::cout << "씬 전환";
 				break;
 			}
 			break;

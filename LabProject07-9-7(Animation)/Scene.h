@@ -63,6 +63,7 @@ public:
 
 	void CheckObjectByBulletCollisions();
 	void CheckMEByObjectCollisions(); // ���ΰǹ� - �÷��̾� �浹üũ (����) 
+	void CheckSitCollisions(); // ���ΰǹ� - �÷��̾� �浹üũ (����) 
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
     void AnimateObjects(float fTimeElapsed);

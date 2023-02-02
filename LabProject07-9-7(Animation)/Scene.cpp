@@ -272,6 +272,7 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	//���Ƿ� �����ϴ� �ٿ���ڽ� (���� ���� Height���� ���� �浹�˻�� �ٲٰ����) 
 	b_Inside = true;
 	xm_MapAABB = BoundingBox(XMFLOAT3(m_ppHierarchicalGameObjects[0]->GetPosition().x, m_ppHierarchicalGameObjects[0]->GetPosition().y, m_ppHierarchicalGameObjects[0]->GetPosition().z+90.f), XMFLOAT3(125.f, 100.0f, 110.0f));
+	
 	xm_SitAABB[0] = BoundingBox(XMFLOAT3(417.f,224.f,737.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //LEFT
 	xm_SitAABB[1] = BoundingBox(XMFLOAT3(505.f,224.f,676.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //UP
 	xm_SitAABB[2] = BoundingBox(XMFLOAT3(416.f,224.f,620.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //RIGHT
@@ -703,7 +704,7 @@ bool CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 
 void CScene::CheckObjectByBulletCollisions()
 {
-	//�޽� �����ɶ� �ٿ�� �ڽ� ����°ɷ� �����ؾߵȴ�
+	//메쉬 생성시 바운딩 박스 생기도록 해야함 
 	for (int i = 0; i < m_nHierarchicalGameObjects; ++i)
 	{
 		m_ppHierarchicalGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppHierarchicalGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
@@ -736,36 +737,43 @@ void CScene::CheckMEByObjectCollisions()
 		}
 	}*/
 	if (b_Inside) {
-		//���� �� �˻�
 		if (!m_pPlayer[g_myid]->aabb.Intersects(xm_MapAABB))
 		{
-			std::cout << "����" << std::endl;
+			std::cout << "내부" << std::endl;
 			XMFLOAT3 xmf3Sub = Vector3::Subtract(m_pPlayer[g_myid]->GetPosition(),xm_MapAABB.Center);
 			xmf3Sub = Vector3::Normalize(xmf3Sub);
 
-			float fLen = 15.0f; //���� �ӷ¸�ŭ���� �ٲ����... �� 
+			float fLen = 15.0f; //속도로 들어갈 수 있게 바꿔야함 
 			xmf3Sub = Vector3::ScalarProduct(XMFLOAT3(-xmf3Sub.x, -xmf3Sub.y, -xmf3Sub.z), fLen, false);
 			xmf3Sub = XMFLOAT3(xmf3Sub.x, 0.0f, xmf3Sub.z);
 			m_pPlayer[g_myid]->Move(xmf3Sub, true);
 
 		}
-		//�̺�Ʈ �˻� 
-		for (int i = 0; i < 4; i++) {
-			if (m_pPlayer->aabb.Intersects(xm_SitAABB[i])) 
-			{
-				/*->�����浹���϶��� ����ϰ�
-					FŰ�� �����浹 �����ϋ� ��������쿡 ī�޶� ��ȯ��Ű��
-
-					�̶�, ī�޶� ������ ���ư��� ����(4����)�� ���ڷ� �޾ƴٰ�
-					case������ �������ְ����.
-					ī�޶� ���� ���� ��1�� Ư����ġ�� �� �ٲ���. 
-					++ ���浹�� ī�޶� �����ϵ��� �� ��. �ٱ����� ���ĳ����� ī�޶� �����ؾ��� */
-				std::cout << i << " - ��° ���� �浹�� " << std::endl;
-			}
-		}
 
 	}
 
+}
+
+void CScene::CheckSitCollisions()
+{	//의자 충돌검사 
+	if (b_Inside) {
+		for (int i = 0; i < 4; i++) {
+			if (m_pPlayer[g_myid]->aabb.Intersects(xm_SitAABB[i]))
+			{
+				std::cout << i << "bound" << std::endl;
+				//i번째 방향으로 카메라돌리고 앉게하기 
+				if (((CTerrainPlayer*)m_pPlayer[g_myid])->motion != 2) {
+					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = 2;
+					std::cout << "시점전환앉기";
+				}
+				else
+				{
+					std::cout << "서기";
+					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = 0;
+				}
+			}
+		}
+	}
 }
 
 bool CScene::ProcessInput(UCHAR *pKeysBuffer)
