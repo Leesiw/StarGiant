@@ -37,6 +37,7 @@ constexpr char SC_BULLET = 12;
 constexpr char SC_BULLET_HIT = 13;
 constexpr char SC_SPAWN_ENEMY = 14;
 constexpr char SC_ENEMY_DIE = 15;
+constexpr char SC_ANIMATION_CHANGE = 16;
 
 enum class PlayerType : char
 {
@@ -88,6 +89,7 @@ struct PLAYER_INFO {
 
 	XMFLOAT3					pos;
 	float           			m_fYaw;
+	char						animation;
 };
 
 struct SPAWN_ENEMY_INFO {
@@ -112,6 +114,10 @@ struct BULLET_HIT_INFO {
 	int bullet_id;
 };
 
+struct ANIMATION_INFO {
+	short id;
+	char animation;
+};
 //-----------------------------------------------------------------------
 
 struct CS_CHANGE_PACKET {
@@ -225,6 +231,13 @@ struct SC_BULLET_HIT_PACKET {
 	char	type;
 	
 	BULLET_HIT_INFO data;
+};
+
+struct SC_ANIMATION_CHANGE_PACKET {
+	unsigned char size;
+	char	type;
+
+	ANIMATION_INFO data;
 };
 
 #pragma pack (pop)

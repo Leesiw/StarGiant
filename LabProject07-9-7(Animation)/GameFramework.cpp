@@ -581,7 +581,7 @@ void CGameFramework::ProcessInput()
 
 	if (isConnect) {
 		m_pPlayer[0]->UpdateOnServer();
-		for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->UpdateOnServer();
+		for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->UpdateOnServer(i != g_myid);
 	}
 	if(!b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Update(m_GameTimer.GetTimeElapsed());
 	else for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Update(m_GameTimer.GetTimeElapsed());
@@ -888,6 +888,9 @@ void CGameFramework::RecvServer()
 			}
 			else { // 그 외는 내부 플레이어
 				m_pInsidePlayer[playerInfo.id]->SetPlayerInfo(playerInfo);
+				if (m_pInsidePlayer[playerInfo.id]->motion != (int)playerInfo.animation) {
+					((CTerrainPlayer*)m_pInsidePlayer[playerInfo.id])->motion = (int)playerInfo.animation;
+				}
 				//m_pInsidePlayer[playerInfo.id]->SetPosition(playerInfo.pos);
 				//m_pInsidePlayer[playerInfo.id]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[playerInfo.id]->GetYaw(), 0.0f);
 			}
@@ -979,6 +982,22 @@ void CGameFramework::RecvServer()
 			}
 			}
 			// m_ppEnemies[
+			break;
+		}
+		case SC_ANIMATION_CHANGE:
+		{
+			char subBuf[sizeof(ANIMATION_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			ANIMATION_INFO ani_info;
+			memcpy(&ani_info, &subBuf, sizeof(ANIMATION_INFO));
+			if (ani_info.id < 3) {	// 내부 플레이어
+				if (m_pInsidePlayer[ani_info.id]->motion != ani_info.animation) {
+					m_pInsidePlayer[ani_info.id]->motion = ani_info.animation;
+				}
+			}
 			break;
 		}
 		case SC_ENEMY_DIE:

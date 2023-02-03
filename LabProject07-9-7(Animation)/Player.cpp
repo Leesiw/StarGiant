@@ -245,11 +245,13 @@ bool CPlayer::HierarchyIntersects(CSkinnedMesh* pCollisionGameObject, bool isSec
 
 
 
-void CPlayer::UpdateOnServer()
+void CPlayer::UpdateOnServer(bool update_rotate)
 {
 	if (!is_update) {
 		SetPosition(player_info.pos);
-		Rotate(0, player_info.m_fYaw - m_fYaw, 0);
+		if (update_rotate) {
+			Rotate(0, player_info.m_fYaw - m_fYaw, 0);
+		}
 		//m_pCamera->Update(player_info.pos, 0);
 		is_update = true;
 	}
@@ -681,13 +683,19 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 				m_pSkinnedAnimationController->SetTrackEnable(3, true);
 
 			}
-			else {
+			else if(motion == 0) {
 				m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				m_pSkinnedAnimationController->SetTrackEnable(1, false);
 				m_pSkinnedAnimationController->SetTrackEnable(2, false);
 				m_pSkinnedAnimationController->SetTrackEnable(3, false);
 				m_pSkinnedAnimationController->SetTrackPosition(1, 0.0f);
 				m_pSkinnedAnimationController->SetTrackPosition(2, 0.0f);
+			}
+			else {
+				m_pSkinnedAnimationController->SetTrackEnable(0, false);
+				m_pSkinnedAnimationController->SetTrackEnable(1, true);
+				m_pSkinnedAnimationController->SetTrackEnable(2, false);
+				m_pSkinnedAnimationController->SetTrackEnable(3, false);
 			}
 		}
 	}

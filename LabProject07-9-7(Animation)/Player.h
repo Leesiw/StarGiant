@@ -101,7 +101,7 @@ public:
 
 	//¼­¹ö 
 	void SetPlayerInfo(PLAYER_INFO p_info) { player_info = p_info; is_update = false; }
-	void UpdateOnServer();
+	void UpdateOnServer(bool rotate_update = true);
 };
 
 class CAirplanePlayer : public CPlayer

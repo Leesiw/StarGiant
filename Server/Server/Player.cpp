@@ -276,11 +276,11 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 		
 		//OnPrepareRender();
 		//UpdateTransform();
-		Move(input_info.dwDirection, 100.0f * fTimeElapsed, false);
+		Move(input_info.dwDirection, 80.0f * fTimeElapsed, false);
 		input_info.dwDirection = NULL;
-		walk = true;
+		m_cAnimation = 1;
 	}
 	else {
-		walk = false;
+		m_cAnimation = 0;
 	}
 }

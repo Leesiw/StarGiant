@@ -18,6 +18,7 @@ void SESSION::send_move_packet(int c_id, CPlayer* m_pPlayer)	// 플레이어 좌표 각
 	p.data.id = c_id;
 	p.data.pos = m_pPlayer->GetPosition();
 	p.data.m_fYaw = m_pPlayer->GetYaw();
+	p.data.animation = m_pPlayer->GetAnimation();
 
 	//p.data.velocity = m_pPlayer->GetVelocity();
 	//p.data.shift = m_pPlayer->GetShift();
