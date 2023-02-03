@@ -708,12 +708,13 @@ void CScene::CheckObjectByBulletCollisions()
 	for (int i = 0; i < m_nHierarchicalGameObjects; ++i)
 	{
 		m_ppHierarchicalGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppHierarchicalGameObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
-				m_pPlayer[0]->m_pChild->aabb = BoundingBox(m_pPlayer[0]->GetPosition(), XMFLOAT3(5.0f, 5.0f, 5.0f));
+		if(b_Inside)m_pPlayer[g_myid]->m_pChild->aabb = BoundingBox(m_pPlayer[0]->GetPosition(), XMFLOAT3(5.0f, 5.0f, 5.0f));
+		else m_pPlayer[0]->m_pChild->aabb = BoundingBox(m_pPlayer[0]->GetPosition(), XMFLOAT3(5.0f, 5.0f, 5.0f));
 
-				if (m_ppHierarchicalGameObjects[i]->m_pChild->aabb.Intersects(m_pPlayer[0]->m_pChild->aabb)) {
-					cout << i<< " - �浹\n";
-				}
-		
+		if (m_ppHierarchicalGameObjects[i]->m_pChild->aabb.Intersects(m_pPlayer[0]->m_pChild->aabb)) {
+			cout << i << " - �浹\n";
+		}
+
 	}
 
 }
@@ -765,11 +766,13 @@ void CScene::CheckSitCollisions()
 				if (((CTerrainPlayer*)m_pPlayer[g_myid])->motion != 2) {
 					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = 2;
 					std::cout << "시점전환앉기";
+					m_pPlayer[g_myid]->SetSitState(true);
 				}
 				else
 				{
 					std::cout << "서기";
 					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = 0;
+					m_pPlayer[g_myid]->SetSitState(false);
 				}
 			}
 		}
@@ -799,8 +802,14 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	if (m_pLights)
 	{
-		m_pLights[1].m_xmf3Position = m_pPlayer[0]->GetPosition();
-		m_pLights[1].m_xmf3Direction = m_pPlayer[0]->GetLookVector();
+		if (b_Inside) {
+			m_pLights[1].m_xmf3Position = m_pPlayer[g_myid]->GetPosition();
+			m_pLights[1].m_xmf3Direction = m_pPlayer[g_myid]->GetLookVector();
+		}
+		else {
+			m_pLights[1].m_xmf3Position = m_pPlayer[0]->GetPosition();
+			m_pLights[1].m_xmf3Direction = m_pPlayer[0]->GetLookVector();
+		}
 	}
 }
 
