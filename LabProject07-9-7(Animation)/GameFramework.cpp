@@ -362,7 +362,16 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 				break;
 			case 0x46: //F키 
-				if (b_Inside)m_pInsideScene->CheckSitCollisions();
+				if (b_Inside)
+				{
+					m_pInsideScene->CheckSitCollisions();
+					CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState());
+				}
+				else if (m_pInsidePlayer[g_myid]->GetSitState())
+				{
+					m_pInsideScene->CheckSitCollisions();
+					CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState());
+				}
 				break;
 			case VK_TAB:
 				if (!isConnect) {
@@ -416,6 +425,19 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 			break;
 	}
 	return(0);
+}
+
+void CGameFramework::CheckSceneChange(bool State)
+{
+	if (State) 
+	{
+		b_Inside = false;
+	}
+	else
+	{
+		b_Inside = true;
+	}
+//추가할 사항 없으면 F에 몰아넣기로 수정
 }
 
 void CGameFramework::OnDestroy()
@@ -577,6 +599,7 @@ void CGameFramework::ProcessInput()
 				if (dwDirection&& b_Inside) m_pInsidePlayer[g_myid]->Move(dwDirection, 10.25f, true);
 			}
 		}
+
 	}
 
 	if (isConnect) {

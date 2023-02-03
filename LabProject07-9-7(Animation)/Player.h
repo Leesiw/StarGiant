@@ -45,6 +45,7 @@ protected:
 	PLAYER_INFO					player_info;
 	bool						is_update = false;
 
+	bool						b_Issit = false;
 public:
 	int motion;
 public:
@@ -64,6 +65,8 @@ public:
 	void SetPosition(const XMFLOAT3& xmf3Position) { Move(XMFLOAT3(xmf3Position.x - m_xmf3Position.x, xmf3Position.y - m_xmf3Position.y, xmf3Position.z - m_xmf3Position.z), false); }
 
 	void SetScale(XMFLOAT3& xmf3Scale) { m_xmf3Scale = xmf3Scale; }
+	void SetSitState(bool state) { b_Issit = state; }
+	bool GetSitState() { return b_Issit; }
 
 	const XMFLOAT3& GetVelocity() const { return(m_xmf3Velocity); }
 	float GetYaw() const { return(m_fYaw); }
