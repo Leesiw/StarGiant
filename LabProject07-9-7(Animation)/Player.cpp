@@ -115,6 +115,50 @@ void CPlayer::Rotate(float x, float y, float z, int mode)
 				m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
 			}
 		}
+
+		else if (nCurrentCameraMode == DRIVE_CAMERA || nCurrentCameraMode == ATTACT_CAMERA_C || nCurrentCameraMode == ATTACT_CAMERA_L || nCurrentCameraMode == ATTACT_CAMERA_R)
+		{
+			if (x != 0.0f)
+			{
+				m_fPitch += x;
+				//if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
+				//if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
+			}
+			if (y != 0.0f)
+			{
+				m_fYaw += y;
+				//if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
+				//if (m_fYaw < 0.0f) m_fYaw += 360.0f;
+			}
+			if (z != 0.0f)
+			{
+				m_fRoll += z;
+				//if (m_fRoll > +20.0f) { z -= (m_fRoll - 20.0f); m_fRoll = +20.0f; }
+				//if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
+			}
+
+			m_pCamera->Rotate(x, y, z);
+			if (x != 0.0f)
+			{
+				XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(x));
+				m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+				m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
+			}
+			if (y != 0.0f)
+			{
+				XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
+				m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+				m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+			}
+			if (z != 0.0f)
+			{
+				XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Look), XMConvertToRadians(z));
+				m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
+				m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+			}
+
+		}
+
 		else if (nCurrentCameraMode == SPACESHIP_CAMERA)
 		{
 			m_pCamera->Rotate(x, y, z);
@@ -165,8 +209,16 @@ void CPlayer::Update(float fTimeElapsed)
 
 	DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	if (nCurrentCameraMode == DRIVE_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	//if (nCurrentCameraMode == ATTACT_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+
+
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
+	if (nCurrentCameraMode == DRIVE_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
+	//if (nCurrentCameraMode == ATTACT_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
+
+
 	m_pCamera->RegenerateViewMatrix();
 
 	fLength = Vector3::Length(m_xmf3Velocity);
@@ -188,6 +240,18 @@ CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
 			break;
 		case SPACESHIP_CAMERA:
 			pNewCamera = new CSpaceShipCamera(m_pCamera);
+			break;
+		case DRIVE_CAMERA:
+			pNewCamera = new CDriveCamera(m_pCamera);
+			break;
+		case ATTACT_CAMERA_C:
+			pNewCamera = new CAttactCamera(m_pCamera);
+			break;
+		case ATTACT_CAMERA_L:
+			pNewCamera = new CAttactCamera(m_pCamera);
+			break;
+		case ATTACT_CAMERA_R:
+			pNewCamera = new CAttactCamera(m_pCamera);
 			break;
 	}
 	if (nCurrentCameraMode == SPACESHIP_CAMERA)
@@ -233,6 +297,9 @@ void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamer
 {
 	DWORD nCameraMode = (pCamera) ? pCamera->GetMode() : 0x00;
 	if (nCameraMode == THIRD_PERSON_CAMERA) CGameObject::Render(pd3dCommandList, pCamera);
+	if (nCameraMode == DRIVE_CAMERA) CGameObject::Render(pd3dCommandList, pCamera);
+	//if (nCameraMode == ATTACT_CAMERA) CGameObject::Render(pd3dCommandList, pCamera);
+
 }
 
 bool CPlayer::HierarchyIntersects(CSkinnedMesh* pCollisionGameObject, bool isSecond) 
@@ -476,6 +543,59 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.25f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, -50.0f));
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			break;
+
+		case DRIVE_CAMERA:
+			SetFriction(250.0f);
+			SetGravity(XMFLOAT3(0.0f, -0.0f, 0.0f));
+			SetMaxVelocityXZ(300.0f);
+			SetMaxVelocityY(400.0f);
+			m_pCamera = OnChangeCamera(DRIVE_CAMERA, nCurrentCameraMode);
+			m_pCamera->SetTimeLag(0.25f);
+			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, -50.0f));
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			break;
+
+		case ATTACT_CAMERA_C:
+			SetFriction(2.0f);
+			SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
+			SetMaxVelocityXZ(0.0f);
+			SetMaxVelocityY(0.0f);
+			m_pCamera = OnChangeCamera(ATTACT_CAMERA_C, nCurrentCameraMode);
+			m_pCamera->SetTimeLag(0.0f);
+			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			break;
+		case ATTACT_CAMERA_L:
+			SetFriction(2.0f);
+			SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
+			SetMaxVelocityXZ(0.0f);
+			SetMaxVelocityY(0.0f);
+			Rotate(0.0f, -90.0f, 0.0f);
+			m_pCamera = OnChangeCamera(ATTACT_CAMERA_L, nCurrentCameraMode);
+			m_pCamera->SetTimeLag(0.0f);
+			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			break;
+		case ATTACT_CAMERA_R:
+			SetFriction(2.0f);
+			SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
+			SetMaxVelocityXZ(0.0f);
+			SetMaxVelocityY(0.0f);
+			Rotate(0.0f, 90.0f, 0.0f);
+			m_pCamera = OnChangeCamera(ATTACT_CAMERA_R, nCurrentCameraMode);
+			m_pCamera->SetTimeLag(0.0f);
+
+			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);

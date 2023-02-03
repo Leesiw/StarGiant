@@ -5,7 +5,13 @@
 #define FIRST_PERSON_CAMERA			0x01
 #define SPACESHIP_CAMERA			0x02
 #define THIRD_PERSON_CAMERA			0x03
-#define SIT_EVENT_CAMERA			0x04
+#define SIT_EVENT_CAMERA			0x08
+#define DRIVE_CAMERA				0x04
+#define ATTACT_CAMERA_C				0x05
+#define ATTACT_CAMERA_L				0x06
+#define ATTACT_CAMERA_R				0x07
+
+
 
 struct VS_CB_CAMERA_INFO
 {
@@ -129,6 +135,27 @@ public:
 
 	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed);
 	virtual void SetLookAt(XMFLOAT3& vLookAt);
+};
+
+class CAttactCamera : public CCamera
+{
+public:
+	CAttactCamera(CCamera* pCamera);
+	virtual ~CAttactCamera() { }
+
+	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
+
+};
+
+class CDriveCamera : public CCamera
+{
+public:
+	CDriveCamera(CCamera* pCamera);
+	virtual ~CDriveCamera() { }
+
+	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed);
+	virtual void SetLookAt(XMFLOAT3& vLookAt);
+
 };
 
 class CSitEventCamera : public CCamera
