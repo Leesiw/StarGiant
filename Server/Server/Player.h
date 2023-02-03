@@ -112,6 +112,8 @@ public:
 
 	bool walk;	//애니메이션
 public:
+	bool CheckCollision();
+
 	virtual void Move(ULONG nDirection, float fDistance, bool bVelocity = false);
 
 	virtual void Update(float fTimeElapsed);

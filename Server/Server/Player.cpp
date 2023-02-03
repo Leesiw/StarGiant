@@ -250,6 +250,66 @@ CTerrainPlayer::~CTerrainPlayer()
 {
 }
 
+bool CTerrainPlayer::CheckCollision()
+{
+	// 외부
+	if (m_xmf3Position.x < 295.4f || m_xmf3Position.x > 554.8f || m_xmf3Position.z < 565.1f || m_xmf3Position.z > 792.5f) {
+		return true;
+	}
+
+	//모니터1
+	if (389.75f < m_xmf3Position.x && m_xmf3Position.x < 446.53f &&  760.f < m_xmf3Position.z &&  m_xmf3Position.z < 767.f) {
+		return true;
+	}
+
+	//모니터2
+	if (524.7f < m_xmf3Position.x && m_xmf3Position.x < 531.1f && 646.4f < m_xmf3Position.z && m_xmf3Position.z < 704.34f) {
+		return true;
+	}
+
+	//모니터3
+	if (389.f < m_xmf3Position.x && m_xmf3Position.x < 447.7f && 591.02f < m_xmf3Position.z && m_xmf3Position.z < 597.53f) {
+		return true;
+	}
+
+	//의자1
+	if (410.03f < m_xmf3Position.x && m_xmf3Position.x < 425.65f && 610.7f < m_xmf3Position.z && m_xmf3Position.z < 626.77f) {
+		return true;
+	}
+
+	//의자2
+	if (497.44f < m_xmf3Position.x && m_xmf3Position.x < 513.16f && 668.66f < m_xmf3Position.z && m_xmf3Position.z < 685.f) {
+		return true;
+	}
+
+	//의자3
+	if (409.93f < m_xmf3Position.x && m_xmf3Position.x < 425.15f && 729.2f < m_xmf3Position.z && m_xmf3Position.z < 745.23f) {
+		return true;
+	}
+
+	//기둥1
+	if (425.5f < m_xmf3Position.x && m_xmf3Position.x < 445.9f && 648.22f < m_xmf3Position.z && m_xmf3Position.z < 669.4f) {
+		return true;
+	}
+
+	//기둥2
+	if (425.5f < m_xmf3Position.x && m_xmf3Position.x < 445.9f && 683.7f < m_xmf3Position.z && m_xmf3Position.z < 705.f) {
+		return true;
+	}
+
+	//책상
+	if (415.0f < m_xmf3Position.x && m_xmf3Position.x < 429.5f && 655.28f < m_xmf3Position.z && m_xmf3Position.z < 697.93f) {
+		return true;
+	}
+
+	//중앙 의자
+	if (396.46f < m_xmf3Position.x && m_xmf3Position.x < 411.03f && 668.5f < m_xmf3Position.z && m_xmf3Position.z < 684.32f) {
+		return true;
+	}
+
+	return false;
+}
+
 void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 {
 	if (dwDirection)
@@ -262,6 +322,13 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 		if (dwDirection & DIR_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
 
 		CPlayer::Move(xmf3Shift, bUpdateVelocity);
+
+		if (CheckCollision()) { 
+			xmf3Shift.x = -xmf3Shift.x; 
+			xmf3Shift.z = -xmf3Shift.z;
+			CPlayer::Move(xmf3Shift, bUpdateVelocity);
+		}
+
 	}
 
 	//CPlayer::Move(dwDirection, fDistance, bUpdateVelocity);
