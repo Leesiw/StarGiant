@@ -82,6 +82,7 @@ struct LOGIN_INFO {
 struct INPUT_INFO {
 	DWORD dwDirection;
 	float yaw;
+	float pitch;
 };
 
 struct PLAYER_INFO {
@@ -89,6 +90,7 @@ struct PLAYER_INFO {
 
 	XMFLOAT3					pos;
 	float           			m_fYaw;
+	float						m_fPitch;
 	char						animation;
 };
 

@@ -602,6 +602,7 @@ void CGameFramework::ProcessInput()
 				}
 				else {
 					my_packet.data.yaw = m_pPlayer[0]->GetYaw();
+					my_packet.data.pitch = m_pPlayer[0]->GetPitch();
 				}
 				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 			}
@@ -615,7 +616,7 @@ void CGameFramework::ProcessInput()
 	}
 
 	if (isConnect) {
-		m_pPlayer[0]->UpdateOnServer();
+		m_pPlayer[0]->UpdateOnServer(player_type != PlayerType::MOVE);
 		for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->UpdateOnServer(i != g_myid);
 	}
 	if(!b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Update(m_GameTimer.GetTimeElapsed());

@@ -62,7 +62,6 @@ void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 			//m_xmf3Destination.y += player_pos.y;
 			//m_xmf3Destination.z += player_pos.z;
 			state = EnemyState::MOVE;
-			m_fMoveTimeRemaining = m_fMoveTime;
 		}
 		else
 		{
@@ -101,20 +100,16 @@ void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 
 void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
 {
-
-	XMFLOAT3 xmf3MovingDirection = GetLook();
-
-	//m_fMoveTimeRemaining -= fTimeElapsed;
-
 	XMFLOAT3 xmf3Position = GetPosition();
 
 	m_xmf3Destination.x += player_pos.x;
 	m_xmf3Destination.y += player_pos.y;
 	m_xmf3Destination.z += player_pos.z;
 
+	XMFLOAT3 vec = Vector3::Subtract(xmf3Position, m_xmf3Destination);
 	float dist = Vector3::Length(Vector3::Subtract(xmf3Position, m_xmf3Destination));
-	if (dist > 100.0f) {
-		if (m_fSpeed < 500.f) {
+	if (dist > 200.0f) {	// 속도 조절
+		if (m_fSpeed < 800.f) {
 			m_fSpeed += 100.f * fTimeElapsed;
 		}
 	}
@@ -127,42 +122,32 @@ void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
 	if (dist > 50.f)
 	{
 		XMFLOAT3 xmf3Look = GetLook();
-		XMFLOAT3 ToDestination = Vector3::Subtract(xmf3Position, m_xmf3Destination);
-		
+		XMFLOAT3 ToDestination = Vector3::Subtract( m_xmf3Destination, xmf3Position);
+
 		xmf3Look = Vector3::Normalize(xmf3Look);
 		ToDestination = Vector3::Normalize(ToDestination);
 		double a = xmf3Look.x * ToDestination.z - xmf3Look.z * ToDestination.x;
-		double angle = asin(a);
+		double angle = asin(a);	//목표 지점을 보기 위해 돌려야 하는 각도
 
 		angle = XMConvertToDegrees(angle);
-		double rotate_angle = fTimeElapsed * 180.0f;
+		double rotate_angle = fTimeElapsed * 180.0f;	// 초당 180도 돌아감
 
-		if (fabs(angle) > rotate_angle) {
-			if (angle < 0) { Rotate(0, -rotate_angle, 0); }
-			else{ Rotate(0, rotate_angle, 0); }
+		if (fabs(angle) > rotate_angle) {	// 목표지점을 보도록 rotate
+			if (angle > 0) { Rotate(0, -rotate_angle, 0); }
+			else { Rotate(0, rotate_angle, 0); }
 		}
-		else {
-			Rotate(0, angle, 0);
-			MoveForward(fTimeElapsed * m_fSpeed);
-		}
-		//Rotate(0, angle / 50.0f, 0);
 
-		
+		ToDestination = Vector3::ScalarProduct(ToDestination, fTimeElapsed * m_fSpeed, false);
+		ToDestination = Vector3::Add(xmf3Position, ToDestination);
 
-		float y_dist = -m_xmf3Destination.y + xmf3Position.y;
-
-		if (fabs(y_dist) > fTimeElapsed * m_fSpeed) {
-			if (y_dist < 0) { MoveUp(fTimeElapsed * m_fSpeed); }
-			else { MoveUp(-fTimeElapsed * m_fSpeed); }
-		}
-		m_xmf3Destination.x -= player_pos.x;
-		m_xmf3Destination.y -= player_pos.y;
-		m_xmf3Destination.z -= player_pos.z;
+		SetPosition(ToDestination);	// 보고 있는 방향과 상관없이 목표지점으로 속도만큼 이동
 	}
-	else
-	{
+	else {
 		state = EnemyState::AIMING;
 	}
+	m_xmf3Destination.x -= player_pos.x;
+	m_xmf3Destination.y -= player_pos.y;
+	m_xmf3Destination.z -= player_pos.z;
 
 	SendPos();
 	
@@ -320,7 +305,6 @@ CMissileEnemy::CMissileEnemy()
 {
 	hp = 10;			
 	m_fCoolTime = 2.0f;		// 공격 간격
-	m_fMoveTime = 1.0f;		// 사거리 안으로 들어가려 움직이는 시간
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 3;
 
@@ -351,7 +335,6 @@ CLaserEnemy::CLaserEnemy()
 {
 	hp = 10;
 	m_fCoolTime = 2.0f;		// 공격 간격
-	m_fMoveTime = 1.0f;		// 사거리 안으로 들어가려 움직이는 시간
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 3;
 
@@ -377,7 +360,6 @@ CPlasmaCannonEnemy::CPlasmaCannonEnemy()
 {
 	hp = 10;
 	m_fCoolTime = 2.0f;		// 공격 간격
-	m_fMoveTime = 1.0f;		// 사거리 안으로 들어가려 움직이는 시간
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 3;
 

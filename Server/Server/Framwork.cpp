@@ -146,7 +146,7 @@ void CGameFramework::BuildObjects()
 	//m_pCamera = m_pPlayer->GetCamera();
 	for (int i = 0; i < MAX_USER; ++i) {
 		CTerrainPlayer* pPlayer = new CTerrainPlayer();
-		pPlayer->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 250.0f, 640.0f));
+		pPlayer->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 250.0f, 740.0f));
 		m_ppPlayers[i] = pPlayer;
 	}
 

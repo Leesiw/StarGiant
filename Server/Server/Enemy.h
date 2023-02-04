@@ -22,9 +22,6 @@ protected:
 	float						m_fCoolTime = 2.0f;
 	float						m_fCoolTimeRemaining = 0.0f;
 
-	float						m_fMoveTime = 3.0f;
-	float						m_fMoveTimeRemaining = 0.0f;
-
 	float						m_fAttackRange = 300.0f;
 
 	float						m_fAvoidTime = 0.0f;

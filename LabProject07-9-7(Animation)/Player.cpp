@@ -88,25 +88,26 @@ void CPlayer::Rotate(float x, float y, float z, int mode)
 		DWORD nCurrentCameraMode = m_pCamera->GetMode();
 		if ((nCurrentCameraMode == FIRST_PERSON_CAMERA) || (nCurrentCameraMode == THIRD_PERSON_CAMERA))
 		{
+			/*
 			if (x != 0.0f)
 			{
 				m_fPitch += x;
 				if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
 				if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
-			}
+			}*/
 			if (y != 0.0f) // && mode == 0) > 서버 클라 연동 시 회전 정보 필요
 			{
 				m_fYaw += y;
 				if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
 				if (m_fYaw < 0.0f) m_fYaw += 360.0f;
 			}
-
+			/*
 			if (z != 0.0f)
 			{
 				m_fRoll += z;
 				if (m_fRoll > +20.0f) { z -= (m_fRoll - 20.0f); m_fRoll = +20.0f; }
 				if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
-			}
+			}*/
 			m_pCamera->Rotate(x, y, z);
 			if (y != 0.0f)
 			{
@@ -319,7 +320,7 @@ void CPlayer::UpdateOnServer(bool update_rotate)
 	if (!is_update) {
 		SetPosition(player_info.pos);
 		if (update_rotate) {
-			Rotate(0, player_info.m_fYaw - m_fYaw, 0);
+			Rotate(player_info.m_fPitch - m_fPitch, player_info.m_fYaw - m_fYaw, 0.0f);
 		}
 		//m_pCamera->Update(player_info.pos, 0);
 		is_update = true;

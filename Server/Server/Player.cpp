@@ -63,8 +63,8 @@ void CPlayer::Rotate(float x, float y, float z)
 	if (x != 0.0f)
 	{
 		m_fPitch += x;
-		if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
-		if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
+		//if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
+		//if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
 	}
 	if (y != 0.0f)
 	{
@@ -84,6 +84,12 @@ void CPlayer::Rotate(float x, float y, float z)
 		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
 		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
 		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+	}
+	if (x != 0.0f)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(x));
+		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+		m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
 	}
 
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
@@ -212,7 +218,7 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 			m_fFireWaitingTime[i] -= fTimeElapsed;
 	}
 
-	Rotate(0, input_info.yaw - m_fYaw, 0);
+	Rotate(input_info.pitch - m_fPitch, input_info.yaw - m_fYaw, 0.0f);
 
 	if (input_info.dwDirection) {
 		Move(input_info.dwDirection, 800.0f * fTimeElapsed, true);
