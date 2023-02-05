@@ -49,7 +49,7 @@ public:
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 
 	//
-	void CheckSceneChange(bool State);
+	void CheckSceneChange(bool State, int num);
 
 private:
 	HINSTANCE					m_hInstance;

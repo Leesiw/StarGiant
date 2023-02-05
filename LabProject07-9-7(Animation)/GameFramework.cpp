@@ -373,22 +373,18 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				}
 
 				break;
-			case 0x46: //F키 
-				if (b_Inside)
-				{
-					m_pInsideScene->CheckSitCollisions();
-					CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState());
-				}
-				else if (m_pInsidePlayer[g_myid]->GetSitState())
-				{
-					m_pInsideScene->CheckSitCollisions();
-					CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState());
-				}
-				break;
 			case VK_TAB:
 				if (!isConnect) {
 					b_Inside = !b_Inside;
 					std::cout << "씬 전환";
+				}
+				break;
+
+			case 0x46: //F키 상호작용 앉기
+				if (b_Inside || m_pInsidePlayer[g_myid]->GetSitState())
+				{
+					int State = m_pInsideScene->CheckSitCollisions();
+					CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState(),State);
 				}
 				break;
 			case 'X':
@@ -439,7 +435,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 	return(0);
 }
 
-void CGameFramework::CheckSceneChange(bool State)
+void CGameFramework::CheckSceneChange(bool State, int num)
 {
 	if (State) 
 	{
@@ -449,6 +445,7 @@ void CGameFramework::CheckSceneChange(bool State)
 	{
 		b_Inside = true;
 	}
+	if(State !=3)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
 //추가할 사항 없으면 F에 몰아넣기로 수정
 }
 
@@ -735,7 +732,7 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	size_t nLength = _tcslen(m_pszFrameRate);
 	XMFLOAT3 xmf3Position;
-	if(b_Inside) xmf3Position = m_pInsidePlayer[g_myid]->GetPosition();
+	if(b_Inside) xmf3Position = m_pInsidePlayer[g_myid]->GetLookVector();
 	else xmf3Position = m_pPlayer[0]->GetPosition();
 	_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);
 	::SetWindowText(m_hWnd, m_pszFrameRate);

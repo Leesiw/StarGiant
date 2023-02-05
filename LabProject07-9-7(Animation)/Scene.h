@@ -63,7 +63,7 @@ public:
 
 	void CheckObjectByBulletCollisions();
 	void CheckMEByObjectCollisions(); // ���ΰǹ� - �÷��̾� �浹üũ (����) 
-	void CheckSitCollisions(); // ���ΰǹ� - �÷��̾� �浹üũ (����) 
+	int CheckSitCollisions(); // ���ΰǹ� - �÷��̾� �浹üũ (����) 
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
     void AnimateObjects(float fTimeElapsed);
@@ -140,10 +140,20 @@ public:
 
 	//�̺�Ʈ �ٿ�� �ڽ� 
 	BoundingBox xm_SitAABB[4];
+	BoundingBox xm_MapAABB;
+	XMFLOAT3 m_LookCamera[4];
 
 	int m_nScenePlayer = 1;
-
-	//�ӽ� ���� �ٿ���ڽ� 
-	BoundingBox xm_MapAABB;
 	bool b_Inside = false;
+};
+
+class CInsideScene : public CScene
+{
+public:
+	CInsideScene() {};
+	~CInsideScene() {};
+
+	//이렇게 옳겨놓고싶음.
+	//BoundingBox xm_SitAABB[4];
+	//BoundingBox xm_MapAABB;
 };

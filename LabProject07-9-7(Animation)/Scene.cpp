@@ -278,6 +278,11 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	xm_SitAABB[2] = BoundingBox(XMFLOAT3(416.f,224.f,620.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //RIGHT
 	xm_SitAABB[3] = BoundingBox(XMFLOAT3(404.f,224.f,677.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //CENTER
 	
+	m_LookCamera[0] = XMFLOAT3(0.0f,-0.0f,1.0f); //LEFT
+	m_LookCamera[1]= XMFLOAT3(1.0f,-0.0f,0.0f);//UP
+	m_LookCamera[2]= XMFLOAT3(0.0f,0.0f,-1.0f);//RIGHT
+	m_LookCamera[3] = XMFLOAT3(1.0f, -0.0f, 0.0f);//CENTER
+
 	for (int i = 0; i < METEOS; ++i) {
 		m_ppMeteorObjects[i] = NULL;
 	}
@@ -755,7 +760,7 @@ void CScene::CheckMEByObjectCollisions()
 
 }
 
-void CScene::CheckSitCollisions()
+int CScene::CheckSitCollisions()
 {	//의자 충돌검사 
 	if (b_Inside) {
 		for (int i = 0; i < 4; i++) {
@@ -766,13 +771,19 @@ void CScene::CheckSitCollisions()
 				if (((CTerrainPlayer*)m_pPlayer[g_myid])->motion != 2) {
 					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = 2;
 					std::cout << "시점전환앉기";
+
+					m_pPlayer[g_myid]->SetLook(m_LookCamera[i]);
 					m_pPlayer[g_myid]->SetSitState(true);
+					return i;
 				}
 				else
 				{
 					std::cout << "서기";
 					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = 0;
+					
+					m_pPlayer[g_myid]->SetLook(m_LookCamera[i]);
 					m_pPlayer[g_myid]->SetSitState(false);
+					return i;
 				}
 			}
 		}

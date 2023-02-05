@@ -65,6 +65,7 @@ public:
 	void SetPosition(const XMFLOAT3& xmf3Position) { Move(XMFLOAT3(xmf3Position.x - m_xmf3Position.x, xmf3Position.y - m_xmf3Position.y, xmf3Position.z - m_xmf3Position.z), false); }
 
 	void SetScale(XMFLOAT3& xmf3Scale) { m_xmf3Scale = xmf3Scale; }
+	void SetLook(XMFLOAT3 LookAt) { m_xmf3Look = LookAt; }
 	void SetSitState(bool state) { b_Issit = state; }
 	bool GetSitState() { return b_Issit; }
 
