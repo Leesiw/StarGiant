@@ -79,18 +79,19 @@ void CPlayer::Rotate(float x, float y, float z)
 		if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
 	}
 
-	if (y != 0.0f)
-	{
-		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
-		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
-		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
-	}
 	if (x != 0.0f)
 	{
 		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(x));
 		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
 		m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
 	}
+	if (y != 0.0f)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
+		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+	}
+
 
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 	m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
@@ -211,6 +212,7 @@ void CAirplanePlayer::Animate(float fTimeElapsed)
 
 void CAirplanePlayer::Update(float fTimeElapsed)
 {
+	if (is_update) { return; }
 	CPlayer::Update(fTimeElapsed);
 
 	for (int i = 0; i < MAX_USER; ++i) {
@@ -224,7 +226,7 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 		Move(input_info.dwDirection, 800.0f * fTimeElapsed, true);
 		input_info.dwDirection = NULL;
 	}
-
+	is_update = true;
 }
 
 void CAirplanePlayer::OnPrepareRender()
@@ -342,9 +344,10 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 
 void CTerrainPlayer::Update(float fTimeElapsed)
 {
-	//if (input_info.yaw != 0) {
+	if (is_update) { m_cAnimation = 0; return; }
+	if (input_info.yaw != m_fYaw) {
 		Rotate(0, input_info.yaw - m_fYaw, 0);
-	//}
+	}
 	if (input_info.dwDirection) {
 		
 		//OnPrepareRender();
@@ -356,4 +359,5 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 	else {
 		m_cAnimation = 0;
 	}
+	is_update = true;
 }

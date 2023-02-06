@@ -40,6 +40,7 @@ protected:
 
 	//¼­¹ö
 	INPUT_INFO					input_info;
+	bool is_update = true;
 
 public:
 	CPlayer();
@@ -75,7 +76,7 @@ public:
 
 	virtual void OnPrepareRender();
 
-	void SetInputInfo(INPUT_INFO i_info) { input_info = i_info; }
+	void SetInputInfo(INPUT_INFO i_info) { input_info = i_info; is_update = false; }
 
 
 };
