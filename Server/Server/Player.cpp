@@ -258,7 +258,7 @@ CTerrainPlayer::~CTerrainPlayer()
 {
 }
 
-bool CTerrainPlayer::CheckCollision()
+bool CTerrainPlayer::CheckCollision(const XMFLOAT3 pos[])
 {
 	// ¿ÜºÎ
 	if (m_xmf3Position.x < 295.4f || m_xmf3Position.x > 554.8f || m_xmf3Position.z < 565.1f || m_xmf3Position.z > 792.5f) {
@@ -314,11 +314,18 @@ bool CTerrainPlayer::CheckCollision()
 	if (396.46f < m_xmf3Position.x && m_xmf3Position.x < 411.03f && 668.5f < m_xmf3Position.z && m_xmf3Position.z < 684.32f) {
 		return true;
 	}
+	float x, z;
+
+	for (int i = 0; i < MAX_USER; ++i) {
+		x = pos[i].x - m_xmf3Position.x;
+		z = pos[i].z - m_xmf3Position.z;
+		if (fabs(x) < 5.f && fabs(z) < 5.f) { return true; }
+	}
 
 	return false;
 }
 
-void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
+void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, const XMFLOAT3 pos[], bool bUpdateVelocity)
 {
 	if (dwDirection)
 	{
@@ -331,7 +338,7 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 
 		CPlayer::Move(xmf3Shift, bUpdateVelocity);
 
-		if (CheckCollision()) { 
+		if (CheckCollision(pos)) { 
 			xmf3Shift.x = -xmf3Shift.x; 
 			xmf3Shift.z = -xmf3Shift.z;
 			CPlayer::Move(xmf3Shift, bUpdateVelocity);
@@ -342,7 +349,7 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 	//CPlayer::Move(dwDirection, fDistance, bUpdateVelocity);
 }
 
-void CTerrainPlayer::Update(float fTimeElapsed)
+void CTerrainPlayer::Update(float fTimeElapsed, const XMFLOAT3 pos[])
 {
 	if (is_update) { m_cAnimation = 0; return; }
 	if (input_info.yaw != m_fYaw) {
@@ -352,7 +359,7 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 		
 		//OnPrepareRender();
 		//UpdateTransform();
-		Move(input_info.dwDirection, 80.0f * fTimeElapsed, false);
+		Move(input_info.dwDirection, 80.0f * fTimeElapsed, pos, false);
 		input_info.dwDirection = NULL;
 		m_cAnimation = 1;
 	}

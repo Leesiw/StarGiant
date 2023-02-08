@@ -182,7 +182,17 @@ void CGameFramework::AnimateObjects(float fTimeElapsed)
 
 	for (int i = 0; i < MAX_USER; ++i)
 	{
-		m_ppPlayers[i]->Update(fTimeElapsed);
+		XMFLOAT3 pos[MAX_USER - 1]{};
+		int num = 0;
+		for (int j = 0; j < MAX_USER; ++j) {
+			if (j == i) { continue; }
+			if (clients[j].in_use) {
+				pos[num] = m_ppPlayers[j]->GetPosition();
+			}
+			else { pos[num] = { 0.f, 0.f, 0.f }; }
+			++num;
+		}
+		m_ppPlayers[i]->Update(fTimeElapsed, pos);
 		if (clients[i].in_use  && clients[i].type == PlayerType::INSIDE) {
 			for (auto& pl : clients) {
 				if (!pl.in_use) continue;

@@ -111,11 +111,13 @@ public:
 	CTerrainPlayer();
 	virtual ~CTerrainPlayer();
 
+
+
 	bool walk;	//애니메이션
 public:
-	bool CheckCollision();
+	bool CheckCollision(const XMFLOAT3 pos[]);
 
-	virtual void Move(ULONG nDirection, float fDistance, bool bVelocity = false);
+	void Move(DWORD dwDirection, float fDistance, const XMFLOAT3 pos[], bool bUpdateVelocity = false);
 
-	virtual void Update(float fTimeElapsed);
+	void Update(float fTimeElapsed, const XMFLOAT3 pos[]);
 };
