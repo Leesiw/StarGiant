@@ -89,7 +89,7 @@ private:
 	CGameTimer					m_GameTimer;
 
 	CScene						*m_pScene = NULL;
-	CPlayer						*m_pPlayer[3] = {};
+	CAirplanePlayer						*m_pPlayer[3] = {};
 	CCamera						*m_pCamera = NULL;
 
 	POINT						m_ptOldCursorPos;
@@ -98,7 +98,7 @@ private:
 
 	// ³»ºÎ 
 	CScene* m_pInsideScene = NULL;
-	CPlayer* m_pInsidePlayer[3] = {};
+	CTerrainPlayer* m_pInsidePlayer[3] = {};
 	CCamera* m_pInsideCamera = NULL;
 
 	bool b_Inside;

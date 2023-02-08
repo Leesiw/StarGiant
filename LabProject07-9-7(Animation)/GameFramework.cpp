@@ -590,18 +590,23 @@ void CGameFramework::ProcessInput()
 			}
 
 			if (isConnect) {
-				CS_MOVE_PACKET my_packet;
-				my_packet.size = sizeof(CS_MOVE_PACKET);
-				my_packet.type = CS_MOVE;
-				my_packet.data.dwDirection = dwDirection;
 				if(player_type == PlayerType::INSIDE){
+					CS_INSIDE_PACKET my_packet;
+					my_packet.size = sizeof(CS_INSIDE_PACKET);
+					my_packet.type = CS_INSIDE_MOVE;
+					my_packet.data.dwDirection = dwDirection;
 					my_packet.data.yaw = m_pInsidePlayer[g_myid]->GetYaw();
+					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 				}
-				else {
-					my_packet.data.yaw = m_pPlayer[0]->GetYaw();
+				else if(player_type == PlayerType::MOVE) {
+					CS_SPACESHIP_PACKET my_packet;
+					my_packet.size = sizeof(CS_SPACESHIP_PACKET);
+					my_packet.type = CS_SPACESHIP_MOVE;
+					my_packet.data.dwDirection = dwDirection;
 					my_packet.data.pitch = m_pPlayer[0]->GetPitch();
+					my_packet.data.yaw = m_pPlayer[0]->GetYaw();
+					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 				}
-				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 			}
 			else {
 				//이동 부분 분할할지 모르겠어서 우선 여따 같이넣어둠 
@@ -899,37 +904,40 @@ void CGameFramework::RecvServer()
 			m_pScene->m_ppMeteorObjects[meteoInfo.id]->m_xmf3MovingDirection = meteoInfo.dir;
 			break;
 		}
-		case SC_MOVE_PLAYER:
+		case SC_MOVE_SPACESHIP:
 		{
-			char subBuf[sizeof(PLAYER_INFO)]{};
+			char subBuf[sizeof(SPACESHIP_INFO)]{};
 			WSABUF wsabuf{ sizeof(subBuf), subBuf };
 			DWORD recvByte{}, recvFlag{};
 			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-			PLAYER_INFO playerInfo;
-			memcpy(&playerInfo, &subBuf, sizeof(PLAYER_INFO));
-			// 클라 플레이어 추가한 후 수정 필요 > PLAYER_INFO[0~2]는 우주선 내부 플레이어 정보, PLAYER_INFO[3]은 우주선 정보
-			
-			if (playerInfo.id == 3) { //id가 3이면 우주선
-				m_pPlayer[0]->SetPlayerInfo(playerInfo);
-				//m_pPlayer[0]->SetPosition(playerInfo.pos);
-				//m_pPlayer[0]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[0]->GetYaw(), 0.0f);
-				//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
-				//m_pPlayer->SetVelocity(playerInfo[3].velocity);
-				//m_pPlayer->SetShift(playerInfo.shift);
-				//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
-				//m_pPlayer[g_myid]->SetPlayerInfo(playerInfo[3]);
-			}
-			else { // 그 외는 내부 플레이어
-				m_pInsidePlayer[playerInfo.id]->SetPlayerInfo(playerInfo);
-				if (m_pInsidePlayer[playerInfo.id]->motion != (int)playerInfo.animation) {
-					((CTerrainPlayer*)m_pInsidePlayer[playerInfo.id])->motion = (int)playerInfo.animation;
-				}
-				//m_pInsidePlayer[playerInfo.id]->SetPosition(playerInfo.pos);
-				//m_pInsidePlayer[playerInfo.id]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[playerInfo.id]->GetYaw(), 0.0f);
-			}
+			SPACESHIP_INFO playerInfo;
+			memcpy(&playerInfo, &subBuf, sizeof(SPACESHIP_INFO));
 
-			//m_pPlayer->OnPrepareRender();
-			//cout << "회전 각도 " << playerInfo.m_fYaw - m_pPlayer->GetYaw() << endl;
+			m_pPlayer[0]->SetPlayerInfo(playerInfo);
+			//m_pPlayer[0]->SetPosition(playerInfo.pos);
+			//m_pPlayer[0]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[0]->GetYaw(), 0.0f);
+			//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
+			//m_pPlayer->SetVelocity(playerInfo[3].velocity);
+			//m_pPlayer->SetShift(playerInfo.shift);
+			//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+			//m_pPlayer[g_myid]->SetPlayerInfo(playerInfo[3]);
+			break;
+		}
+		case SC_MOVE_INSIDEPLAYER:
+		{
+			char subBuf[sizeof(INSIDE_PLAYER_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+			INSIDE_PLAYER_INFO playerInfo;
+			memcpy(&playerInfo, &subBuf, sizeof(INSIDE_PLAYER_INFO));
+
+			m_pInsidePlayer[playerInfo.id]->SetPlayerInfo(playerInfo);
+			if (m_pInsidePlayer[playerInfo.id]->motion != (int)playerInfo.animation) {
+				((CTerrainPlayer*)m_pInsidePlayer[playerInfo.id])->motion = (int)playerInfo.animation;
+			}
+			//m_pInsidePlayer[playerInfo.id]->SetPosition(playerInfo.pos);
+			//m_pInsidePlayer[playerInfo.id]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[playerInfo.id]->GetYaw(), 0.0f);
 			break;
 		}
 		case SC_MOVE_INFO:
@@ -946,19 +954,6 @@ void CGameFramework::RecvServer()
 			}
 			m_pScene->m_ppEnemies[enemyInfo.id]->SetPosition(enemyInfo.pos);
 			m_pScene->m_ppEnemies[enemyInfo.id]->Rotate(0, enemyInfo.m_fYaw - m_pScene->m_ppEnemies[enemyInfo.id]->m_fYaw, 0.0f);
-
-			// 클라 적 추가 후 수정 필요
-
-			//			printf("enemy angle : %f %f %f\n", m_Enemy->GetPitch(),
-								//m_Enemy->GetYaw(), m_Enemy->GetRoll());
-						//printf("enemy pos : %f %f %f\n", enemyInfo.pos.x, enemyInfo.pos.y, enemyInfo.pos.z);
-			/*
-			m_Enemy->SetPosition(enemyInfo.pos);
-			m_Enemy->m_pChild->Rotate(enemyInfo.m_fPitch - m_Enemy->GetPitch(),
-				enemyInfo.m_fYaw - m_Enemy->GetYaw(), enemyInfo.m_fRoll - m_Enemy->GetRoll());	// 실제 Rotate
-			m_Enemy->SetPYR(enemyInfo.m_fPitch,
-				enemyInfo.m_fYaw, enemyInfo.m_fRoll);
-			m_Enemy->SetAppeared(enemyInfo.appeared);*/
 			break;
 		}
 		case SC_BULLET:
@@ -983,38 +978,8 @@ void CGameFramework::RecvServer()
 
 			BULLET_HIT_INFO bulletInfo;
 			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_HIT_INFO));
-			//m_pScene->m_ppGameObjects[bulletInfo.meteo_id]->hp -= 3;
-			((CAirplanePlayer*)m_pPlayer)->m_ppBullets[bulletInfo.bullet_id]->Reset();
-			break;
-		}
-		case SC_SPAWN_ENEMY:
-		{
-			char subBuf[sizeof(SPAWN_ENEMY_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
 
-			SPAWN_ENEMY_INFO spawnInfo;
-			memcpy(&spawnInfo, &subBuf, sizeof(SPAWN_ENEMY_INFO));
-
-			// 적 배열에 적을 추가한다
-			switch (spawnInfo.type) {
-			case EnemyType::MISSILE:
-			{
-				// m_ppEnemies[spawnInfo.id] = new CEnemy > 혹은 처음부터 다 생성해 놓고 모델만 바꿔주기 > bool 멤버 변수를 통해 그릴지 말지를 결정.
-				// 해당 적 타입의 모델 붙이기
-				break;
-			}
-			case EnemyType::LASER:
-			{
-				break;
-			}
-			case EnemyType::PLASMACANNON:
-			{
-				break;
-			}
-			}
-			// m_ppEnemies[
+			// 적/플레이어 hp 감소. 폭발 애니메이션/소리/죽음 등
 			break;
 		}
 		case SC_ANIMATION_CHANGE:

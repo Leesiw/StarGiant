@@ -41,10 +41,6 @@ protected:
 
 	CCamera						*m_pCamera = NULL;
 
-
-	PLAYER_INFO					player_info;
-	bool						is_update = false;
-
 	bool						b_Issit = false;
 public:
 	int motion;
@@ -103,9 +99,6 @@ public:
 	virtual void UpdateBoundingBox() { aabb.Center = m_xmf3Position; }
 	bool HierarchyIntersects(CSkinnedMesh* pCollisionGameObject, bool isSecond = false);
 
-	//서버 
-	void SetPlayerInfo(PLAYER_INFO p_info) { player_info = p_info; is_update = false; }
-	void UpdateOnServer(bool rotate_update = true);
 };
 
 class CAirplanePlayer : public CPlayer
@@ -124,11 +117,18 @@ public:
 	float						m_fBulletEffectiveRange = 150.0f;
 
 
-private:
+	SPACESHIP_INFO					player_info;
+	bool						is_update = true;
 	virtual void OnPrepareAnimate();
 	virtual void Animate(float fTimeElapsed);
 
+private:
+
 public:
+	//서버 
+	void SetPlayerInfo(SPACESHIP_INFO p_info) { player_info = p_info; is_update = false; }
+	void UpdateOnServer(bool rotate_update = true);
+
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	virtual void OnPrepareRender();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
@@ -150,7 +150,14 @@ public:
 	CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext=NULL);
 	virtual ~CTerrainPlayer();
 
+	INSIDE_PLAYER_INFO					player_info;
+	bool						is_update = true;
+
 public:
+	//서버 
+	void SetPlayerInfo(INSIDE_PLAYER_INFO p_info) { player_info = p_info; is_update = false; }
+	void UpdateOnServer(bool rotate_update = true);
+
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 
 	virtual void OnPlayerUpdateCallback(float fTimeElapsed);

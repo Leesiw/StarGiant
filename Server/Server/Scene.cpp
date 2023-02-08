@@ -242,7 +242,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
 		//XMFLOAT3 sub = Vector3::Subtract(m_pos, p_pos);
 		//if (fabs(sub.x) > 1000.0f || fabs(sub.y) > 1000.0f || fabs(sub.z) > 1000.0f) {
-		if (dist > 2000.0f){
+		if (dist > 1000.0f){
 
 			m_ppMeteoObjects[i]->m_xmf4x4ToParent = Matrix4x4::Identity();
 			XMFLOAT3 random_pos{ urdPos(dree) , urdPos(dree), urdPos(dree)};

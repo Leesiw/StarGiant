@@ -39,7 +39,6 @@ protected:
 	char						m_cAnimation = 0;
 
 	//서버
-	INPUT_INFO					input_info;
 	bool is_update = true;
 
 public:
@@ -75,10 +74,6 @@ public:
 	virtual void Update(float fTimeElapsed);
 
 	virtual void OnPrepareRender();
-
-	void SetInputInfo(INPUT_INFO i_info) { input_info = i_info; is_update = false; }
-
-
 };
 
 class CAirplanePlayer : public CPlayer
@@ -98,7 +93,10 @@ public:
 
 	bool FireBullet(short attack_num);
 
+	SPACESHIP_INPUT_INFO input_info;
 public:
+	void SetInputInfo(SPACESHIP_INPUT_INFO i_info) { input_info = i_info; is_update = false; }
+
 	virtual void Animate(float fTimeElapsed);
 	virtual void Update(float fTimeElapsed);
 	virtual void OnPrepareRender();
@@ -114,7 +112,10 @@ public:
 
 
 	bool walk;	//애니메이션
+	INSIDE_INPUT_INFO input_info;
 public:
+	void SetInputInfo(INSIDE_INPUT_INFO i_info) { input_info = i_info; is_update = false; }
+
 	bool CheckCollision(const XMFLOAT3 pos[]);
 
 	void Move(DWORD dwDirection, float fDistance, const XMFLOAT3 pos[], bool bUpdateVelocity = false);

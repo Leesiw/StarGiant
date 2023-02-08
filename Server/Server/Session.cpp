@@ -10,19 +10,30 @@ void SESSION::send_change_packet(int c_id, PlayerType p_type)
 	do_send(&p);
 }
 
-void SESSION::send_move_packet(int c_id, CPlayer* m_pPlayer)	// 플레이어 좌표 각도 전송
+void SESSION::send_spaceship_packet(int c_id, CAirplanePlayer* m_pPlayer)	// 플레이어 좌표 각도 전송
 {
-	SC_MOVE_PLAYER_PACKET p;
-	p.size = sizeof(SC_MOVE_PLAYER_PACKET);
-	p.type = SC_MOVE_PLAYER;
-	p.data.id = c_id;
+	SC_MOVE_SPACESHIP_PACKET p;
+	p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
+	p.type = SC_MOVE_SPACESHIP;
 	p.data.pos = m_pPlayer->GetPosition();
 	p.data.m_fYaw = m_pPlayer->GetYaw();
 	p.data.m_fPitch = m_pPlayer->GetPitch();
-	p.data.animation = m_pPlayer->GetAnimation();
 
 	//p.data.velocity = m_pPlayer->GetVelocity();
 	//p.data.shift = m_pPlayer->GetShift();
+	do_send(&p);
+}
+
+void SESSION::send_inside_packet(int c_id, CTerrainPlayer* m_pPlayer)
+{
+	SC_MOVE_INSIDE_PACKET p;
+	p.size = sizeof(SC_MOVE_INSIDE_PACKET);
+	p.type = SC_MOVE_INSIDEPLAYER;
+	p.data.id = c_id;
+	p.data.pos = m_pPlayer->GetPosition();
+	p.data.m_fYaw = m_pPlayer->GetYaw();
+	p.data.animation = m_pPlayer->GetAnimation();
+
 	do_send(&p);
 }
 
@@ -192,13 +203,13 @@ void SESSION::send_meteo_packet(int c_id, CMeteoObject* meteo[])
 	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
 }
 
-void SESSION::send_bullet_hit_packet(int c_id, int meteo_id, int bullet_id)
+void SESSION::send_bullet_hit_packet(int c_id, short id, short hp)
 {
 	SC_BULLET_HIT_PACKET p;
 	p.size = sizeof(SC_BULLET_HIT_PACKET);
 	p.type = SC_BULLET_HIT;
-	p.data.meteo_id = meteo_id;
-	p.data.bullet_id = bullet_id;
+	p.data.id = id;
+	p.data.hp = hp;
 
 	do_send(&p);
 }

@@ -212,14 +212,13 @@ void CAirplanePlayer::Animate(float fTimeElapsed)
 
 void CAirplanePlayer::Update(float fTimeElapsed)
 {
-	if (is_update) { return; }
 	CPlayer::Update(fTimeElapsed);
-
 	for (int i = 0; i < MAX_USER; ++i) {
 		if (m_fFireWaitingTime[i] > 0.0f)
 			m_fFireWaitingTime[i] -= fTimeElapsed;
 	}
 
+	if (is_update) { return; }
 	Rotate(input_info.pitch - m_fPitch, input_info.yaw - m_fYaw, 0.0f);
 
 	if (input_info.dwDirection) {

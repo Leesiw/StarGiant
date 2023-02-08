@@ -303,7 +303,7 @@ void CPlayer::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamer
 
 }
 
-bool CPlayer::HierarchyIntersects(CSkinnedMesh* pCollisionGameObject, bool isSecond) 
+bool CPlayer::HierarchyIntersects(CSkinnedMesh* pCollisionGameObject, bool isSecond)
 {
 	//if (OOBB.Intersects(pCollisionGameObject->m_xmOOBB) && pCollisionGameObject)
 	//	return true;
@@ -313,19 +313,6 @@ bool CPlayer::HierarchyIntersects(CSkinnedMesh* pCollisionGameObject, bool isSec
 	return this->HierarchyIntersects(pCollisionGameObject, true);
 }
 
-
-
-void CPlayer::UpdateOnServer(bool update_rotate)
-{
-	if (!is_update) {
-		SetPosition(player_info.pos);
-		if (update_rotate) {
-			Rotate(player_info.m_fPitch - m_fPitch, player_info.m_fYaw - m_fYaw, 0.0f);
-		}
-		//m_pCamera->Update(player_info.pos, 0);
-		is_update = true;
-	}
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 
@@ -491,6 +478,18 @@ void CAirplanePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 
 	CPlayer::Render(pd3dCommandList, pCamera);
 
+}
+
+void CAirplanePlayer::UpdateOnServer(bool rotate_update)
+{
+	if (!is_update) {
+		SetPosition(player_info.pos);
+		if (rotate_update) {
+			Rotate(player_info.m_fPitch - m_fPitch, player_info.m_fYaw - m_fYaw, 0.0f);
+		}
+		//m_pCamera->Update(player_info.pos, 0);
+		is_update = true;
+	}
 }
 
 CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
@@ -678,6 +677,18 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 
 CTerrainPlayer::~CTerrainPlayer()
 {
+}
+
+void CTerrainPlayer::UpdateOnServer(bool rotate_update)
+{
+	if (!is_update) {
+		SetPosition(player_info.pos);
+		if (rotate_update) {
+			Rotate(0.0f, player_info.m_fYaw - m_fYaw, 0.0f);
+		}
+		//m_pCamera->Update(player_info.pos, 0);
+		is_update = true;
+	}
 }
 
 CCamera *CTerrainPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)

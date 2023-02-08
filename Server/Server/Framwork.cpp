@@ -196,7 +196,7 @@ void CGameFramework::AnimateObjects(float fTimeElapsed)
 		if (clients[i].in_use  && clients[i].type == PlayerType::INSIDE) {
 			for (auto& pl : clients) {
 				if (!pl.in_use) continue;
-				pl.send_move_packet(i, m_ppPlayers[i]);
+				pl.send_inside_packet(i, m_ppPlayers[i]);
 			}
 		}
 	}
@@ -254,14 +254,17 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		break;
 	}
-	case CS_MOVE: {
-		CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
-		if (clients[c_id].type == PlayerType::INSIDE) {
-			// 플레이어 이동
-			m_ppPlayers[c_id]->SetInputInfo(p->data);
-		}
-		else if (clients[c_id].type == PlayerType::MOVE) {
+	case CS_SPACESHIP_MOVE: {
+		CS_SPACESHIP_PACKET* p = reinterpret_cast<CS_SPACESHIP_PACKET*>(packet);
+		if (clients[c_id].type == PlayerType::MOVE) {
 			m_pSpaceship->SetInputInfo(p->data);
+		}
+		break;
+	}
+	case CS_INSIDE_MOVE: {
+		CS_INSIDE_PACKET* p = reinterpret_cast<CS_INSIDE_PACKET*>(packet);
+		if (clients[c_id].type == PlayerType::INSIDE) {
+			m_ppPlayers[c_id]->SetInputInfo(p->data);
 		}
 		break;
 	}
@@ -299,7 +302,7 @@ void CGameFramework::ClientProcess()
 			AnimateObjects(fps.count());
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;
-				pl.send_move_packet(3, m_pSpaceship);
+				pl.send_spaceship_packet(3, m_pSpaceship);
 				if (!(num = num % 10)) {
 					pl.send_meteo_packet(0, m_pScene->m_ppMeteoObjects);
 				}
