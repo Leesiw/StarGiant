@@ -82,10 +82,10 @@ public:
 	CAirplanePlayer();
 	virtual ~CAirplanePlayer();
 
-	CGameObject** m_BulletObjects = NULL;
-	CBulletObject* m_ppBullets[BULLETS];
+	short hp;
+	short damage;
+
 	float						m_fBulletEffectiveRange = 150.0f;
-	CGameObject* pBullet;
 
 	//ºÒ·¿
 	float						m_fFireDelayTime;
@@ -96,7 +96,7 @@ public:
 	SPACESHIP_INPUT_INFO input_info;
 public:
 	void SetInputInfo(SPACESHIP_INPUT_INFO i_info) { input_info = i_info; is_update = false; }
-
+	bool CanAttack(short num);
 	virtual void Animate(float fTimeElapsed);
 	virtual void Update(float fTimeElapsed);
 	virtual void OnPrepareRender();

@@ -270,16 +270,16 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	}
 	case CS_ATTACK: {
 		CS_ATTACK_PACKET* p = reinterpret_cast<CS_ATTACK_PACKET*>(packet);
-		/*
-		if (clients[c_id].type == PlayerType::ATTACK) {
-			if (((CAirplanePlayer*)m_pSpaceship)->FireBullet(1)) {
-				for (auto& pl : clients) {
-					if (false == pl.in_use) continue;
-					pl.send_bullet_packet(0, m_pSpaceship);
+		
+		if (clients[c_id].type >= PlayerType::ATTACK1 && clients[c_id].type <= PlayerType::ATTACK3) {
+			if (m_pSpaceship->CanAttack((short)clients[c_id].type - (short)PlayerType::ATTACK1)) {
+				m_pScene->CheckEnemyByBulletCollisions(p->data);
+				for (auto& pl : clients)
+				{
+					pl.send_bullet_packet(0, p->data.pos, p->data.direction);
 				}
 			}
 		}
-		*/
 		break;
 	}
 	}

@@ -135,7 +135,7 @@ void CScene::CheckMeteoByPlayerCollisions()
 
 void CScene::CheckObjectByBulletCollisions()
 {
-
+	/*
 	CBulletObject** ppBullets = m_pSpaceship->m_ppBullets;
 	for (int i = 0; i < METEOS; ++i)
 	{
@@ -160,34 +160,30 @@ void CScene::CheckObjectByBulletCollisions()
 				}
 			}
 		}
-	}
+	}*/
 }
 
-void CScene::CheckEnemyByBulletCollisions()
+void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 {
+	float dist = 500.f; // 플레이어 사거리
 
-	CBulletObject** ppBullets = m_pSpaceship->m_ppBullets;
-	/*
-	if (m_enemy && m_enemy->hp < 0) return;
-	for (int j = 0; j < BULLETS; j++)
+	for (int i = 0; i < ENEMIES; ++i)
 	{
-		if (ppBullets[j]->m_bActive) {
-			XMFLOAT3 pos = m_enemy->GetPosition();
-			pos.z += 130.0f;
-			m_enemy->aabb = BoundingBox(pos, XMFLOAT3(8.0f, 8.0f, 3.0f));
-			ppBullets[j]->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(20.0f, 20.0f, 50.0f));
-			//m_enemy->m_xmOOBB.Center.z += 130.0f;
-			if (m_enemy->aabb.Intersects(ppBullets[j]->aabb)) {
-				//if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i])) {
-				m_enemy->hp -= 3;
-				ppBullets[j]->Reset();
-				if (m_enemy->hp < 0) {
-					m_enemy->SetResetWaitingTime();
-				}
+		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
+		XMVECTOR pos = XMLoadFloat3(&data.pos);
+		XMVECTOR dir = XMLoadFloat3(&data.direction);
+		
+		if (m_ppEnemies[i]->boundingbox.Intersects(pos, dir, dist)) //총알/적 충돌시
+		{
+			m_ppEnemies[i]->hp -= m_pSpaceship->damage;
+			if (m_ppEnemies[i]->hp <= 0) { m_ppEnemies[i]->SetisAlive(false); }
+
+			for (auto& pl : clients)
+			{
+				pl.send_bullet_hit_packet(0, i, m_ppEnemies[i]->hp);
 			}
 		}
 	}
-	*/
 }
 
 void CScene::SpawnEnemy()

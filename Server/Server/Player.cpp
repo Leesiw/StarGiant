@@ -143,7 +143,7 @@ CAirplanePlayer::CAirplanePlayer()
 	SetGravity(XMFLOAT3(0.0f, -0.0f, 0.0f));
 	SetMaxVelocityXZ(300.0f);
 	SetMaxVelocityY(400.0f);
-
+	/*
 	for (int i = 0; i < BULLETS; i++)
 	{
 		m_ppBullets[i] = new CBulletObject(m_fBulletEffectiveRange);
@@ -152,7 +152,7 @@ CAirplanePlayer::CAirplanePlayer()
 		m_ppBullets[i]->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		m_ppBullets[i]->SetMovingSpeed(300.0f);
 		m_ppBullets[i]->SetActive(false);
-	}
+	}*/
 }
 
 CAirplanePlayer::~CAirplanePlayer()
@@ -160,7 +160,7 @@ CAirplanePlayer::~CAirplanePlayer()
 }
 
 bool CAirplanePlayer::FireBullet(short attack_num)
-{
+{/*
 	if (m_fFireWaitingTime[attack_num] > 0.0f)
 		return false;
 
@@ -194,11 +194,19 @@ bool CAirplanePlayer::FireBullet(short attack_num)
 		m_fFireWaitingTime[attack_num] = m_fFireDelayTime * 1.0f;
 
 		return true;
-	}
+	}*/
+}
+
+bool CAirplanePlayer::CanAttack(short num)
+{
+	if (m_fFireWaitingTime[num] > 0.0f) { return false; }
+	m_fFireWaitingTime[num] = m_fFireDelayTime * 1.0f;
+	return true;
 }
 
 void CAirplanePlayer::Animate(float fTimeElapsed)
 {
+	/*
 	for (int i = 0; i < BULLETS; i++)
 	{
 		if (m_ppBullets[i]->m_bActive) {
@@ -206,7 +214,7 @@ void CAirplanePlayer::Animate(float fTimeElapsed)
 			m_ppBullets[i]->Animate(fTimeElapsed);
 		};
 	}
-
+	*/
 	CPlayer::Animate(fTimeElapsed);
 }
 

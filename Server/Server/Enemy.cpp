@@ -284,7 +284,7 @@ void CEnemy::Animate(float fElapsedTime)
 
 void CEnemy::Animate(float fTimeElapsed, XMFLOAT3 player_pos)
 {
-	AI(fTimeElapsed, player_pos);
+	if (isAlive) { AI(fTimeElapsed, player_pos); }
 }
 
 void CEnemy::SendPos()

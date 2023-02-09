@@ -21,7 +21,7 @@ public:
 
 	void CheckMeteoByPlayerCollisions();
 	void CheckObjectByBulletCollisions();
-	void CheckEnemyByBulletCollisions();
+	void CheckEnemyByBulletCollisions(BULLET_INFO& data);
 
 	void SpawnEnemy();
 
