@@ -112,7 +112,7 @@ struct ENEMY_INFO {
 
 	XMFLOAT3 pos;
 
-	//float           			m_fPitch;
+	float           			m_fPitch;
 	//float           			m_fRoll;
 	float           			m_fYaw;
 };

@@ -1531,8 +1531,8 @@ void CEnemyObject::Rotate(float x, float y, float z)
 	if (x != 0.0f)
 	{
 		m_fPitch += x;
-		if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
-		if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
+		if (m_fPitch > 360.0f) m_fPitch -= 360.0f;
+		if (m_fPitch < 0.0f) m_fPitch += 360.0f;
 	}
 	if (y != 0.0f)
 	{
@@ -1543,8 +1543,8 @@ void CEnemyObject::Rotate(float x, float y, float z)
 	if (z != 0.0f)
 	{
 		m_fRoll += z;
-		if (m_fRoll > +20.0f) { z -= (m_fRoll - 20.0f); m_fRoll = +20.0f; }
-		if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
+		if (m_fRoll > 360.0f) m_fRoll -= 360.0f;
+		if (m_fRoll < 0.0f) m_fRoll += 360.0f;
 	}
 
 	CGameObject::Rotate(x, y, z);

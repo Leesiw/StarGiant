@@ -340,25 +340,25 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			case VK_F1:
 			case VK_F2:
 			case VK_F3:
-				m_pCamera = m_pPlayer[g_myid]->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
+				m_pCamera = m_pPlayer[0]->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
 				break;
 			case VK_F4:
-					m_pCamera = m_pPlayer[g_myid]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
+					m_pCamera = m_pPlayer[0]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
 				break;
 			case VK_F5:
-					m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_L, m_GameTimer.GetTimeElapsed());
+					m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_L, m_GameTimer.GetTimeElapsed());
 				break;
 			case VK_F6:
-				m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_C, m_GameTimer.GetTimeElapsed());
+				m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_C, m_GameTimer.GetTimeElapsed());
 				break;
 			case VK_F7:
-				m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
+				m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
 				break;
 			case VK_F9:
 				ChangeSwapChainState();
 				break;
 			case VK_CONTROL:
-				((CAirplanePlayer*)m_pPlayer[g_myid])->FireBullet(NULL);
+				((CAirplanePlayer*)m_pPlayer[0])->FireBullet(NULL);
 				std::cout << "총알";
 				break;
 			case VK_SPACE:
@@ -512,6 +512,7 @@ void CGameFramework::BuildObjects()
 		m_pScene->m_pPlayer[i] = m_pPlayer[i] = pAirPlayer[i];
 	}
 	m_pCamera = m_pPlayer[0]->GetCamera();
+	m_pCamera = m_pPlayer[0]->ChangeCamera((DWORD)(4), m_GameTimer.GetTimeElapsed());
 	for (int i = 0; i < m_pInsideScene->m_nScenePlayer; ++i) {
 		m_pInsideScene->m_pPlayer[i] = m_pInsidePlayer[i] = pPlayer[i];
 	}
@@ -573,7 +574,7 @@ void CGameFramework::ProcessInput()
 				cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 2.0f; // 감도 조절 필요
 				ptCursorPos.x = rect.right / 2; ptCursorPos.y = rect.bottom / 2;
 				ClientToScreen(m_hWnd, &ptCursorPos);
-				SetCursorPos(ptCursorPos.x, ptCursorPos.y);	// 화면 중앙에 커서 고정
+				//SetCursorPos(ptCursorPos.x, ptCursorPos.y);	// 화면 중앙에 커서 고정
 			}
 		}
 		GetCursorPos(&m_ptOldCursorPos);
@@ -964,7 +965,7 @@ void CGameFramework::RecvServer()
 				m_pScene->m_ppEnemies[enemyInfo.id]->isAlive = true;
 			}
 			m_pScene->m_ppEnemies[enemyInfo.id]->SetPosition(enemyInfo.pos);
-			m_pScene->m_ppEnemies[enemyInfo.id]->Rotate(0, enemyInfo.m_fYaw - m_pScene->m_ppEnemies[enemyInfo.id]->m_fYaw, 0.0f);
+			m_pScene->m_ppEnemies[enemyInfo.id]->Rotate(enemyInfo.m_fPitch - m_pScene->m_ppEnemies[enemyInfo.id]->m_fPitch, enemyInfo.m_fYaw - m_pScene->m_ppEnemies[enemyInfo.id]->m_fYaw, 0.0f);
 			break;
 		}
 		case SC_BULLET:

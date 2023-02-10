@@ -46,6 +46,7 @@ void SESSION::send_enemy_packet(int c_id, ENEMY_INFO& enemy_info)
 
 	p.data.id = enemy_info.id;
 	p.data.m_fYaw = enemy_info.m_fYaw;
+	p.data.m_fPitch = enemy_info.m_fPitch;
 	p.data.pos = enemy_info.pos;
 
 	char buf[sizeof(SC_MOVE_ENEMY_PACKET)];

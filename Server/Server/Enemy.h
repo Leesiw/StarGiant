@@ -22,7 +22,9 @@ protected:
 	float						m_fCoolTime = 2.0f;
 	float						m_fCoolTimeRemaining = 0.0f;
 
-	float						m_fAttackRange = 300.0f;
+	float						m_fAttackRange = 600.0f;
+
+	XMFLOAT3					m_xmf3Velocity;
 
 	float						m_fAvoidTime = 0.0f;
 	bool						m_bAvoidDir;		// true면 오른쪽, false면 왼쪽
@@ -50,6 +52,8 @@ public:
 	virtual void AttackAI(float fTimeElapsed, XMFLOAT3& player_pos);
 	virtual void Attack(float fTimeElapsed, XMFLOAT3& player_pos);
 	virtual void AvoidAI(float fTimeElapsed);
+
+	virtual void VelocityUpdate(float fTimeElapsed);
 
 	void Rotate(float x, float y, float z);
 

@@ -18,10 +18,19 @@ CEnemy::~CEnemy()
 
 void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 {
+	VelocityUpdate(fTimeElapsed);
+	
 	if (m_fCoolTimeRemaining > 0.0f) {
 		m_fCoolTimeRemaining -= fTimeElapsed;
 	}
+	
 	XMFLOAT3 pos = GetPosition();
+	if(fabs(pos.x - player_pos.x) < 50.0f && fabs(pos.z - player_pos.z) < 50.0f)
+	{
+		XMFLOAT3 ToGo = Vector3::Add(pos, player_pos, -1.f);
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, ToGo, fTimeElapsed * 10.f);
+	}
+
 	float dist;
 	switch (state)
 	{
@@ -30,7 +39,7 @@ void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 		dist = Vector3::Length(Vector3::Subtract(pos, player_pos));
 		if (dist > m_fAttackRange)	// 사거리 충족 안되면 이동
 		{
-			switch (urdEnemyAI(dree) % 4) {
+			switch (urdEnemyAI(dree) % 4) {	// 목적지 설정
 			case 0:
 			{
 				m_xmf3Destination.x = urdPos2(dree);
@@ -93,9 +102,10 @@ void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 		AvoidAI(fTimeElapsed);
 		break;
 	case EnemyState::MOVE:
-		MoveAI(fTimeElapsed, player_pos);
+		//MoveAI(fTimeElapsed, player_pos);
 		break;
 	}
+	SendPos();
 }
 
 void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
@@ -108,16 +118,6 @@ void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
 
 	XMFLOAT3 vec = Vector3::Subtract(xmf3Position, m_xmf3Destination);
 	float dist = Vector3::Length(Vector3::Subtract(xmf3Position, m_xmf3Destination));
-	if (dist > 200.0f) {	// 속도 조절
-		if (m_fSpeed < 800.f) {
-			m_fSpeed += 100.f * fTimeElapsed;
-		}
-	}
-	else {
-		if (m_fSpeed > 10.f) {
-			m_fSpeed -= 100.f * fTimeElapsed;
-		}
-	}
 
 	if (dist > 50.f)
 	{
@@ -259,8 +259,10 @@ void CEnemy::Rotate(float x, float y, float z)
 	if (x != 0.0f)
 	{
 		m_fPitch += x;
-		if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
-		if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
+		if (m_fPitch > 360.0f) m_fPitch -= 360.0f;
+		if (m_fPitch < 0.0f) m_fPitch += 360.0f;
+		//if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
+		//if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
 	}
 	if (y != 0.0f)
 	{
@@ -287,6 +289,31 @@ void CEnemy::Animate(float fTimeElapsed, XMFLOAT3 player_pos)
 	if (isAlive) { AI(fTimeElapsed, player_pos); }
 }
 
+void CEnemy::VelocityUpdate(float fTimeElapsed)
+{
+	
+
+	float fLength = Vector3::Length(m_xmf3Velocity);
+	float fMaxVelocity = 500.f;
+	if (fLength > fMaxVelocity)
+	{
+		m_xmf3Velocity.x *= (fMaxVelocity / fLength) * fTimeElapsed * 30;
+		m_xmf3Velocity.y *= (fMaxVelocity / fLength) * fTimeElapsed * 30;
+		m_xmf3Velocity.z *= (fMaxVelocity / fLength) * fTimeElapsed * 30;
+	}
+
+	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
+	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(GetLook(), fTimeElapsed * 30.f, false);
+	xmf3Velocity = Vector3::Add(xmf3Velocity, LookVelocity);
+	//Move(xmf3Velocity, false);
+	XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
+	SetPosition(xmf3Position);
+
+	float fDeceleration = (50.0f * fTimeElapsed);
+	if (fDeceleration > fLength) fDeceleration = fLength;
+	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+}
+
 void CEnemy::SendPos()
 {
 	for (auto& pl : clients)
@@ -294,6 +321,7 @@ void CEnemy::SendPos()
 		ENEMY_INFO info;
 		info.id = id;
 		info.m_fYaw = m_fYaw;
+		info.m_fPitch = m_fPitch;
 		info.pos = GetPosition();
 		pl.send_enemy_packet(0, info);
 	}

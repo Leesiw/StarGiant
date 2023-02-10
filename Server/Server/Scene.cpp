@@ -207,6 +207,7 @@ void CScene::SpawnEnemy()
 					ENEMY_INFO e_info;
 					e_info.id = j;
 					e_info.m_fYaw = m_ppEnemies[j]->GetYaw();
+					e_info.m_fPitch = m_ppEnemies[j]->GetPitch();
 					e_info.pos = m_ppEnemies[j]->GetPosition();
 					pl.send_enemy_packet(0, e_info);
 				}
