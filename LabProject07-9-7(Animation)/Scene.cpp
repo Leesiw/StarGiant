@@ -179,6 +179,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_ppHierarchicalGameObjects[12]->SetScale(3.0f, 3.0f, 3.0f);
 	if (pMeteoModel) delete pMeteoModel;
 
+	//=====================================
 	for (int i = 0; i < METEOS / 2; ++i) {
 		CLoadedModelInfo* pMeteoModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo2.bin", NULL);
 		m_ppMeteorObjects[i] = new CMeteorObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMeteoModel, 1);
@@ -196,7 +197,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppMeteorObjects[i]->SetScale(3.0f, 3.0f, 3.0f);
 		if (pMeteoModel) delete pMeteoModel;
 	}
-
+	//=====================================
 	for (int i = 0; i < ENEMIES / 3; ++i) {
 		CLoadedModelInfo* pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AlienDestroyer.bin", NULL);
 		m_ppEnemies[i] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
@@ -221,7 +222,16 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppEnemies[i]->SetScale(10.0f, 10.0f, 10.0f);
 		if (pEnemyModel) delete pEnemyModel;
 	}
-
+	//=====================================
+	for (int i = 0; i < ENEMY_BULLETS; ++i) {
+		CLoadedModelInfo* pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Cube2.bin", NULL);
+		m_ppEnemyBullets[i] = new CBulletObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
+		m_ppEnemyBullets[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_ppEnemyBullets[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
+		m_ppEnemyBullets[i]->SetScale(1.0f, 1.0f, 1.0f);
+		if (pEnemyModel) delete pEnemyModel;
+	}
+	//=====================================
 	m_nShaders = 1;
 	m_ppShaders = new CShader*[m_nShaders];
 
@@ -342,6 +352,12 @@ void CScene::ReleaseObjects()
 	{
 		for (int i = 0; i < ENEMIES; i++) if (m_ppEnemies[i]) m_ppEnemies[i]->Release();
 		delete[] m_ppEnemies;
+	}
+
+	if (m_ppEnemyBullets)
+	{
+		for (int i = 0; i < ENEMY_BULLETS; i++) if (m_ppEnemyBullets[i]) m_ppEnemyBullets[i]->Release();
+		delete[] m_ppEnemyBullets;
 	}
 
 	ReleaseShaderVariables();
@@ -870,6 +886,16 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 			m_ppEnemies[i]->Animate(m_fElapsedTime);
 			if (!m_ppEnemies[i]->m_pSkinnedAnimationController) m_ppEnemies[i]->UpdateTransform(NULL);
 			m_ppEnemies[i]->Render(pd3dCommandList, pCamera);
+		}
+	}
+
+	for (int i = 0; i < ENEMY_BULLETS; i++)
+	{
+		//if (m_ppEnemyBullets[i] && m_ppEnemyBullets[i]->is_fire)
+		{
+			m_ppEnemyBullets[i]->Animate(m_fElapsedTime);
+			if (!m_ppEnemyBullets[i]->m_pSkinnedAnimationController) m_ppEnemyBullets[i]->UpdateTransform(NULL);
+			m_ppEnemyBullets[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
 }

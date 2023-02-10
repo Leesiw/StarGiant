@@ -1574,6 +1574,15 @@ CBulletObject::CBulletObject(float fEffectiveRange)
 	m_fBulletEffectiveRange = fEffectiveRange;
 }
 
+CBulletObject::CBulletObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
+{
+	CLoadedModelInfo* pBulletModel = pModel;
+	if (!pBulletModel) pBulletModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
+
+	SetChild(pBulletModel->m_pModelRootObject, true);
+	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pBulletModel);
+}
+
 void CBulletObject::Animate(float fElapsedTime)
 {
 	m_fElapsedTimeAfterFire += fElapsedTime;

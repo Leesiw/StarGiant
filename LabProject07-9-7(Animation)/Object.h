@@ -621,6 +621,8 @@ class CBulletObject : public CGameObject
 {
 public:
 	CBulletObject(float fEffectiveRange);
+	CBulletObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks);
+
 	virtual ~CBulletObject() {};
 public:
 	virtual void Animate(float fElapsedTime);
@@ -638,7 +640,7 @@ public:
 	XMFLOAT4X4						m_xmf4x4Transform;
 
 
-
+	bool						is_fire = false;
 	float						m_fRotationSpeed = 0.0f;
 
 	float m_fPitch, m_fYaw, m_fRoll;

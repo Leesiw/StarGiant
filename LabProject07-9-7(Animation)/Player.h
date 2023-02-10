@@ -114,7 +114,7 @@ public:
 	CBulletObject* m_ppBullets[BULLETS];
 	void FireBullet(CGameObject* pLockedObject);
 	void SetBulletFromServer(BULLET_INFO bulletInfo);
-	float						m_fBulletEffectiveRange = 150.0f;
+	float						m_fBulletEffectiveRange = 300.0f;
 
 
 	SPACESHIP_INFO					player_info;

@@ -331,15 +331,15 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 	for (int i = 0; i < BULLETS; i++)
 	{
-		CLoadedModelInfo* pBulletMesh = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/meteo2.bin", NULL);
+		CLoadedModelInfo* pBulletMesh = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Cube.bin", NULL);
 
 		m_ppBullets[i] = new CBulletObject(m_fBulletEffectiveRange);
-		m_ppBullets[i]->SetScale(2.0f, 2.0f, 2.0f);
+		m_ppBullets[i]->SetScale(2.0f, 2.0f, 4.0f);
 		m_ppBullets[i]->SetChild(pBulletMesh->m_pModelRootObject, true);
 
 
 		m_ppBullets[i]->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-		m_ppBullets[i]->SetMovingSpeed(300.0f);
+		m_ppBullets[i]->SetMovingSpeed(2000.0f);
 		m_ppBullets[i]->SetActive(false);
 
 		//오브젝트 설정시 각각의 skinnedAnimationcontroller을 설정해주어야하는 거엿다.  

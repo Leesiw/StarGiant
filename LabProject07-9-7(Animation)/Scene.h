@@ -118,9 +118,12 @@ public:
 
 
 
-	CMeteorObject							*m_ppMeteorObjects[METEOS];
+	CMeteorObject						*m_ppMeteorObjects[METEOS];
 
-	CEnemyObject							*m_ppEnemies[ENEMIES];
+	CEnemyObject						*m_ppEnemies[ENEMIES];
+
+	CBulletObject						*m_ppEnemyBullets[ENEMY_BULLETS];
+
 
 
 	int									m_nShaders = 0;
