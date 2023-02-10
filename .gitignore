@@ -49,3 +49,4 @@ star/include/SFML/Network/Mesh.obj
 star/include/SFML/Network/GameFramework.obj
 star/include/SFML/Network/Camera.obj
 star/Playerdasf.cpp
+*.vsidx
