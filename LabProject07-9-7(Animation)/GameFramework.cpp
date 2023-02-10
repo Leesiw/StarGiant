@@ -311,7 +311,7 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
 			::SetCapture(hWnd);
-			::GetCursorPos(&m_ptOldCursorPos);
+
 			break;
 		case WM_LBUTTONUP:
 		case WM_RBUTTONUP:
@@ -374,12 +374,9 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 				break;
 			case VK_TAB:
-				if (!isConnect) {
-					b_Inside = !b_Inside;
-					std::cout << "씬 전환";
-				}
+				b_Inside = !b_Inside;
+				std::cout << "씬 전환";
 				break;
-
 			case 0x46: //F키 상호작용 앉기
 				if (b_Inside || m_pInsidePlayer[g_myid]->GetSitState())
 				{
@@ -554,20 +551,40 @@ void CGameFramework::ProcessInput()
 	{
 		float cxDelta = 0.0f, cyDelta = 0.0f;
 		POINT ptCursorPos;
-		if (GetCapture() == m_hWnd)
+		GetCursorPos(&ptCursorPos);
+		ScreenToClient(m_hWnd, &ptCursorPos);
+		RECT rect;
+		GetClientRect(m_hWnd, &rect);
+
+		// if문 > 마우스 커서가 게임 화면 안에 있을 때
+		//if (ptCursorPos.x >= 0 && ptCursorPos.x < rect.right 
+		//	&& ptCursorPos.y >= 0 && ptCursorPos.y < rect.bottom)
 		{
-			SetCursor(NULL);
-			GetCursorPos(&ptCursorPos);
-			cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
-			cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
-			SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
+			if (!b_Inside) { // 외부 우주선. 클라 화면 중앙과 커서의 위치 차이에 따라 회전
+				//ShowCursor(true); //커서 보이게 > 조종법을 이 방식으로 한다면 화면 전환시마다 이걸해줘야 함
+				float x = (float)(rect.right - rect.left) / 2;
+				float y = (float)(rect.bottom - rect.top) / 2;
+				cxDelta = (float)(ptCursorPos.x - x) / 100.0f;
+				cyDelta = (float)(ptCursorPos.y - y) / 100.0f;
+			}
+			else { // 내부 플레이어. 이전 마우스 커서와 현재 마우스 커서 위치 차이에 따라 회전.
+				//ShowCursor(false); // 커서 안보이게 > 조종법을 이 방식으로 한다면 화면 전환시마다 이걸해줘야 함
+				ScreenToClient(m_hWnd, &m_ptOldCursorPos);
+				cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 2.0f; // 감도 조절 필요
+				ptCursorPos.x = rect.right / 2; ptCursorPos.y = rect.bottom / 2;
+				ClientToScreen(m_hWnd, &ptCursorPos);
+				SetCursorPos(ptCursorPos.x, ptCursorPos.y);	// 화면 중앙에 커서 고정
+			}
 		}
+		GetCursorPos(&m_ptOldCursorPos);
+		//SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
+		//SetCursor(NULL);
 
 		DWORD dwDirection = 0;
-		if (pKeysBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
-		if (pKeysBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
-		if (pKeysBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
-		if (pKeysBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
+		if (pKeysBuffer['W'] & 0xF0) dwDirection |= DIR_FORWARD;
+		if (pKeysBuffer['S'] & 0xF0) dwDirection |= DIR_BACKWARD;
+		if (pKeysBuffer['A'] & 0xF0) dwDirection |= DIR_LEFT;
+		if (pKeysBuffer['D'] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 
@@ -576,16 +593,10 @@ void CGameFramework::ProcessInput()
 			if (cxDelta || cyDelta)
 			{
 				if (b_Inside) {
-					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
-						m_pInsidePlayer[g_myid]->Rotate(cyDelta, 0.0f, -cxDelta, 1);
-					else
-						m_pInsidePlayer[g_myid]->Rotate(cyDelta, cxDelta, 0.0f, 1);
+					m_pInsidePlayer[g_myid]->Rotate(0.0f, cxDelta, 0.0f);
 				}
 				else {
-					if (pKeysBuffer[VK_RBUTTON] & 0xF0)
-						m_pPlayer[0]->Rotate(cyDelta, 0.0f, -cxDelta);
-					else
-						m_pPlayer[0]->Rotate(cyDelta, cxDelta, 0.0f);
+					m_pPlayer[0]->Rotate(cyDelta, cxDelta, 0.0f);
 				}
 			}
 
@@ -966,7 +977,13 @@ void CGameFramework::RecvServer()
 			BULLET_INFO bulletInfo;
 			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_INFO));
 
-			((CAirplanePlayer*)m_pPlayer[0])->SetBulletFromServer(bulletInfo);
+			//((CAirplanePlayer*)m_pPlayer[0])->SetBulletFromServer(bulletInfo);
+			for (int i = 0; i < ENEMY_BULLETS; ++i) {
+				if (!m_pScene->m_ppEnemyBullets[i]->is_fire)
+					m_pScene->m_ppEnemyBullets[i]->SetFirePosition(bulletInfo.pos);
+					m_pScene->m_ppEnemyBullets[i]->SetMovingDirection(bulletInfo.direction);
+					m_pScene->m_ppEnemyBullets[i]->is_fire = true;
+			}
 			break;
 		}
 		case SC_BULLET_HIT:
