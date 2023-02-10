@@ -784,8 +784,8 @@ int CScene::CheckSitCollisions()
 			{
 				std::cout << i << "bound" << std::endl;
 				//i번째 방향으로 카메라돌리고 앉게하기 
-				if (((CTerrainPlayer*)m_pPlayer[g_myid])->motion != 2) {
-					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = 2;
+				if (((CTerrainPlayer*)m_pPlayer[g_myid])->motion != AnimationState::SIT) {
+					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = AnimationState::SIT;
 					std::cout << "시점전환앉기";
 
 					m_pPlayer[g_myid]->SetLook(m_LookCamera[i]);
@@ -795,7 +795,7 @@ int CScene::CheckSitCollisions()
 				else
 				{
 					std::cout << "서기";
-					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = 0;
+					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = AnimationState::IDLE;
 					
 					m_pPlayer[g_myid]->SetLook(m_LookCamera[i]);
 					m_pPlayer[g_myid]->SetSitState(false);

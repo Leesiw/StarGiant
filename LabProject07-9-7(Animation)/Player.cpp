@@ -810,14 +810,14 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 		if (::IsZero(fLength))
 		{
 
-			if (motion == 2) {
+			if (motion == AnimationState::SIT) {
 				m_pSkinnedAnimationController->SetTrackEnable(0, false);
 				m_pSkinnedAnimationController->SetTrackEnable(1, false);
 				m_pSkinnedAnimationController->SetTrackEnable(2, false);
 				m_pSkinnedAnimationController->SetTrackEnable(3, true);
 
 			}
-			else if(motion == 0) {
+			else if(motion == AnimationState::IDLE) {
 				m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				m_pSkinnedAnimationController->SetTrackEnable(1, false);
 				m_pSkinnedAnimationController->SetTrackEnable(2, false);

@@ -43,7 +43,7 @@ protected:
 
 	bool						b_Issit = false;
 public:
-	int motion;
+	AnimationState motion;
 public:
 	CPlayer();
 	virtual ~CPlayer();

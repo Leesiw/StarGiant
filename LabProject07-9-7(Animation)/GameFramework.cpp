@@ -362,14 +362,14 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				std::cout << "총알";
 				break;
 			case VK_SPACE:
-				if (((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion != 2) {
-					((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = 2;
+				if (((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion != AnimationState::SIT) {
+					((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = AnimationState::SIT;
 					std::cout << "앉기";
 				}
 				else
 				{
 					std::cout << "서기";
-					((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = 0;
+					((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = AnimationState::IDLE;
 				}
 
 				break;
@@ -828,10 +828,10 @@ void CGameFramework::RecvServer()
 			}
 			// 여기서 온 정보에 따라 해당 캐릭터가 특정 자리에 앉게 하거나 일어나게 한다
 			if (l_info.player_type == PlayerType::INSIDE) {
-				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = 0;
+				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::IDLE;
 			}
 			else {
-				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = 2;
+				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::SIT;
 			}
 			
 			
@@ -933,8 +933,8 @@ void CGameFramework::RecvServer()
 			memcpy(&playerInfo, &subBuf, sizeof(INSIDE_PLAYER_INFO));
 
 			m_pInsidePlayer[playerInfo.id]->SetPlayerInfo(playerInfo);
-			if (m_pInsidePlayer[playerInfo.id]->motion != (int)playerInfo.animation) {
-				((CTerrainPlayer*)m_pInsidePlayer[playerInfo.id])->motion = (int)playerInfo.animation;
+			if (int(m_pInsidePlayer[playerInfo.id]->motion) != (int)playerInfo.animation) {
+				((CTerrainPlayer*)m_pInsidePlayer[playerInfo.id])->motion = (AnimationState)playerInfo.animation;
 			}
 			//m_pInsidePlayer[playerInfo.id]->SetPosition(playerInfo.pos);
 			//m_pInsidePlayer[playerInfo.id]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[playerInfo.id]->GetYaw(), 0.0f);
@@ -992,8 +992,8 @@ void CGameFramework::RecvServer()
 			ANIMATION_INFO ani_info;
 			memcpy(&ani_info, &subBuf, sizeof(ANIMATION_INFO));
 			if (ani_info.id < 3) {	// 내부 플레이어
-				if (m_pInsidePlayer[ani_info.id]->motion != ani_info.animation) {
-					m_pInsidePlayer[ani_info.id]->motion = ani_info.animation;
+				if (int(m_pInsidePlayer[ani_info.id]->motion) != ani_info.animation) {
+					m_pInsidePlayer[ani_info.id]->motion = (AnimationState)ani_info.animation;
 				}
 			}
 			break;
