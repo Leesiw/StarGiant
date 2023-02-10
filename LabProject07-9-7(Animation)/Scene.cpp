@@ -891,12 +891,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < ENEMY_BULLETS; i++)
 	{
-		//if (m_ppEnemyBullets[i] && m_ppEnemyBullets[i]->is_fire)
-		{
-			m_ppEnemyBullets[i]->Animate(m_fElapsedTime);
-			if (!m_ppEnemyBullets[i]->m_pSkinnedAnimationController) m_ppEnemyBullets[i]->UpdateTransform(NULL);
-			m_ppEnemyBullets[i]->Render(pd3dCommandList, pCamera);
-		}
+		if (m_ppEnemyBullets[i]) m_ppEnemyBullets[i]->Render(pd3dCommandList, pCamera);
 	}
 }
 
