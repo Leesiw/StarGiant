@@ -88,26 +88,12 @@ void CPlayer::Rotate(float x, float y, float z, int mode)
 		DWORD nCurrentCameraMode = m_pCamera->GetMode();
 		if ((nCurrentCameraMode == FIRST_PERSON_CAMERA) || (nCurrentCameraMode == THIRD_PERSON_CAMERA))
 		{
-			/*
-			if (x != 0.0f)
-			{
-				m_fPitch += x;
-				if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
-				if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
-			}*/
 			if (y != 0.0f) // && mode == 0) > 서버 클라 연동 시 회전 정보 필요
 			{
 				m_fYaw += y;
 				if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
 				if (m_fYaw < 0.0f) m_fYaw += 360.0f;
 			}
-			/*
-			if (z != 0.0f)
-			{
-				m_fRoll += z;
-				if (m_fRoll > +20.0f) { z -= (m_fRoll - 20.0f); m_fRoll = +20.0f; }
-				if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
-			}*/
 			m_pCamera->Rotate(x, y, z);
 			if (y != 0.0f)
 			{
@@ -485,11 +471,27 @@ void CAirplanePlayer::UpdateOnServer(bool rotate_update)
 	if (!is_update) {
 		SetPosition(player_info.pos);
 		if (rotate_update) {
-			Rotate(player_info.m_fPitch - m_fPitch, player_info.m_fYaw - m_fYaw, 0.0f);
+			XMVECTOR a = XMLoadFloat4(&player_info.Quaternion);
+			XMMATRIX mat = XMMatrixRotationQuaternion(a);
+			XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(Matrix4x4::Identity(), mat);
+			m_xmf3Right.x = xmf4x4._11; m_xmf3Right.y = xmf4x4._12; m_xmf3Right.z = xmf4x4._13;
+			m_xmf3Up.x = xmf4x4._21; m_xmf3Up.y = xmf4x4._22; m_xmf3Up.z = xmf4x4._23;
+			m_xmf3Look.x = xmf4x4._31; m_xmf3Look.y = xmf4x4._32; m_xmf3Look.z = xmf4x4._33;
 		}
 		//m_pCamera->Update(player_info.pos, 0);
 		is_update = true;
 	}
+}
+
+XMVECTOR CAirplanePlayer::GetQuaternion()
+{
+	m_xmf4x4ToParent._11 = m_xmf3Right.x; m_xmf4x4ToParent._12 = m_xmf3Right.y; m_xmf4x4ToParent._13 = m_xmf3Right.z;
+	m_xmf4x4ToParent._21 = m_xmf3Up.x; m_xmf4x4ToParent._22 = m_xmf3Up.y; m_xmf4x4ToParent._23 = m_xmf3Up.z;
+	m_xmf4x4ToParent._31 = m_xmf3Look.x; m_xmf4x4ToParent._32 = m_xmf3Look.y; m_xmf4x4ToParent._33 = m_xmf3Look.z;
+	m_xmf4x4ToParent._41 = m_xmf3Position.x; m_xmf4x4ToParent._42 = m_xmf3Position.y; m_xmf4x4ToParent._43 = m_xmf3Position.z;
+	XMMATRIX b = XMLoadFloat4x4(&m_xmf4x4ToParent);
+	XMVECTOR a = XMQuaternionRotationMatrix(b);
+	return XMVECTOR(a);
 }
 
 CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)

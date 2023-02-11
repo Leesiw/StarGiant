@@ -89,14 +89,12 @@ struct INSIDE_INPUT_INFO {
 
 struct SPACESHIP_INPUT_INFO {
 	DWORD dwDirection;
-	float yaw;
-	float pitch;
+	XMFLOAT4 Quaternion;
 };
 
 struct SPACESHIP_INFO {
 	XMFLOAT3					pos;
-	float           			m_fYaw;
-	float						m_fPitch;
+	XMFLOAT4					Quaternion;
 };
 
 struct INSIDE_PLAYER_INFO {

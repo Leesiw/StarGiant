@@ -128,6 +128,7 @@ public:
 	//¼­¹ö 
 	void SetPlayerInfo(SPACESHIP_INFO p_info) { player_info = p_info; is_update = false; }
 	void UpdateOnServer(bool rotate_update = true);
+	XMVECTOR GetQuaternion();
 
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	virtual void OnPrepareRender();

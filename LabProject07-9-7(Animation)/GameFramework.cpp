@@ -561,14 +561,14 @@ void CGameFramework::ProcessInput()
 		//if (ptCursorPos.x >= 0 && ptCursorPos.x < rect.right 
 		//	&& ptCursorPos.y >= 0 && ptCursorPos.y < rect.bottom)
 		{
-			if (!b_Inside) { // 외부 우주선. 클라 화면 중앙과 커서의 위치 차이에 따라 회전
+			if (!b_Inside&&!isConnect || player_type == PlayerType::MOVE && isConnect) { // 외부 우주선. 클라 화면 중앙과 커서의 위치 차이에 따라 회전
 				//ShowCursor(true); //커서 보이게 > 조종법을 이 방식으로 한다면 화면 전환시마다 이걸해줘야 함
 				float x = (float)(rect.right - rect.left) / 2;
 				float y = (float)(rect.bottom - rect.top) / 2;
 				cxDelta = (float)(ptCursorPos.x - x) / 100.0f;
 				cyDelta = (float)(ptCursorPos.y - y) / 100.0f;
 			}
-			else { // 내부 플레이어. 이전 마우스 커서와 현재 마우스 커서 위치 차이에 따라 회전.
+			else if(b_Inside && !isConnect || player_type == PlayerType::INSIDE && isConnect) { // 내부 플레이어. 이전 마우스 커서와 현재 마우스 커서 위치 차이에 따라 회전.
 				//ShowCursor(false); // 커서 안보이게 > 조종법을 이 방식으로 한다면 화면 전환시마다 이걸해줘야 함
 				ScreenToClient(m_hWnd, &m_ptOldCursorPos);
 				cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 2.0f; // 감도 조절 필요
@@ -615,8 +615,10 @@ void CGameFramework::ProcessInput()
 					my_packet.size = sizeof(CS_SPACESHIP_PACKET);
 					my_packet.type = CS_SPACESHIP_MOVE;
 					my_packet.data.dwDirection = dwDirection;
-					my_packet.data.pitch = m_pPlayer[0]->GetPitch();
-					my_packet.data.yaw = m_pPlayer[0]->GetYaw();
+					XMFLOAT4 a;
+					XMStoreFloat4(&a, m_pPlayer[0]->GetQuaternion());
+					my_packet.data.Quaternion = a;
+						
 					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 				}
 			}

@@ -16,8 +16,8 @@ void SESSION::send_spaceship_packet(int c_id, CAirplanePlayer* m_pPlayer)	// วรท
 	p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
 	p.type = SC_MOVE_SPACESHIP;
 	p.data.pos = m_pPlayer->GetPosition();
-	p.data.m_fYaw = m_pPlayer->GetYaw();
-	p.data.m_fPitch = m_pPlayer->GetPitch();
+	XMFLOAT4 a;
+	p.data.Quaternion = m_pPlayer->input_info.Quaternion;
 
 	//p.data.velocity = m_pPlayer->GetVelocity();
 	//p.data.shift = m_pPlayer->GetShift();
