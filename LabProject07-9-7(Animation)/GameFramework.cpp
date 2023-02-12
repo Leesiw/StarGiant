@@ -381,7 +381,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				if (b_Inside || m_pInsidePlayer[g_myid]->GetSitState())
 				{
 					int State = m_pInsideScene->CheckSitCollisions();
-					CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState(),State);
+					CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState(), State);
 				}
 				break;
 			case 'X':
@@ -442,7 +442,11 @@ void CGameFramework::CheckSceneChange(bool State, int num)
 	{
 		b_Inside = true;
 	}
-	if(State !=3)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
+
+	if (num == 0)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_L, m_GameTimer.GetTimeElapsed());
+	if (num == 1)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_C, m_GameTimer.GetTimeElapsed());
+	if (num == 2)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
+	if (num == 3)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
 //추가할 사항 없으면 F에 몰아넣기로 수정
 }
 
