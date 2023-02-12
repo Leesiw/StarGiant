@@ -295,6 +295,7 @@ void CThirdPersonCamera::SetLookAt(XMFLOAT3& xmf3LookAt)
 	m_xmf3Look = XMFLOAT3(mtxLookAt._13, mtxLookAt._23, mtxLookAt._33);
 }
 
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 CSitEventCamera::CSitEventCamera(CCamera* pCamera)
 {

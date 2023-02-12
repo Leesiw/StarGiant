@@ -293,6 +293,12 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_LookCamera[2]= XMFLOAT3(0.0f,0.0f,-1.0f);//RIGHT
 	m_LookCamera[3] = XMFLOAT3(1.0f, -0.0f, 0.0f);//CENTER
 
+	m_SitPos[0] = XMFLOAT3(418.0f, 224.0f, 738.0f); //LEFT
+	m_SitPos[1] = XMFLOAT3(506.0f, 224.0f, 677.0f);//UP
+	m_SitPos[2] = XMFLOAT3(418.0f, 224.0f, 618.0f);//RIGHT
+	m_SitPos[3] = XMFLOAT3(405.0f, 224.0f, 677.0);//CENTER
+
+
 	for (int i = 0; i < METEOS; ++i) {
 		m_ppMeteorObjects[i] = NULL;
 	}
@@ -786,8 +792,8 @@ int CScene::CheckSitCollisions()
 				//i번째 방향으로 카메라돌리고 앉게하기 
 				if (((CTerrainPlayer*)m_pPlayer[g_myid])->motion != AnimationState::SIT) {
 					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = AnimationState::SIT;
-					std::cout << "시점전환앉기";
-
+					std::cout << "시점전환앉기\n";
+					m_pPlayer[g_myid]->SetPosition(m_SitPos[i]);
 					m_pPlayer[g_myid]->SetLook(m_LookCamera[i]);
 					m_pPlayer[g_myid]->SetSitState(true);
 					return i;

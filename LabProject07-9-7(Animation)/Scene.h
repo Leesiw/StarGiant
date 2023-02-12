@@ -145,6 +145,8 @@ public:
 	BoundingBox xm_SitAABB[4];
 	BoundingBox xm_MapAABB;
 	XMFLOAT3 m_LookCamera[4];
+	XMFLOAT3 m_SitPos[4];
+
 
 	int m_nScenePlayer = 1;
 	bool b_Inside = false;
