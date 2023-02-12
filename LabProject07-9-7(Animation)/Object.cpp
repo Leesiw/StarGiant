@@ -1515,6 +1515,8 @@ CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 {
 	isAlive = false;
 
+	m_xmf4x4Rotate = Matrix4x4::Identity();
+
 	CLoadedModelInfo* pEnemyModel = pModel;
 	if (!pEnemyModel) pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
 
@@ -1526,30 +1528,49 @@ CEnemyObject::~CEnemyObject()
 {
 }
 
-void CEnemyObject::Rotate(float x, float y, float z)
+void CEnemyObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 {
-	if (x != 0.0f)
-	{
-		m_fPitch += x;
-		if (m_fPitch > 360.0f) m_fPitch -= 360.0f;
-		if (m_fPitch < 0.0f) m_fPitch += 360.0f;
+	if (pxmf4x4Parent) {
+
+		XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(m_xmf4x4ToParent, *pxmf4x4Parent);
+		m_xmf4x4World = Matrix4x4::Multiply(m_xmf4x4Rotate, xmf4x4);
 	}
-	if (y != 0.0f)
-	{
-		m_fYaw += y;
-		if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
-		if (m_fYaw < 0.0f) m_fYaw += 360.0f;
-	}
-	if (z != 0.0f)
-	{
-		m_fRoll += z;
-		if (m_fRoll > 360.0f) m_fRoll -= 360.0f;
-		if (m_fRoll < 0.0f) m_fRoll += 360.0f;
+	else {
+		m_xmf4x4World = Matrix4x4::Multiply(m_xmf4x4Rotate, m_xmf4x4ToParent);
 	}
 
-	CGameObject::Rotate(x, y, z);
+	if (m_pSibling) m_pSibling->UpdateTransform(pxmf4x4Parent);
+	if (m_pChild) m_pChild->UpdateTransform(&m_xmf4x4World);
 }
 
+void CEnemyObject::ResetRotate()
+{
+	m_xmf4x4Rotate = Matrix4x4::Identity();
+}
+
+void CEnemyObject::Rotate(float fPitch, float fYaw, float fRoll)
+{
+	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
+	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
+
+	UpdateTransform(NULL);
+}
+
+void CEnemyObject::Rotate(XMFLOAT3* pxmf3Axis, float fAngle)
+{
+	XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(pxmf3Axis), XMConvertToRadians(fAngle));
+	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
+
+	UpdateTransform(NULL);
+}
+
+void CEnemyObject::Rotate(XMFLOAT4* pxmf4Quaternion)
+{
+	XMMATRIX mtxRotate = XMMatrixRotationQuaternion(XMLoadFloat4(pxmf4Quaternion));
+	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
+
+	UpdateTransform(NULL);
+}
 
 //============================================================================================
 CInsideShipObject::CInsideShipObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)

@@ -54,6 +54,13 @@ enum class EnemyType : char
 
 #pragma pack (push, 1)
 
+// login
+struct LOGIN_INFO {
+	short	id;
+	PlayerType player_type;
+};
+
+//meteo
 struct METEO_INFO {
 	XMFLOAT3 pos;
 };
@@ -71,30 +78,22 @@ struct SPAWN_METEO_INFO {
 	XMFLOAT3 direction;
 };
 
+// bullet
 struct BULLET_INFO {
 	XMFLOAT3 pos;
 	XMFLOAT3 direction;
 };
 
-struct LOGIN_INFO {
-	short	id;
-	PlayerType player_type;
+struct BULLET_HIT_INFO {
+	short id;
+	short hp;
 };
 
+// inside
 struct INSIDE_INPUT_INFO {
 	DWORD dwDirection;
 	float yaw;
 	float pitch;
-};
-
-struct SPACESHIP_INPUT_INFO {
-	DWORD dwDirection;
-	XMFLOAT4 Quaternion;
-};
-
-struct SPACESHIP_INFO {
-	XMFLOAT3					pos;
-	XMFLOAT4					Quaternion;
 };
 
 struct INSIDE_PLAYER_INFO {
@@ -105,55 +104,33 @@ struct INSIDE_PLAYER_INFO {
 	char						animation;
 };
 
+// spaceship
+struct SPACESHIP_INPUT_INFO {
+	DWORD dwDirection;
+	XMFLOAT4 Quaternion;
+};
+
+struct SPACESHIP_INFO {
+	XMFLOAT3					pos;
+	XMFLOAT4					Quaternion;
+};
+
+//enemy
 struct ENEMY_INFO {
 	short id;
 
 	XMFLOAT3 pos;
-
-	float           			m_fPitch;
-	//float           			m_fRoll;
-	float           			m_fYaw;
+	XMFLOAT4 Quaternion;
 };
 
-struct BULLET_HIT_INFO {
-	short id;
-	short hp;
-};
-
+//animation
 struct ANIMATION_INFO {
 	short id;
 	char animation;
 };
 //-----------------------------------------------------------------------
 
-struct CS_CHANGE_PACKET {
-	unsigned char size;
-	char	type;
-
-	PlayerType player_type;
-};
-
-struct CS_SPACESHIP_PACKET {
-	unsigned char size;
-	char	type;
-
-	SPACESHIP_INPUT_INFO	data;
-};
-
-struct CS_INSIDE_PACKET {
-	unsigned char size;
-	char	type;
-
-	INSIDE_INPUT_INFO	data;
-};
-
-struct CS_ATTACK_PACKET {
-	unsigned char size;
-	char	type;
-
-	BULLET_INFO data;
-};
-
+// login
 struct SC_LOGIN_INFO_PACKET {
 	unsigned char size;
 	char	type;
@@ -175,11 +152,52 @@ struct SC_REMOVE_PLAYER_PACKET {
 	short	id;
 };
 
+// type
+struct CS_CHANGE_PACKET {
+	unsigned char size;
+	char	type;
+
+	PlayerType player_type;
+};
+
 struct SC_CHANGE_PACKET {
 	unsigned char size;
 	char	type;
 
 	LOGIN_INFO	data;
+};
+
+// meteo
+struct SC_SPAWN_METEO_PACKET {
+	unsigned char size;
+	char	type;
+	SPAWN_METEO_INFO data;
+};
+
+struct SC_SPAWN_ALL_METEO_PACKET {
+	unsigned char size;
+	char	type;
+	SPAWN_METEO_INFO data[METEOS];
+};
+
+struct SC_METEO_DIRECTION_PACKET {
+	unsigned char size;
+	char	type;
+	METEO_DIRECTION_INFO data;
+};
+
+struct SC_METEO_PACKET {
+	unsigned char size;
+	char	type;
+	METEO_INFO meteo[METEOS];
+};
+
+// spaceship
+struct CS_SPACESHIP_PACKET {
+	unsigned char size;
+	char	type;
+
+	SPACESHIP_INPUT_INFO	data;
 };
 
 struct SC_MOVE_SPACESHIP_PACKET {
@@ -189,6 +207,14 @@ struct SC_MOVE_SPACESHIP_PACKET {
 	SPACESHIP_INFO data;
 };
 
+// inside
+struct CS_INSIDE_PACKET {
+	unsigned char size;
+	char	type;
+
+	INSIDE_INPUT_INFO	data;
+};
+
 struct SC_MOVE_INSIDE_PACKET {
 	unsigned char size;
 	char	type;
@@ -196,36 +222,12 @@ struct SC_MOVE_INSIDE_PACKET {
 	INSIDE_PLAYER_INFO data;
 };
 
-
-struct SC_MOVE_ENEMY_PACKET {
+// attack
+struct CS_ATTACK_PACKET {
 	unsigned char size;
 	char	type;
 
-	ENEMY_INFO data;
-};
-
-struct SC_SPAWN_METEO_PACKET {
-	unsigned char size;
-	char	type;
-	SPAWN_METEO_INFO data;
-};
-
-struct SC_METEO_DIRECTION_PACKET {
-	unsigned char size;
-	char	type;
-	METEO_DIRECTION_INFO data;
-};
-
-struct SC_SPAWN_ALL_METEO_PACKET {
-	unsigned char size;
-	char	type;
-	SPAWN_METEO_INFO data[METEOS];
-};
-
-struct SC_METEO_PACKET {
-	unsigned char size;
-	char	type;
-	METEO_INFO meteo[METEOS];
+	BULLET_INFO data;
 };
 
 struct SC_BULLET_PACKET {
@@ -238,10 +240,19 @@ struct SC_BULLET_PACKET {
 struct SC_BULLET_HIT_PACKET {
 	unsigned char size;
 	char	type;
-	
+
 	BULLET_HIT_INFO data;
 };
 
+// enemy
+struct SC_MOVE_ENEMY_PACKET {
+	unsigned char size;
+	char	type;
+
+	ENEMY_INFO data;
+};
+
+// animation
 struct SC_ANIMATION_CHANGE_PACKET {
 	unsigned char size;
 	char	type;

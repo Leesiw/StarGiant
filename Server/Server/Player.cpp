@@ -155,7 +155,9 @@ CAirplanePlayer::~CAirplanePlayer()
 }
 
 bool CAirplanePlayer::FireBullet(short attack_num)
-{/*
+{
+	return false;
+	/*
 	if (m_fFireWaitingTime[attack_num] > 0.0f)
 		return false;
 

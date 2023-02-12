@@ -64,6 +64,8 @@ public:
 	float GetYaw() { return m_fYaw; }
 	float GetRoll() { return m_fRoll; }
 
+	XMFLOAT4 GetQuaternion();
+
 	void ResetCoolTime() { m_fCoolTimeRemaining = m_fCoolTime; }
 
 	void SendPos();

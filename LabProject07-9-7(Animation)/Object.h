@@ -400,7 +400,7 @@ public:
 	void Rotate(XMFLOAT4 *pxmf4Quaternion);
 
 	CGameObject *GetParent() { return(m_pParent); }
-	void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent=NULL);
+	virtual void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent=NULL);
 	CGameObject *FindFrame(char *pstrFrameName);
 
 	CTexture *FindReplicatedTexture(_TCHAR *pstrTextureName);
@@ -603,12 +603,19 @@ class CEnemyObject : public CGameObject
 public:
 	bool isAlive;
 
+	XMFLOAT4X4 m_xmf4x4Rotate;
 	float m_fPitch, m_fYaw, m_fRoll;
 
 	CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks);
 	virtual ~CEnemyObject();
 
+	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
+
 	virtual void Rotate(float x, float y, float z);
+	virtual void Rotate(XMFLOAT3* pxmf3Axis, float fAngle);
+	virtual void Rotate(XMFLOAT4* pxmf4Quaternion);
+
+	void ResetRotate();
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

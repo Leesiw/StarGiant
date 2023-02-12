@@ -84,8 +84,7 @@ void CGameFramework::Init() {
 					Alive[i] = m_pScene->m_ppEnemies[i]->GetisAlive();
 					if (Alive[i]) {
 						e_info[i].id = i;
-						e_info[i].m_fYaw = m_pScene->m_ppEnemies[i]->GetYaw();
-						e_info[i].m_fPitch = m_pScene->m_ppEnemies[i]->GetPitch();
+						e_info[i].Quaternion = m_pScene->m_ppEnemies[i]->GetQuaternion();
 						e_info[i].pos = m_pScene->m_ppEnemies[i]->GetPosition();
 					}
 				}

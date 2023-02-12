@@ -967,7 +967,8 @@ void CGameFramework::RecvServer()
 				m_pScene->m_ppEnemies[enemyInfo.id]->isAlive = true;
 			}
 			m_pScene->m_ppEnemies[enemyInfo.id]->SetPosition(enemyInfo.pos);
-			m_pScene->m_ppEnemies[enemyInfo.id]->Rotate(enemyInfo.m_fPitch - m_pScene->m_ppEnemies[enemyInfo.id]->m_fPitch, enemyInfo.m_fYaw - m_pScene->m_ppEnemies[enemyInfo.id]->m_fYaw, 0.0f);
+			m_pScene->m_ppEnemies[enemyInfo.id]->ResetRotate();
+			m_pScene->m_ppEnemies[enemyInfo.id]->Rotate(&enemyInfo.Quaternion);
 			break;
 		}
 		case SC_BULLET:

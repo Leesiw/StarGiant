@@ -102,7 +102,7 @@ void CEnemy::AI(float fTimeElapsed, XMFLOAT3 & player_pos)
 		AvoidAI(fTimeElapsed);
 		break;
 	case EnemyState::MOVE:
-		//MoveAI(fTimeElapsed, player_pos);
+		MoveAI(fTimeElapsed, player_pos);
 		break;
 	}
 	SendPos();
@@ -118,7 +118,7 @@ void CEnemy::MoveAI(float fTimeElapsed, XMFLOAT3& player_pos)
 
 	XMFLOAT3 vec = Vector3::Subtract(xmf3Position, m_xmf3Destination);
 	float dist = Vector3::Length(Vector3::Subtract(xmf3Position, m_xmf3Destination));
-
+	m_fSpeed = 500.0f;
 	if (dist > 50.f)
 	{
 		XMFLOAT3 xmf3Look = GetLook();
@@ -320,11 +320,19 @@ void CEnemy::SendPos()
 	{
 		ENEMY_INFO info;
 		info.id = id;
-		info.m_fYaw = m_fYaw;
-		info.m_fPitch = m_fPitch;
+		info.Quaternion = GetQuaternion();
 		info.pos = GetPosition();
 		pl.send_enemy_packet(0, info);
 	}
+}
+
+XMFLOAT4 CEnemy::GetQuaternion()
+{
+	XMMATRIX mat = XMLoadFloat4x4(&m_xmf4x4ToParent);
+	XMVECTOR vec = XMQuaternionRotationMatrix(mat);
+	XMFLOAT4 xmf4;
+	XMStoreFloat4(&xmf4, vec);
+	return xmf4;
 }
 
 //-------------------------------------------------------------------------------------
