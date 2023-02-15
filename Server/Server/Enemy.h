@@ -1,5 +1,4 @@
 #pragma once
-#include "Object.h"
 #include "Session.h"
 
 enum class EnemyState : char
@@ -22,14 +21,17 @@ protected:
 	float						m_fCoolTime = 2.0f;
 	float						m_fCoolTimeRemaining = 0.0f;
 
-	float						m_fAttackRange = 600.0f;
+	float						m_fAttackRange = 300.0f;
 
 	XMFLOAT3					m_xmf3Velocity;
 
+	float						m_fMoveTime = 1.0f;
+	float						m_fMoveTimeRemaining = 1.0f;
+
+	bool						m_bRotateToPlayer = false;
+
 	float						m_fAvoidTime = 0.0f;
 	bool						m_bAvoidDir;		// true면 오른쪽, false면 왼쪽
-
-	float m_fSpeed;
 
 	XMFLOAT3					m_xmf3Destination;
 
@@ -46,11 +48,11 @@ public:
 	bool GetisAlive() { return isAlive; }
 	void SetisAlive(bool i_a) { isAlive = i_a; }
 
-	virtual void AI(float fTimeElapsed, XMFLOAT3& player_pos);
-	virtual void MoveAI(float fTimeElapsed, XMFLOAT3& player_pos);
-	virtual void AimingAI(float fTimeElapsed, XMFLOAT3& player_pos);
-	virtual void AttackAI(float fTimeElapsed, XMFLOAT3& player_pos);
-	virtual void Attack(float fTimeElapsed, XMFLOAT3& player_pos);
+	virtual void AI(float fTimeElapsed, CPlayer* player);
+	virtual void MoveAI(float fTimeElapsed, CPlayer* player);
+	virtual void AimingAI(float fTimeElapsed, CPlayer* player);
+	virtual void AttackAI(float fTimeElapsed, CPlayer* player);
+	virtual void Attack(float fTimeElapsed, CPlayer* player);
 	virtual void AvoidAI(float fTimeElapsed);
 
 	virtual void VelocityUpdate(float fTimeElapsed);
@@ -58,7 +60,7 @@ public:
 	void Rotate(float x, float y, float z);
 
 	virtual void Animate(float fElapsedTime);
-	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
+	virtual void Animate(float fTimeElapsed, CPlayer* player);
 
 	float GetPitch() { return m_fPitch; }
 	float GetYaw() { return m_fYaw; }
@@ -85,7 +87,7 @@ public:
 
 public:
 	virtual void Animate(float fTimeElapsed);
-	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
+	virtual void Animate(float fTimeElapsed, CPlayer* player);
 };
 
 class CLaserEnemy : public CEnemy
@@ -98,7 +100,7 @@ public:
 	float m_fAvoidReductionRate;	// 상대 가속/방향 전환 시 명중률 떨어지는 정도
 public:
 	virtual void Animate(float fTimeElapsed);
-	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
+	virtual void Animate(float fTimeElapsed, CPlayer* player);
 };
 
 class CPlasmaCannonEnemy : public CLaserEnemy
@@ -108,5 +110,5 @@ public:
 	virtual ~CPlasmaCannonEnemy();
 public:
 	virtual void Animate(float fTimeElapsed);
-	virtual void Animate(float fTimeElapsed, XMFLOAT3 player_pos);
+	virtual void Animate(float fTimeElapsed, CPlayer* player);
 };

@@ -40,6 +40,19 @@ static std::uniform_real_distribution<float> urdScale2(3, 5);
 static std::uniform_int_distribution<int> urdEnemyAI(0, 100);
 static std::uniform_int_distribution<int> urdEnemyType(0, 2);
 
+
+#define RANDOM_COLOR			XMFLOAT4(rand() / float(RAND_MAX), rand() / float(RAND_MAX), rand() / float(RAND_MAX), rand() / float(RAND_MAX))
+
+#define EPSILON					1.0e-10f
+
+inline bool IsZero(float fValue) { return((fabsf(fValue) < EPSILON)); }
+inline bool IsEqual(float fA, float fB) { return(::IsZero(fA - fB)); }
+inline bool IsZero(float fValue, float fEpsilon) { return((fabsf(fValue) < fEpsilon)); }
+inline bool IsEqual(float fA, float fB, float fEpsilon) { return(::IsZero(fA - fB, fEpsilon)); }
+inline float InverseSqrt(float fValue) { return 1.0f / sqrtf(fValue); }
+inline void Swap(float* pfS, float* pfT) { float fTemp = *pfS; *pfS = *pfT; *pfT = fTemp; }
+
+
 /*
 // 소켓 함수 오류 출력 후 종료
 void err_quit(const char* msg)

@@ -971,8 +971,10 @@ void CGameFramework::RecvServer()
 				m_pScene->m_ppEnemies[enemyInfo.id]->isAlive = true;
 			}
 			m_pScene->m_ppEnemies[enemyInfo.id]->SetPosition(enemyInfo.pos);
+			m.lock();
 			m_pScene->m_ppEnemies[enemyInfo.id]->ResetRotate();
 			m_pScene->m_ppEnemies[enemyInfo.id]->Rotate(&enemyInfo.Quaternion);
+			m.unlock();
 			break;
 		}
 		case SC_BULLET:
