@@ -794,7 +794,7 @@ int CScene::CheckSitCollisions()
 					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = AnimationState::SIT;
 					std::cout << "시점전환앉기\n";
 					m_pPlayer[g_myid]->SetPosition(m_SitPos[i]);
-					m_pPlayer[g_myid]->SetLook(m_LookCamera[i]);
+					//m_pPlayer[g_myid]->SetLook(m_LookCamera[i]); > 회전 연동 시 문제 생김 + right 벡터같은거 상관 없이 행렬 자체 건드려서 플레이어 일그러짐
 					m_pPlayer[g_myid]->SetSitState(true);
 					return i;
 				}
@@ -803,13 +803,15 @@ int CScene::CheckSitCollisions()
 					std::cout << "서기";
 					((CTerrainPlayer*)m_pPlayer[g_myid])->motion = AnimationState::IDLE;
 					
-					m_pPlayer[g_myid]->SetLook(m_LookCamera[i]);
+					//m_pPlayer[g_myid]->SetLook(m_LookCamera[i]);
 					m_pPlayer[g_myid]->SetSitState(false);
 					return i;
 				}
 			}
 		}
 	}
+
+	return -1;
 }
 
 bool CScene::ProcessInput(UCHAR *pKeysBuffer)

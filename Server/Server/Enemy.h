@@ -55,7 +55,7 @@ public:
 	virtual void Attack(float fTimeElapsed, CPlayer* player);
 	virtual void AvoidAI(float fTimeElapsed);
 
-	virtual void VelocityUpdate(float fTimeElapsed);
+	virtual void VelocityUpdate(float fTimeElapsed, CPlayer* player);
 
 	void Rotate(float x, float y, float z);
 

@@ -381,7 +381,31 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				if (b_Inside || m_pInsidePlayer[g_myid]->GetSitState())
 				{
 					int State = m_pInsideScene->CheckSitCollisions();
-					CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState(), State);
+					if (!isConnect) {
+						CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState(), State);
+					}
+					if (State == 3) {
+						CS_CHANGE_PACKET my_packet;
+						my_packet.size = sizeof(CS_CHANGE_PACKET);
+						my_packet.type = CS_CHANGE;
+						my_packet.player_type = PlayerType::MOVE;
+						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+					}
+					else if(State >= 0) {
+						CS_CHANGE_PACKET my_packet;
+						my_packet.size = sizeof(CS_CHANGE_PACKET);
+						my_packet.type = CS_CHANGE;
+						my_packet.player_type = (PlayerType)(State + 2);
+						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+					}
+				}
+
+				if (player_type != PlayerType::INSIDE) {
+					CS_CHANGE_PACKET my_packet;
+					my_packet.size = sizeof(CS_CHANGE_PACKET);
+					my_packet.type = CS_CHANGE;
+					my_packet.player_type = PlayerType::INSIDE;
+					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 				}
 				break;
 			case 'X':
@@ -561,11 +585,15 @@ void CGameFramework::ProcessInput()
 		RECT rect;
 		GetClientRect(m_hWnd, &rect);
 
+
+		XMFLOAT3 a = m_pInsidePlayer[0]->GetPosition();
+		a.y = 10.f;
+		m_pInsidePlayer[0]->SetPosition( a);
 		// if문 > 마우스 커서가 게임 화면 안에 있을 때
 		//if (ptCursorPos.x >= 0 && ptCursorPos.x < rect.right 
 		//	&& ptCursorPos.y >= 0 && ptCursorPos.y < rect.bottom)
 		{
-			if (!b_Inside&&!isConnect || player_type == PlayerType::MOVE && isConnect) { // 외부 우주선. 클라 화면 중앙과 커서의 위치 차이에 따라 회전
+			if (!b_Inside&&!isConnect || player_type != PlayerType::INSIDE && isConnect) { // 외부 우주선. 클라 화면 중앙과 커서의 위치 차이에 따라 회전
 				//ShowCursor(true); //커서 보이게 > 조종법을 이 방식으로 한다면 화면 전환시마다 이걸해줘야 함
 				float x = (float)(rect.right - rect.left) / 2;
 				float y = (float)(rect.bottom - rect.top) / 2;
@@ -842,17 +870,37 @@ void CGameFramework::RecvServer()
 				}
 				else {
 					b_Inside = false;
+					if (player_type == PlayerType::MOVE) {
+						m_pCamera = m_pPlayer[0]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
+					}
+					else if (player_type == PlayerType::ATTACK1) {
+						m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_L, m_GameTimer.GetTimeElapsed());
+					}
+					else if (player_type == PlayerType::ATTACK2) {
+						m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_C, m_GameTimer.GetTimeElapsed());
+					}
+					else if (player_type == PlayerType::ATTACK3) {
+						m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
+					}
 				}
 			}
 			// 여기서 온 정보에 따라 해당 캐릭터가 특정 자리에 앉게 하거나 일어나게 한다
 			if (l_info.player_type == PlayerType::INSIDE) {
 				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::IDLE;
 			}
-			else {
+			else if(l_info.player_type == PlayerType::MOVE) {
 				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::SIT;
+				m_pInsidePlayer[l_info.id]->SetPosition(m_pInsideScene->m_SitPos[3]);
+				//m_pPlayer[l_info.id]->SetLook(m_pInsideScene->m_LookCamera[3]);
+				m_pInsidePlayer[l_info.id]->SetSitState(true);
 			}
-			
-			
+			else {	// Attack
+				int i = (int)l_info.player_type - 2;
+				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::SIT;
+				m_pInsidePlayer[l_info.id]->SetPosition(m_pInsideScene->m_SitPos[i]);
+				//m_pPlayer[l_info.id]->SetLook(m_pInsideScene->m_LookCamera[i]);
+				m_pInsidePlayer[l_info.id]->SetSitState(true);
+			}
 			// 정보에 따라 카메라/씬 전환 (MOVE : 3인칭 우주선 외부, ATTACK1/2/3 : 1인칭 공격 모드, INSIDE : 우주선 내부 3인칭)
 			break;
 		}
