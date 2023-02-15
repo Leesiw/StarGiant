@@ -11,7 +11,8 @@
 #define ATTACT_CAMERA_L				0x06
 #define ATTACT_CAMERA_R				0x07
 
-
+#include "3DDefinitions.h"
+class Frustrum;
 
 struct VS_CB_CAMERA_INFO
 {
@@ -50,6 +51,7 @@ protected:
 
 	ID3D12Resource					*m_pd3dcbCamera = NULL;
 	VS_CB_CAMERA_INFO				*m_pcbMappedCamera = NULL;
+
 
 public:
 	CCamera();
@@ -107,6 +109,9 @@ public:
 	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f) { }
 	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed) { }
 	virtual void SetLookAt(XMFLOAT3& xmf3LookAt) { }
+
+	int SceneTimer = 0;
+	bool CameraSence1(bool ON);
 };
 
 class CSpaceShipCamera : public CCamera
@@ -166,5 +171,32 @@ public:
 
 	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed);
 	virtual void SetLookAt(XMFLOAT3& vLookAt);
+};
+
+////////////////////////////////////////////////////////////////////////
+class CFrustrumCamera : public CCamera
+{
+public:
+	CFrustrumCamera(int renderWidth, int renderHeight, Vertex& positionIn, Vertex& lookAtIn, float zNearIn, float aFarin);
+	virtual ~CFrustrumCamera() { }
+
+	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed, UINT8* tKeys=NULL);
+	virtual void SetLookAt(XMFLOAT3& vLookAt); //apply
+
+	void SetupPerspective();
+
+	//void UpdateMouse(int deltax, int deltay);
+	void Render();
+	void Info_Print();
+
+	// Frustrum Á¤º¸
+	float fovy;
+	float aspect;
+	float zNear;
+	float zFar;
+
+	void UpdateFrustrum();
+	Frustrum* frustrum;
+
 };
 

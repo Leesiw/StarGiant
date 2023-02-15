@@ -102,6 +102,7 @@ private:
 	CCamera* m_pInsideCamera = NULL;
 
 	bool b_Inside;
+	bool b_CameraScene = false;
 	// 
 	
 

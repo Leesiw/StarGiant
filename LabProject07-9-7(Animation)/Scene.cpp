@@ -29,7 +29,7 @@ CScene::~CScene()
 
 void CScene::BuildDefaultLightsAndMaterials()
 {
-	m_nLights = 5;
+	m_nLights = 6;
 	m_pLights = new LIGHT[m_nLights];
 	::ZeroMemory(m_pLights, sizeof(LIGHT) * m_nLights);
 
@@ -81,6 +81,14 @@ void CScene::BuildDefaultLightsAndMaterials()
 	m_pLights[4].m_xmf4Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.0f);
 	m_pLights[4].m_xmf3Position = XMFLOAT3(600.0f, 250.0f, 700.0f);
 	m_pLights[4].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.001f, 0.0001f);
+	/// //GodRay Light
+	m_pLights[5].m_nType = POINT_LIGHT;
+	m_pLights[5].m_fRange = 200.0f;
+	m_pLights[5].m_xmf4Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	m_pLights[5].m_xmf4Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pLights[5].m_xmf4Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.0f);
+	m_pLights[5].m_xmf3Position = XMFLOAT3(600.0f, 250.0f, 700.0f);
+	m_pLights[5].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.001f, 0.0001f);
 }
 
 void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
@@ -268,7 +276,7 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	XMFLOAT4 xmf4Color(0.0f, 0.3f, 0.0f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 257, 257, xmf3Scale, xmf4Color);
 
-	m_nHierarchicalGameObjects = 1;
+	m_nHierarchicalGameObjects = 2;
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 
 	//����� ���� 
@@ -277,7 +285,13 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_ppHierarchicalGameObjects[0]->SetPosition(425.0f, 250.f - 30.0f, 590.0f);
 	m_ppHierarchicalGameObjects[0]->SetScale(9.0f, 9.0f, 9.0f);
 
+	CLoadedModelInfo* pSeatModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InsideSeat.bin", NULL);
+	m_ppHierarchicalGameObjects[1] = new CInsideShipObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pSeatModel, 1);
+	m_ppHierarchicalGameObjects[1]->SetPosition(390.0f, 250.f - 30.0f, 590.0f);
+	m_ppHierarchicalGameObjects[1]->SetScale(1.0f, 1.0f, 1.0f);
+
 	if (pInsideModel) delete pInsideModel;
+	if (pSeatModel) delete pSeatModel;
 
 	//���Ƿ� �����ϴ� �ٿ���ڽ� (���� ���� Height���� ���� �浹�˻�� �ٲٰ����) 
 	b_Inside = true;
