@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "Camera.h"
+#include "Frustrum.h"
 
 CCamera::CCamera()
 {
@@ -143,6 +144,18 @@ void CCamera::SetViewportsAndScissorRects(ID3D12GraphicsCommandList *pd3dCommand
 {
 	pd3dCommandList->RSSetViewports(1, &m_d3dViewport);
 	pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect);
+}
+
+bool CCamera::CameraSence1(bool ON)
+{
+	if (SceneTimer != 20&&ON) {
+		SetPosition(XMFLOAT3(GetPosition().x, GetPosition().y, GetPosition().z-5.0f));
+		SceneTimer++;
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -490,3 +503,66 @@ void CDriveCamera::SetLookAt(XMFLOAT3& xmf3LookAt)
 	m_xmf3Look = XMFLOAT3(mtxLookAt._13, mtxLookAt._23, mtxLookAt._33);
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+CFrustrumCamera::CFrustrumCamera(int renderWidth, int renderHeight, Vertex& positionIn, Vertex& lookAtIn, float zNearIn, float aFarin)
+{
+	//m_nMode = DRIVE_CAMERA;
+
+	//m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	//m_xmf3Right.y = 0.0f;
+	//m_xmf3Look.y = 0.0f;
+	//m_xmf3Right = Vector3::Normalize(m_xmf3Right);
+	//m_xmf3Look = Vector3::Normalize(m_xmf3Look);
+
+	m_xmf3Position.x = positionIn.x;
+	m_xmf3Position.y = positionIn.y;
+	m_xmf3Position.z = positionIn.z;
+
+	m_xmf3Look.x = lookAtIn.x;
+	m_xmf3Look.y = lookAtIn.y;
+	m_xmf3Look.z = lookAtIn.z;
+
+	m_xmf3Up = XMFLOAT3(0, 1, 0);
+
+	fovy = 55;
+	aspect = (float)renderWidth / renderHeight;
+	zNear = zNearIn;
+	zFar = aFarin;
+
+	frustrum = new Frustrum(this);
+	frustrum->update();
+}
+
+void CFrustrumCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed, UINT8* tKeys)
+{
+	//플레이어 바라보는 방향에 따른 Frustrum변환 설정 
+}
+
+void CFrustrumCamera::SetLookAt(XMFLOAT3& vLookAt)
+{//수정 필요. 
+	XMFLOAT4X4 mtxLookAt = Matrix4x4::LookAtLH(m_xmf3Position, vLookAt, m_xmf3Up);
+		m_xmf3Right = XMFLOAT3(mtxLookAt._11, mtxLookAt._21, mtxLookAt._31);
+		m_xmf3Up = XMFLOAT3(mtxLookAt._12, mtxLookAt._22, mtxLookAt._32);
+		m_xmf3Look = XMFLOAT3(mtxLookAt._13, mtxLookAt._23, mtxLookAt._33);
+}
+
+void CFrustrumCamera::SetupPerspective()
+{
+}
+
+void CFrustrumCamera::Render()
+{
+}
+
+
+void CFrustrumCamera::Info_Print()
+{
+	//printf("Camera position: x=%f,y=%f,z=%f : lookat: x=%f,y=%f,z=%f\n", m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z, m_xmf3Look.x, m_xmf3Look.y, m_xmf3Look.z);
+}
+
+void CFrustrumCamera::UpdateFrustrum()
+{
+	frustrum->update();
+}

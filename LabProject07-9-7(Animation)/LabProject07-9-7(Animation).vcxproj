@@ -150,8 +150,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Server\Server\protocol.h" />
+    <ClInclude Include="3DDefinitions.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DDSTextureLoader12.h" />
+    <ClInclude Include="Frustrum.h" />
     <ClInclude Include="GameFramework.h" />
     <ClInclude Include="LabProject07-9-7(Animation).h" />
     <ClInclude Include="Mesh.h" />
@@ -168,6 +170,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DDSTextureLoader12.cpp" />
+    <ClCompile Include="Frustrum.cpp" />
     <ClCompile Include="GameFramework.cpp" />
     <ClCompile Include="LabProject07-9-7(Animation).cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -190,6 +193,11 @@
   <ItemGroup>
     <Image Include="LabProject07-9-7(Animation).ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

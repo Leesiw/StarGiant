@@ -436,11 +436,12 @@ void CGameFramework::CheckSceneChange(bool State, int num)
 {
 	if (State) 
 	{
-		b_Inside = false;
+		b_CameraScene = true;
 	}
 	else
 	{
 		b_Inside = true;
+		m_pInsideCamera->SceneTimer = 0;
 	}
 
 	if (num == 0)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_L, m_GameTimer.GetTimeElapsed());
@@ -714,6 +715,7 @@ void CGameFramework::FrameAdvance()
 
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
+	if(b_CameraScene)b_Inside = b_CameraScene = m_pInsideCamera->CameraSence1(b_CameraScene);
 	if (m_pScene&&!b_Inside) m_pScene->Render(m_pd3dCommandList, m_pCamera);
 	if (m_pInsideScene&&b_Inside) m_pInsideScene->Render(m_pd3dCommandList, m_pInsideCamera);
 

@@ -60,6 +60,12 @@
     <ClInclude Include="..\Server\Server\protocol.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Frustrum.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="3DDefinitions.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -98,6 +104,9 @@
     <ClCompile Include="WICTextureLoader12.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Frustrum.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LabProject07-9-7(Animation).rc">
@@ -111,5 +120,10 @@
     <Image Include="LabProject07-9-7(Animation).ico">
       <Filter>리소스 파일</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders.hlsl">
+      <Filter>헤더 파일</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
