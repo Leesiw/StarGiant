@@ -626,7 +626,7 @@ void CGameFramework::ProcessInput()
 		{
 			if (cxDelta || cyDelta)
 			{
-				if (b_Inside) {
+				if (b_Inside && !isConnect || player_type == PlayerType::INSIDE && isConnect) {
 					m_pInsidePlayer[g_myid]->Rotate(0.0f, cxDelta, 0.0f);
 				}
 				else {
