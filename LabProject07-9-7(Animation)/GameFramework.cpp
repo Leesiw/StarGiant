@@ -1039,10 +1039,12 @@ void CGameFramework::RecvServer()
 
 			//((CAirplanePlayer*)m_pPlayer[0])->SetBulletFromServer(bulletInfo);
 			for (int i = 0; i < ENEMY_BULLETS; ++i) {
-				if (!m_pScene->m_ppEnemyBullets[i]->is_fire)
+				if (!m_pScene->m_ppEnemyBullets[i]->m_bActive) {
 					m_pScene->m_ppEnemyBullets[i]->SetFirePosition(bulletInfo.pos);
 					m_pScene->m_ppEnemyBullets[i]->SetMovingDirection(bulletInfo.direction);
-					m_pScene->m_ppEnemyBullets[i]->is_fire = true;
+					m_pScene->m_ppEnemyBullets[i]->SetActive(true);
+					break;
+				}
 			}
 			break;
 		}

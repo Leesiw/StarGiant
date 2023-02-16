@@ -169,6 +169,13 @@ void CEnemy::AimingAI(float fTimeElapsed, CPlayer* player)
 	float pitch = asin(-player_pos.y);
 	float yaw = atan2(player_pos.x, player_pos.z);
 	
+	XMFLOAT3 xmfToPlayer = Vector3::Subtract(GetPosition(), player->GetPosition());
+	XMFLOAT3 xmf3Look = GetLook();
+
+//	xmf3Look = Vector3::Normalize(xmf3Look);
+//	xmfToPlayer = Vector3::Normalize(xmfToPlayer);
+//	double fAngle = Vector3::Angle(xmf3Look, xmfToPlayer);
+
 	if (::IsZero(yaw) && ::IsZero(pitch)) {
 		state = EnemyState::ATTACK;
 	}
@@ -186,15 +193,14 @@ void CEnemy::AttackAI(float fTimeElapsed, CPlayer* player)
 		// 플레이어 쪽이 아닌 반대 쪽을 보고 있는지 체크
 		XMFLOAT3 xmf3RotateDir = GetLook();
 		XMFLOAT3 xmf3Position = GetPosition();
-		XMFLOAT3 xmfToPlayer = Vector3::Subtract(xmf3Position, player->GetPosition());
+		XMFLOAT3 xmfToPlayer = Vector3::Subtract(player->GetPosition(), xmf3Position);
 		XMFLOAT3 xmf3Look = GetLook();
 
 		xmf3Look = Vector3::Normalize(xmf3Look);
 		xmfToPlayer = Vector3::Normalize(xmfToPlayer);
 		double fAngle = Vector3::Angle(xmf3Look, xmfToPlayer);
 
-
-		if (fAngle > 30.f) {
+		if (fAngle > 10.f) {
 			state = EnemyState::AIMING;
 		}
 		else {
@@ -211,7 +217,7 @@ void CEnemy::Attack(float fTimeElapsed, CPlayer* player)
 	{
 		XMFLOAT3 xmf3Pos = GetPosition();
 		XMFLOAT3 player_pos = player->GetPosition();
-		XMFLOAT3 xmfToPlayer = Vector3::Subtract(xmf3Pos, player_pos);
+		XMFLOAT3 xmfToPlayer = Vector3::Subtract(player_pos, xmf3Pos);
 		pl.send_bullet_packet(0, xmf3Pos, xmfToPlayer);
 	}
 }
@@ -309,8 +315,8 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CPlayer* player)
 		SetPosition(xmf3Position);
 	}
 	else {
-		XMFLOAT3 player_pos = player->GetPosition();
-		XMFLOAT3 real_pos = Vector3::Add(player_pos, m_xmf3RelativePos);
+		m_xmf3RelativePos = Vector3::Add(m_xmf3RelativePos, xmf3Velocity);
+		XMFLOAT3 real_pos = Vector3::Add(player->GetPosition(), m_xmf3RelativePos);
 		SetPosition(real_pos);
 	}
 	

@@ -237,6 +237,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppEnemyBullets[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_ppEnemyBullets[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
 		m_ppEnemyBullets[i]->SetScale(1.0f, 1.0f, 1.0f);
+		m_ppEnemyBullets[i]->SetMovingSpeed(1000.f);
+		m_ppEnemyBullets[i]->is_fire = false;
 		if (pEnemyModel) delete pEnemyModel;
 	}
 	//=====================================
@@ -913,9 +915,10 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 	for (int i = 0; i < ENEMY_BULLETS; i++)
 	{
-		if (m_ppEnemyBullets[i] && m_ppEnemyBullets[i]->is_fire)
+		if (m_ppEnemyBullets[i] && m_ppEnemyBullets[i]->m_bActive)
 		{
-			m_ppEnemies[i]->Animate(m_fElapsedTime);
+			m_ppEnemyBullets[i]->Animate(m_fElapsedTime);
+			if (!m_ppEnemyBullets[i]->m_pSkinnedAnimationController) m_ppEnemyBullets[i]->UpdateTransform(NULL);
 			m_ppEnemyBullets[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
