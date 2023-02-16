@@ -145,6 +145,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		
 		if (m_ppEnemies[i]->boundingbox.Intersects(pos, dir, dist)) //총알/적 충돌시
 		{
+			printf("hit");
 			m_ppEnemies[i]->hp -= m_pSpaceship->damage;
 			if (m_ppEnemies[i]->hp <= 0) { m_ppEnemies[i]->SetisAlive(false); }
 

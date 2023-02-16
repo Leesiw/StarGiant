@@ -209,6 +209,9 @@ void CEnemy::AttackAI(float fTimeElapsed, CPlayer* player)
 			state = EnemyState::IDLE;
 		}
 	}
+	else {
+		// ³·Àº È®·ü·Î ·£´ý ¿òÁ÷ÀÓ
+	}
 }
 
 void CEnemy::Attack(float fTimeElapsed, CPlayer* player)

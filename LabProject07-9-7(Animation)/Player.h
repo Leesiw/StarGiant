@@ -118,7 +118,8 @@ public:
 
 
 	SPACESHIP_INFO					player_info;
-	bool						is_update = true;
+	bool							is_update = true;
+	short							hp;
 	virtual void OnPrepareAnimate();
 	virtual void Animate(float fTimeElapsed);
 

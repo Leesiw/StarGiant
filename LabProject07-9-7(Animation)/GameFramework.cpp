@@ -429,6 +429,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
+	
 	switch (nMessageID)
 	{
 		case WM_ACTIVATE:
@@ -442,6 +443,16 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 		case WM_SIZE:
 			break;
 		case WM_LBUTTONDOWN:
+			if (player_type >= PlayerType::ATTACK1 && player_type <= PlayerType::ATTACK3) {
+				CS_ATTACK_PACKET packet{};
+				packet.size = sizeof(packet);
+				packet.type = CS_ATTACK;
+
+				packet.data.pos = m_pCamera->GetPosition();
+				packet.data.direction = m_pCamera->GetLookVector();
+				send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+			}
+			break;
         case WM_RBUTTONDOWN:
         case WM_LBUTTONUP:
         case WM_RBUTTONUP:
@@ -866,6 +877,7 @@ void CGameFramework::RecvServer()
 			LOGIN_INFO l_info;
 			memcpy(&l_info, &subBuf, sizeof(LOGIN_INFO));
 			if (l_info.id == g_myid) {
+				// 정보에 따라 카메라/씬 전환 (MOVE : 3인칭 우주선 외부, ATTACK1/2/3 : 1인칭 공격 모드, INSIDE : 우주선 내부 3인칭)
 				player_type = l_info.player_type;
 				if (player_type == PlayerType::INSIDE) {
 					b_Inside = true;
@@ -903,7 +915,6 @@ void CGameFramework::RecvServer()
 				//m_pPlayer[l_info.id]->SetLook(m_pInsideScene->m_LookCamera[i]);
 				m_pInsidePlayer[l_info.id]->SetSitState(true);
 			}
-			// 정보에 따라 카메라/씬 전환 (MOVE : 3인칭 우주선 외부, ATTACK1/2/3 : 1인칭 공격 모드, INSIDE : 우주선 내부 3인칭)
 			break;
 		}
 		case SC_ADD_PLAYER:
@@ -1059,6 +1070,21 @@ void CGameFramework::RecvServer()
 			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_HIT_INFO));
 
 			// 적/플레이어 hp 감소. 폭발 애니메이션/소리/죽음 등
+			if (bulletInfo.id >= 0) {
+				if (bulletInfo.hp < 0) {
+					m_pScene->m_ppEnemies[bulletInfo.id]->isAlive = false;
+				}
+				else {
+					m_pScene->m_ppEnemies[bulletInfo.id]->hp = bulletInfo.hp;
+				}
+			}
+			else { // 플레이어 타격
+				m_pPlayer[0]->hp = bulletInfo.hp;
+				if(bulletInfo.hp < 0)
+				{ 
+					// 게임 오버 
+				}
+			}
 			break;
 		}
 		case SC_ANIMATION_CHANGE:

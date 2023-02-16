@@ -602,6 +602,7 @@ class CEnemyObject : public CGameObject
 {
 public:
 	bool isAlive;
+	short hp;
 
 	XMFLOAT4X4 m_xmf4x4Rotate;
 	float m_fPitch, m_fYaw, m_fRoll;
