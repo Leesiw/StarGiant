@@ -133,36 +133,6 @@ void CScene::CheckMeteoByPlayerCollisions()
 	}
 }
 
-void CScene::CheckObjectByBulletCollisions()
-{
-	/*
-	CBulletObject** ppBullets = m_pSpaceship->m_ppBullets;
-	for (int i = 0; i < METEOS; ++i)
-	{
-		if (!m_ppMeteoObjects[i]->mesh) continue;
-		for (int j = 0; j < BULLETS; j++)
-		{
-			//ppBullets[j]->UpdateBoundingBox();
-			if (ppBullets[j]->m_bActive) {
-				
-				m_ppMeteoObjects[i]->aabb = BoundingBox(m_ppMeteoObjects[i]->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
-				ppBullets[j]->aabb = BoundingBox(ppBullets[j]->GetPosition(), XMFLOAT3(20.0f, 20.0f, 20.0f));
-
-				if (m_ppMeteoObjects[i]->aabb.Intersects(ppBullets[j]->aabb)) {
-					//if (ppBullets[j]->HierarchyIntersects(m_ppGameObjects[i])) {
-					//m_ppMeteoObjects[i]->hp -= 3;
-					ppBullets[j]->Reset();
-
-					for (auto& pl : clients) {
-						if (false == pl.in_use) continue;
-						//pl.send_bullet_hit_packet(0, i, j);
-					}
-				}
-			}
-		}
-	}*/
-}
-
 void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 {
 	float dist = 500.f; // 플레이어 사거리
@@ -182,6 +152,17 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 			{
 				pl.send_bullet_hit_packet(0, i, m_ppEnemies[i]->hp);
 			}
+		}
+	}
+}
+
+void CScene::CheckEnemyCollisions()
+{
+	for (int i = 0; i < ENEMIES; ++i)
+	{
+		for (int j = 0; j < ENEMIES; ++j) 
+		{
+
 		}
 	}
 }
@@ -269,6 +250,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	}
 
 	CheckMeteoByPlayerCollisions();
-	CheckObjectByBulletCollisions();
+	//CheckObjectByBulletCollisions();
 	//CheckEnemyByBulletCollisions();
 }

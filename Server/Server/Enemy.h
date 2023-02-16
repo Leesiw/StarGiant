@@ -34,6 +34,7 @@ protected:
 	bool						m_bAvoidDir;		// true면 오른쪽, false면 왼쪽
 
 	XMFLOAT3					m_xmf3Destination;
+	XMFLOAT3					m_xmf3RelativePos;
 
 	short						damage;
 

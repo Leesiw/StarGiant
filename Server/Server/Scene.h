@@ -20,8 +20,8 @@ public:
 	void AnimateObjects(float fTimeElapsed);
 
 	void CheckMeteoByPlayerCollisions();
-	void CheckObjectByBulletCollisions();
 	void CheckEnemyByBulletCollisions(BULLET_INFO& data);
+	void CheckEnemyCollisions();
 
 	void SpawnEnemy();
 

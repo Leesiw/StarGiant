@@ -19,6 +19,7 @@ CEnemy::~CEnemy()
 void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 {
 
+	VelocityUpdate(fTimeElapsed, player);
 	XMFLOAT3 player_pos = player->GetPosition();
 	
 	if (m_fCoolTimeRemaining > 0.0f) {
@@ -29,13 +30,15 @@ void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(pos, player_pos));
 
-	if (dist < 150.f)
+	if (dist < 100.f)
 	{
-		//XMFLOAT3 ToGo = Vector3::ScalarProduct(GetLook(), -1.f);//Vector3::Add(pos, player_pos, -1.f);
-		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), fTimeElapsed * -150.f);
+		XMFLOAT3 ToGo = Vector3::Add(pos, player_pos, -1.f);
+		ToGo = Vector3::ScalarProduct(ToGo,100.f);
+		ToGo = Vector3::Add(player_pos, ToGo);
+		SetPosition(ToGo);
 	}
 
-	VelocityUpdate(fTimeElapsed, player);
+	
 
 	switch (state)
 	{
@@ -82,12 +85,13 @@ void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 		}
 		else
 		{
-			if (urdEnemyAI(dree) > 30)
+			state = EnemyState::ATTACK;/*
+			if (urdEnemyAI(dree) > 10)
 			{
 				state = EnemyState::ATTACK;
 			}
 			else 
-			{/*
+			{
 				state = EnemyState::AVOID;
 				if (urdEnemyAI(dree) > 50)
 				{
@@ -96,8 +100,8 @@ void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 				else
 				{
 					m_bAvoidDir = false;
-				}*/
-			}
+				}
+			}*/
 		}
 		break;
 	case EnemyState::AIMING:	// 플레이어 방향을 바라보도록 한다
@@ -138,16 +142,15 @@ void CEnemy::MoveAI(float fTimeElapsed, CPlayer* player)
 		float pitch = asin(-new_pos.y);
 		float yaw = atan2(new_pos.x, new_pos.z);
 
-		Rotate(pitch * fTimeElapsed * 180.f, yaw * fTimeElapsed * 180.f, 0.f);
-		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook() , fTimeElapsed * dist / 2);
-
+		Rotate(pitch * fTimeElapsed * 360.f, yaw * fTimeElapsed * 360.f, 0.f);
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook() , fTimeElapsed * dist);
 		UpdateTransform();
 
 		Rotate(0.f, 0.f, 30.f * fTimeElapsed);
 	}
 	else {
+		m_xmf3RelativePos = Vector3::Add(GetPosition(), player_pos, -1.f);
 		state = EnemyState::AIMING;
-		return;
 	}
 
 	m_xmf3Destination.x -= player_pos.x;
@@ -157,8 +160,9 @@ void CEnemy::MoveAI(float fTimeElapsed, CPlayer* player)
 
 void CEnemy::AimingAI(float fTimeElapsed, CPlayer* player)
 {
-	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// 역행렬
 	XMFLOAT3 player_pos = player->GetPosition();
+	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// 역행렬
+	
 	player_pos = Vector3::TransformCoord(player_pos, inv_mat); // 타겟의 위치를 적 자체의 좌표계로 변환
 	player_pos = Vector3::Normalize(player_pos);
 
@@ -171,7 +175,7 @@ void CEnemy::AimingAI(float fTimeElapsed, CPlayer* player)
 
 	Rotate(pitch * fTimeElapsed * 180.f, yaw * fTimeElapsed * 180.f, 0.f);
 
-	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), 100.f * fTimeElapsed);
+	//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), 100.f * fTimeElapsed);
 
 }
 
@@ -297,11 +301,21 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CPlayer* player)
 	}
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
-	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(GetLook(), fTimeElapsed * 30.f, false);
-	xmf3Velocity = Vector3::Add(xmf3Velocity, LookVelocity);
+	XMFLOAT3 LookVelocity;
+	if (state == EnemyState::MOVE || state == EnemyState::IDLE) {
+		LookVelocity = Vector3::ScalarProduct(GetLook(), fTimeElapsed * 200.f, false);
+		xmf3Velocity = Vector3::Add(xmf3Velocity, LookVelocity);
+		XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
+		SetPosition(xmf3Position);
+	}
+	else {
+		XMFLOAT3 player_pos = player->GetPosition();
+		XMFLOAT3 real_pos = Vector3::Add(player_pos, m_xmf3RelativePos);
+		SetPosition(real_pos);
+	}
+	
 	//Move(xmf3Velocity, false);
-	XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
-	SetPosition(xmf3Position);
+	
 
 	float fDeceleration = (200.0f * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
