@@ -42,6 +42,9 @@ protected:
 	CCamera						*m_pCamera = NULL;
 
 	bool						b_Issit = false;
+	int pastcam = 0;
+	float r = 0;
+
 public:
 	AnimationState motion;
 public:
@@ -62,7 +65,10 @@ public:
 
 	void SetScale(XMFLOAT3& xmf3Scale) { m_xmf3Scale = xmf3Scale; }
 	void SetLook(XMFLOAT3 LookAt) { m_xmf3Look = LookAt; }
+
 	void SetSitState(bool state) { b_Issit = state; }
+
+
 	bool GetSitState() { return b_Issit; }
 
 	const XMFLOAT3& GetVelocity() const { return(m_xmf3Velocity); }

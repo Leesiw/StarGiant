@@ -309,10 +309,10 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_LookCamera[2]= XMFLOAT3(0.0f,0.0f,-1.0f);//RIGHT
 	m_LookCamera[3] = XMFLOAT3(1.0f, -0.0f, 0.0f);//CENTER
 
-	m_SitPos[0] = XMFLOAT3(418.0f, 224.0f, 738.0f); //LEFT
-	m_SitPos[1] = XMFLOAT3(506.0f, 224.0f, 677.0f);//UP
-	m_SitPos[2] = XMFLOAT3(418.0f, 224.0f, 618.0f);//RIGHT
-	m_SitPos[3] = XMFLOAT3(405.0f, 224.0f, 677.0);//CENTER
+	m_SitPos[0] = XMFLOAT3(416.0f, 230.0f, 734.0f); //LEFT
+	m_SitPos[1] = XMFLOAT3(505.0f, 230.0f, 673.0f);//UP
+	m_SitPos[2] = XMFLOAT3(416.0f, 230.0f, 613.0f);//RIGHT
+	m_SitPos[3] = XMFLOAT3(405.0f, 230.0f, 673.0);//CENTER
 
 
 	for (int i = 0; i < METEOS; ++i) {

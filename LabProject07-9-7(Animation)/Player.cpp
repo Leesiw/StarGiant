@@ -103,25 +103,58 @@ void CPlayer::Rotate(float x, float y, float z, int mode)
 			}
 		}
 
-		else if (nCurrentCameraMode == DRIVE_CAMERA || nCurrentCameraMode == ATTACT_CAMERA_C || nCurrentCameraMode == ATTACT_CAMERA_L || nCurrentCameraMode == ATTACT_CAMERA_R)
+		else if (nCurrentCameraMode == DRIVE_CAMERA)
 		{
 			if (x != 0.0f)
 			{
 				m_fPitch += x;
-				//if (m_fPitch > +89.0f) { x -= (m_fPitch - 89.0f); m_fPitch = +89.0f; }
-				//if (m_fPitch < -89.0f) { x -= (m_fPitch + 89.0f); m_fPitch = -89.0f; }
 			}
 			if (y != 0.0f)
 			{
 				m_fYaw += y;
-				//if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
-				//if (m_fYaw < 0.0f) m_fYaw += 360.0f;
+			
 			}
 			if (z != 0.0f)
 			{
 				m_fRoll += z;
-				//if (m_fRoll > +20.0f) { z -= (m_fRoll - 20.0f); m_fRoll = +20.0f; }
-				//if (m_fRoll < -20.0f) { z -= (m_fRoll + 20.0f); m_fRoll = -20.0f; }
+			}
+
+			m_pCamera->Rotate(x, y, z);
+			if (x != 0.0f)
+			{
+				XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(x));
+				m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+				m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
+			}
+			if (y != 0.0f)
+			{
+				XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
+				m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+				m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+			}
+			if (z != 0.0f)
+			{
+				XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Look), XMConvertToRadians(z));
+				m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
+				m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+			}
+
+		}
+
+		else if (nCurrentCameraMode == ATTACT_CAMERA_C || nCurrentCameraMode == ATTACT_CAMERA_L || nCurrentCameraMode == ATTACT_CAMERA_R)
+		{
+			if (x != 0.0f)
+			{
+				m_fPitch += x;
+			}
+			if (y != 0.0f)
+			{
+				m_fYaw += y;
+
+			}
+			if (z != 0.0f)
+			{
+				m_fRoll += z;
 			}
 
 			m_pCamera->Rotate(x, y, z);
@@ -561,6 +594,8 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			pastcam = 4;
+
 			break;
 
 		case ATTACT_CAMERA_C:
@@ -569,38 +604,53 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityXZ(0.0f);
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_C, nCurrentCameraMode);
+			if (pastcam != 5)
+				m_pCamera->Rotate(0.0f, -r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			pastcam = 5;
+
 			break;
 		case ATTACT_CAMERA_L:
 			SetFriction(2.0f);
 			SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
 			SetMaxVelocityXZ(0.0f);
 			SetMaxVelocityY(0.0f);
-			Rotate(0.0f, -90.0f, 0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_L, nCurrentCameraMode);
+			if (pastcam == 7)
+				m_pCamera->Rotate(0.0f, -r, 0.0f);
+			r = -90.0f;
+			if (pastcam != 6)
+				m_pCamera->Rotate(0.0f, r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			pastcam = 6;
+
 			break;
 		case ATTACT_CAMERA_R:
 			SetFriction(2.0f);
 			SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
 			SetMaxVelocityXZ(0.0f);
 			SetMaxVelocityY(0.0f);
-			Rotate(0.0f, 90.0f, 0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_R, nCurrentCameraMode);
+			if (pastcam == 6)
+				m_pCamera->Rotate(0.0f, -r, 0.0f);
+			r = 90.0f;
+			if (pastcam != 7)
+				m_pCamera->Rotate(0.0f, r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
-
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			pastcam = 7;
+
 			break;
 
 		default:
@@ -610,6 +660,7 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 	Update(fTimeElapsed);
 
 	return(m_pCamera);
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -763,7 +814,10 @@ void CTerrainPlayer::OnPlayerUpdateCallback(float fTimeElapsed)
 	XMFLOAT3 xmf3PlayerVelocity = GetVelocity();
 	xmf3PlayerVelocity.y = 0.0f;
 	SetVelocity(xmf3PlayerVelocity);
-	xmf3PlayerPosition.y = 224.0f;
+	if(this->motion!= AnimationState::SIT)
+		xmf3PlayerPosition.y = 224.0f;
+	else
+		xmf3PlayerPosition.y = 229.0f;
 	SetPosition(xmf3PlayerPosition);
 
 }
