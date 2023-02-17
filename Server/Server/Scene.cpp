@@ -142,8 +142,8 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
 		XMVECTOR pos = XMLoadFloat3(&data.pos);
 		XMVECTOR dir = XMLoadFloat3(&data.direction);
-		
-		if (m_ppEnemies[i]->boundingbox.Intersects(pos, dir, dist)) //총알/적 충돌시
+		m_ppEnemies[i]->UpdateBoundingBox();
+		if (m_ppEnemies[i]->m_xmOOBB.Intersects(pos, dir, dist)) //총알/적 충돌시
 		{
 			printf("hit");
 			m_ppEnemies[i]->hp -= m_pSpaceship->damage;
@@ -184,7 +184,7 @@ void CScene::SpawnEnemy()
 				if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; }
 				m_ppEnemies[j]->SetisAlive(true);
 				m_ppEnemies[j]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
-
+				m_ppEnemies[j]->state = EnemyState::IDLE;
 				for (auto& pl : clients) {
 					ENEMY_INFO e_info;
 					e_info.id = j;

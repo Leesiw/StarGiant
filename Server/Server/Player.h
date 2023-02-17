@@ -83,12 +83,12 @@ public:
 	virtual ~CAirplanePlayer();
 
 	short hp;
-	short damage;
+	short damage = 5;
 
 	float						m_fBulletEffectiveRange = 150.0f;
 
 	//ºÒ·¿
-	float						m_fFireDelayTime = 3.f;
+	float						m_fFireDelayTime = 0.5f;
 	float						m_fFireWaitingTime[3];
 
 	bool FireBullet(short attack_num);

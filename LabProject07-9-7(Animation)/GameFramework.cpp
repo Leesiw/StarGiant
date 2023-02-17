@@ -1071,7 +1071,7 @@ void CGameFramework::RecvServer()
 
 			// 적/플레이어 hp 감소. 폭발 애니메이션/소리/죽음 등
 			if (bulletInfo.id >= 0) {
-				if (bulletInfo.hp < 0) {
+				if (bulletInfo.hp <= 0) {
 					m_pScene->m_ppEnemies[bulletInfo.id]->isAlive = false;
 				}
 				else {
@@ -1080,7 +1080,7 @@ void CGameFramework::RecvServer()
 			}
 			else { // 플레이어 타격
 				m_pPlayer[0]->hp = bulletInfo.hp;
-				if(bulletInfo.hp < 0)
+				if(bulletInfo.hp <= 0)
 				{ 
 					// 게임 오버 
 				}

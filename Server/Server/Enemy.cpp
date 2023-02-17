@@ -85,6 +85,7 @@ void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 		}
 		else
 		{
+			m_xmf3RelativePos = Vector3::Add(GetPosition(), player_pos, -1.f);
 			state = EnemyState::ATTACK;/*
 			if (urdEnemyAI(dree) > 10)
 			{
@@ -204,9 +205,15 @@ void CEnemy::AttackAI(float fTimeElapsed, CPlayer* player)
 			state = EnemyState::AIMING;
 		}
 		else {
-			Attack(fTimeElapsed, player);
-			ResetCoolTime();
-			state = EnemyState::IDLE;
+			float length = Vector3::Length(m_xmf3Destination);
+			if (length < m_fAttackRange) {
+				state = EnemyState::AIMING;
+				Attack(fTimeElapsed, player);
+				ResetCoolTime();
+			}
+			else {
+				state = EnemyState::MOVE;
+			}
 		}
 	}
 	else {
@@ -361,6 +368,8 @@ CMissileEnemy::CMissileEnemy()
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 3;
 
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, -0.981136f, -3.06843f), XMFLOAT3(7.79472f, 8.2804f, 9.19255f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+
 	isAlive = false;
 }
 
@@ -391,6 +400,8 @@ CLaserEnemy::CLaserEnemy()
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 3;
 
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.0188516f, -0.336726f, -0.0989028f), XMFLOAT3(1.739f, 1.51158f, 1.67118f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+
 	isAlive = false;
 }
 
@@ -415,6 +426,8 @@ CPlasmaCannonEnemy::CPlasmaCannonEnemy()
 	m_fCoolTime = 2.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 3;
+
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 3.99769f, 7.3113f), XMFLOAT3(17.6804f, 11.0108f, 47.4969f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 
 	isAlive = false;
 }
