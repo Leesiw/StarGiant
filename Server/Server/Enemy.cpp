@@ -86,23 +86,7 @@ void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 		else
 		{
 			m_xmf3RelativePos = Vector3::Add(GetPosition(), player_pos, -1.f);
-			state = EnemyState::ATTACK;/*
-			if (urdEnemyAI(dree) > 10)
-			{
-				state = EnemyState::ATTACK;
-			}
-			else 
-			{
-				state = EnemyState::AVOID;
-				if (urdEnemyAI(dree) > 50)
-				{
-					m_bAvoidDir = true;
-				}
-				else
-				{
-					m_bAvoidDir = false;
-				}
-			}*/
+			state = EnemyState::ATTACK;
 		}
 		break;
 	case EnemyState::AIMING:	// 플레이어 방향을 바라보도록 한다
@@ -169,21 +153,12 @@ void CEnemy::AimingAI(float fTimeElapsed, CPlayer* player)
 
 	float pitch = asin(-player_pos.y);
 	float yaw = atan2(player_pos.x, player_pos.z);
-	
-	XMFLOAT3 xmfToPlayer = Vector3::Subtract(GetPosition(), player->GetPosition());
-	XMFLOAT3 xmf3Look = GetLook();
 
-//	xmf3Look = Vector3::Normalize(xmf3Look);
-//	xmfToPlayer = Vector3::Normalize(xmfToPlayer);
-//	double fAngle = Vector3::Angle(xmf3Look, xmfToPlayer);
-
-	if (::IsZero(yaw) && ::IsZero(pitch)) {
+	if (yaw < 0.05 && pitch < 0.05) {
 		state = EnemyState::ATTACK;
 	}
 
 	Rotate(pitch * fTimeElapsed * 180.f, yaw * fTimeElapsed * 180.f, 0.f);
-
-	//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), 100.f * fTimeElapsed);
 
 }
 
@@ -207,7 +182,7 @@ void CEnemy::AttackAI(float fTimeElapsed, CPlayer* player)
 		else {
 			float length = Vector3::Length(m_xmf3Destination);
 			if (length < m_fAttackRange) {
-				state = EnemyState::AIMING;
+				state = EnemyState::IDLE;
 				Attack(fTimeElapsed, player);
 				ResetCoolTime();
 			}
@@ -217,7 +192,23 @@ void CEnemy::AttackAI(float fTimeElapsed, CPlayer* player)
 		}
 	}
 	else {
+
 		// 낮은 확률로 랜덤 움직임
+		if (!::IsZero(m_xmf3Velocity.x)) return;
+		if (urdEnemyAI(dree) < 10) {
+			if (urdEnemyAI(dree) < 25) {
+				m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, player->GetLook(), 100.f);
+			}
+			else if (urdEnemyAI(dree) < 50) {
+				m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, player->GetLook(), -100.f);
+			}
+			else if (urdEnemyAI(dree) < 75) {
+				m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), 100.f);
+			}
+			else {
+				m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), -100.f);
+			}
+		}
 	}
 }
 
@@ -335,9 +326,14 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CPlayer* player)
 		SetPosition(xmf3Position);
 	}
 	else {
-		m_xmf3RelativePos = Vector3::Add(m_xmf3RelativePos, xmf3Velocity);
-		XMFLOAT3 real_pos = Vector3::Add(player->GetPosition(), m_xmf3RelativePos);
-		SetPosition(real_pos);
+		m_fMoveTimeRemaining -= fTimeElapsed;
+		if (m_fMoveTimeRemaining < 0.f) { m_fSpeed = urdPos2(dree); m_fMoveTimeRemaining = m_fMoveTime; }
+		XMFLOAT3 LookVelocity = Vector3::ScalarProduct(player->GetLook(), fTimeElapsed * m_fSpeed, false);
+		//xmf3PVelocity = Vector3::ScalarProduct(xmf3PVelocity, -fTimeElapsed, false);
+		xmf3Velocity = Vector3::Add(LookVelocity, xmf3Velocity);
+		XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
+		//real_pos = Vector3::Add(real_pos, xmf3Velocity);
+		SetPosition(xmf3Position);
 	}
 	
 	//Move(xmf3Velocity, false);

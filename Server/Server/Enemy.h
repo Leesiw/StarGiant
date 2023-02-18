@@ -24,6 +24,7 @@ protected:
 	float						m_fAttackRange = 300.0f;
 
 	XMFLOAT3					m_xmf3Velocity;
+	float						m_fSpeed;
 
 	float						m_fMoveTime = 1.0f;
 	float						m_fMoveTimeRemaining = 1.0f;
