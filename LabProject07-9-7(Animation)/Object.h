@@ -653,6 +653,9 @@ public:
 	XMFLOAT4X4						m_xmf4x4Transform;
 
 
+	XMFLOAT3					m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3					m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
+
 	bool						is_fire = false;
 	float						m_fRotationSpeed = 0.0f;
 
@@ -663,7 +666,11 @@ public:
 	void SetMovingSpeed(float fSpeed) { m_fMovingSpeed = fSpeed; }
 	void SetMovingDirection(XMFLOAT3& xmf3MovingDirection) { m_xmf3MovingDirection = Vector3::Normalize(xmf3MovingDirection); }
 
-	void SetFirePosition(XMFLOAT3 xmf3FirePosition){m_xmf3FirePosition = xmf3FirePosition;SetPosition(xmf3FirePosition);};
+	void SetFirePosition(XMFLOAT3 xmf3FirePosition){m_xmf3FirePosition = xmf3FirePosition; SetPosition(xmf3FirePosition);};
+
+	void Move(DWORD dwDirection, float fDistance);
+	void Move(const XMFLOAT3& xmf3Shift);
+
 	void Reset();
 
 

@@ -1598,7 +1598,7 @@ CBulletObject::CBulletObject(float fEffectiveRange)
 CBulletObject::CBulletObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
 {
 	CLoadedModelInfo* pBulletModel = pModel;
-	if (!pBulletModel) pBulletModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
+	if (!pBulletModel) pBulletModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/cube.bin", NULL);
 
 	SetChild(pBulletModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pBulletModel);
@@ -1610,50 +1610,41 @@ void CBulletObject::Animate(float fElapsedTime)
 
 	float fDistance = m_fMovingSpeed * fElapsedTime;
 
-	if ((m_fElapsedTimeAfterFire > m_fLockingDelayTime) && m_pLockedObject)
+	if ((m_fElapsedTimeAfterFire > m_fLockingDelayTime))
 	{
-		XMFLOAT3 xmf3Position = GetPosition();
-		XMVECTOR xmvPosition = XMLoadFloat3(&xmf3Position);
-
-		XMFLOAT3 xmf3LockedObjectPosition = m_pLockedObject->GetPosition();
-		XMVECTOR xmvLockedObjectPosition = XMLoadFloat3(&xmf3LockedObjectPosition);
-		XMVECTOR xmvToLockedObject = xmvLockedObjectPosition - xmvPosition;
-		xmvToLockedObject = XMVector3Normalize(xmvToLockedObject);
-
-		XMVECTOR xmvMovingDirection = XMLoadFloat3(&m_xmf3MovingDirection);
-		xmvMovingDirection = XMVector3Normalize(XMVectorLerp(xmvMovingDirection, xmvToLockedObject, 0.25f));
-		XMStoreFloat3(&m_xmf3MovingDirection, xmvMovingDirection);
+		m_xmf3Position.x = m_xmf4x4ToParent._41;
+		m_xmf3Position.y = m_xmf4x4ToParent._42;
+		m_xmf3Position.z = m_xmf4x4ToParent._43;
+		
 	}
-#ifdef _WITH_VECTOR_OPERATION
-	XMFLOAT3 xmf3Position = GetPosition();
+	m_xmf3Position.x = m_xmf4x4ToParent._41;
+	m_xmf3Position.y = m_xmf4x4ToParent._42;
+	m_xmf3Position.z = m_xmf4x4ToParent._43;
 
-	m_fRotationAngle += m_fRotationSpeed * fElapsedTime;
-	if (m_fRotationAngle > 360.0f) m_fRotationAngle = m_fRotationAngle - 360.0f;
-
-
-	XMFLOAT3 xmf3RotationAxis = Vector3::CrossProduct(m_xmf3RotationAxis, m_xmf3MovingDirection, true);
-	float fDotProduct = Vector3::DotProduct(m_xmf3RotationAxis, m_xmf3MovingDirection);
-	float fRotationAngle = ::IsEqual(fDotProduct, 1.0f) ? 0.0f : (float)XMConvertToDegrees(acos(fDotProduct));
-	XMFLOAT4X4 mtxRotate2 = Matrix4x4::RotationAxis(xmf3RotationAxis, fRotationAngle);
-
-	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate1, mtxRotate2);
-
-	XMFLOAT3 xmf3Movement = Vector3::ScalarProduct(m_xmf3MovingDirection, fDistance, false);
-	xmf3Position = Vector3::Add(xmf3Position, xmf3Movement);
-	SetPosition(xmf3Position);
-#else
-
-	XMFLOAT3 xmf3Movement = Vector3::ScalarProduct(m_xmf3MovingDirection, fDistance, false);
-	XMFLOAT3 xmf3Position = GetPosition();
-	xmf3Position = Vector3::Add(xmf3Position, xmf3Movement);
-	SetPosition(xmf3Position);
 	m_fMovingDistance += fDistance;
-#endif
 
-
+	Move(DIR_FORWARD, fDistance);
+	cout << GetPosition().z << endl;
 	if ((m_fMovingDistance > m_fBulletEffectiveRange) || (m_fElapsedTimeAfterFire > m_fLockingTime)) Reset();
 
+
 	CGameObject::Animate(fElapsedTime);
+}
+
+void CBulletObject::Move(DWORD dwDirection, float fDistance)
+{
+	if (dwDirection)
+	{
+		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
+		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+		Move(xmf3Shift);
+	}
+}
+
+void CBulletObject::Move(const XMFLOAT3& xmf3Shift)
+{
+	m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
+	SetPosition(m_xmf3Position);
 }
 
 void CBulletObject::Reset()
