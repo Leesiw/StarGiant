@@ -223,12 +223,22 @@ void CEnemy::AttackAI(float fTimeElapsed, CPlayer* player)
 
 void CEnemy::Attack(float fTimeElapsed, CPlayer* player)
 {
+	XMFLOAT3 xmf3Pos = GetPosition();
+	XMFLOAT3 player_pos = player->GetPosition();
+	XMFLOAT3 xmfToPlayer = Vector3::Subtract(player_pos, xmf3Pos);
+
 	for (auto& pl : clients)
 	{
-		XMFLOAT3 xmf3Pos = GetPosition();
-		XMFLOAT3 player_pos = player->GetPosition();
-		XMFLOAT3 xmfToPlayer = Vector3::Subtract(player_pos, xmf3Pos);
 		pl.send_bullet_packet(0, xmf3Pos, xmfToPlayer);
+	}
+
+	if (urdEnemyAI(dree) < hit_probability) {	// 플레이어에게 공격 명중
+		if (player->GetHP() <= 0) { return; }
+		player->SetHP(player->GetHP() - damage);
+		for (auto& pl : clients)
+		{
+			pl.send_bullet_hit_packet(0, -1, player->GetHP());
+		}
 	}
 }
 

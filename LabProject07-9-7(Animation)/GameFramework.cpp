@@ -798,7 +798,7 @@ void CGameFramework::FrameAdvance()
 	XMFLOAT3 xmf3Position;
 	if(b_Inside) xmf3Position = m_pInsidePlayer[g_myid]->GetLookVector();
 	else xmf3Position = m_pPlayer[0]->GetPosition();
-	_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);
+	_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%.2f, %.2f, %.2f) HP : %d"), xmf3Position.x, xmf3Position.y, xmf3Position.z, m_pPlayer[0]->hp);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 }
 

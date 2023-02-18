@@ -36,7 +36,8 @@ protected:
 	XMFLOAT3					m_xmf3Destination;
 	XMFLOAT3					m_xmf3RelativePos;
 
-	short						damage;
+	short						damage = 3;
+	short						hit_probability = 50;
 
 	bool						isAlive;
 public:

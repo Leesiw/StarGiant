@@ -203,16 +203,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 {
 	m_fElapsedTime = fTimeElapsed;
 
-	//m_ppGameObjects[1]->turnturn(fTimeElapsed);
-	//MoveMeteo(m_GameTimer.GetTimeElapsed());
-	//for (int i = 0; i < METEOS; i++) {
-		//if (!m_pSpaceship->GetBox().Intersects(m_ppGameObjects[i]->m_xmOOBB)) {
-			//std::cout << "´«";
-			//m_ppGameObjects[i]->Replace(m_pPlayer->GetPosition());
-		//}
-
-	//}
-	
 	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
 	for (int i = 0; i < METEOS; ++i) 
 	{ 

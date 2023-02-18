@@ -33,6 +33,7 @@ public:
 	CEnemy*						m_ppEnemies[ENEMIES];
 	short						m_sEnemyNum;
 
+	bool						m_bIsRunning = true;
 	float						m_fElapsedTime = 0.0f;
 };
 

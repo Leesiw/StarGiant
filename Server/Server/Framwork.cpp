@@ -168,6 +168,7 @@ void CGameFramework::ReleaseObjects()
 
 void CGameFramework::AnimateObjects(float fTimeElapsed)
 {
+	if (!m_pScene->m_bIsRunning) { return; }
 	m_fEnemySpawnTimeRemaining -= fTimeElapsed;
 	if (m_fEnemySpawnTimeRemaining < 0.0f)
 	{
@@ -201,17 +202,15 @@ void CGameFramework::AnimateObjects(float fTimeElapsed)
 		}
 	}
 
-
-	//m_Enemy->Animate(fTimeElapsed, m_pSpaceship->GetPosition());
-	/*
-	if (((CEnemyShip*)m_Enemy)->FireBullet(NULL))
-	{
-		for (auto& pl : clients) {
-			if (false == pl.in_use) continue;
-			pl.send_bullet_packet(0, m_Enemy, m_pSpaceship->GetPosition());
-		}
+	for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
+		if (false == pl.in_use) continue;
+		pl.send_spaceship_packet(3, m_pSpaceship);
+		pl.send_meteo_packet(0, m_pScene->m_ppMeteoObjects);
+		// 적 위치?
 	}
-	*/
+
+	// 플레이어 hp가 소진될 시 게임 안 돌아가도록
+	//if (m_pSpaceship->GetHP() <= 0) { m_pScene->m_bIsRunning = false; }
 }
 
 
@@ -230,7 +229,8 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (p->player_type == PlayerType::INSIDE)
 		{
 			clients[c_id].type = PlayerType::INSIDE;
-
+			m_pScene->m_bIsRunning = true;
+			m_pSpaceship->SetHP(100);
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;
 				pl.send_change_packet(c_id, p->player_type);
@@ -291,22 +291,12 @@ void CGameFramework::ClientProcess()
 	auto StartTime = chrono::system_clock::now();
 	auto EndTime = chrono::system_clock::now();
 
-	short num = 0;
 	while (true) {
 		EndTime = chrono::system_clock::now();
 		fps = EndTime - StartTime;
-
 		if (fps.count() > 0.0333333) {
-			++num;
 			StartTime = chrono::system_clock::now();
 			AnimateObjects(fps.count());
-			for (auto& pl : clients) {
-				if (false == pl.in_use) continue;
-				pl.send_spaceship_packet(3, m_pSpaceship);
-				if (!(num = num % 10)) {
-					pl.send_meteo_packet(0, m_pScene->m_ppMeteoObjects);
-				}
-			}
 		}
 	}
 }
