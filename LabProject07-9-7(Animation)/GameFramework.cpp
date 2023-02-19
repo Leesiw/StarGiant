@@ -876,6 +876,32 @@ void CGameFramework::RecvServer()
 
 			LOGIN_INFO l_info;
 			memcpy(&l_info, &subBuf, sizeof(LOGIN_INFO));
+			
+			// 여기서 온 정보에 따라 해당 캐릭터가 특정 자리에 앉게 하거나 일어나게 한다
+			if (l_info.player_type == PlayerType::INSIDE) {
+				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::IDLE;
+				m_pInsidePlayer[l_info.id]->SetSitState(false);
+			}
+			else if(l_info.player_type == PlayerType::MOVE) {
+				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::SIT;
+				m_pInsidePlayer[l_info.id]->SetPosition(m_pInsideScene->m_SitPos[3]);
+				//m_pPlayer[l_info.id]->SetLook(m_pInsideScene->m_LookCamera[3]);
+				m_pInsidePlayer[l_info.id]->is_update = true;
+				m_pInsidePlayer[l_info.id]->Rotate(0.f, 90.f - m_pInsidePlayer[l_info.id]->GetYaw(), 0.f);
+				m_pInsidePlayer[l_info.id]->SetSitState(true);
+			}
+			else {	// Attack
+				int i = (int)l_info.player_type - 2;
+				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::SIT;
+				m_pInsidePlayer[l_info.id]->SetPosition(m_pInsideScene->m_SitPos[i]);
+				//m_pPlayer[l_info.id]->SetLook(m_pInsideScene->m_LookCamera[i]);
+				m_pInsidePlayer[l_info.id]->is_update = true;
+				m_pInsidePlayer[l_info.id]->Rotate(0.f, 90.f * (float)i -m_pInsidePlayer[l_info.id]->GetYaw(), 0.f);
+			
+				printf("%d : yaw : %f\n", i, m_pInsidePlayer[l_info.id]->GetYaw());
+				m_pInsidePlayer[l_info.id]->SetSitState(true);
+			}
+
 			if (l_info.id == g_myid) {
 				// 정보에 따라 카메라/씬 전환 (MOVE : 3인칭 우주선 외부, ATTACK1/2/3 : 1인칭 공격 모드, INSIDE : 우주선 내부 3인칭)
 				player_type = l_info.player_type;
@@ -897,23 +923,6 @@ void CGameFramework::RecvServer()
 						m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
 					}
 				}
-			}
-			// 여기서 온 정보에 따라 해당 캐릭터가 특정 자리에 앉게 하거나 일어나게 한다
-			if (l_info.player_type == PlayerType::INSIDE) {
-				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::IDLE;
-			}
-			else if(l_info.player_type == PlayerType::MOVE) {
-				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::SIT;
-				m_pInsidePlayer[l_info.id]->SetPosition(m_pInsideScene->m_SitPos[3]);
-				//m_pPlayer[l_info.id]->SetLook(m_pInsideScene->m_LookCamera[3]);
-				m_pInsidePlayer[l_info.id]->SetSitState(true);
-			}
-			else {	// Attack
-				int i = (int)l_info.player_type - 2;
-				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::SIT;
-				m_pInsidePlayer[l_info.id]->SetPosition(m_pInsideScene->m_SitPos[i]);
-				//m_pPlayer[l_info.id]->SetLook(m_pInsideScene->m_LookCamera[i]);
-				m_pInsidePlayer[l_info.id]->SetSitState(true);
 			}
 			break;
 		}
