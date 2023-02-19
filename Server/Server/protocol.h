@@ -8,6 +8,7 @@ using namespace DirectX;
 #define METEOS					20
 #define ENEMIES					36
 #define ENEMY_BULLETS			50
+#define GODRAY_SAMPLE			30
 
 
 constexpr int MAX_USER = 3;

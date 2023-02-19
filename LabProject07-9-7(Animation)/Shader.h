@@ -102,21 +102,6 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-class CGodRayShader : public CShader
-{
-public:
-	CGodRayShader();
-	virtual ~CGodRayShader();
-
-
-	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
-
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
-	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
-};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -204,4 +189,32 @@ public:
 
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, void* pContext = NULL, float height = 0.0f);
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class CGodRayShader : public CShader
+{
+public:
+	CGodRayShader();
+	virtual ~CGodRayShader();
 
+	CGameObject*					pRayObject = NULL;
+	CTexturedRectMesh*				pRayRectMesh[GODRAY_SAMPLE];
+	CTexture*						pNoiseTexture[2];
+
+	CFrustrumCamera*				pLightCamera =NULL;
+
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
+	virtual D3D12_BLEND_DESC CreateBlendState();
+
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, void* pContext = NULL);
+	virtual void AnimateObjects(float fTimeElapsed);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+
+	//virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, int nPipelineState);
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
+protected:
+	CGameObject**					m_ppObjects = 0;
+	int								m_nObjects = 0;
+};

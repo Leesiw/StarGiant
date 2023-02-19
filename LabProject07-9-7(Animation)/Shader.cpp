@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Shader.h"
+#include "Scene.h"
 
 CShader::CShader()
 {
@@ -678,7 +679,7 @@ D3D12_INPUT_LAYOUT_DESC CGodRayShader::CreateInputLayout()
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
 
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-
+	//
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
 	d3dInputLayoutDesc.NumElements = nInputElementDescs;
@@ -705,6 +706,150 @@ D3D12_DEPTH_STENCIL_DESC CGodRayShader::CreateDepthStencilState()
 	d3dDepthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
 
 	return(d3dDepthStencilDesc);
+}
+
+D3D12_BLEND_DESC CGodRayShader::CreateBlendState()
+{
+	D3D12_BLEND_DESC d3dBlendDesc;
+	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
+	d3dBlendDesc.AlphaToCoverageEnable = FALSE;
+	d3dBlendDesc.IndependentBlendEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].BlendEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
+	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	return(d3dBlendDesc);
+}
+
+void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, void* pContext)
+{
+	//Frustom을 이용한 광원 범위 설정 ( scene light에서 설정한 광원위치 기준, 플레이어 방향기준 
+	int renderWidth = 1024;
+	int renderHeight = 1024;
+	Vertex camera1Position = Vertex(-10, 00, 60); //560
+	Vertex camera1LookAt = Vertex(-1000, 600, -2000);
+	pLightCamera =new CFrustrumCamera(renderWidth, renderHeight, camera1Position, camera1LookAt, 10, 100000);
+
+
+	// 샘플 수 만큼 사각형만들기.. 
+	// -> frustrum 생성 후 n개로 나눴을때 n번쨰 사각형 위치 계산할 수 있게 해야함. 그걸로 오브젝트 만들어야할듯/ 
+	// 텍스처 블랜드해서 그릴 수 있게 하기. 
+
+	// hlsl 에서 잘 조정해보기... 
+	//조명 위치를 보여줄 간단한.. 모델아이.. 나중에 없애도됌. 
+	CLoadedModelInfo* pEthanModel = pModel;
+	if (!pEthanModel) pEthanModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Ethan.bin", NULL);
+	
+	pNoiseTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pNoiseTexture[1] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+
+	pNoiseTexture[0]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Noise01.dds", RESOURCE_TEXTURE2D, 0);
+	pNoiseTexture[1]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Noise02.dds", RESOURCE_TEXTURE2D, 0);
+
+	
+	CScene::CreateShaderResourceViews(pd3dDevice, pNoiseTexture[0], 13, false);
+	CScene::CreateShaderResourceViews(pd3dDevice, pNoiseTexture[1], 14, false); //수정 필요 
+	CScene::CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 2);
+
+	//우선 크기를 직접 맞춰주는 반복문으로 해보겠다. 
+
+	m_nObjects = GODRAY_SAMPLE;
+	m_ppObjects = new CGameObject * [m_nObjects];
+
+	//int nTerrainWidth = int(pTerrain->GetWidth());
+	//int nTerrainLength = int(pTerrain->GetLength());
+
+	//XMFLOAT3 xmf3Scale = pTerrain->GetScale();
+
+	//CGameObject* pBillboardObject = NULL;
+	for (int i = 0; i < GODRAY_SAMPLE; i++) {
+		pRayObject = NULL;
+		//종횡비 pLightCamera->aspect 을 이용해 N번째 사각형의 크기를 지정한다. 
+		/*if (pRayObject)
+		{
+			pSaveObject = new CGameObject();
+
+			pSaveObject->SetChild(pRayObject);
+
+			float xPosition = x * xmf3Scale.x;
+			float zPosition = z * xmf3Scale.z;
+			float fHeight = pTerrain->GetHeight(xPosition, zPosition);
+
+			pSaveObject->SetPosition(xPosition, fHeight + fyOffset, zPosition);
+			m_ppObjects[i] = pSaveObject;
+		}
+
+		pRayRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 8.0f, 8.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+		pRayObject->SetMesh(pRayRectMesh);
+		pRayObject->SetTexture(pNoiseTexture[0]);*/
+	}
+
+
+	//CMaterial* pTerrainMaterial = new CMaterial(2);
+	//pTerrainMaterial->SetTexture(pTerrainBaseTexture, 0);
+	//pTerrainMaterial->SetTexture(pTerrainDetailTexture, 1);
+	//pTerrainMaterial->SetShader(pTerrainShader);
+
+	//SetMaterial(0, pTerrainMaterial);
+	
+	
+			//엔진만듬------------------------------------------------------ -
+			//	light 생성
+			//	FBO생성
+			//	쉐이더 생성
+			//	VS PS연결후
+
+			//	uniformExposure = 0.0034f;
+			//uniformDecay = 1.0f;
+			//uniformDensity = 0.84f;
+			//uniformWeight = 5.65f;
+			//입력 및 쉐이더에 입력준비
+
+
+			//	엔진실행(반복문내용)---------------------------------------------------- -
+			//	update하고
+			//	render한다.
+
+			//	update
+			//	타이머 갱신
+			//	화면에 따른 frustrum 갱신, 업데이트
+
+			//	render
+			//	1.// FBO가 있는 경우 FrameBuffer를 통해 오프스크린 버퍼로 렌더링
+			//	2.빛으로 점멸원 검은색 그리기(그림자맵 ? )
+			//	3.광 산란이 없는 장면 렌더링
+			//	4.라이트 산란 효과를 위에 덧그린다.
+
+
+}
+
+void CGodRayShader::AnimateObjects(float fTimeElapsed)
+{
+}
+
+void CGodRayShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+	for (int i = 0; i < m_nObjects; i++)//m_nObjects
+	{
+		//if (m_ppObjects[i]) m_ppObjects[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+	}
+	CShader::Render(pd3dCommandList, pCamera);
+
+	for (int i = 0; i < m_nObjects; i++)//m_nObjects
+	{
+		if (m_ppObjects[i]) {
+			m_ppObjects[i]->UpdateTransform(NULL);
+			m_ppObjects[i]->Render(pd3dCommandList, pCamera);
+		}
+	}
 }
 
 D3D12_SHADER_BYTECODE CGodRayShader::CreateVertexShader()

@@ -606,7 +606,7 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_C, nCurrentCameraMode);
 			if (pastcam != ATTACT_CAMERA_C)
-				Rotate(0.0f, -r, 0.0f);
+				m_pCamera->Rotate(0.0f, -r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
@@ -622,10 +622,10 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_L, nCurrentCameraMode);
 			if (pastcam == ATTACT_CAMERA_R)
-				Rotate(0.0f, -r, 0.0f);
+				m_pCamera->Rotate(0.0f, -r, 0.0f);
 			r = -90.0f;
 			if (pastcam != ATTACT_CAMERA_L)
-				Rotate(0.0f, r, 0.0f);
+				m_pCamera->Rotate(0.0f, r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
@@ -641,10 +641,10 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_R, nCurrentCameraMode);
 			if (pastcam == ATTACT_CAMERA_L)
-				Rotate(0.0f, -r, 0.0f);
+				m_pCamera->Rotate(0.0f, -r, 0.0f);
 			r = 90.0f;
 			if (pastcam != ATTACT_CAMERA_R)
-				Rotate(0.0f, r, 0.0f);
+				m_pCamera->Rotate(0.0f, r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);

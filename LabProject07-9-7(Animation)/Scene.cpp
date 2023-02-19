@@ -87,7 +87,7 @@ void CScene::BuildDefaultLightsAndMaterials()
 	m_pLights[5].m_xmf4Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	m_pLights[5].m_xmf4Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_pLights[5].m_xmf4Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.0f);
-	m_pLights[5].m_xmf3Position = XMFLOAT3(600.0f, 250.0f, 700.0f);
+	m_pLights[5].m_xmf3Position = XMFLOAT3(425.0f, 250.0f, 640.0f);
 	m_pLights[5].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.001f, 0.0001f);
 }
 
@@ -241,7 +241,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppEnemyBullets[i]->is_fire = false;
 		if (pEnemyModel) delete pEnemyModel;
 	}
-	//=====================================
+	//=====================================XMFLOAT3(425.0f, 250.0f, 640.0f);
 	m_nShaders = 1;
 	m_ppShaders = new CShader*[m_nShaders];
 
@@ -286,14 +286,14 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_ppHierarchicalGameObjects[0] = new CInsideShipObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pInsideModel, 1);
 	m_ppHierarchicalGameObjects[0]->SetPosition(425.0f, 250.f - 30.0f, 590.0f);
 	m_ppHierarchicalGameObjects[0]->SetScale(9.0f, 9.0f, 9.0f);
+	if (pInsideModel) delete pInsideModel;
 
 	CLoadedModelInfo* pSeatModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/InsideSeat.bin", NULL);
 	m_ppHierarchicalGameObjects[1] = new CInsideShipObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pSeatModel, 1);
 	m_ppHierarchicalGameObjects[1]->SetPosition(390.0f, 250.f - 30.0f, 590.0f);
 	m_ppHierarchicalGameObjects[1]->SetScale(1.0f, 1.0f, 1.0f);
-
-	if (pInsideModel) delete pInsideModel;
 	if (pSeatModel) delete pSeatModel;
+	
 
 	//���Ƿ� �����ϴ� �ٿ���ڽ� (���� ���� Height���� ���� �浹�˻�� �ٲٰ����) 
 	b_Inside = true;
@@ -304,15 +304,15 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	xm_SitAABB[2] = BoundingBox(XMFLOAT3(416.f,224.f,620.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //RIGHT
 	xm_SitAABB[3] = BoundingBox(XMFLOAT3(404.f,224.f,677.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //CENTER
 	
-	m_LookCamera[0] = XMFLOAT3(0.0f,-0.0f,1.0f); //LEFT
-	m_LookCamera[1]= XMFLOAT3(1.0f,-0.0f,0.0f);//UP
-	m_LookCamera[2]= XMFLOAT3(0.0f,0.0f,-1.0f);//RIGHT
-	m_LookCamera[3] = XMFLOAT3(1.0f, -0.0f, 0.0f);//CENTER
+	m_LookCamera[0] = XMFLOAT3(0.0f,-0.0f,1.0f);  //LEFT
+	m_LookCamera[1]= XMFLOAT3(1.0f,-0.0f,0.0f);	  //UP
+	m_LookCamera[2]= XMFLOAT3(0.0f,0.0f,-1.0f);   //RIGHT
+	m_LookCamera[3] = XMFLOAT3(1.0f, -0.0f, 0.0f); //CENTER
 
 	m_SitPos[0] = XMFLOAT3(416.0f, 230.0f, 734.0f); //LEFT
-	m_SitPos[1] = XMFLOAT3(505.0f, 230.0f, 673.0f);//UP
-	m_SitPos[2] = XMFLOAT3(416.0f, 230.0f, 613.0f);//RIGHT
-	m_SitPos[3] = XMFLOAT3(405.0f, 230.0f, 673.0);//CENTER
+	m_SitPos[1] = XMFLOAT3(505.0f, 230.0f, 673.0f); //UP
+	m_SitPos[2] = XMFLOAT3(416.0f, 230.0f, 613.0f); //RIGHT
+	m_SitPos[3] = XMFLOAT3(405.0f, 230.0f, 673.0);  //CENTER
 
 
 	for (int i = 0; i < METEOS; ++i) {
@@ -322,13 +322,10 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	/*m_nShaders = 1;
 	m_ppShaders = new CShader * [m_nShaders];
 
-	CEthanObjectsShader* pEthanObjectsShader = new CEthanObjectsShader();
-	pEthanObjectsShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEthanModel, m_pTerrain);
+	CGodRayShader* pRayShader = new CGodRayShader();
+	pRayShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEthanModel, m_pTerrain);
 
-	m_ppShaders[0] = pEthanObjectsShader;
-
-	if (pEthanModel) delete pEthanModel;*/
-	
+	m_ppShaders[0] = pRayShader;*/
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
