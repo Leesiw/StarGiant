@@ -230,13 +230,13 @@ void CPlayer::Update(float fTimeElapsed)
 	DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (nCurrentCameraMode == DRIVE_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
-	//if (nCurrentCameraMode == ATTACT_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	//if (nCurrentCameraMode == ATTACT_CAMERA_L) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 
 
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
 	if (nCurrentCameraMode == DRIVE_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
-	//if (nCurrentCameraMode == ATTACT_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
+	//if (nCurrentCameraMode == ATTACT_CAMERA_L) m_pCamera->SetLookAt(m_xmf3Position);
 
 
 	m_pCamera->RegenerateViewMatrix();
@@ -401,12 +401,9 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 
 		pBulletObject->m_xmf3Look = m_xmf3Look;
 		pBulletObject->m_xmf4x4ToParent = m_xmf4x4ToParent;
-
 		xmf3FirePosition.x = xmf3Position.x;
 		xmf3FirePosition.y = xmf3Position.y;
 		xmf3FirePosition.z = xmf3Position.z;
-
-
 		pBulletObject->SetPosition(xmf3FirePosition);
 		pBulletObject->SetActive(true);
 	
@@ -591,7 +588,7 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-			pastcam = 4;
+			pastcam = DRIVE_CAMERA;
 
 			break;
 
@@ -601,14 +598,14 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityXZ(0.0f);
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_C, nCurrentCameraMode);
-			if (pastcam != 5)
+			if (pastcam != ATTACT_CAMERA_C)
 				m_pCamera->Rotate(0.0f, -r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-			pastcam = 5;
+			pastcam = ATTACT_CAMERA_C;
 
 			break;
 		case ATTACT_CAMERA_L:
@@ -617,10 +614,10 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityXZ(0.0f);
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_L, nCurrentCameraMode);
-			if (pastcam == 7)
+			if (pastcam == ATTACT_CAMERA_R)
 				m_pCamera->Rotate(0.0f, -r, 0.0f);
 			r = -90.0f;
-			if (pastcam != 6)
+			if (pastcam != ATTACT_CAMERA_L)
 				m_pCamera->Rotate(0.0f, r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
@@ -636,17 +633,17 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityXZ(0.0f);
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_R, nCurrentCameraMode);
-			if (pastcam == 6)
+			if (pastcam == ATTACT_CAMERA_L)
 				m_pCamera->Rotate(0.0f, -r, 0.0f);
 			r = 90.0f;
-			if (pastcam != 7)
+			if (pastcam != ATTACT_CAMERA_R)
 				m_pCamera->Rotate(0.0f, r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-			pastcam = 7;
+			pastcam = ATTACT_CAMERA_R;
 
 			break;
 
@@ -679,12 +676,16 @@ void CSoundCallbackHandler::HandleCallback(void *pCallbackData, float fTrackPosi
 #endif
 }
 
-CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext)
+CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext, int i)
 {
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 
 	//CLoadedModelInfo *pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Angrybot.bin", NULL);
-	CLoadedModelInfo* pDoggyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Doggy_V2.bin", NULL);
+	CLoadedModelInfo* pDoggyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Doggy_V0.bin", NULL);;
+	if (i == 0)	pDoggyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Doggy_V0.bin", NULL);
+	if (i == 1)	pDoggyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Doggy_V1.bin", NULL);
+	if (i == 2)pDoggyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Doggy_V2.bin", NULL);
+
 	SetChild(pDoggyModel->m_pModelRootObject, true);
 
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 4, pDoggyModel);

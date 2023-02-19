@@ -532,7 +532,7 @@ void CGameFramework::BuildObjects()
 #ifdef _WITH_TERRAIN_PLAYER
 	CTerrainPlayer* pPlayer[3];
 	for (int i = 0; i < 3; ++i) {
-		pPlayer[i] = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain);
+		pPlayer[i] = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain,i);
 		pPlayer[i]->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 250.0f, 640.0f));
 		pPlayer[i]->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
 	}
