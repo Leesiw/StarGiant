@@ -86,7 +86,7 @@ public:
 	CAirplanePlayer();
 	virtual ~CAirplanePlayer();
 
-	short damage = 5;
+	short damage = 10;
 
 	float						m_fBulletEffectiveRange = 150.0f;
 

@@ -1624,7 +1624,7 @@ void CBulletObject::Animate(float fElapsedTime)
 	m_fMovingDistance += fDistance;
 
 	Move(DIR_FORWARD, fDistance);
-	cout << GetPosition().z << endl;
+//	cout << GetPosition().z << endl;
 	if ((m_fMovingDistance > m_fBulletEffectiveRange) || (m_fElapsedTimeAfterFire > m_fLockingTime)) Reset();
 
 

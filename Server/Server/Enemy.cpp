@@ -131,7 +131,7 @@ void CEnemy::MoveAI(float fTimeElapsed, CPlayer* player)
 		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook() , fTimeElapsed * dist);
 		UpdateTransform();
 
-		Rotate(0.f, 0.f, 30.f * fTimeElapsed);
+		//Rotate(0.f, 0.f, 30.f * fTimeElapsed);
 	}
 	else {
 		m_xmf3RelativePos = Vector3::Add(GetPosition(), player_pos, -1.f);
@@ -318,23 +318,13 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CPlayer* player)
 	}
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
-	XMFLOAT3 LookVelocity;
-	if (state == EnemyState::MOVE || state == EnemyState::IDLE) {
-		LookVelocity = Vector3::ScalarProduct(GetLook(), fTimeElapsed * 200.f, false);
-		xmf3Velocity = Vector3::Add(xmf3Velocity, LookVelocity);
-		XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
-		SetPosition(xmf3Position);
-	}
-	else {
-		m_fMoveTimeRemaining -= fTimeElapsed;
-		if (m_fMoveTimeRemaining < 0.f) { m_fSpeed = urdPos2(dree); m_fMoveTimeRemaining = m_fMoveTime; }
-		XMFLOAT3 LookVelocity = Vector3::ScalarProduct(player->GetLook(), fTimeElapsed * m_fSpeed, false);
-		//xmf3PVelocity = Vector3::ScalarProduct(xmf3PVelocity, -fTimeElapsed, false);
-		xmf3Velocity = Vector3::Add(LookVelocity, xmf3Velocity);
-		XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
-		//real_pos = Vector3::Add(real_pos, xmf3Velocity);
-		SetPosition(xmf3Position);
-	}
+
+	m_fMoveTimeRemaining -= fTimeElapsed;
+	if (m_fMoveTimeRemaining < 0.f) { m_fSpeed = urdPos2(dree); m_fMoveTimeRemaining = 5.f; }
+	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(player->GetLook(), fTimeElapsed * m_fSpeed, false);
+	xmf3Velocity = Vector3::Add(LookVelocity, xmf3Velocity);
+	XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
+	SetPosition(xmf3Position);
 	
 	//Move(xmf3Velocity, false);
 	
