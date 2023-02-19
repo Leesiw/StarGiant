@@ -399,7 +399,14 @@ void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 		XMFLOAT3 xmf3Up = GetUp();
 		XMFLOAT3 xmf3FirePosition;
 
+		XMFLOAT3 m_xmf3Look = GetLookVector();
+		XMFLOAT3 m_xmf3LookC = m_pCamera->GetLookVector();
+
+		m_xmf3LookC.y = m_xmf3Look.y;
 		pBulletObject->m_xmf3Look = m_xmf3Look;
+		//cout << "Ä«¸Þ¶ó GetLookVector: " << m_pCamera->GetLookVector().x <<" " << m_pCamera->GetLookVector().y << " " << m_pCamera->GetLookVector().z << " " <<endl;
+		//cout << "GetLookVector: " << GetLookVector().x << " " << GetLookVector().y << " " << GetLookVector().z << " " << endl;
+
 		pBulletObject->m_xmf4x4ToParent = m_xmf4x4ToParent;
 		xmf3FirePosition.x = xmf3Position.x;
 		xmf3FirePosition.y = xmf3Position.y;
@@ -599,7 +606,7 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_C, nCurrentCameraMode);
 			if (pastcam != ATTACT_CAMERA_C)
-				m_pCamera->Rotate(0.0f, -r, 0.0f);
+				Rotate(0.0f, -r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
@@ -615,10 +622,10 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_L, nCurrentCameraMode);
 			if (pastcam == ATTACT_CAMERA_R)
-				m_pCamera->Rotate(0.0f, -r, 0.0f);
+				Rotate(0.0f, -r, 0.0f);
 			r = -90.0f;
 			if (pastcam != ATTACT_CAMERA_L)
-				m_pCamera->Rotate(0.0f, r, 0.0f);
+				Rotate(0.0f, r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
@@ -634,10 +641,10 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_R, nCurrentCameraMode);
 			if (pastcam == ATTACT_CAMERA_L)
-				m_pCamera->Rotate(0.0f, -r, 0.0f);
+				Rotate(0.0f, -r, 0.0f);
 			r = 90.0f;
 			if (pastcam != ATTACT_CAMERA_R)
-				m_pCamera->Rotate(0.0f, r, 0.0f);
+				Rotate(0.0f, r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
