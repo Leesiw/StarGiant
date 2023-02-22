@@ -28,6 +28,12 @@
 #include <thread>
 #include <mutex>
 
+//ui√ﬂ∞°
+#include <dwrite.h>
+#include <d3d11on12.h>
+#include <d2d1_3.h>
+#include <dxgi1_6.h>
+//
 using namespace std;
 
 #include <d3d12.h>
@@ -66,8 +72,14 @@ extern HINSTANCE						ghAppInstance;
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
-
+//ui
+#pragma comment(lib, "dwrite.lib")
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "d2d1.lib")
+//
 #pragma comment(lib, "dxguid.lib")
+
+
 
 static mutex m;
 

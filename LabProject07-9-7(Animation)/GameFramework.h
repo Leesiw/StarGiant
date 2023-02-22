@@ -37,6 +37,8 @@ public:
     void AnimateObjects();
     void FrameAdvance();
 
+	void UpdateUI();
+
 	// ¼­¹ö
 	bool ConnectServer();
 	void RecvServer();
