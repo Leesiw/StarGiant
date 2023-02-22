@@ -13,10 +13,8 @@ public:
 	void Init();
 
 	void BuildObjects();
-	void BuildObjects2();
 	void ReleaseObjects();
 
-	bool ProcessInput(UCHAR* pKeysBuffer);
 	void AnimateObjects(float fTimeElapsed);
 
 	void CheckMeteoByPlayerCollisions();
@@ -26,14 +24,15 @@ public:
 	void SpawnEnemy();
 
 	CAirplanePlayer* m_pSpaceship = NULL;
-	CPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
+	CTerrainPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
 
 public:
 	CMeteoObject*				m_ppMeteoObjects[METEOS];
 	CEnemy*						m_ppEnemies[ENEMIES];
-	short						m_sEnemyNum;
 
 	bool						m_bIsRunning = true;
-	float						m_fElapsedTime = 0.0f;
+
+	float m_fEnemySpawnTime = 10.0f;
+	float m_fEnemySpawnTimeRemaining = 0.0f;
 };
 

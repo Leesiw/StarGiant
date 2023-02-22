@@ -136,28 +136,6 @@ void CGameFramework::BuildObjects()
 	m_pScene = new CScene();
 
 	if (m_pScene) m_pScene->BuildObjects();
-
-
-	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
-	pAirplanePlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-	pAirplanePlayer->mesh = true;
-	pAirplanePlayer->boundingbox = BoundingOrientedBox{ XMFLOAT3(-0.000000f, -0.000000f, -0.000096f), XMFLOAT3(15.5f, 15.5f, 3.90426f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
-	m_pScene->m_pSpaceship = m_pSpaceship = pAirplanePlayer;
-	//m_pCamera = m_pPlayer->GetCamera();
-	for (int i = 0; i < MAX_USER; ++i) {
-		CTerrainPlayer* pPlayer = new CTerrainPlayer();
-		pPlayer->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 250.0f, 740.0f));
-		m_ppPlayers[i] = pPlayer;
-	}
-
-	/////////////////////////////////////////
-
-	//CEnemyShip* enemyship = new CEnemyShip();
-	//m_pScene->m_enemy = m_Enemy = enemyship;
-
-	////////////////////////////////////////
-
-	////////////////////////////////////////
 }
 
 void CGameFramework::ReleaseObjects()
@@ -169,48 +147,10 @@ void CGameFramework::ReleaseObjects()
 void CGameFramework::AnimateObjects(float fTimeElapsed)
 {
 	if (!m_pScene->m_bIsRunning) { return; }
-	m_fEnemySpawnTimeRemaining -= fTimeElapsed;
-	if (m_fEnemySpawnTimeRemaining < 0.0f)
-	{
-		m_pScene->SpawnEnemy();// 적 스폰
-		m_fEnemySpawnTimeRemaining = m_fEnemySpawnTime;
-	}
-
 	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
 
-	m_pSpaceship->Animate(fTimeElapsed);
-	m_pSpaceship->Update(fTimeElapsed);
-
-	for (int i = 0; i < MAX_USER; ++i)
-	{
-		XMFLOAT3 pos[MAX_USER - 1]{};
-		int num = 0;
-		for (int j = 0; j < MAX_USER; ++j) {
-			if (j == i) { continue; }
-			if (clients[j].in_use) {
-				pos[num] = m_ppPlayers[j]->GetPosition();
-			}
-			else { pos[num] = { 0.f, 0.f, 0.f }; }
-			++num;
-		}
-		m_ppPlayers[i]->Update(fTimeElapsed, pos);
-		if (clients[i].in_use  && clients[i].type == PlayerType::INSIDE) {
-			for (auto& pl : clients) {
-				if (!pl.in_use) continue;
-				pl.send_inside_packet(i, m_ppPlayers[i]);
-			}
-		}
-	}
-
-	for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
-		if (false == pl.in_use) continue;
-		pl.send_spaceship_packet(3, m_pSpaceship);
-		pl.send_meteo_packet(0, m_pScene->m_ppMeteoObjects);
-		// 적 위치?
-	}
-
 	// 플레이어 hp가 소진될 시 게임 안 돌아가도록
-	//if (m_pSpaceship->GetHP() <= 0) { m_pScene->m_bIsRunning = false; }
+	//if (m_pScene->m_pSpaceship->GetHP() <= 0) { m_pScene->m_bIsRunning = false; }
 }
 
 
@@ -229,8 +169,6 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (p->player_type == PlayerType::INSIDE)
 		{
 			clients[c_id].type = PlayerType::INSIDE;
-			m_pScene->m_bIsRunning = true;
-			m_pSpaceship->SetHP(100);
 			for (auto& pl : clients) {
 				if (false == pl.in_use) continue;
 				pl.send_change_packet(c_id, p->player_type);
@@ -257,14 +195,14 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_SPACESHIP_MOVE: {
 		CS_SPACESHIP_PACKET* p = reinterpret_cast<CS_SPACESHIP_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::MOVE) {
-			m_pSpaceship->SetInputInfo(p->data);
+			m_pScene->m_pSpaceship->SetInputInfo(p->data);
 		}
 		break;
 	}
 	case CS_INSIDE_MOVE: {
 		CS_INSIDE_PACKET* p = reinterpret_cast<CS_INSIDE_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::INSIDE) {
-			m_ppPlayers[c_id]->SetInputInfo(p->data);
+			m_pScene->m_ppPlayers[c_id]->SetInputInfo(p->data);
 		}
 		break;
 	}
@@ -272,7 +210,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		CS_ATTACK_PACKET* p = reinterpret_cast<CS_ATTACK_PACKET*>(packet);
 		
 		if (clients[c_id].type >= PlayerType::ATTACK1 && clients[c_id].type <= PlayerType::ATTACK3) {
-			if (m_pSpaceship->CanAttack((short)clients[c_id].type - (short)PlayerType::ATTACK1)) {
+			if (m_pScene->m_pSpaceship->CanAttack((short)clients[c_id].type - (short)PlayerType::ATTACK1)) {
 				m_pScene->CheckEnemyByBulletCollisions(p->data);
 				for (auto& pl : clients)
 				{

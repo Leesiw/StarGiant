@@ -23,6 +23,18 @@ void CScene::Init()
 
 void CScene::BuildObjects()
 {
+	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
+	pAirplanePlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+	pAirplanePlayer->mesh = true;
+	pAirplanePlayer->boundingbox = BoundingOrientedBox{ XMFLOAT3(-0.000000f, -0.000000f, -0.000096f), XMFLOAT3(15.5f, 15.5f, 3.90426f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+	m_pSpaceship = pAirplanePlayer;
+	//m_pCamera = m_pPlayer->GetCamera();
+	for (int i = 0; i < MAX_USER; ++i) {
+		CTerrainPlayer* pPlayer = new CTerrainPlayer();
+		pPlayer->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 250.0f, 740.0f));
+		m_ppPlayers[i] = pPlayer;
+	}
+
 	// meteo
 	CMeteoObject* meteo = NULL;
 
@@ -65,15 +77,14 @@ void CScene::BuildObjects()
 
 void CScene::ReleaseObjects()
 {
+	if (m_pSpaceship) { delete m_pSpaceship; }
+	if (m_ppPlayers) { delete[] m_ppPlayers; }
+	if (m_ppEnemies) { delete[] m_ppEnemies; }
+
 	if (m_ppMeteoObjects)
 	{
 		delete[] m_ppMeteoObjects;
 	}
-}
-
-bool CScene::ProcessInput(UCHAR* pKeysBuffer)
-{
-	return(false);
 }
 
 void CScene::CheckMeteoByPlayerCollisions()
@@ -201,7 +212,12 @@ void CScene::SpawnEnemy()
 
 void CScene::AnimateObjects(float fTimeElapsed)
 {
-	m_fElapsedTime = fTimeElapsed;
+	m_fEnemySpawnTimeRemaining -= fTimeElapsed;
+	if (m_fEnemySpawnTimeRemaining < 0.0f)
+	{
+		SpawnEnemy();// 적 스폰
+		m_fEnemySpawnTimeRemaining = m_fEnemySpawnTime;
+	}
 
 	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
 	for (int i = 0; i < METEOS; ++i) 
@@ -238,6 +254,37 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (int i = 0; i < ENEMIES; ++i)
 	{
 		if (m_ppEnemies[i]->GetisAlive()) { m_ppEnemies[i]->Animate(fTimeElapsed, m_pSpaceship); }
+	}
+
+	m_pSpaceship->Animate(fTimeElapsed);
+	m_pSpaceship->Update(fTimeElapsed);
+
+	for (int i = 0; i < MAX_USER; ++i)
+	{
+		XMFLOAT3 pos[MAX_USER - 1]{};
+		int num = 0;
+		for (int j = 0; j < MAX_USER; ++j) {
+			if (j == i) { continue; }
+			if (clients[j].in_use) {
+				pos[num] = m_ppPlayers[j]->GetPosition();
+			}
+			else { pos[num] = { 0.f, 0.f, 0.f }; }
+			++num;
+		}
+		m_ppPlayers[i]->Update(fTimeElapsed, pos);
+		if (clients[i].in_use && clients[i].type == PlayerType::INSIDE) {
+			for (auto& pl : clients) {
+				if (!pl.in_use) continue;
+				pl.send_inside_packet(i, m_ppPlayers[i]);
+			}
+		}
+	}
+
+	for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
+		if (false == pl.in_use) continue;
+		pl.send_spaceship_packet(3, m_pSpaceship);
+		pl.send_meteo_packet(0, m_ppMeteoObjects);
+		// 적 위치?
 	}
 
 	CheckMeteoByPlayerCollisions();
