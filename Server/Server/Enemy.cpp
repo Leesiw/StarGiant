@@ -321,7 +321,7 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CPlayer* player)
 
 	m_fMoveTimeRemaining -= fTimeElapsed;
 	if (m_fMoveTimeRemaining < 0.f) { m_fSpeed = urdPos2(dree); m_fMoveTimeRemaining = 5.f; }
-	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(player->GetLook(), fTimeElapsed * m_fSpeed, false);
+	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(player->GetLook(), fTimeElapsed * 100.f, false);
 	xmf3Velocity = Vector3::Add(LookVelocity, xmf3Velocity);
 	XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
 	SetPosition(xmf3Position);

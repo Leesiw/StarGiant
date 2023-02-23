@@ -69,6 +69,9 @@ public:
 	float GetYaw() { return m_fYaw; }
 	float GetRoll() { return m_fRoll; }
 
+	void SetVelocity(const XMFLOAT3& xmf3Velocity) { m_xmf3Velocity = xmf3Velocity; }
+	const XMFLOAT3& GetVelocity() const { return(m_xmf3Velocity); }
+
 	XMFLOAT4 GetQuaternion();
 
 	void ResetCoolTime() { m_fCoolTimeRemaining = m_fCoolTime; }

@@ -94,7 +94,7 @@ void CScene::CheckMeteoByPlayerCollisions()
 	m_pSpaceship->UpdateBoundingBox();
 
 	for (int i = 0; i < METEOS; ++i) {
-		if (time(NULL) - m_ppMeteoObjects[i]->coll_time > 3) {
+		if (time(NULL) - m_ppMeteoObjects[i]->coll_time >= 1) {
 			m_ppMeteoObjects[i]->UpdateBoundingBox();
 
 			if (m_pSpaceship->HierarchyIntersects(m_ppMeteoObjects[i]))
@@ -121,26 +121,6 @@ void CScene::CheckMeteoByPlayerCollisions()
 				}
 			}
 		}
-
-		//m_ppGameObjects[i]->m_pChild->aabb = BoundingBox(m_ppGameObjects[i]->m_pChild->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
-		//m_pPlayer->m_pChild->aabb = BoundingBox(m_pPlayer->m_pChild->GetPosition(), XMFLOAT3(10.0f, 10.0f, 10.0f));
-
-		//if (m_ppGameObjects[i]->m_pChild->aabb.Intersects(m_pPlayer->m_pChild->aabb)) {
-		//	std::cout << "面倒! ";
-		//}
-
-
-
-		/*if (m_pPlayer->m_xmOOBB.Intersects(Objects->m_ppObjects[i]->m_xmOOBB)) {
-
-			XMFLOAT3 xmf3Sub = Objects->m_ppObjects[i]->GetPosition();
-			xmf3Sub = Vector3::Subtract(m_pPlayer->GetPosition(), xmf3Sub);
-			xmf3Sub = Vector3::Normalize(xmf3Sub);
-
-			xmf3Sub.y = 0;
-			std::cout << "面倒! ";
-			m_pPlayer->Move(xmf3Sub, false);
-		}*/
 	}
 }
 
@@ -170,11 +150,59 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 
 void CScene::CheckEnemyCollisions()
 {
+	// 利甸尝府
 	for (int i = 0; i < ENEMIES; ++i)
 	{
-		for (int j = 0; j < ENEMIES; ++j) 
+		m_ppEnemies[i]->UpdateBoundingBox();
+		for (int j = i + 1; j < ENEMIES; ++j) 
 		{
+			if (m_ppEnemies[i]->HierarchyIntersects(m_ppEnemies[j]))
+			{
+				XMFLOAT3 vel1 = m_ppEnemies[i]->GetVelocity();
+				XMFLOAT3 vel2 = m_ppEnemies[j]->GetVelocity();
+				float m1 = 1.0f; float m2 = 5.0f;
+				float finalVelX1 = ((m1 - m2) / (m1 + m2)) * vel1.x + ((2.f * m2) / (m1 + m2)) * vel2.x;
+				float finalVelY1 = ((m1 - m2) / (m1 + m2)) * vel1.y + ((2.f * m2) / (m1 + m2)) * vel2.y;
+				float finalVelZ1 = ((m1 - m2) / (m1 + m2)) * vel1.z + ((2.f * m2) / (m1 + m2)) * vel2.z;
+				float finalVelX2 = ((2.f * m1) / (m1 + m2)) * vel1.x + ((m2 - m1) / (m1 + m2)) * vel2.x;
+				float finalVelY2 = ((2.f * m1) / (m1 + m2)) * vel1.y + ((m2 - m1) / (m1 + m2)) * vel2.y;
+				float finalVelZ2 = ((2.f * m1) / (m1 + m2)) * vel1.z + ((m2 - m1) / (m1 + m2)) * vel2.z;
 
+				m_ppEnemies[i]->SetVelocity(XMFLOAT3(finalVelX1, finalVelY1, finalVelZ1));
+				m_ppEnemies[j]->SetVelocity(XMFLOAT3(finalVelX2, finalVelY2, finalVelZ2));
+			}
+		}
+	}
+
+	//利&款籍
+
+	for (int i = 0; i < METEOS; ++i) {
+		if (time(NULL) - m_ppMeteoObjects[i]->coll_time >= 1) {
+			m_ppMeteoObjects[i]->UpdateBoundingBox();
+			for (int j = 0; j < ENEMIES; ++j) {
+
+				if (m_ppEnemies[j]->HierarchyIntersects(m_ppMeteoObjects[i]))
+				{
+					m_ppMeteoObjects[i]->coll_time = time(NULL);
+					XMFLOAT3 vel1 = m_ppEnemies[j]->GetVelocity();
+					XMFLOAT3 vel2 = m_ppMeteoObjects[i]->GetMovingDirection();
+					float m1 = 1.0f; float m2 = 5.0f;
+					float finalVelX1 = ((m1 - m2) / (m1 + m2)) * vel1.x + ((2.f * m2) / (m1 + m2)) * vel2.x;
+					float finalVelY1 = ((m1 - m2) / (m1 + m2)) * vel1.y + ((2.f * m2) / (m1 + m2)) * vel2.y;
+					float finalVelZ1 = ((m1 - m2) / (m1 + m2)) * vel1.z + ((2.f * m2) / (m1 + m2)) * vel2.z;
+					float finalVelX2 = ((2.f * m1) / (m1 + m2)) * vel1.x + ((m2 - m1) / (m1 + m2)) * vel2.x;
+					float finalVelY2 = ((2.f * m1) / (m1 + m2)) * vel1.y + ((m2 - m1) / (m1 + m2)) * vel2.y;
+					float finalVelZ2 = ((2.f * m1) / (m1 + m2)) * vel1.z + ((m2 - m1) / (m1 + m2)) * vel2.z;
+
+					m_ppEnemies[j]->SetVelocity(XMFLOAT3(finalVelX1, finalVelY1, finalVelZ1));
+					m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(finalVelX2, finalVelY2, finalVelZ2));
+
+					for (auto& pl : clients)
+					{
+						pl.send_meteo_direction_packet(0, i, m_ppMeteoObjects[i]);
+					}
+				}
+			}
 		}
 	}
 }
@@ -288,6 +316,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	}
 
 	CheckMeteoByPlayerCollisions();
+	CheckEnemyCollisions();
 	//CheckObjectByBulletCollisions();
 	//CheckEnemyByBulletCollisions();
 }
