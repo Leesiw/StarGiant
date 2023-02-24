@@ -9,6 +9,7 @@ using namespace DirectX;
 #define ENEMIES					36
 #define ENEMY_BULLETS			50
 #define GODRAY_SAMPLE			30
+#define UI_CNT					1
 
 
 constexpr int MAX_USER = 3;

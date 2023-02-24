@@ -802,6 +802,11 @@ void CGameFramework::FrameAdvance()
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 }
 
+void CGameFramework::UpdateUI()
+{
+
+}
+
 
 // ¼­¹ö
 bool CGameFramework::ConnectServer()

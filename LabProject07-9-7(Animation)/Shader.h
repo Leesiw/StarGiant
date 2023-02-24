@@ -218,3 +218,19 @@ protected:
 	CGameObject**					m_ppObjects = 0;
 	int								m_nObjects = 0;
 };
+
+
+
+class CUIShader : public CShader
+{
+public:
+	CUIShader() {};
+	virtual ~CUIShader() {};
+
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+	virtual D3D12_RASTERIZER_DESC CreateRasterizerState();
+	virtual D3D12_BLEND_DESC CreateBlendState();
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
+
+};

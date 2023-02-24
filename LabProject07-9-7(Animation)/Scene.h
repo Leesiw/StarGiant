@@ -6,6 +6,8 @@
 
 #include "Shader.h"
 #include "Player.h"
+#include "UI.h"
+
 
 #define MAX_LIGHTS						16 
 
@@ -117,12 +119,14 @@ public:
 	CGameObject							**m_ppHierarchicalGameObjects = NULL;
 
 
-
 	CMeteorObject						*m_ppMeteorObjects[METEOS];
 
 	CEnemyObject						*m_ppEnemies[ENEMIES];
 
 	CBulletObject						*m_ppEnemyBullets[ENEMY_BULLETS];
+
+	CUI								*m_ppUI[UI_CNT];
+
 
 
 
@@ -131,6 +135,8 @@ public:
 
 	CSkyBox								*m_pSkyBox = NULL;
 	CHeightMapTerrain					*m_pTerrain = NULL;
+
+
 
 	LIGHT								*m_pLights = NULL;
 	int									m_nLights = 0;
