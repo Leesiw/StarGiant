@@ -150,26 +150,57 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 
 void CScene::CheckEnemyCollisions()
 {
+	for (int i = 0; i < ENEMIES; ++i)
+	{
+		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
+		m_ppEnemies[i]->UpdateBoundingBox();
+
+		if (m_pSpaceship->HierarchyIntersects(m_ppEnemies[i]))
+		{
+			XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
+			xmf3Sub = Vector3::Subtract(m_ppEnemies[i]->GetPosition(), xmf3Sub);
+			xmf3Sub = Vector3::Normalize(xmf3Sub);
+			XMFLOAT3 vel = m_ppEnemies[i]->GetVelocity();
+			float fLen = Vector3::Length(vel);
+			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+			XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
+
+			m_ppEnemies[i]->hp = -1;
+			m_ppEnemies[i]->SetisAlive(false);
+			
+			m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+
+			short new_hp = m_pSpaceship->GetHP() - m_ppEnemies[i]->GetDamage();
+			m_pSpaceship->SetHP(new_hp);
+
+			for (auto& pl : clients)
+			{
+				pl.send_bullet_hit_packet(0, i, m_ppEnemies[i]->hp);
+				if (m_pSpaceship->GetHP() <= 0) { continue; }
+				pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
+			}
+		}
+	}
+
 	// Àûµé³¢¸®
 	for (int i = 0; i < ENEMIES; ++i)
 	{
-		m_ppEnemies[i]->UpdateBoundingBox();
+		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
 		for (int j = i + 1; j < ENEMIES; ++j) 
 		{
+			if (!m_ppEnemies[j]->GetisAlive()) { continue; }
 			if (m_ppEnemies[i]->HierarchyIntersects(m_ppEnemies[j]))
 			{
-				XMFLOAT3 vel1 = m_ppEnemies[i]->GetVelocity();
+				XMFLOAT3 xmf3Sub = m_ppEnemies[j]->GetPosition();
+				xmf3Sub = Vector3::Subtract(m_ppEnemies[i]->GetPosition(), xmf3Sub);
+				xmf3Sub = Vector3::Normalize(xmf3Sub);
+				XMFLOAT3 vel = m_ppEnemies[i]->GetVelocity();
+				float fLen = Vector3::Length(vel);
+				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
 				XMFLOAT3 vel2 = m_ppEnemies[j]->GetVelocity();
-				float m1 = 1.0f; float m2 = 5.0f;
-				float finalVelX1 = ((m1 - m2) / (m1 + m2)) * vel1.x + ((2.f * m2) / (m1 + m2)) * vel2.x;
-				float finalVelY1 = ((m1 - m2) / (m1 + m2)) * vel1.y + ((2.f * m2) / (m1 + m2)) * vel2.y;
-				float finalVelZ1 = ((m1 - m2) / (m1 + m2)) * vel1.z + ((2.f * m2) / (m1 + m2)) * vel2.z;
-				float finalVelX2 = ((2.f * m1) / (m1 + m2)) * vel1.x + ((m2 - m1) / (m1 + m2)) * vel2.x;
-				float finalVelY2 = ((2.f * m1) / (m1 + m2)) * vel1.y + ((m2 - m1) / (m1 + m2)) * vel2.y;
-				float finalVelZ2 = ((2.f * m1) / (m1 + m2)) * vel1.z + ((m2 - m1) / (m1 + m2)) * vel2.z;
 
-				m_ppEnemies[i]->SetVelocity(XMFLOAT3(finalVelX1, finalVelY1, finalVelZ1));
-				m_ppEnemies[j]->SetVelocity(XMFLOAT3(finalVelX2, finalVelY2, finalVelZ2));
+				m_ppEnemies[i]->SetVelocity(Vector3::Add(vel, xmf3Sub));
+				m_ppEnemies[j]->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
 			}
 		}
 	}

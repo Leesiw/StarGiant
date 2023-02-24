@@ -902,8 +902,6 @@ void CGameFramework::RecvServer()
 				//m_pPlayer[l_info.id]->SetLook(m_pInsideScene->m_LookCamera[i]);
 				m_pInsidePlayer[l_info.id]->is_update = true;
 				m_pInsidePlayer[l_info.id]->Rotate(0.f, 90.f * (float)i -m_pInsidePlayer[l_info.id]->GetYaw(), 0.f);
-			
-				printf("%d : yaw : %f\n", i, m_pInsidePlayer[l_info.id]->GetYaw());
 				m_pInsidePlayer[l_info.id]->SetSitState(true);
 			}
 
