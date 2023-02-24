@@ -29,16 +29,14 @@ void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 	XMFLOAT3 pos = GetPosition();
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(pos, player_pos));
-
-	if (dist < 100.f)
+	
+	if (dist < 100.f && attack_step != 2)
 	{
 		XMFLOAT3 ToGo = Vector3::Add(pos, player_pos, -1.f);
 		ToGo = Vector3::ScalarProduct(ToGo,100.f);
 		ToGo = Vector3::Add(player_pos, ToGo);
 		SetPosition(ToGo);
 	}
-
-	
 
 	switch (state)
 	{
@@ -76,16 +74,16 @@ void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 
 			XMFLOAT3 player_vel = player->GetLook();
 			m_xmf3Destination.y = urdPos3(dree);
-		//	m_xmf3Destination.x += player_pos.x + player_vel.x * 100.f;
-			//m_xmf3Destination.y += player_pos.y + player_vel.y * 100.f;
-			//m_xmf3Destination.z += player_pos.z + player_vel.z * 100.f;
 
 			m_fMoveTimeRemaining = m_fMoveTime;
 			state = EnemyState::MOVE;
 		}
 		else
 		{
-			m_xmf3RelativePos = Vector3::Add(GetPosition(), player_pos, -1.f);
+			if (type == EnemyType::MISSILE) 
+			{
+				attack_step = 0;
+			}
 			state = EnemyState::ATTACK;
 		}
 		break;
@@ -94,9 +92,6 @@ void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 		break;
 	case EnemyState::ATTACK:
 		AttackAI(fTimeElapsed, player);
-		break;
-	case EnemyState::AVOID:
-		AvoidAI(fTimeElapsed);
 		break;
 	case EnemyState::MOVE:
 		MoveAI(fTimeElapsed, player);
@@ -134,7 +129,6 @@ void CEnemy::MoveAI(float fTimeElapsed, CPlayer* player)
 		//Rotate(0.f, 0.f, 30.f * fTimeElapsed);
 	}
 	else {
-		m_xmf3RelativePos = Vector3::Add(GetPosition(), player_pos, -1.f);
 		state = EnemyState::AIMING;
 	}
 
@@ -155,6 +149,10 @@ void CEnemy::AimingAI(float fTimeElapsed, CPlayer* player)
 	float yaw = atan2(player_pos.x, player_pos.z);
 
 	if (yaw < 0.05 && pitch < 0.05) {
+		if (type == EnemyType::MISSILE)
+		{
+			attack_step = 0;
+		}
 		state = EnemyState::ATTACK;
 	}
 
@@ -196,13 +194,14 @@ void CEnemy::AttackAI(float fTimeElapsed, CPlayer* player)
 		// 낮은 확률로 랜덤 움직임
 		if (!::IsZero(m_xmf3Velocity.x)) return;
 		if (urdEnemyAI(dree) < 10) {
-			if (urdEnemyAI(dree) < 25) {
+			int dir = urdEnemyAI(dree);
+			if (dir < 25) {
 				m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, player->GetLook(), 100.f);
 			}
-			else if (urdEnemyAI(dree) < 50) {
+			else if (dir < 50) {
 				m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, player->GetLook(), -100.f);
 			}
-			else if (urdEnemyAI(dree) < 75) {
+			else if (dir < 75) {
 				m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), 100.f);
 			}
 			else {
@@ -233,35 +232,6 @@ void CEnemy::Attack(float fTimeElapsed, CPlayer* player)
 	}
 }
 
-void CEnemy::AvoidAI(float fTimeElapsed)
-{
-	if (m_fAvoidTime > 1.0f)
-	{
-		m_fAvoidTime = 0.0f;
-		state = EnemyState::IDLE;
-	}
-	/*
-	if (m_bAvoidDir)
-	{
-		if (m_fAvoidTime < 0.5f) {
-			CGameObject::MoveStrafe(fTimeElapsed * 100.f);
-		}
-		else {
-			CGameObject::MoveStrafe(fTimeElapsed * -100.f);
-		}
-	}
-	else
-	{
-		if (m_fAvoidTime < 0.5f) {
-			CGameObject::MoveStrafe(fTimeElapsed * -100.f);
-		}
-		else {
-			CGameObject::MoveStrafe(fTimeElapsed * 100.f);
-		}
-	}
-	*/
-	m_fAvoidTime += fTimeElapsed;
-}
 
 void CEnemy::Rotate(float x, float y, float z)
 {
@@ -325,11 +295,8 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CPlayer* player)
 	xmf3Velocity = Vector3::Add(LookVelocity, xmf3Velocity);
 	XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
 	SetPosition(xmf3Position);
-	
-	//Move(xmf3Velocity, false);
-	
 
-	float fDeceleration = (200.0f * fTimeElapsed);
+	float fDeceleration = (100.0f * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
 }
@@ -359,6 +326,7 @@ XMFLOAT4 CEnemy::GetQuaternion()
 
 CMissileEnemy::CMissileEnemy()
 {
+	type = EnemyType::MISSILE;
 	hp = 10;			
 	m_fCoolTime = 2.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
@@ -373,9 +341,100 @@ CMissileEnemy::~CMissileEnemy()
 {
 }
 
-bool CMissileEnemy::FireBullet(CGameObject* pLockedObject)
+void CMissileEnemy::AttackAI(float fTimeElapsed, CPlayer* player)
 {
-	return false;
+	if (attack_step == 0) 
+	{
+		XMFLOAT3 player_pos = player->GetPosition();
+		XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// 역행렬
+
+		player_pos = Vector3::TransformCoord(player_pos, inv_mat); // 타겟의 위치를 적 자체의 좌표계로 변환
+		player_pos = Vector3::Normalize(player_pos);
+
+		float pitch = asin(-player_pos.y);
+		float yaw = atan2(player_pos.x, player_pos.z);
+
+		Rotate(pitch * fTimeElapsed * 180.f, yaw * fTimeElapsed * 180.f, 0.f);
+
+		if (!::IsZero(m_xmf3Velocity.x)) return;
+		if (urdEnemyAI(dree) < 10) {
+
+			int dir = urdEnemyAI(dree);
+			if (dir < 10) {
+				XMFLOAT3 pl_pos = player->GetPosition();
+				XMFLOAT3 dir{ urdPos3(dree), urdPos3(dree), urdPos3(dree) };
+				dir = Vector3::Normalize(dir);
+				m_xmf3Destination = Vector3::Add(pl_pos, dir, 200.f);
+
+				attack_step = 1;
+			}
+			else if (dir < 25) {
+				m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, player->GetLook(), 100.f);
+			}
+			else if (dir < 50) {
+				m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, player->GetLook(), -100.f);
+			}
+			else if (dir < 75) {
+				m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), 100.f);
+			}
+			else {
+				m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), -100.f);
+			}
+		}
+	}
+	else if (attack_step == 1)
+	{
+		XMFLOAT3 xmf3Position = GetPosition();
+		
+
+		XMFLOAT3 player_pos = player->GetPosition();
+		XMFLOAT3 vec = Vector3::Subtract(player_pos, xmf3Position);
+		float dist = Vector3::Length(vec);
+
+		XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// 역행렬
+
+		player_pos = Vector3::TransformCoord(player_pos, inv_mat); // 타겟의 위치를 적 자체의 좌표계로 변환
+		player_pos = Vector3::Normalize(player_pos);
+
+		float pitch = asin(-player_pos.y);
+		float yaw = atan2(player_pos.x, player_pos.z);
+
+		Rotate(pitch * fTimeElapsed * 180.f, yaw * fTimeElapsed * 180.f, 0.f);
+
+		if (dist < 200.f)
+		{
+			m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), -10.f * fTimeElapsed);
+		}
+		else {
+			m_fAttackTimeRemaining = m_fAttackTime;
+			attack_step = 2;
+		}
+	}
+	else 
+	{
+		if (m_fAttackTimeRemaining > 0.f) {
+			m_fAttackTimeRemaining -= fTimeElapsed;
+			
+		}
+		else {
+			attack_step = 0;
+			state = EnemyState::IDLE;
+			return;
+		}
+		
+		XMFLOAT3 xmf3Position = GetPosition();
+		XMFLOAT3 p_pos = player->GetPosition();
+
+		XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));
+		XMFLOAT3 new_pos = Vector3::TransformCoord(p_pos, inv_mat);
+		new_pos = Vector3::Normalize(new_pos);
+
+		float pitch = asin(-new_pos.y);
+		float yaw = atan2(new_pos.x, new_pos.z);
+		Rotate(pitch * fTimeElapsed * 360.f, yaw * fTimeElapsed * 360.f, 0.f);
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), fTimeElapsed * 200.f);		
+	}
+
 }
 
 void CMissileEnemy::Animate(float fTimeElapsed)
@@ -391,6 +450,7 @@ void CMissileEnemy::Animate(float fTimeElapsed, CPlayer* player)
 
 CLaserEnemy::CLaserEnemy()
 {
+	type = EnemyType::LASER;
 	hp = 10;
 	m_fCoolTime = 2.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
@@ -418,6 +478,7 @@ void CLaserEnemy::Animate(float fTimeElapsed, CPlayer* player)
 
 CPlasmaCannonEnemy::CPlasmaCannonEnemy()
 {
+	type = EnemyType::PLASMACANNON;
 	hp = 10;
 	m_fCoolTime = 2.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
