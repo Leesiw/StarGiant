@@ -105,6 +105,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
+
+
 	XMFLOAT3 xmf3Scale(8.0f, 2.0f, 8.0f);
 	XMFLOAT4 xmf4Color(0.0f, 0.3f, 0.0f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 257, 257, xmf3Scale, xmf4Color);
@@ -242,6 +244,20 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		if (pEnemyModel) delete pEnemyModel;
 	}
 	//=====================================XMFLOAT3(425.0f, 250.0f, 640.0f);
+	float fx = FRAME_BUFFER_WIDTH / 2;
+	float fy = FRAME_BUFFER_HEIGHT / 2;
+
+	for (int i = 0; i < UI_CNT; ++i) {
+		//m_ppUI = new CGameObject * [UI_CNT];
+		m_ppUI[i] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, 10, 10, 10);
+		m_ppUI[i]->SetPosition(310.0f, m_pTerrain->GetHeight(310.0f, 630.0f), 630.0f);
+		m_ppUI[i]->SetScale(100.0f, 100.0f, 100.0f);
+
+	}
+
+
+	
+	//=====================================
 	m_nShaders = 1;
 	m_ppShaders = new CShader*[m_nShaders];
 
@@ -293,6 +309,8 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_ppHierarchicalGameObjects[1]->SetPosition(390.0f, 250.f - 30.0f, 590.0f);
 	m_ppHierarchicalGameObjects[1]->SetScale(1.0f, 1.0f, 1.0f);
 	if (pSeatModel) delete pSeatModel;
+
+
 	
 
 	//���Ƿ� �����ϴ� �ٿ���ڽ� (���� ���� Height���� ���� �浹�˻�� �ٲٰ����) 
@@ -378,6 +396,13 @@ void CScene::ReleaseObjects()
 		for (int i = 0; i < ENEMY_BULLETS; i++) if (m_ppEnemyBullets[i]) m_ppEnemyBullets[i]->Release();
 		delete[] m_ppEnemyBullets;
 	}
+
+	if (m_ppUI)
+	{
+		for (int i = 0; i < UI_CNT; i++) if (m_ppUI[i]) m_ppUI[i]->Release();
+		delete[] m_ppUI;
+	}
+
 
 	ReleaseShaderVariables();
 
@@ -603,11 +628,11 @@ void CScene::ReleaseUploadBuffers()
 {
 	if (m_pSkyBox) m_pSkyBox->ReleaseUploadBuffers();
 	if (m_pTerrain) m_pTerrain->ReleaseUploadBuffers();
-
 	for (int i = 0; i < m_nShaders; i++) m_ppShaders[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nHierarchicalGameObjects; i++) m_ppHierarchicalGameObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < METEOS; i++)if(m_ppMeteorObjects[i]!=NULL) m_ppMeteorObjects[i]->ReleaseUploadBuffers();
+
 }
 
 void CScene::RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info)
@@ -917,6 +942,14 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 			m_ppEnemyBullets[i]->Animate(m_fElapsedTime);
 			if (!m_ppEnemyBullets[i]->m_pSkinnedAnimationController) m_ppEnemyBullets[i]->UpdateTransform(NULL);
 			m_ppEnemyBullets[i]->Render(pd3dCommandList, pCamera);
+		}
+	}
+
+	for (int i = 0; i < UI_CNT; i++)
+	{
+		if (m_ppUI[i])
+		{
+			m_ppUI[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
 }

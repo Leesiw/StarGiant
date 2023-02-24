@@ -1,6 +1,5 @@
 #pragma once
 
-
 struct TextBlock
 {
     std::wstring        strText;
@@ -37,4 +36,17 @@ private:
     std::vector<ID3D11Resource*>    m_vWrappedRenderTargets;
     std::vector<ID2D1Bitmap1*>      m_vd2dRenderTargets;
     std::vector<TextBlock>          m_vTextBlocks;
+};
+
+class CUI : public CGameObject
+{
+public: 
+    CUI();
+    virtual ~CUI();
+    CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nWidth = 20, UINT nHeight = 20, UINT nDepth = 20);
+
+    virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+
+public:
+  
 };
