@@ -181,7 +181,7 @@ CUI::CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, I
     m_pUIShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
     m_pUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-   CScene::CreateShaderResourceViews(pd3dDevice, m_ppUITexture[0], 10, false);
+   CScene::CreateShaderResourceViews(pd3dDevice, m_ppUITexture[0], 15, false);
 
     m_pUIMaterial = new CMaterial(1);
     m_pUIMaterial->SetTexture(m_ppUITexture[0], 0);

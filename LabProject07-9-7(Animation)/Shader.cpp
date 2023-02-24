@@ -867,10 +867,11 @@ D3D12_SHADER_BYTECODE CGodRayShader::CreatePixelShader()
 
 D3D12_INPUT_LAYOUT_DESC CUIShader::CreateInputLayout()
 {
-	UINT nInputElementDescs = 1;
+	UINT nInputElementDescs = 2;
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
 
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
@@ -903,7 +904,7 @@ D3D12_BLEND_DESC CUIShader::CreateBlendState()
 {
 	D3D12_BLEND_DESC d3dBlendDesc;
 	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
-	d3dBlendDesc.AlphaToCoverageEnable = FALSE;
+	d3dBlendDesc.AlphaToCoverageEnable = TRUE;
 	d3dBlendDesc.IndependentBlendEnable = FALSE;
 	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;
 	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
@@ -915,15 +916,16 @@ D3D12_BLEND_DESC CUIShader::CreateBlendState()
 	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
 	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
 	return(d3dBlendDesc);
 }
 
 D3D12_SHADER_BYTECODE CUIShader::CreateVertexShader()
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSSkyBox", "vs_5_1", &m_pd3dVertexShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VS_UI", "vs_5_1", &m_pd3dVertexShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CUIShader::CreatePixelShader()
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSSkyBox", "ps_5_1", &m_pd3dPixelShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_UI", "ps_5_1", &m_pd3dPixelShaderBlob));
 }

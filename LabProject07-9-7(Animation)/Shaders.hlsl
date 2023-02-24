@@ -246,3 +246,35 @@ float4 PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input) : SV_TARGET
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+struct VS_UI_INPUT
+{
+	float3 position : POSITION;
+	float2 uv : TEXCOORD;
+};
+
+struct VS_UI_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD0;
+};
+
+VS_UI_OUTPUT VS_UI(VS_UI_INPUT input)
+{
+	VS_UI_OUTPUT output;
+
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.uv = input.uv;
+
+	return(output);
+}
+
+Texture2D gtxtUITexture : register(t14);
+
+float4 PS_UI(VS_UI_OUTPUT input) : SV_TARGET
+{
+	float4 cColor = gtxtUITexture.Sample(gssWrap, input.uv);
+	return (cColor);
+}
