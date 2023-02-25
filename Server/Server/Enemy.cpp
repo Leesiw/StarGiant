@@ -30,12 +30,19 @@ void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(pos, player_pos));
 	
-	if (dist < 100.f && attack_step != 2)
+	if (dist < 100.f)
 	{
-		XMFLOAT3 ToGo = Vector3::Add(pos, player_pos, -1.f);
-		ToGo = Vector3::ScalarProduct(ToGo,100.f);
-		ToGo = Vector3::Add(player_pos, ToGo);
-		SetPosition(ToGo);
+		if (type != EnemyType::MISSILE) {
+			XMFLOAT3 ToGo = Vector3::Subtract(pos, player_pos);
+			ToGo = Vector3::ScalarProduct(ToGo, 100.f);
+			ToGo = Vector3::Add(player_pos, ToGo);
+			SetPosition(ToGo);
+		}
+		else if (attack_step != 2)
+		{
+			XMFLOAT3 ToGo = Vector3::Subtract(pos, player_pos);
+			m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, ToGo, 10.f);
+		}
 	}
 
 	switch (state)

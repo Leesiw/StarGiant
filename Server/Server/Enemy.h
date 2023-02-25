@@ -83,7 +83,7 @@ public:
 	CMissileEnemy();
 	virtual ~CMissileEnemy();
 
-	float m_fAttackTime = 10.f;
+	float m_fAttackTime = 5.f;
 	float m_fAttackTimeRemaining;
 
 public:
