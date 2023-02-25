@@ -43,8 +43,10 @@ class CUI : public CGameObject
 public: 
     CUI();
     virtual ~CUI();
-    CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nWidth = 20, UINT nHeight = 20, UINT nDepth = 0);
+    CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int num = 0, UINT nWidth = 20, UINT nHeight = 20, UINT nDepth = 0);
 
+
+    void MinmapUpdate();
     virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 
 public:

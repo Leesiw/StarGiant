@@ -244,20 +244,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		if (pEnemyModel) delete pEnemyModel;
 	}
 	//=====================================XMFLOAT3(425.0f, 250.0f, 640.0f);
-	float fx = FRAME_BUFFER_WIDTH / 2;
-	float fy = FRAME_BUFFER_HEIGHT / 2;
+	BuildUI(pd3dDevice, pd3dCommandList);
 
-	for (int i = 0; i < UI_CNT; ++i) {
-		//m_ppUI = new CGameObject * [UI_CNT];
-		m_ppUI[i] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, 20, 20, 0);
-		m_ppUI[i]->SetPosition(fx, fy, 0.0f);
-		m_ppUI[i]->SetScale(20.0f, 20.0f, 20.0f);
-
-	}
-
-
-	
-	//=====================================
 	m_nShaders = 1;
 	m_ppShaders = new CShader*[m_nShaders];
 
@@ -269,6 +257,20 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	if (pEthanModel) delete pEthanModel;
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+}
+
+void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	float fx = FRAME_BUFFER_WIDTH / 2;
+	float fy = FRAME_BUFFER_HEIGHT / 2;
+	m_ppUI[0] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::CROSSHAIR), 20, 20, 0);
+	m_ppUI[0]->SetPosition(fx, fy, 0.0f);
+	m_ppUI[0]->SetScale(20.0f, 20.0f, 20.0f);
+
+	m_ppUI[1] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::MINIMAP), 20, 20, 0);
+	m_ppUI[1]->SetPosition(fx + 10.0f, fy, 10.0f);
+	m_ppUI[1]->SetScale(20.0f, 20.0f, 20.0f);
+
 }
 
 void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap)
@@ -895,6 +897,14 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			m_pLights[1].m_xmf3Direction = m_pPlayer[0]->GetLookVector();
 		}
 	}
+
+	//for (int i = 0; i < UI_CNT; i++)
+	//{
+	//	if (m_ppUI[i])
+	//	{
+	//		m_ppUI[i]->SetPosition(m_pPlayer[0]->GetPosition().x, m_pPlayer[0]->GetPosition().y, m_pPlayer[0]->GetPosition().z);
+	//	}
+	//}
 }
 
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)

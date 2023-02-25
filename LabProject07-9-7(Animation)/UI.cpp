@@ -3,7 +3,6 @@
 #include "UI.h"
 #include "Scene.h"
 
-using namespace std;
 
 UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue)
 {
@@ -160,7 +159,7 @@ CUI::CUI()
 CUI::~CUI()
 {
 }
-CUI::CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature,UINT nWidth, UINT nHeight, UINT nDepth) : CGameObject(1)
+CUI::CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int num, UINT nWidth, UINT nHeight, UINT nDepth) : CGameObject(1)
 {
     CTexturedRectMesh* pUIMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, nWidth, nHeight, nDepth);
     SetMesh(pUIMesh);
@@ -168,27 +167,37 @@ CUI::CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, I
     CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 
-    CTexture* m_ppUITexture[1];
+    CTexture* m_ppUITexture[2];
     CUIShader* m_pUIShader;
     CMaterial* m_pUIMaterial;
 
 
-    m_ppUITexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-    m_ppUITexture[0]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/crosshair.dds", 0);
+    m_ppUITexture[static_cast<int>(UIType::CROSSHAIR)] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+    m_ppUITexture[static_cast<int>(UIType::CROSSHAIR)]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/crosshair.dds", 0);
+
+    m_ppUITexture[static_cast<int>(UIType::MINIMAP)] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+    m_ppUITexture[static_cast<int>(UIType::MINIMAP)]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/minimap.dds", 0);
 
     m_pUIShader = new CUIShader();
 
     m_pUIShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
     m_pUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-   CScene::CreateShaderResourceViews(pd3dDevice, m_ppUITexture[0], 15, false);
+    for (int i = 0; i < UI_CNT; i++)
+         CScene::CreateShaderResourceViews(pd3dDevice, m_ppUITexture[i], 15, false);
 
     m_pUIMaterial = new CMaterial(1);
-    m_pUIMaterial->SetTexture(m_ppUITexture[0], 0);
+    m_pUIMaterial->SetTexture(m_ppUITexture[num], 0);
     m_pUIMaterial->SetShader(m_pUIShader);
     SetMaterial(0, m_pUIMaterial);
 
 }
+
+void CUI::MinmapUpdate()
+{
+
+}
+
 
 void CUI::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {

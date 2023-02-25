@@ -521,6 +521,12 @@ void CGameFramework::OnDestroy()
 
 void CGameFramework::BuildObjects()
 {
+	if (!m_pUILayer)
+	{
+		m_pUILayer = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue);
+	}
+	m_pUILayer->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight);
+
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
 	m_pScene = new CScene();
@@ -574,6 +580,9 @@ void CGameFramework::BuildObjects()
 
 void CGameFramework::ReleaseObjects()
 {
+	if (m_pUILayer) m_pUILayer->ReleaseResources();
+	if (m_pUILayer) delete m_pUILayer;
+
 	if (m_pPlayer) for (int i = 0; i < 3; ++i)m_pPlayer[i]->Release();
 	if (m_pInsidePlayer) for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Release();
 
@@ -730,6 +739,8 @@ void CGameFramework::FrameAdvance()
 
     AnimateObjects();
 
+	UpdateUI();
+
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
@@ -775,6 +786,7 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
+	m_pUILayer->Render(m_nSwapChainBufferIndex);
 
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
@@ -804,7 +816,16 @@ void CGameFramework::FrameAdvance()
 
 void CGameFramework::UpdateUI()
 {
+	vector<wstring> labels;
+	wchar_t position_ui[50];
+	_stprintf_s(position_ui, _countof(position_ui), _T("UI 테스트\n"));
 
+	wstring uiText = L"UI 테스트";
+	for (auto s : labels)
+	{
+		uiText += s;
+	}
+	m_pUILayer->UpdateLabels(uiText);
 }
 
 

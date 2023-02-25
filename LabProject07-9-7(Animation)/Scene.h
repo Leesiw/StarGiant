@@ -54,6 +54,8 @@ public:
 
 	void BuildDefaultLightsAndMaterials();
 	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+	void BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+
 	void BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap);
 	//�� ���̶� ������ ���Ű����� ������ �� ���� ���� �����. �����ϰ� ������ �ڵ��� �ްԸ���.(���� ������ ��ũ���� ��������� �ʿ��ҽ� �̰� ���ְ� �����ؾ��ҰŰ���) 
 	void ReleaseObjects();

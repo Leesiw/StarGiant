@@ -98,6 +98,9 @@ private:
 
 	_TCHAR						m_pszFrameRate[70];
 
+	UILayer* m_pUILayer = NULL;
+	CUI* m_pUI = NULL;
+
 	// ³»ºÎ 
 	CScene* m_pInsideScene = NULL;
 	CTerrainPlayer* m_pInsidePlayer[3] = {};

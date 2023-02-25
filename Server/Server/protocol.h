@@ -9,7 +9,7 @@ using namespace DirectX;
 #define ENEMIES					36
 #define ENEMY_BULLETS			50
 #define GODRAY_SAMPLE			30
-#define UI_CNT					1
+#define UI_CNT					2
 
 
 constexpr int MAX_USER = 3;
@@ -52,6 +52,11 @@ enum class PlayerType : char
 enum class EnemyType : char
 {
 	MISSILE, LASER, PLASMACANNON 
+};
+
+enum class UIType : char
+{
+	CROSSHAIR, MINIMAP, HP
 };
 
 #pragma pack (push, 1)
