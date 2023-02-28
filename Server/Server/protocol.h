@@ -11,6 +11,7 @@ using namespace DirectX;
 #define GODRAY_SAMPLE			30
 #define UI_CNT					2
 
+#define MAX_ITEM				15	// 보석 최대 레벨?
 
 constexpr int MAX_USER = 3;
 
@@ -41,7 +42,7 @@ constexpr char SC_MOVE_INSIDEPLAYER = 12;
 constexpr char SC_MOVE_INFO = 13;
 constexpr char SC_BULLET = 14;
 constexpr char SC_BULLET_HIT = 15;
-constexpr char SC_ENEMY_DIE = 16;
+constexpr char SC_ITEM = 16;
 constexpr char SC_ANIMATION_CHANGE = 17;
 
 enum class PlayerType : char
@@ -59,6 +60,11 @@ enum class UIType : char
 	CROSSHAIR, MINIMAP, HP
 };
 
+enum class ItemType : char
+{
+	JEWEL_ATT, JEWEL_DEF, JEWEL_HEAL
+};
+
 #pragma pack (push, 1)
 
 // login
@@ -67,7 +73,7 @@ struct LOGIN_INFO {
 	PlayerType player_type;
 };
 
-//meteo
+// meteo
 struct METEO_INFO {
 	XMFLOAT3 pos;
 };
@@ -122,7 +128,7 @@ struct SPACESHIP_INFO {
 	XMFLOAT4					Quaternion;
 };
 
-//enemy
+// enemy
 struct ENEMY_INFO {
 	short id;
 
@@ -130,10 +136,16 @@ struct ENEMY_INFO {
 	XMFLOAT4 Quaternion;
 };
 
-//animation
+// animation
 struct ANIMATION_INFO {
 	short id;
 	char animation;
+};
+
+// item
+struct ITEM_INFO {
+	ItemType type;
+	short num;
 };
 //-----------------------------------------------------------------------
 
@@ -266,5 +278,14 @@ struct SC_ANIMATION_CHANGE_PACKET {
 
 	ANIMATION_INFO data;
 };
+
+// item
+struct SC_ITEM_PACKET {
+	unsigned char size;
+	char	type;
+
+	ITEM_INFO data;
+};
+
 
 #pragma pack (pop)

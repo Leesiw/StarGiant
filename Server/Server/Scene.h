@@ -30,6 +30,8 @@ public:
 	CMeteoObject*				m_ppMeteoObjects[METEOS];
 	CEnemy*						m_ppEnemies[ENEMIES];
 
+	std::map<ItemType, short>	items;
+
 	bool						m_bIsRunning = true;
 
 	float m_fEnemySpawnTime = 10.0f;

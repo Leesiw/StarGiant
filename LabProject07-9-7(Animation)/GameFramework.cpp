@@ -36,6 +36,10 @@ CGameFramework::CGameFramework()
 	for(int i=0; i<3; ++i)
 		m_pInsidePlayer[i] = NULL;
 
+	items[ItemType::JEWEL_ATT] = 0;
+	items[ItemType::JEWEL_DEF] = 0;
+	items[ItemType::JEWEL_HEAL] = 0;
+
 	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
 }
 
@@ -1138,8 +1142,16 @@ void CGameFramework::RecvServer()
 			}
 			break;
 		}
-		case SC_ENEMY_DIE:
+		case SC_ITEM:
 		{
+			char subBuf[sizeof(ITEM_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			ITEM_INFO item_info;
+			memcpy(&item_info, &subBuf, sizeof(ITEM_INFO));
+			items[item_info.type] = item_info.num;
 			break;
 		}
 		default:

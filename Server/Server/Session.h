@@ -97,4 +97,5 @@ public:
 	void send_meteo_direction_packet(int c_id, short id, CMeteoObject* meteo);
 	void send_meteo_packet(int c_id, CMeteoObject* []);
 	void send_bullet_hit_packet(int c_id, short id, short hp);
+	void send_item_packet(int c_id, ITEM_INFO& item);
 };

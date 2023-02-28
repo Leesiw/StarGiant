@@ -11,6 +11,10 @@ CScene::CScene()
 	{
 		m_ppEnemies[i] = NULL;
 	}
+
+	items[ItemType::JEWEL_ATT] = 0;
+	items[ItemType::JEWEL_DEF] = 0;
+	items[ItemType::JEWEL_HEAL] = 0;
 }
 
 CScene::~CScene()
@@ -138,7 +142,27 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		{
 			printf("hit");
 			m_ppEnemies[i]->hp -= m_pSpaceship->damage;
-			if (m_ppEnemies[i]->hp <= 0) { m_ppEnemies[i]->SetisAlive(false); }
+			if (m_ppEnemies[i]->hp <= 0) { 
+				m_ppEnemies[i]->SetisAlive(false);
+
+				short num = urdEnemyAI(dree);
+				ItemType item_type;
+				if (num < 3) { item_type = ItemType::JEWEL_ATT; }
+				else if(num < 6){ item_type = ItemType::JEWEL_DEF; }
+				else if(num < 9){ item_type = ItemType::JEWEL_HEAL; }
+
+				
+				if (items[item_type] < MAX_ITEM) {
+					++items[item_type];
+					ITEM_INFO info;
+					info.type = item_type;
+					info.num = items[item_type];
+					for (auto& pl : clients)
+					{
+						pl.send_item_packet(0, info);
+					}
+				}
+			}
 
 			for (auto& pl : clients)
 			{
@@ -161,7 +185,7 @@ void CScene::CheckEnemyCollisions()
 			xmf3Sub = Vector3::Subtract(m_ppEnemies[i]->GetPosition(), xmf3Sub);
 			xmf3Sub = Vector3::Normalize(xmf3Sub);
 			XMFLOAT3 vel = m_ppEnemies[i]->GetVelocity();
-			float fLen = Vector3::Length(vel);
+			float fLen = Vector3::Length(vel) / 10.f;
 			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
 			XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
 

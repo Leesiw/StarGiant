@@ -213,3 +213,14 @@ void SESSION::send_bullet_hit_packet(int c_id, short id, short hp)
 
 	do_send(&p);
 }
+
+void SESSION::send_item_packet(int c_id, ITEM_INFO& item)
+{
+	SC_ITEM_PACKET p;
+	p.size = sizeof(SC_ITEM_PACKET);
+	p.type = SC_ITEM;
+	p.data.type = item.type;
+	p.data.num = item.num;
+
+	do_send(&p);
+}

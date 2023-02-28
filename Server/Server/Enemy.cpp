@@ -41,7 +41,7 @@ void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 		else if (attack_step != 2)
 		{
 			XMFLOAT3 ToGo = Vector3::Subtract(pos, player_pos);
-			m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, ToGo, 10.f);
+			m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, ToGo, 5.f);
 		}
 	}
 
