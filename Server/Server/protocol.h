@@ -6,7 +6,7 @@ using namespace DirectX;
 
 #define BULLETS					50
 #define METEOS					20
-#define ENEMIES					36
+#define ENEMIES					27
 #define ENEMY_BULLETS			50
 #define GODRAY_SAMPLE			30
 #define UI_CNT					2
@@ -62,7 +62,8 @@ enum class UIType : char
 
 enum class ItemType : char
 {
-	JEWEL_ATT, JEWEL_DEF, JEWEL_HEAL
+	JEWEL_ATT, JEWEL_DEF, JEWEL_HEAL, JEWEL_HP
+	// 공격력/방어력/회복력/최대HP
 };
 
 #pragma pack (push, 1)

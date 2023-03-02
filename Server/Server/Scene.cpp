@@ -66,11 +66,11 @@ void CScene::BuildObjects()
 	}
 
 	for (int i = 0; i < ENEMIES / 3; ++i) {
-		m_ppEnemies[i] = new CLaserEnemy;
+		m_ppEnemies[i] = new CPlasmaCannonEnemy;
 		m_ppEnemies[i]->id = i;
 	}
 	for (int i = ENEMIES / 3; i < ENEMIES / 3 * 2; ++i) {
-		m_ppEnemies[i] = new CPlasmaCannonEnemy;
+		m_ppEnemies[i] = new CLaserEnemy;
 		m_ppEnemies[i]->id = i;
 	}
 	for (int i = ENEMIES / 3 * 2; i < ENEMIES; ++i) {
@@ -142,31 +142,56 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		{
 			printf("hit");
 			m_ppEnemies[i]->hp -= m_pSpaceship->damage;
+			for (auto& pl : clients)
+			{
+				pl.send_bullet_hit_packet(0, i, m_ppEnemies[i]->hp);
+			}
+
 			if (m_ppEnemies[i]->hp <= 0) { 
 				m_ppEnemies[i]->SetisAlive(false);
 
 				short num = urdEnemyAI(dree);
 				ItemType item_type;
-				if (num < 3) { item_type = ItemType::JEWEL_ATT; }
-				else if(num < 6){ item_type = ItemType::JEWEL_DEF; }
-				else if(num < 9){ item_type = ItemType::JEWEL_HEAL; }
-
-				
-				if (items[item_type] < MAX_ITEM) {
-					++items[item_type];
-					ITEM_INFO info;
-					info.type = item_type;
-					info.num = items[item_type];
-					for (auto& pl : clients)
-					{
-						pl.send_item_packet(0, info);
+				if (num < 3) { 
+					item_type = ItemType::JEWEL_ATT;
+					if (items[item_type] < MAX_ITEM) {
+						m_pSpaceship->damage = 4 + items[item_type];
 					}
+					else { return; }
 				}
-			}
-
-			for (auto& pl : clients)
-			{
-				pl.send_bullet_hit_packet(0, i, m_ppEnemies[i]->hp);
+				else if(num < 6){ 
+					item_type = ItemType::JEWEL_DEF;
+					if (items[item_type] < MAX_ITEM) {
+						m_pSpaceship->def = 1 + items[item_type];
+					}
+					else { return; }
+				}
+				else if(num < 9){ 
+					item_type = ItemType::JEWEL_HEAL;
+					if (items[item_type] < MAX_ITEM) {
+						m_pSpaceship->heal = 3 + items[item_type];
+					}
+					else { return; }
+				}
+				else if (num < 12) { 
+					item_type = ItemType::JEWEL_HP;
+					if (items[item_type] < MAX_ITEM) {
+						m_pSpaceship->max_hp = 110 + 10 * items[item_type];
+					}
+					else { return; }
+				}
+				else {
+					return;
+				}
+				
+				++items[item_type];
+				ITEM_INFO info;
+				info.type = item_type;
+				info.num = items[item_type];
+				for (auto& pl : clients)
+				{
+					pl.send_item_packet(0, info);
+				}
 			}
 		}
 	}
@@ -185,8 +210,9 @@ void CScene::CheckEnemyCollisions()
 			xmf3Sub = Vector3::Subtract(m_ppEnemies[i]->GetPosition(), xmf3Sub);
 			xmf3Sub = Vector3::Normalize(xmf3Sub);
 			XMFLOAT3 vel = m_ppEnemies[i]->GetVelocity();
-			float fLen = Vector3::Length(vel) / 10.f;
-			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+			float fLen = Vector3::Length(vel);
+			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, true);
+			
 			XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
 
 			m_ppEnemies[i]->hp = -1;
@@ -194,7 +220,9 @@ void CScene::CheckEnemyCollisions()
 			
 			m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
 
-			short new_hp = m_pSpaceship->GetHP() - m_ppEnemies[i]->GetDamage();
+			short real_damage = m_ppEnemies[i]->GetDamage() - m_pSpaceship->def;
+			if (real_damage <= 0) { real_damage = 1; }
+			short new_hp = m_pSpaceship->GetHP() - real_damage;
 			m_pSpaceship->SetHP(new_hp);
 
 			for (auto& pl : clients)
@@ -219,8 +247,8 @@ void CScene::CheckEnemyCollisions()
 				xmf3Sub = Vector3::Subtract(m_ppEnemies[i]->GetPosition(), xmf3Sub);
 				xmf3Sub = Vector3::Normalize(xmf3Sub);
 				XMFLOAT3 vel = m_ppEnemies[i]->GetVelocity();
-				float fLen = Vector3::Length(vel);
-				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+				float fLen = Vector3::Length(vel) / 30.f;
+				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, true);
 				XMFLOAT3 vel2 = m_ppEnemies[j]->GetVelocity();
 
 				m_ppEnemies[i]->SetVelocity(Vector3::Add(vel, xmf3Sub));

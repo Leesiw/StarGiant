@@ -38,8 +38,6 @@ protected:
 
 	char						m_cAnimation = 0;
 
-	short hp = 100;
-
 	//¼­¹ö
 	bool is_update = true;
 
@@ -62,8 +60,6 @@ public:
 	void SetPosition(const XMFLOAT3& xmf3Position) { Move(XMFLOAT3(xmf3Position.x - m_xmf3Position.x, xmf3Position.y - m_xmf3Position.y, xmf3Position.z - m_xmf3Position.z), false); }
 
 	void SetScale(XMFLOAT3& xmf3Scale) { m_xmf3Scale = xmf3Scale; }
-	void SetHP(short s) { hp = s; }
-	short GetHP() { return hp; }
 
 	const XMFLOAT3& GetVelocity() const { return(m_xmf3Velocity); }
 	float GetYaw() const { return(m_fYaw); }
@@ -86,7 +82,12 @@ public:
 	CAirplanePlayer();
 	virtual ~CAirplanePlayer();
 
-	short damage = 10;
+	short max_hp = 100;
+	short hp = 100;
+
+	short damage = 3;
+	short heal = 2;
+	short def = 0;
 
 	float						m_fBulletEffectiveRange = 150.0f;
 
@@ -98,6 +99,9 @@ public:
 
 	SPACESHIP_INPUT_INFO input_info;
 public:
+	void SetHP(short s) { hp = s; }
+	short GetHP() { return hp; }
+
 	void SetInputInfo(SPACESHIP_INPUT_INFO i_info) { input_info = i_info; is_update = false; }
 	bool CanAttack(short num);
 	virtual void Animate(float fTimeElapsed);

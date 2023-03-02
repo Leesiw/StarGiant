@@ -16,7 +16,7 @@ CEnemy::~CEnemy()
 {
 }
 
-void CEnemy::AI(float fTimeElapsed, CPlayer* player)
+void CEnemy::AI(float fTimeElapsed, CAirplanePlayer* player)
 {
 
 	VelocityUpdate(fTimeElapsed, player);
@@ -108,7 +108,7 @@ void CEnemy::AI(float fTimeElapsed, CPlayer* player)
 	SendPos();
 }
 
-void CEnemy::MoveAI(float fTimeElapsed, CPlayer* player)
+void CEnemy::MoveAI(float fTimeElapsed, CAirplanePlayer* player)
 {	
 	XMFLOAT3 xmf3Position = GetPosition();
 	XMFLOAT3 player_pos = player->GetPosition();
@@ -144,7 +144,7 @@ void CEnemy::MoveAI(float fTimeElapsed, CPlayer* player)
 	m_xmf3Destination.z -= player_pos.z;
 }
 
-void CEnemy::AimingAI(float fTimeElapsed, CPlayer* player)
+void CEnemy::AimingAI(float fTimeElapsed, CAirplanePlayer* player)
 {
 	XMFLOAT3 player_pos = player->GetPosition();
 	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// 역행렬
@@ -167,7 +167,7 @@ void CEnemy::AimingAI(float fTimeElapsed, CPlayer* player)
 
 }
 
-void CEnemy::AttackAI(float fTimeElapsed, CPlayer* player)
+void CEnemy::AttackAI(float fTimeElapsed, CAirplanePlayer* player)
 {
 	if (m_fCoolTimeRemaining <= 0.0f)
 	{
@@ -218,7 +218,7 @@ void CEnemy::AttackAI(float fTimeElapsed, CPlayer* player)
 	}
 }
 
-void CEnemy::Attack(float fTimeElapsed, CPlayer* player)
+void CEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 {
 	XMFLOAT3 xmf3Pos = GetPosition();
 	XMFLOAT3 player_pos = player->GetPosition();
@@ -231,7 +231,9 @@ void CEnemy::Attack(float fTimeElapsed, CPlayer* player)
 
 	if (urdEnemyAI(dree) < hit_probability) {	// 플레이어에게 공격 명중
 		if (player->GetHP() <= 0) { return; }
-		player->SetHP(player->GetHP() - damage);
+		short real_damage = damage - player->def;
+		if (real_damage <= 0) { real_damage = 1; }
+		player->SetHP(player->GetHP() - real_damage);
 		for (auto& pl : clients)
 		{
 			pl.send_bullet_hit_packet(0, -1, player->GetHP());
@@ -276,12 +278,12 @@ void CEnemy::Animate(float fElapsedTime)
 {
 }
 
-void CEnemy::Animate(float fTimeElapsed, CPlayer* player)
+void CEnemy::Animate(float fTimeElapsed, CAirplanePlayer* player)
 {
 	if (isAlive) { AI(fTimeElapsed, player); }
 }
 
-void CEnemy::VelocityUpdate(float fTimeElapsed, CPlayer* player)
+void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 {
 	
 
@@ -334,10 +336,10 @@ XMFLOAT4 CEnemy::GetQuaternion()
 CMissileEnemy::CMissileEnemy()
 {
 	type = EnemyType::MISSILE;
-	hp = 10;			
+	hp = 5;			
 	m_fCoolTime = 2.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
-	damage = 3;
+	damage = 8;
 
 	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, -0.981136f, -3.06843f), XMFLOAT3(7.79472f, 8.2804f, 9.19255f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 
@@ -348,7 +350,7 @@ CMissileEnemy::~CMissileEnemy()
 {
 }
 
-void CMissileEnemy::AttackAI(float fTimeElapsed, CPlayer* player)
+void CMissileEnemy::AttackAI(float fTimeElapsed, CAirplanePlayer* player)
 {
 	if (attack_step == 0) 
 	{
@@ -448,7 +450,7 @@ void CMissileEnemy::Animate(float fTimeElapsed)
 {
 }
 
-void CMissileEnemy::Animate(float fTimeElapsed, CPlayer* player)
+void CMissileEnemy::Animate(float fTimeElapsed, CAirplanePlayer* player)
 {
 	CEnemy::Animate(fTimeElapsed, player);
 }
@@ -458,7 +460,7 @@ void CMissileEnemy::Animate(float fTimeElapsed, CPlayer* player)
 CLaserEnemy::CLaserEnemy()
 {
 	type = EnemyType::LASER;
-	hp = 10;
+	hp = 3;
 	m_fCoolTime = 2.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 3;
@@ -476,7 +478,7 @@ void CLaserEnemy::Animate(float fTimeElapsed)
 {
 }
 
-void CLaserEnemy::Animate(float fTimeElapsed, CPlayer* player)
+void CLaserEnemy::Animate(float fTimeElapsed, CAirplanePlayer* player)
 {
 	CEnemy::Animate(fTimeElapsed, player);
 }
@@ -487,9 +489,9 @@ CPlasmaCannonEnemy::CPlasmaCannonEnemy()
 {
 	type = EnemyType::PLASMACANNON;
 	hp = 10;
-	m_fCoolTime = 2.0f;		// 공격 간격
+	m_fCoolTime = 5.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
-	damage = 3;
+	damage = 6;
 
 	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 3.99769f, 7.3113f), XMFLOAT3(17.6804f, 11.0108f, 47.4969f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 
@@ -504,7 +506,7 @@ void CPlasmaCannonEnemy::Animate(float fTimeElapsed)
 {
 }
 
-void CPlasmaCannonEnemy::Animate(float fTimeElapsed, CPlayer* player)
+void CPlasmaCannonEnemy::Animate(float fTimeElapsed, CAirplanePlayer* player)
 {
 	CEnemy::Animate(fTimeElapsed, player);
 }

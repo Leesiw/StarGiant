@@ -48,18 +48,18 @@ public:
 	bool GetisAlive() { return isAlive; }
 	void SetisAlive(bool i_a) { isAlive = i_a; }
 
-	virtual void AI(float fTimeElapsed, CPlayer* player);
-	virtual void MoveAI(float fTimeElapsed, CPlayer* player);
-	virtual void AimingAI(float fTimeElapsed, CPlayer* player);
-	virtual void AttackAI(float fTimeElapsed, CPlayer* player);
-	virtual void Attack(float fTimeElapsed, CPlayer* player);
+	virtual void AI(float fTimeElapsed, CAirplanePlayer* player);
+	virtual void MoveAI(float fTimeElapsed, CAirplanePlayer* player);
+	virtual void AimingAI(float fTimeElapsed, CAirplanePlayer* player);
+	virtual void AttackAI(float fTimeElapsed, CAirplanePlayer* player);
+	virtual void Attack(float fTimeElapsed, CAirplanePlayer* player);
 
-	virtual void VelocityUpdate(float fTimeElapsed, CPlayer* player);
+	virtual void VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player);
 
 	void Rotate(float x, float y, float z);
 
 	virtual void Animate(float fElapsedTime);
-	virtual void Animate(float fTimeElapsed, CPlayer* player);
+	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);
 
 	float GetPitch() { return m_fPitch; }
 	float GetYaw() { return m_fYaw; }
@@ -87,10 +87,10 @@ public:
 	float m_fAttackTimeRemaining;
 
 public:
-	virtual void AttackAI(float fTimeElapsed, CPlayer* player);
+	virtual void AttackAI(float fTimeElapsed, CAirplanePlayer* player);
 
 	virtual void Animate(float fTimeElapsed);
-	virtual void Animate(float fTimeElapsed, CPlayer* player);
+	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);
 };
 
 class CLaserEnemy : public CEnemy
@@ -103,7 +103,7 @@ public:
 	float m_fAvoidReductionRate;	// 상대 가속/방향 전환 시 명중률 떨어지는 정도
 public:
 	virtual void Animate(float fTimeElapsed);
-	virtual void Animate(float fTimeElapsed, CPlayer* player);
+	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);
 };
 
 class CPlasmaCannonEnemy : public CLaserEnemy
@@ -113,5 +113,5 @@ public:
 	virtual ~CPlasmaCannonEnemy();
 public:
 	virtual void Animate(float fTimeElapsed);
-	virtual void Animate(float fTimeElapsed, CPlayer* player);
+	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);
 };
