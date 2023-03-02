@@ -15,6 +15,7 @@ CScene::CScene()
 	items[ItemType::JEWEL_ATT] = 0;
 	items[ItemType::JEWEL_DEF] = 0;
 	items[ItemType::JEWEL_HEAL] = 0;
+	items[ItemType::JEWEL_HP] = 0;
 }
 
 CScene::~CScene()

@@ -39,6 +39,7 @@ CGameFramework::CGameFramework()
 	items[ItemType::JEWEL_ATT] = 0;
 	items[ItemType::JEWEL_DEF] = 0;
 	items[ItemType::JEWEL_HEAL] = 0;
+	items[ItemType::JEWEL_HP] = 0;
 
 	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
 }
@@ -1152,6 +1153,10 @@ void CGameFramework::RecvServer()
 			ITEM_INFO item_info;
 			memcpy(&item_info, &subBuf, sizeof(ITEM_INFO));
 			items[item_info.type] = item_info.num;
+
+			if (item_info.type == ItemType::JEWEL_HP) {
+				m_pPlayer[0]->max_hp = 100 + 10 * item_info.num;
+			}
 			break;
 		}
 		default:
