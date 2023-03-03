@@ -278,3 +278,4 @@ float4 PS_UI(VS_UI_OUTPUT input) : SV_TARGET
 	float4 cColor = gtxtUITexture.Sample(gssWrap, input.uv);
 	return (cColor);
 }
+ 

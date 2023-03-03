@@ -216,21 +216,21 @@ void CUI::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
         //SetPosition(xmf3Position);
         //
 
-        XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
-        XMFLOAT3 xmf3CameraLook = pCamera->GetLookVector();
-        CPlayer* pPlayer = pCamera->GetPlayer();
-        XMFLOAT3 xmf3PlayerPosition = pPlayer->GetPosition();
-        XMFLOAT3 xmf3PlayerLook = pPlayer->GetLookVector();
-        XMFLOAT3 xmf3Position = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 50.0f, false));
-        SetPosition(xmf3Position);
-        SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+    XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+    XMFLOAT3 xmf3CameraLook = pCamera->GetLookVector();
+    CPlayer* pPlayer = pCamera->GetPlayer();
+    XMFLOAT3 xmf3PlayerPosition = pPlayer->GetPosition();
+    XMFLOAT3 xmf3PlayerLook = pPlayer->GetLookVector();
+    XMFLOAT3 xmf3Position = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 50.0f, false));
+    SetPosition(xmf3Position);
+    SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 
-       
 
-        
-        //cout << "player.x" << xmf3PlayerPosition.x<< endl;
-        //cout << "player.y" << xmf3PlayerPosition.y << endl;
-        //cout << "player.z" << xmf3PlayerPosition.z << endl;
+
+
+    //cout << "player.x" << xmf3PlayerPosition.x<< endl;
+    //cout << "player.y" << xmf3PlayerPosition.y << endl;
+    //cout << "player.z" << xmf3PlayerPosition.z << endl;
 
 
 

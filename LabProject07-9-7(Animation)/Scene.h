@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Player.h"
 #include "UI.h"
+#include "Boss.h"
 
 
 #define MAX_LIGHTS						16 
@@ -55,6 +56,7 @@ public:
 	void BuildDefaultLightsAndMaterials();
 	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	void BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap);
 	//�� ���̶� ������ ���Ű����� ������ �� ���� ���� �����. �����ϰ� ������ �ڵ��� �ްԸ���.(���� ������ ��ũ���� ��������� �ʿ��ҽ� �̰� ���ְ� �����ؾ��ҰŰ���) 
@@ -123,7 +125,16 @@ public:
 	CGameObject							**m_ppHierarchicalGameObjects = NULL;
 
 
+	CGameObject* m_pBoss = NULL;
+	Boss* m_ppBoss = NULL;
+
+
+
+
 	CMeteorObject						*m_ppMeteorObjects[METEOS];
+
+	CMeteorObject* landob;
+
 
 	CEnemyObject						*m_ppEnemies[ENEMIES];
 

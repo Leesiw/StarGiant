@@ -156,11 +156,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_ppHierarchicalGameObjects[6]->m_pSkinnedAnimationController->SetTrackWeight(1, 0.2f);
 	m_ppHierarchicalGameObjects[6]->SetPosition(350.0f, m_pTerrain->GetHeight(350.0f, 670.0f), 670.0f);
 
-	CLoadedModelInfo *pZebraModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Zebra.bin", NULL);
-	m_ppHierarchicalGameObjects[7] = new CZebraObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pZebraModel, 1);
+	CLoadedModelInfo *pZebraModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Red.bin", NULL);
+	m_ppHierarchicalGameObjects[7] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pZebraModel, 1);
 	m_ppHierarchicalGameObjects[7]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppHierarchicalGameObjects[7]->SetPosition(280.0f, m_pTerrain->GetHeight(280.0f, 640.0f), 620.0f);
-	m_ppHierarchicalGameObjects[7]->SetScale(0.1f, 0.1f, 0.1f);
+	m_ppHierarchicalGameObjects[7]->SetScale(1.0f, 1.0f, 1.0f);
 	if (pZebraModel) delete pZebraModel;
 
 	CLoadedModelInfo *pLionModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Lion.bin", NULL);
@@ -244,7 +244,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		if (pEnemyModel) delete pEnemyModel;
 	}
 	//=====================================XMFLOAT3(425.0f, 250.0f, 640.0f);
+	BuildBoss(pd3dDevice, pd3dCommandList);
 	BuildUI(pd3dDevice, pd3dCommandList);
+
 
 	m_nShaders = 1;
 	m_ppShaders = new CShader*[m_nShaders];
@@ -270,6 +272,25 @@ void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	m_ppUI[1] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::MINIMAP), 20, 20, 0);
 	m_ppUI[1]->SetPosition(fx + 10.0f, fy, 10.0f);
 	m_ppUI[1]->SetScale(20.0f, 20.0f, 20.0f);
+
+}
+
+void CScene::BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	CLoadedModelInfo* pBossModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Red.bin", NULL);
+	m_ppBoss = new Boss();
+	m_ppBoss->BossObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBossModel);
+	m_ppBoss->SetPosition(0.0f + 10, 250.0f, 640.0f);
+	m_ppBoss->SetScale(10.0f, 10.0f, 10.0f);
+	if (pBossModel) delete pBossModel;
+
+	CLoadedModelInfo* pLandModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Slime.bin", NULL);
+	landob = new CMeteorObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pLandModel, 1);
+	landob->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	landob->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y - 10.0f, m_ppBoss->GetPosition().z);
+	landob->SetScale(50.0f, 50.0f, 50.0f);
+	if (pLandModel) delete pLandModel;
+
 
 }
 
@@ -404,6 +425,20 @@ void CScene::ReleaseObjects()
 		for (int i = 0; i < UI_CNT; i++) if (m_ppUI[i]) m_ppUI[i]->Release();
 		delete[] m_ppUI;
 	}
+
+
+	if (landob)
+	{
+		landob->Release();
+		delete[] landob;
+	}
+
+	if (m_ppBoss)
+	{
+		m_ppBoss->Release();
+		delete[] m_ppBoss;
+	}
+
 
 
 	ReleaseShaderVariables();
@@ -987,5 +1022,13 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 			m_ppUI[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
+
+	if (m_ppBoss) {
+		m_ppBoss->Animate(m_fElapsedTime);
+		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
+		m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition());
+		m_ppBoss->Render(pd3dCommandList, pCamera);
+	}
+	if(landob)landob->Render(pd3dCommandList, pCamera);
 }
 

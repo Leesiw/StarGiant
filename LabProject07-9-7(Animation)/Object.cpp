@@ -471,6 +471,14 @@ void CAnimationController::SetTrackWeight(int nAnimationTrack, float fWeight)
 	if (m_pAnimationTracks) m_pAnimationTracks[nAnimationTrack].SetWeight(fWeight);
 }
 
+void CAnimationController::SetTrackAllUnable(int Cnt)
+{
+	if (m_pAnimationTracks)
+		for (int i = 0; i < Cnt; ++i) {
+			m_pAnimationTracks[Cnt].SetEnable(false);
+		}	
+}
+
 void CAnimationController::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
 {
 	for (int i = 0; i < m_nSkinnedMeshes; i++)
@@ -1471,7 +1479,7 @@ CLionObject::~CLionObject()
 CZebraObject::CZebraObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, CLoadedModelInfo *pModel, int nAnimationTracks)
 {
 	CLoadedModelInfo *pZebraModel = pModel;
-	if (!pZebraModel) pZebraModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Zebra.bin", NULL);
+	if (!pZebraModel) pZebraModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Red.bin", NULL);
 
 	SetChild(pZebraModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pZebraModel);
