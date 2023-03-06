@@ -159,9 +159,11 @@ CUI::CUI()
 CUI::~CUI()
 {
 }
-CUI::CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int num, UINT nWidth, UINT nHeight, UINT nDepth) : CGameObject(1)
+CUI::CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int num, UINT nWidth, UINT nHeight, UINT nDepth,
+    XMFLOAT2 xmf2LeftTop, XMFLOAT2 xmf2LeftBot, XMFLOAT2 xmf2RightBot, XMFLOAT2 xmf2RightTop) : CGameObject(1)
 {
     CTexturedRectMesh* pUIMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, nWidth, nHeight, nDepth);
+    //CPlaneMesh* pUIMesh = new CPlaneMesh(pd3dDevice, pd3dCommandList, nWidth, nHeight, nDepth, xmf2LeftTop, xmf2LeftBot, xmf2RightBot, xmf2RightTop, 1.0f, 1.0f);
     SetMesh(pUIMesh);
 
     CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -178,9 +180,10 @@ CUI::CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, I
     m_ppUITexture[static_cast<int>(UIType::MINIMAP)] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
     m_ppUITexture[static_cast<int>(UIType::MINIMAP)]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/minimap.dds", 0);
 
+
     m_pUIShader = new CUIShader();
 
-    m_pUIShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+     m_pUIShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
     m_pUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
     for (int i = 0; i < UI_CNT; i++)
@@ -216,14 +219,18 @@ void CUI::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
         //SetPosition(xmf3Position);
         //
 
+
+
+
     XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
     XMFLOAT3 xmf3CameraLook = pCamera->GetLookVector();
     CPlayer* pPlayer = pCamera->GetPlayer();
     XMFLOAT3 xmf3PlayerPosition = pPlayer->GetPosition();
     XMFLOAT3 xmf3PlayerLook = pPlayer->GetLookVector();
     XMFLOAT3 xmf3Position = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 50.0f, false));
-    SetPosition(xmf3Position);
+ //  SetPosition(xmf3Position);
     SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+
 
 
 

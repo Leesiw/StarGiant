@@ -1001,19 +1001,27 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		}
 	}
 
+	if (m_ppBoss) {
+		m_ppBoss->Animate(m_fElapsedTime);
+		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
+		m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
+		m_ppBoss->Render(pd3dCommandList, pCamera);
+	}
+	if (landob)landob->Render(pd3dCommandList, pCamera);
+
 }
 
 void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
-
+	pCamera->OrthogonalProjectionMatrix(-5000.0f, 5000.0f, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
-
 	UpdateShaderVariables(pd3dCommandList);
 
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+
 
 	for (int i = 0; i < UI_CNT; i++)
 	{
@@ -1023,12 +1031,8 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 		}
 	}
 
-	if (m_ppBoss) {
-		m_ppBoss->Animate(m_fElapsedTime);
-		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
-		m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
-		m_ppBoss->Render(pd3dCommandList, pCamera);
-	}
-	if(landob)landob->Render(pd3dCommandList, pCamera);
+	pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+
+
 }
 

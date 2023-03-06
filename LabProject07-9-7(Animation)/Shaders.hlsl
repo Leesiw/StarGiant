@@ -11,6 +11,7 @@ cbuffer cbCameraInfo : register(b1)
 	matrix					gmtxView : packoffset(c0);
 	matrix					gmtxProjection : packoffset(c4);
 	float3					gvCameraPosition : packoffset(c8);
+	matrix					gmtxOrthProjection : packoffset(c12);
 };
 
 cbuffer cbGameObjectInfo : register(b2)
@@ -265,7 +266,12 @@ VS_UI_OUTPUT VS_UI(VS_UI_INPUT input)
 {
 	VS_UI_OUTPUT output;
 
-	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	//output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	//output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxOrthProjection);
+
+	output.position = mul(mul(float4(input.position, 1.f), gmtxGameObject), gmtxOrthProjection);
+
+
 	output.uv = input.uv;
 
 	return(output);
