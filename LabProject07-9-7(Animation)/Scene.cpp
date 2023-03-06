@@ -265,13 +265,13 @@ void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 {
 	float fx = FRAME_BUFFER_WIDTH / 2;
 	float fy = FRAME_BUFFER_HEIGHT / 2;
-	m_ppUI[0] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::CROSSHAIR), 20, 20, 0);
+	m_ppUI[0] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::CROSSHAIR), 10, 10, 0);
 	m_ppUI[0]->SetPosition(fx, fy, 0.0f);
 	m_ppUI[0]->SetScale(10.0f, 10.0f, 10.0f);
 
-	m_ppUI[1] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::MINIMAP), 20, 20, 0);
+	m_ppUI[1] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::MINIMAP), 1, 1, 0);
 	m_ppUI[1]->SetPosition(fx + 10.0f, fy, 10.0f);
-	m_ppUI[1]->SetScale(20.0f, 20.0f, 20.0f);
+	//m_ppUI[1]->SetScale(0.0f, 0.0f, 0.0f);
 
 }
 
@@ -1026,7 +1026,7 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 	if (m_ppBoss) {
 		m_ppBoss->Animate(m_fElapsedTime);
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
-		m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition());
+		m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
 		m_ppBoss->Render(pd3dCommandList, pCamera);
 	}
 	if(landob)landob->Render(pd3dCommandList, pCamera);
