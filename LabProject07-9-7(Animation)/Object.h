@@ -363,6 +363,7 @@ public:
 	void SetShader(CShader *pShader);
 	void SetShader(int nMaterial, CShader *pShader);
 	void SetMaterial(int nMaterial, CMaterial *pMaterial);
+	void SetTexture(CTexture* texture);
 
 	void SetChild(CGameObject *pChild, bool bReferenceUpdate=false);
 
@@ -666,6 +667,7 @@ public:
 	XMFLOAT3					m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 
 	bool						is_fire = false;
+	bool						is_enemy_fire = false;
 	float						m_fRotationSpeed = 0.0f;
 
 	float m_fPitch, m_fYaw, m_fRoll;
@@ -675,8 +677,13 @@ public:
 	void SetMovingSpeed(float fSpeed) { m_fMovingSpeed = fSpeed; }
 	void SetMovingDirection(XMFLOAT3& xmf3MovingDirection) { m_xmf3MovingDirection = Vector3::Normalize(xmf3MovingDirection); }
 
-	void SetFirePosition(XMFLOAT3 xmf3FirePosition){m_xmf3FirePosition = xmf3FirePosition; SetPosition(xmf3FirePosition);};
-
+	void SetFirePosition(XMFLOAT3 xmf3FirePosition){
+		m_xmf3FirePosition = xmf3FirePosition; SetPosition(xmf3FirePosition);
+		 m_xmf4x4ToParent._41 = m_xmf3FirePosition.x;
+		 m_xmf4x4ToParent._42 = m_xmf3FirePosition.y;
+		 m_xmf4x4ToParent._43 = m_xmf3FirePosition.z;
+	};
+	void SetEnemyFire4x4(XMFLOAT3 Player_Position);
 	void Move(DWORD dwDirection, float fDistance);
 	void Move(const XMFLOAT3& xmf3Shift);
 

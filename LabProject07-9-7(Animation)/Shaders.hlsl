@@ -278,4 +278,84 @@ float4 PS_UI(VS_UI_OUTPUT input) : SV_TARGET
 	float4 cColor = gtxtUITexture.Sample(gssWrap, input.uv);
 	return (cColor);
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ struct VS_GOD_INPUT
+{
+	float3 position : POSITION;
+	float2 uv : TEXCOORD;
+};
+
+struct VS_GOD_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD0;
+	//float4 ChannelMask :COLOR0;
+};
+
+VS_GOD_OUTPUT VS_GOD(VS_GOD_INPUT input)
+{
+	/*VS_UI_OUTPUT output;
+
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.uv = input.uv;
+
+ float4					m_cAmbient;
+float4					m_cDiffuse;
+float4					m_cSpecular; //a = power
+float4					m_cEmissive;
+	return(output);*/
+	VS_GOD_OUTPUT output;
+
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.uv = input.uv;
+
+	return(output);
+
+}
+
+Texture2D gtxtGODTexture : register(t15);
+
+float4 PS_GOD(VS_GOD_OUTPUT input) : SV_TARGET
+{
+	/*float compositeNoise = 0.015f;
+	float shadow = 1.0f;
+	float4 cookie = (1.0f, 1.0f, 1.0f, 1.0f);
+
+	float shadowMapDepth;
+	float4 output; 
+
+	if (bCookie) {
+		cookie = tex2Dproj(CookieSampler, tcProj);
+	}
+	if (bScrollingNoise) {
+		float4 noise1 = tex2Dproj(ScrollingNosieSampler, tcProjScro111);
+		float4 noise2 = tex2Dproj(ScrollingNosieSampler, tcProjScro112);
+
+		compositeNoise = noise1.r * noise2.g * 0.05f;
+	}
+
+	shadowMapDepth = tex2Dproj(ShadowMapSampler, tcProj);
+
+	if (bShadowMapping) {
+		if (IsPos_depth.w < shadowMapDepth)
+			shadow = 1.0f;
+		else
+			shadow = 0.0f;
+	}
+
+	float atten = 0.25f + 20000.0f / dot(IsPos_depth.xyz, IsPos_Depthxyz);
+	float scale = 9.0f / fFractionOfMaxShells;
+
+	output.rgb = compositeNoise * cookie.rgb * lightColor * scale * atten * shadow * ChannelMask;
+	output.a = saturate(dot(output.rgb, float3(1.0f, 1.0f, 1.0f)));
+
+	return (output);*/
+	float4 cColor = gtxtGODTexture.Sample(gssWrap, input.uv);
+	return (cColor);
+
+
+}
  

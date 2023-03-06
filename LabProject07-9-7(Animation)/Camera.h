@@ -189,6 +189,11 @@ public:
 	void Render();
 	void Info_Print();
 
+	float Getfovy() { return fovy; };
+	float Getaspect() { return aspect; };
+	float GetzNear() { return zNear; };
+	float GetzFar() { return zFar; };
+
 	// Frustrum Á¤º¸
 	float fovy;
 	float aspect;

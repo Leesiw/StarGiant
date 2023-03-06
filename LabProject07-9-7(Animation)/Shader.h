@@ -197,7 +197,9 @@ public:
 	CGodRayShader();
 	virtual ~CGodRayShader();
 
-	CGameObject*					pRayObject = NULL;
+	CGameObject*					pLightObject =new CGameObject(1);
+	CGameObject*					pGameObject =new CGameObject(1);
+
 	CTexturedRectMesh*				pRayRectMesh[GODRAY_SAMPLE];
 	CTexture*						pNoiseTexture[2];
 

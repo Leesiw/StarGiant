@@ -631,6 +631,18 @@ void CGameObject::SetMaterial(int nMaterial, CMaterial *pMaterial)
 	if (m_ppMaterials[nMaterial]) m_ppMaterials[nMaterial]->AddRef();
 }
 
+void CGameObject::SetTexture(CTexture* texture)
+{
+	if (m_ppMaterials != NULL)
+	{
+		//m_nMaterials = 1;
+		//m_ppMaterials = new CMaterial * [m_nMaterials];
+		CMaterial* pMaterial = new CMaterial(1); //
+		pMaterial->SetTexture(texture);
+		m_ppMaterials[0] = pMaterial;
+	}
+}
+
 CSkinnedMesh *CGameObject::FindSkinnedMesh(char *pstrSkinnedMeshName)
 {
 	CSkinnedMesh *pSkinnedMesh = NULL;
@@ -1641,6 +1653,7 @@ void CBulletObject::Animate(float fElapsedTime)
 	m_fMovingDistance += fDistance;
 
 	Move(DIR_FORWARD, fDistance);
+
 //	cout << GetPosition().z << endl;
 	if ((m_fMovingDistance > m_fBulletEffectiveRange) || (m_fElapsedTimeAfterFire > m_fLockingTime)) Reset();
 
@@ -1649,20 +1662,45 @@ void CBulletObject::Animate(float fElapsedTime)
 }
 
 
+void CBulletObject::SetEnemyFire4x4(XMFLOAT3 Player_Position)
+{
+	//m_fMovingDistance  기반으로 UP, Right, directt 설정해주기 
+	/*XMFLOAT3 xmf3Position(m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+	XMFLOAT4X4 mtxLookAt = Matrix4x4::LookAtLH(xmf3Position, Player_Position, m_xmf3Up);*/
+
+	m_xmf3Look = Vector3::Normalize(m_xmf3MovingDirection);
+	m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
+	m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
+
+	m_xmf4x4ToParent._11 = m_xmf3Right.x; m_xmf4x4ToParent._12 = m_xmf3Right.y; m_xmf4x4ToParent._13 = m_xmf3Right.z;
+	m_xmf4x4ToParent._21 = m_xmf3Up.x; m_xmf4x4ToParent._22 = m_xmf3Up.y; m_xmf4x4ToParent._23 = m_xmf3Up.z;
+	m_xmf4x4ToParent._31 = m_xmf3Look.x; m_xmf4x4ToParent._32 = m_xmf3Look.y; m_xmf4x4ToParent._33 = m_xmf3Look.z;
+}
+
 void CBulletObject::Move(DWORD dwDirection, float fDistance)
 {
 	if (dwDirection)
 	{
 		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
-		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
-		if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
-		if (dwDirection & DIR_RIGHT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
-		if (dwDirection & DIR_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
-		if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
-		if (dwDirection & DIR_DOWN) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
+		if (is_enemy_fire) 
+		{
+			//cout << m_fPitch<< "   " << m_fYaw << "   " << m_fRoll << endl;
+			//cout << m_xmf3Right.x<< "   " << m_xmf3Right.y << "   " << m_xmf3Right.z << endl;
+			xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3MovingDirection, fDistance);
+		}
+		else
+		{
+			if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+			if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
+			if (dwDirection & DIR_RIGHT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
+			if (dwDirection & DIR_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
+			if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
+			if (dwDirection & DIR_DOWN) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
+		}
 		Move(xmf3Shift);
 	}
 }
+
 
 void CBulletObject::Move(const XMFLOAT3& xmf3Shift)
 {

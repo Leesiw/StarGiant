@@ -212,6 +212,7 @@ void CShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamer
 	OnPrepareRender(pd3dCommandList);
 }
 
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 CTerrainShader::CTerrainShader()
@@ -733,71 +734,73 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	//Frustom을 이용한 광원 범위 설정 ( scene light에서 설정한 광원위치 기준, 플레이어 방향기준 
 	int renderWidth = 1024;
 	int renderHeight = 1024;
-	Vertex camera1Position = Vertex(-10, 00, 60); //560
-	Vertex camera1LookAt = Vertex(-1000, 600, -2000);
-	pLightCamera =new CFrustrumCamera(renderWidth, renderHeight, camera1Position, camera1LookAt, 10, 100000);
+	int renderDepth = 1000;
+ 
+	Vertex camera1Position = Vertex(400, 300, 600); //560 광원위치(-10, 00, 60);
+	Vertex camera1LookAt = Vertex(425, 250, 642); // 처음 젠위치로 합시다 (-1000, 600, -2000);
+	XMFLOAT3 cameraLookVector = Vector3::Normalize(Vector3::Subtract(XMFLOAT3(camera1Position.x, camera1Position.y, camera1Position.z), XMFLOAT3(camera1LookAt.x, camera1LookAt.y, camera1LookAt.z)));
+	pLightCamera =new CFrustrumCamera(renderWidth, renderHeight, camera1Position, camera1LookAt, 10, 1000);//원래 100000
 
-
-	// 샘플 수 만큼 사각형만들기.. 
-	// -> frustrum 생성 후 n개로 나눴을때 n번쨰 사각형 위치 계산할 수 있게 해야함. 그걸로 오브젝트 만들어야할듯/ 
-	// 텍스처 블랜드해서 그릴 수 있게 하기. 
 
 	// hlsl 에서 잘 조정해보기... 
 	//조명 위치를 보여줄 간단한.. 모델아이.. 나중에 없애도됌. 
-	CLoadedModelInfo* pEthanModel = pModel;
-	if (!pEthanModel) pEthanModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Ethan.bin", NULL);
-	
+	CLoadedModelInfo* pMeteoModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Monster.bin", NULL);
+	pLightObject = new CMeteorObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pMeteoModel, 1);
+	pLightObject->SetPosition(430.0f, 320.0f, 700.0f);
+	pLightObject->SetScale(3.0f, 3.0f, 3.0f);
+	if (pMeteoModel) delete pMeteoModel;
+
 	pNoiseTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	pNoiseTexture[1] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pNoiseTexture[0]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Noise01.dds", 0);
+	pNoiseTexture[1]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Noise02.dds", 0);
 
-	pNoiseTexture[0]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Noise01.dds", RESOURCE_TEXTURE2D, 0);
-	pNoiseTexture[1]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Noise02.dds", RESOURCE_TEXTURE2D, 0);
-
-	
-	CScene::CreateShaderResourceViews(pd3dDevice, pNoiseTexture[0], 13, false);
-	CScene::CreateShaderResourceViews(pd3dDevice, pNoiseTexture[1], 14, false); //수정 필요 
-	CScene::CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 2);
+	CScene::CreateShaderResourceViews(pd3dDevice, pNoiseTexture[0], 16, false);
+	CScene::CreateShaderResourceViews(pd3dDevice, pNoiseTexture[1], 17, false); //수정 필요 
+	//CScene::CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 2);
 
 	//우선 크기를 직접 맞춰주는 반복문으로 해보겠다. 
-
 	m_nObjects = GODRAY_SAMPLE;
 	m_ppObjects = new CGameObject * [m_nObjects];
 
-	//int nTerrainWidth = int(pTerrain->GetWidth());
-	//int nTerrainLength = int(pTerrain->GetLength());
+	int zNear = pLightCamera->GetzNear();
+	int zFar = pLightCamera->GetzFar();
+	int nLen = 0; 
+	CGameObject* pRayObject = new CGameObject(1);
+	
 
-	//XMFLOAT3 xmf3Scale = pTerrain->GetScale();
+	CSkyBoxShader* pSkyBoxShader = new CSkyBoxShader();
+	pSkyBoxShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pSkyBoxShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-	//CGameObject* pBillboardObject = NULL;
 	for (int i = 0; i < GODRAY_SAMPLE; i++) {
-		pRayObject = NULL;
+		pRayObject = new CGameObject(1);
+		CMaterial* pRayMaterial = new CMaterial(1);
 		//종횡비 pLightCamera->aspect 을 이용해 N번째 사각형의 크기를 지정한다. 
-		/*if (pRayObject)
+		nLen = ((GODRAY_SAMPLE - i) * zNear + (zFar * i)) / (GODRAY_SAMPLE - 1); //((N-a)*n + a*f)/(N-1) 
+
+		//구한 너비로 mesh만들기 
+		CTexturedRectMesh* NRayMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, nLen, nLen, 0.0f);
+		pRayObject->SetMesh(NRayMesh);
+		
+		//Noise Texture 섞기 
+		if(i%2)pRayMaterial->SetTexture(pNoiseTexture[0]);
+		else pRayMaterial->SetTexture(pNoiseTexture[1]);
+
+		pRayMaterial->SetShader(pSkyBoxShader);
+			
+
+		if (pRayObject)
 		{
-			pSaveObject = new CGameObject();
-
-			pSaveObject->SetChild(pRayObject);
-
-			float xPosition = x * xmf3Scale.x;
-			float zPosition = z * xmf3Scale.z;
-			float fHeight = pTerrain->GetHeight(xPosition, zPosition);
-
-			pSaveObject->SetPosition(xPosition, fHeight + fyOffset, zPosition);
-			m_ppObjects[i] = pSaveObject;
+			//시작점 - 광원사이의 직선을 중심(방향벡터)로 하는 점들의 평면과의 교차점
+			/*광원위치 - 프러스텀 길이 를 방향벡터로 N등분 하기, 임의로 길이 renderDepth 1000 설정  */
+			pRayObject->SetPosition(Vector3::Add(XMFLOAT3(camera1Position.x, camera1Position.y, camera1Position.z),
+						Vector3::ScalarProduct(cameraLookVector, (renderDepth / GODRAY_SAMPLE) * i)));
+			pRayObject->SetMaterial(0,pRayMaterial);
+			m_ppObjects[i] = pRayObject;
 		}
 
-		pRayRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 8.0f, 8.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-		pRayObject->SetMesh(pRayRectMesh);
-		pRayObject->SetTexture(pNoiseTexture[0]);*/
 	}
-
-
-	//CMaterial* pTerrainMaterial = new CMaterial(2);
-	//pTerrainMaterial->SetTexture(pTerrainBaseTexture, 0);
-	//pTerrainMaterial->SetTexture(pTerrainDetailTexture, 1);
-	//pTerrainMaterial->SetShader(pTerrainShader);
-
-	//SetMaterial(0, pTerrainMaterial);
 	
 	
 			//엔진만듬------------------------------------------------------ -
@@ -839,28 +842,29 @@ void CGodRayShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
 	for (int i = 0; i < m_nObjects; i++)//m_nObjects
 	{
-		//if (m_ppObjects[i]) m_ppObjects[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+		//if (m_ppObjects[i]) m_ppObjects[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));// 빛광원객체만 하도록 수정해야함
 	}
 	CShader::Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < m_nObjects; i++)//m_nObjects
 	{
 		if (m_ppObjects[i]) {
-			m_ppObjects[i]->UpdateTransform(NULL);
+			//m_ppObjects[i]->UpdateTransform(NULL);
 			m_ppObjects[i]->Render(pd3dCommandList, pCamera);
+			//pLightObject->Render(pd3dCommandList, pCamera);
 		}
 	}
 }
 
 D3D12_SHADER_BYTECODE CGodRayShader::CreateVertexShader()
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSSkyBox", "vs_5_1", &m_pd3dVertexShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VS_GOD", "vs_5_1", &m_pd3dVertexShaderBlob));
 }
 
 
 D3D12_SHADER_BYTECODE CGodRayShader::CreatePixelShader()
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSSkyBox", "ps_5_1", &m_pd3dPixelShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_GOD", "ps_5_1", &m_pd3dPixelShaderBlob));
 }
 
 //======================================

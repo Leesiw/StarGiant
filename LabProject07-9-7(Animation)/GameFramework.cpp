@@ -1093,6 +1093,7 @@ void CGameFramework::RecvServer()
 				if (!m_pScene->m_ppEnemyBullets[i]->m_bActive) {
 					m_pScene->m_ppEnemyBullets[i]->SetFirePosition(bulletInfo.pos);
 					m_pScene->m_ppEnemyBullets[i]->SetMovingDirection(bulletInfo.direction);
+					m_pScene->m_ppEnemyBullets[i]->SetEnemyFire4x4(m_pPlayer[0]->GetPosition());
 					m_pScene->m_ppEnemyBullets[i]->SetActive(true);
 					break;
 				}
