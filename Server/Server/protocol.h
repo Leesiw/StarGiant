@@ -4,6 +4,15 @@
 using namespace DirectX;
 //using namespace DirectX::PackedVector;
 
+const unsigned char option0 = 0x1;  // hex for 0000 0001 
+const unsigned char option1 = 0x2;  // hex for 0000 0010
+const unsigned char option2 = 0x4;  // hex for 0000 0100
+const unsigned char option3 = 0x8;  // hex for 0000 1000
+const unsigned char option4 = 0x10; // hex for 0001 0000
+const unsigned char option5 = 0x20; // hex for 0010 0000
+const unsigned char option6 = 0x40; // hex for 0100 0000
+const unsigned char option7 = 0x80; // hex for 1000 0000
+
 #define BULLETS					50
 #define METEOS					20
 #define ENEMIES					27

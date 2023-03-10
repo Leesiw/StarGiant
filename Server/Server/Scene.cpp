@@ -85,11 +85,7 @@ void CScene::ReleaseObjects()
 	if (m_pSpaceship) { delete m_pSpaceship; }
 	if (m_ppPlayers) { delete[] m_ppPlayers; }
 	if (m_ppEnemies) { delete[] m_ppEnemies; }
-
-	if (m_ppMeteoObjects)
-	{
-		delete[] m_ppMeteoObjects;
-	}
+	if (m_ppMeteoObjects){ delete[] m_ppMeteoObjects; }
 }
 
 void CScene::CheckMeteoByPlayerCollisions()
@@ -308,6 +304,7 @@ void CScene::SpawnEnemy()
 				m_ppEnemies[j]->SetisAlive(true);
 				m_ppEnemies[j]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
 				m_ppEnemies[j]->state = EnemyState::IDLE;
+				m_ppEnemies[j]->SetDestination();
 				for (auto& pl : clients) {
 					ENEMY_INFO e_info;
 					e_info.id = j;

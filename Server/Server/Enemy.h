@@ -3,7 +3,7 @@
 
 enum class EnemyState : char
 {
-	IDLE, MOVE, AIMING, ATTACK
+	IDLE, MOVE, AIMING
 };
 
 extern array<SESSION, MAX_USER> clients;
@@ -30,9 +30,7 @@ protected:
 	short						damage = 3;
 	short						hit_probability = 50;
 
-	short attack_step; // 0: 플레이어 주위 배회 1: 플레이어 앞쪽에 목적지 설정. 이동. 2: 플레이어에게 돌진
-
-	bool						isAlive;
+	unsigned char enemy_flags = 0;	// 0 : 살아있는지 1 : 플레이어를 보고 있는지 
 public:
 	short id;
 	EnemyType type;
@@ -41,18 +39,19 @@ public:
 	EnemyState state;
 
 public:
-	bool GetisAlive() { return isAlive; }
-	void SetisAlive(bool i_a) { isAlive = i_a; }
+	bool GetisAlive() { return enemy_flags & option0; }
+	void SetisAlive(bool i_a);
 
+	void SetDestination();
 	virtual void AI(float fTimeElapsed, CAirplanePlayer* player);
 	virtual void MoveAI(float fTimeElapsed, CAirplanePlayer* player);
 	virtual void AimingAI(float fTimeElapsed, CAirplanePlayer* player);
-	virtual void AttackAI(float fTimeElapsed, CAirplanePlayer* player);
 	virtual void Attack(float fTimeElapsed, CAirplanePlayer* player);
 
 	virtual void VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player);
 
 	void Rotate(float x, float y, float z);
+	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
 
 	virtual void Animate(float fElapsedTime);
 	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);
@@ -79,11 +78,7 @@ public:
 	CMissileEnemy();
 	virtual ~CMissileEnemy();
 
-	float m_fAttackTime = 5.f;
-	float m_fAttackTimeRemaining;
-
 public:
-	virtual void AttackAI(float fTimeElapsed, CAirplanePlayer* player);
 
 	virtual void Animate(float fTimeElapsed);
 	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);

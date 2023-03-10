@@ -232,7 +232,7 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 	m_xmf3Look.x = xmf4x4._31; m_xmf3Look.y = xmf4x4._32; m_xmf3Look.z = xmf4x4._33;
 
 	if (input_info.dwDirection) {
-		Move(input_info.dwDirection, 800.0f * fTimeElapsed, true);
+		Move(input_info.dwDirection, 300.0f * fTimeElapsed, true);
 		input_info.dwDirection = NULL;
 	}
 	is_update = true;
