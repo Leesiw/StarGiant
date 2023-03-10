@@ -11,7 +11,7 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <fstream>
 #include <sqlext.h>
 #include "protocol.h"

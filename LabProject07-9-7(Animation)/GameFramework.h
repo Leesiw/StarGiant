@@ -114,8 +114,8 @@ private:
 	// 서버
 	PlayerType player_type;
 
-	// 보석 개수 > ItemType : 무슨 보석인지 / short : 해당 보석 개수
-	std::map<ItemType, short> items;
+	// 보석 개수 > ItemType : 무슨 보석인지 / char : 해당 보석 개수
+	std::unordered_map<ItemType, char> items;
 
 	thread    NetworkThread{};
 	SOCKET sock;

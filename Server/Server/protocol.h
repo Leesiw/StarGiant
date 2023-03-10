@@ -164,7 +164,7 @@ struct ANIMATION_INFO {
 // item
 struct ITEM_INFO {
 	ItemType type;
-	short num;
+	char num;
 };
 //-----------------------------------------------------------------------
 

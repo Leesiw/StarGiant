@@ -53,7 +53,7 @@ using namespace std;
 #include <WS2tcpip.h>
 #include "..\Server\Server\protocol.h"
 
-#include <map>
+#include <unordered_map>
 
 #ifdef _DEBUG
 #include <dxgidebug.h>

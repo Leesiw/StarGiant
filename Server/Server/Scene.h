@@ -30,7 +30,7 @@ public:
 	CMeteoObject*				m_ppMeteoObjects[METEOS];
 	CEnemy*						m_ppEnemies[ENEMIES];
 
-	std::map<ItemType, short>	items;
+	std::unordered_map<ItemType, char>	items;
 
 	bool						m_bIsRunning = true;
 
