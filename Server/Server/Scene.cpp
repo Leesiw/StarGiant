@@ -255,7 +255,6 @@ void CScene::CheckEnemyCollisions()
 	}
 
 	//Àû&¿î¼®
-
 	for (int i = 0; i < METEOS; ++i) {
 		if (time(NULL) - m_ppMeteoObjects[i]->coll_time >= 1) {
 			m_ppMeteoObjects[i]->UpdateBoundingBox();

@@ -24,7 +24,6 @@ protected:
 	float						m_fAttackRange = 300.0f;
 
 	XMFLOAT3					m_xmf3Velocity;
-
 	XMFLOAT3					m_xmf3Destination;
 
 	short						damage = 3;

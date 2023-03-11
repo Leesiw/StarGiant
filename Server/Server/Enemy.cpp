@@ -35,12 +35,10 @@ void CEnemy::AI(float fTimeElapsed, CAirplanePlayer* player)
 		ToGo = Vector3::Add(player_pos, ToGo);
 		SetPosition(ToGo);
 	}
-
+	
 	switch (state)
 	{
 	case EnemyState::IDLE:
-		// 플레이어와의 거리
-		
 		if (dist > m_fAttackRange)	// 사거리 충족 안되면 이동
 		{
 			state = EnemyState::MOVE;
