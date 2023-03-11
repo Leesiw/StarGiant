@@ -247,13 +247,12 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	for (int i = 0; i < ENEMY_BULLETS; ++i) {
 		CLoadedModelInfo* pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Rocket10.bin", NULL);
-		m_ppEnemyMissiles[i] = new CBulletObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
+		m_ppEnemyMissiles[i] = new CMissileObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
 		m_ppEnemyMissiles[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_ppEnemyMissiles[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
 		m_ppEnemyMissiles[i]->SetScale(1.0f, 1.0f, 1.0f);
-		m_ppEnemyMissiles[i]->SetMovingSpeed(1000.f);
-		m_ppEnemyMissiles[i]->is_fire = false;
-		m_ppEnemyMissiles[i]->is_enemy_fire = true;
+
+		m_ppEnemyMissiles[i]->m_bActive = true;
 		if (pEnemyModel) delete pEnemyModel;
 	}
 

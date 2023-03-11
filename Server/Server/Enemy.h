@@ -1,5 +1,6 @@
 #pragma once
 #include "Session.h"
+#include "Missile.h"
 
 enum class EnemyState : char
 {
@@ -29,7 +30,8 @@ protected:
 	short						damage = 3;
 	short						hit_probability = 50;
 
-	unsigned char enemy_flags = 0;	// 0 : 살아있는지 1 : 플레이어를 보고 있는지 
+	unsigned char enemy_flags = 0;	// 0 : 살아있는지 1 : 플레이어를 보고 있는지
+	// 2 : 미사일 발사 여부
 public:
 	short id;
 	EnemyType type;
@@ -40,6 +42,8 @@ public:
 public:
 	bool GetisAlive() { return enemy_flags & option0; }
 	void SetisAlive(bool i_a);
+
+	bool GetLaunchMissile() { return enemy_flags & option2; }
 
 	void SetDestination();
 	virtual void AI(float fTimeElapsed, CAirplanePlayer* player);
@@ -69,6 +73,8 @@ public:
 	void ResetCoolTime() { m_fCoolTimeRemaining = m_fCoolTime; }
 
 	void SendPos();
+
+	virtual MissileInfo GetMissileInfo() { MissileInfo info; info.damage = 0; return info; }
 };
 
 class CMissileEnemy : public CEnemy
@@ -77,7 +83,12 @@ public:
 	CMissileEnemy();
 	virtual ~CMissileEnemy();
 
+	char missile_damage = 4;
+
+	MissileInfo info;
 public:
+	virtual MissileInfo GetMissileInfo() { enemy_flags &= ~option2; return info; }
+	virtual void Attack(float fTimeElapsed, CAirplanePlayer* player);
 
 	virtual void Animate(float fTimeElapsed);
 	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);

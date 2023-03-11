@@ -28,12 +28,13 @@ void CScene::Init()
 
 void CScene::BuildObjects()
 {
+	// player
 	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
 	pAirplanePlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 	pAirplanePlayer->mesh = true;
 	pAirplanePlayer->boundingbox = BoundingOrientedBox{ XMFLOAT3(-0.000000f, -0.000000f, -0.000096f), XMFLOAT3(15.5f, 15.5f, 3.90426f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	m_pSpaceship = pAirplanePlayer;
-	//m_pCamera = m_pPlayer->GetCamera();
+
 	for (int i = 0; i < MAX_USER; ++i) {
 		CTerrainPlayer* pPlayer = new CTerrainPlayer();
 		pPlayer->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 250.0f, 740.0f));
@@ -42,7 +43,6 @@ void CScene::BuildObjects()
 
 	// meteo
 	CMeteoObject* meteo = NULL;
-
 
 	for (int i = 0; i < METEOS; ++i) {
 		meteo = new CMeteoObject();
@@ -66,6 +66,7 @@ void CScene::BuildObjects()
 		m_ppMeteoObjects[i]->UpdateTransform(NULL);
 	}
 
+	// enemy
 	for (int i = 0; i < ENEMIES / 3; ++i) {
 		m_ppEnemies[i] = new CPlasmaCannonEnemy;
 		m_ppEnemies[i]->id = i;
@@ -77,6 +78,11 @@ void CScene::BuildObjects()
 	for (int i = ENEMIES / 3 * 2; i < ENEMIES; ++i) {
 		m_ppEnemies[i] = new CMissileEnemy;
 		m_ppEnemies[i]->id = i;
+	}
+
+	// misile
+	for (int i = 0; i < ENEMY_BULLETS; ++i) {
+		m_ppMissiles[i] = new CMissile;
 	}
 }
 
@@ -361,7 +367,43 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	for (int i = 0; i < ENEMIES; ++i)
 	{
-		if (m_ppEnemies[i]->GetisAlive()) { m_ppEnemies[i]->Animate(fTimeElapsed, m_pSpaceship); }
+		if (m_ppEnemies[i]->GetisAlive()) { 
+			m_ppEnemies[i]->Animate(fTimeElapsed, m_pSpaceship); 
+
+			if (m_ppEnemies[i]->GetLaunchMissile()) {
+				MissileInfo info = m_ppEnemies[i]->GetMissileInfo();
+				if (info.damage == 0) continue;
+				for (int j = 0; j < ENEMY_BULLETS; ++j) {
+					if (!m_ppMissiles[j]->GetisActive()) {
+						m_ppMissiles[j]->SetNewMissile(info);
+						MISSILE_INFO m_info;
+						m_info.id = j;
+						m_info.pos = info.StartPos;
+						m_info.Quaternion = info.Quaternion;
+						for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
+							if (false == pl.in_use) continue;
+							pl.send_missile_packet(0, m_info);
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < ENEMY_BULLETS; ++i) {
+		if (m_ppMissiles[i]->GetisActive()) {
+			m_ppMissiles[i]->Animate(fTimeElapsed, m_pSpaceship);
+			MISSILE_INFO m_info;
+			m_info.id = i;
+			m_info.pos = m_ppMissiles[i]->GetPosition();
+			//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
+			m_info.Quaternion = m_ppMissiles[i]->GetQuaternion();
+			for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
+				if (false == pl.in_use) continue;
+				pl.send_missile_packet(0, m_info);
+			}
+		}
 	}
 
 	m_pSpaceship->Animate(fTimeElapsed);

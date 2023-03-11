@@ -73,6 +73,20 @@ void SESSION::send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction)
 
 	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
 }
+
+void SESSION::send_missile_packet(int c_id, MISSILE_INFO& info)
+{
+	SC_MISSILE_PACKET p;
+	p.size = sizeof(SC_MISSILE_PACKET);
+	p.type = SC_MISSILE;
+	p.data.id = info.id;
+	p.data.pos = info.pos;
+	p.data.Quaternion = info.Quaternion;
+
+	do_send(&p);
+}
+
+
 /*
 void SESSION::send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 player_pos)
 {

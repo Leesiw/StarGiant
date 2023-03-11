@@ -51,8 +51,10 @@ constexpr char SC_MOVE_INSIDEPLAYER = 12;
 constexpr char SC_MOVE_INFO = 13;
 constexpr char SC_BULLET = 14;
 constexpr char SC_BULLET_HIT = 15;
-constexpr char SC_ITEM = 16;
-constexpr char SC_ANIMATION_CHANGE = 17;
+constexpr char SC_MISSILE = 16;
+constexpr char SC_REMOVE_MISSILE = 17;
+constexpr char SC_ITEM = 18;
+constexpr char SC_ANIMATION_CHANGE = 19;
 
 enum class PlayerType : char
 {
@@ -128,6 +130,13 @@ struct BULLET_INFO {
 struct BULLET_HIT_INFO {
 	short id;
 	short hp;
+};
+
+// missile
+struct MISSILE_INFO {
+	char id;
+	XMFLOAT3 pos;
+	XMFLOAT4 Quaternion;
 };
 
 // inside
@@ -289,6 +298,15 @@ struct SC_BULLET_HIT_PACKET {
 	char	type;
 
 	BULLET_HIT_INFO data;
+};
+
+// missile
+
+struct SC_MISSILE_PACKET {
+	unsigned char size;
+	char	type;
+
+	MISSILE_INFO data;
 };
 
 // enemy

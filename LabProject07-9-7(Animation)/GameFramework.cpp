@@ -1128,6 +1128,28 @@ void CGameFramework::RecvServer()
 			}
 			break;
 		}
+		case SC_MISSILE:
+		{
+			char subBuf[sizeof(MISSILE_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			MISSILE_INFO miss_info;
+			memcpy(&miss_info, &subBuf, sizeof(MISSILE_INFO));
+			m_pScene->m_ppEnemyMissiles[miss_info.id]->SetPosition(miss_info.pos);
+
+
+			if (!m_pScene->m_ppEnemyMissiles[miss_info.id]->m_bActive) {
+				m_pScene->m_ppEnemyMissiles[miss_info.id]->m_bActive = true;
+			}
+			m_pScene->m_ppEnemyMissiles[miss_info.id]->SetPosition(miss_info.pos);
+			m.lock();
+			m_pScene->m_ppEnemyMissiles[miss_info.id]->ResetRotate();
+			m_pScene->m_ppEnemyMissiles[miss_info.id]->Rotate(&miss_info.Quaternion);
+			m.unlock();
+			break;
+		}
 		case SC_ANIMATION_CHANGE:
 		{
 			char subBuf[sizeof(ANIMATION_INFO)]{};

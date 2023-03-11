@@ -1,6 +1,7 @@
 #pragma once
 #include "Session.h"
 #include "Enemy.h"
+#include "Missile.h"
 
 extern array<SESSION, MAX_USER> clients;
 
@@ -29,6 +30,7 @@ public:
 public:
 	CMeteoObject*				m_ppMeteoObjects[METEOS];
 	CEnemy*						m_ppEnemies[ENEMIES];
+	CMissile*					m_ppMissiles[ENEMY_BULLETS];
 
 	std::unordered_map<ItemType, char>	items;
 

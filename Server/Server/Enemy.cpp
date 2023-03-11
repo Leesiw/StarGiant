@@ -6,6 +6,8 @@ CEnemy::CEnemy()
 	m_xmf4x4ToParent = Matrix4x4::Identity();
 	m_xmf4x4World = Matrix4x4::Identity();
 
+	enemy_flags &= ~option2;
+
 	hp = 10;
 	state = EnemyState::IDLE;
 }
@@ -292,15 +294,26 @@ CMissileEnemy::CMissileEnemy()
 {
 	type = EnemyType::MISSILE;
 	hp = 5;			
-	m_fCoolTime = 2.0f;		// 공격 간격
+	m_fCoolTime = 10.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 8;
+
+	enemy_flags &= ~option2;
 
 	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, -0.981136f, -3.06843f), XMFLOAT3(7.79472f, 8.2804f, 9.19255f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 }
 
 CMissileEnemy::~CMissileEnemy()
 {
+}
+
+void CMissileEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
+{
+	ResetCoolTime();
+	enemy_flags |= option2;
+	info.StartPos = GetPosition();
+	info.Quaternion = GetQuaternion();
+	info.damage = missile_damage;
 }
 
 void CMissileEnemy::Animate(float fTimeElapsed)
@@ -321,6 +334,8 @@ CLaserEnemy::CLaserEnemy()
 	m_fCoolTime = 2.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 3;
+
+	enemy_flags &= ~option2;
 
 	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.0188516f, -0.336726f, -0.0989028f), XMFLOAT3(1.739f, 1.51158f, 1.67118f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 }
@@ -347,6 +362,8 @@ CPlasmaCannonEnemy::CPlasmaCannonEnemy()
 	m_fCoolTime = 5.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
 	damage = 6;
+
+	enemy_flags &= ~option2;
 
 	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 3.99769f, 7.3113f), XMFLOAT3(17.6804f, 11.0108f, 47.4969f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 }

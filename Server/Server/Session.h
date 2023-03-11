@@ -90,6 +90,7 @@ public:
 	void send_inside_packet(int c_id, CTerrainPlayer* m_pPlayer);
 	void send_enemy_packet(int c_id, ENEMY_INFO& enemy_info);
 	void send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction);
+	void send_missile_packet(int c_id, MISSILE_INFO& info);
 	//void send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 player_pos);
 	void send_spawn_meteo_packet(int c_id, short id, CMeteoObject* meteo);
 	void send_spawn_all_meteo_packet(int c_id, CMeteoObject* meteo[]);

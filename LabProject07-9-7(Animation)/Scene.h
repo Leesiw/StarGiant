@@ -140,7 +140,7 @@ public:
 
 	CBulletObject						*m_ppEnemyBullets[ENEMY_BULLETS];
 
-	CBulletObject						*m_ppEnemyMissiles[ENEMY_BULLETS];
+	CMissileObject						*m_ppEnemyMissiles[ENEMY_BULLETS];
 
 
 	CUI								*m_ppUI[UI_CNT];
