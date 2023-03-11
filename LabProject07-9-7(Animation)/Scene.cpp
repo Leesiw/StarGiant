@@ -244,6 +244,20 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_ppEnemyBullets[i]->is_enemy_fire = true;
 		if (pEnemyModel) delete pEnemyModel;
 	}
+
+	for (int i = 0; i < ENEMY_BULLETS; ++i) {
+		CLoadedModelInfo* pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Rocket10.bin", NULL);
+		m_ppEnemyMissiles[i] = new CBulletObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
+		m_ppEnemyMissiles[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_ppEnemyMissiles[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
+		m_ppEnemyMissiles[i]->SetScale(1.0f, 1.0f, 1.0f);
+		m_ppEnemyMissiles[i]->SetMovingSpeed(1000.f);
+		m_ppEnemyMissiles[i]->is_fire = false;
+		m_ppEnemyMissiles[i]->is_enemy_fire = true;
+		if (pEnemyModel) delete pEnemyModel;
+	}
+
+
 	//=====================================XMFLOAT3(425.0f, 250.0f, 640.0f);
 	BuildBoss(pd3dDevice, pd3dCommandList);
 	BuildUI(pd3dDevice, pd3dCommandList);
@@ -424,6 +438,13 @@ void CScene::ReleaseObjects()
 		for (int i = 0; i < ENEMY_BULLETS; i++) if (m_ppEnemyBullets[i]) m_ppEnemyBullets[i]->Release();
 		delete[] m_ppEnemyBullets;
 	}
+
+	if (m_ppEnemyMissiles)
+	{
+		for (int i = 0; i < ENEMY_BULLETS; i++) if (m_ppEnemyMissiles[i]) m_ppEnemyMissiles[i]->Release();
+		delete[] m_ppEnemyMissiles;
+	}
+
 
 	if (m_ppUI)
 	{
@@ -1025,6 +1046,16 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppEnemyBullets[i]->Animate(m_fElapsedTime);
 			if (!m_ppEnemyBullets[i]->m_pSkinnedAnimationController) m_ppEnemyBullets[i]->UpdateTransform(NULL);
 			m_ppEnemyBullets[i]->Render(pd3dCommandList, pCamera);
+		}
+	}
+
+	for (int i = 0; i < ENEMY_BULLETS; i++)
+	{
+		if (m_ppEnemyMissiles[i] && m_ppEnemyMissiles[i]->m_bActive)
+		{
+			m_ppEnemyMissiles[i]->Animate(m_fElapsedTime);
+			if (!m_ppEnemyMissiles[i]->m_pSkinnedAnimationController) m_ppEnemyMissiles[i]->UpdateTransform(NULL);
+			m_ppEnemyMissiles[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
 
