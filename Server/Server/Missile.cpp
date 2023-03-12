@@ -1,4 +1,5 @@
 #include "Missile.h"
+#include "Session.h"
 
 CMissile::CMissile()
 {
@@ -6,6 +7,9 @@ CMissile::CMissile()
 	m_xmf4x4World = Matrix4x4::Identity();
 
 	isActive = false;
+
+	// 바운딩 박스 모델 수정 시 수정 필요.
+	boundingbox = BoundingOrientedBox(XMFLOAT3(-2.38419e-07f, 0.640688f, -2.98023e-07f), XMFLOAT3(1.44325f, 6.89483f, 1.44325f), XMFLOAT4(0.f, 0.f, 0.f, 1.f));
 }
 
 void CMissile::Animate(float fTimeElapsed, CGameObject* target)
@@ -25,7 +29,7 @@ void CMissile::Animate(float fTimeElapsed, CGameObject* target)
 
 	m_fMovingDistance += fDistance;
 
-	if (m_fTrackingTimeRemaining < -10.f) Reset();
+	if (m_fTrackingTimeRemaining < -10.f) { Reset(); }
 }
 
 void CMissile::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)

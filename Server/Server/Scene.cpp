@@ -325,7 +325,7 @@ void CScene::CheckMissileCollisions()
 
 			for (auto& pl : clients)
 			{
-				// 미사일 제거 패킷
+				pl.send_remove_missile_packet(0, i);
 				pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
 			}
 		}
@@ -351,11 +351,13 @@ void CScene::SpawnEnemy()
 				m_ppEnemies[j]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
 				m_ppEnemies[j]->state = EnemyState::IDLE;
 				m_ppEnemies[j]->SetDestination();
+				ENEMY_INFO e_info;
+				e_info.id = j;
+				e_info.Quaternion = m_ppEnemies[j]->GetQuaternion();
+				e_info.pos = m_ppEnemies[j]->GetPosition();
+
 				for (auto& pl : clients) {
-					ENEMY_INFO e_info;
-					e_info.id = j;
-					e_info.Quaternion = m_ppEnemies[j]->GetQuaternion();
-					e_info.pos = m_ppEnemies[j]->GetPosition();
+					if (false == pl.in_use) continue;
 					pl.send_enemy_packet(0, e_info);
 				}
 	
@@ -442,7 +444,12 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			m_info.Quaternion = m_ppMissiles[i]->GetQuaternion();
 			for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
 				if (false == pl.in_use) continue;
-				pl.send_missile_packet(0, m_info);
+				if (m_ppMissiles[i]->GetisActive()) {
+					pl.send_missile_packet(0, m_info);
+				}
+				else {
+					pl.send_remove_missile_packet(0, i);
+				}
 			}
 		}
 	}
