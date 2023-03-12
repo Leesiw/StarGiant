@@ -95,7 +95,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 76); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 216); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
 
 	CMaterial::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -282,15 +282,22 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 300);
+
 	float fx = FRAME_BUFFER_WIDTH / 2;
 	float fy = FRAME_BUFFER_HEIGHT / 2;
+
 	m_ppUI[0] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::CROSSHAIR), 10, 10, 0);
 	m_ppUI[0]->SetPosition(fx, fy, 0.0f);
 	m_ppUI[0]->SetScale(10.0f, 10.0f, 10.0f);
 
 	m_ppUI[1] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::MINIMAP), 1, 1, 0);
 	m_ppUI[1]->SetPosition(fx + 10.0f, fy, 10.0f);
-	//m_ppUI[1]->SetScale(0.0f, 0.0f, 0.0f);
+
+	for (int i = 2; i < UI_CNT; ++i) {
+		m_ppUI[i] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::HP), 15, 2, 0);
+		m_ppUI[i]->SetPosition(fx + 10.0f + 20.0f * i, fy, 10.0f);
+	}
 }
 
 void CScene::BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -980,6 +987,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		}
 	}
 
+
 	for (int i = 0; i < UI_CNT; i++)
 	{
 		if (m_ppUI[i])
@@ -1038,6 +1046,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 	}
 
+
+
 	for (int i = 0; i < ENEMY_BULLETS; i++)
 	{
 		if (m_ppEnemyBullets[i] && m_ppEnemyBullets[i]->m_bActive)
@@ -1071,6 +1081,30 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 	UpdateShaderVariables(pd3dCommandList);
 
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+	XMFLOAT3 xmf3CameraLook = pCamera->GetLookVector();
+	XMFLOAT3 xmf3Position = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 50.0f, false));
+	
+	m_ppUI[0]->SetPosition(xmf3Position); //static_cast<int>(UIType::CROSSHAIR)
+	m_ppUI[0]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+
+	for (int i = 2; i < ENEMIES + 2; i++) // hp bar
+	{
+		m_ppUI[i]->SetPosition(m_ppEnemies[i - 2]->GetPosition().x, m_ppEnemies[i - 2]->GetPosition().y + 10.0f, m_ppEnemies[i - 2]->GetPosition().z);
+		m_ppUI[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
+		m_ppUI[i]->HpbarUpdate(m_ppEnemies[i - 2]->GetPosition(), m_ppEnemies[i - 2]->GetMaxHp(), m_ppEnemies[i - 2]->GetcurHp());
+	}
+
+
+	////hp테스트
+	//m_ppUI[3]->SetPosition(m_ppEnemies[0]->GetPosition());
+	//m_ppUI[3]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
+	//m_ppUI[3]->HpbarUpdate(m_ppEnemies[0]->GetPosition(), 10, 1);
+	//m_ppUI[5]->SetPosition(m_ppEnemies[0]->GetPosition());
+	//m_ppUI[5]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
+	//m_ppUI[5]->HpbarUpdate(m_ppEnemies[0]->GetPosition(), 10, 5);
+	//m_ppUI[4]->SetPosition(m_ppEnemies[0]->GetPosition().x, m_ppEnemies[0]->GetPosition().y + 10.0f, m_ppEnemies[0]->GetPosition().z);
+	//m_ppUI[4]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
+
 
 	for (int i = 0; i < UI_CNT; i++)
 	{

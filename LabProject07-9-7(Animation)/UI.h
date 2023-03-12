@@ -47,8 +47,10 @@ public:
 
 
     void MinmapUpdate();
+    void HpbarUpdate(XMFLOAT3 pos, short MaxHp, short curHp);
+    
     virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 
 public:
-  
+    CTexture* m_ppUITexture;
 };

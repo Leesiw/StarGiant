@@ -18,7 +18,7 @@ const unsigned char option7 = 0x80; // hex for 1000 0000
 #define ENEMIES					27
 #define ENEMY_BULLETS			50
 #define GODRAY_SAMPLE			30
-#define UI_CNT					2
+#define UI_CNT					static_cast<int>(UIType::COUNT) + ENEMIES - 1
 
 #define MAX_ITEM				15	// 보석 최대 레벨?
 
@@ -87,6 +87,8 @@ enum class EnemyType : char
 enum class UIType : char
 {
 	CROSSHAIR, MINIMAP, HP
+
+	,COUNT
 };
 
 enum class ItemType : char

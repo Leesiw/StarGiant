@@ -611,6 +611,8 @@ class CEnemyObject : public CGameObject
 public:
 	bool isAlive;
 	short hp;
+	short Maxhp;
+
 
 	XMFLOAT4X4 m_xmf4x4Rotate;
 	float m_fPitch, m_fYaw, m_fRoll;
@@ -625,6 +627,9 @@ public:
 	virtual void Rotate(XMFLOAT4* pxmf4Quaternion);
 
 	void ResetRotate();
+	short GetcurHp() { return hp; }
+	short GetMaxHp() { return Maxhp; }
+
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
