@@ -19,6 +19,9 @@ const unsigned char option7 = 0x80; // hex for 1000 0000
 #define ENEMY_BULLETS			50
 #define GODRAY_SAMPLE			30
 #define UI_CNT					static_cast<int>(UIType::COUNT) + ENEMIES - 1
+#define UI_INSIDE_CNT			/*static_cast<int>(UIInsideType::COUNT) */ 4
+
+
 
 #define MAX_ITEM				15	// 보석 최대 레벨?
 
@@ -89,6 +92,13 @@ enum class UIType : char
 	CROSSHAIR, MINIMAP, HP
 
 	,COUNT
+};
+
+enum class UIInsideType : char
+{
+	FSIT = static_cast<int>(UIType::COUNT)
+
+	, END, COUNT = END - static_cast<int>(UIType::COUNT)
 };
 
 enum class ItemType : char

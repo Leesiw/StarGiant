@@ -56,6 +56,8 @@ public:
 	void BuildDefaultLightsAndMaterials();
 	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	void BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void BuildUIInside(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+
 	void BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap);
@@ -75,6 +77,8 @@ public:
     void AnimateObjects(float fTimeElapsed);
     void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
 	void RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
+	void RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
+
 
 
 	void ReleaseUploadBuffers();
@@ -144,6 +148,9 @@ public:
 
 
 	CUI								*m_ppUI[UI_CNT];
+
+	CUI								*m_ppUIInside[UI_INSIDE_CNT];
+
 
 
 

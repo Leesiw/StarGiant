@@ -95,7 +95,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 216); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 230); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
 
 	CMaterial::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -292,9 +292,18 @@ void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	m_ppUI[1] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::MINIMAP), 1, 1, 0);
 	m_ppUI[1]->SetPosition(fx + 10.0f, fy, 10.0f);
 
-	for (int i = 2; i < UI_CNT; ++i) {
+	for (int i = 2; i < ENEMIES + 2; ++i) { //  UI_CNT
 		m_ppUI[i] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::HP), 15, 2, 0);
 		m_ppUI[i]->SetPosition(fx + 10.0f + 20.0f * i, fy, 10.0f);
+	}
+
+
+}
+
+void CScene::BuildUIInside(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	for (int i = 0; i < UI_INSIDE_CNT; ++i) {
+		m_ppUIInside[i] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIInsideType::FSIT), 15, 15, 0);
 	}
 }
 
@@ -383,6 +392,8 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 		m_ppMeteorObjects[i] = NULL;
 	}
 
+	BuildUIInside(pd3dDevice, pd3dCommandList);
+
 	/*m_nShaders = 1;
 	m_ppShaders = new CShader * [m_nShaders];
 
@@ -455,6 +466,13 @@ void CScene::ReleaseObjects()
 		for (int i = 0; i < UI_CNT; i++) if (m_ppUI[i]) m_ppUI[i]->Release();
 		delete[] m_ppUI;
 	}
+
+	if (m_ppUIInside)
+	{
+		for (int i = 0; i < UI_INSIDE_CNT; i++) if (m_ppUIInside[i]) m_ppUIInside[i]->Release();
+		delete[] m_ppUIInside;
+	}
+
 
 
 	if (landob)
@@ -1119,5 +1137,41 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 		m_ppBoss->Render(pd3dCommandList, pCamera);
 	}
 	if (landob)landob->Render(pd3dCommandList, pCamera);
+}
+
+void CScene::RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+
+	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+	pCamera->UpdateShaderVariables(pd3dCommandList);
+
+	UpdateShaderVariables(pd3dCommandList);
+
+
+	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+	XMFLOAT3 xmf3CameraLook = pCamera->GetLookVector();
+	XMFLOAT3 xmf3Position = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 50.0f, false));
+
+	m_SitPos[0] = XMFLOAT3(416.0f, 230.0f, 734.0f); //LEFT
+	m_SitPos[1] = XMFLOAT3(505.0f, 230.0f, 673.0f); //UP
+	m_SitPos[2] = XMFLOAT3(416.0f, 230.0f, 613.0f); //RIGHT
+	m_SitPos[3] = XMFLOAT3(405.0f, 230.0f, 673.0);  //CENTER
+
+	m_ppUIInside[0]->SetPosition(m_SitPos[0].x, m_SitPos[0].y + 10.0f, m_SitPos[0].z);
+	m_ppUIInside[1]->SetPosition(m_SitPos[1].x, m_SitPos[1].y + 10.0f, m_SitPos[1].z);
+	m_ppUIInside[2]->SetPosition(m_SitPos[2].x, m_SitPos[2].y + 10.0f, m_SitPos[2].z);
+	m_ppUIInside[3]->SetPosition(m_SitPos[3].x, m_SitPos[3].y + 10.0f, m_SitPos[3].z);
+
+	for (int i = 0; i < UI_INSIDE_CNT; i++)
+	{
+		if (m_ppUIInside[i])
+		{
+			m_ppUIInside[i]->SetScale(2.0f, 2.0f, 2.0f);
+			m_ppUIInside[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
+			m_ppUIInside[i]->Render(pd3dCommandList, pCamera);
+		}
+	}
 }
 

@@ -780,6 +780,7 @@ void CGameFramework::FrameAdvance()
 	if (m_pPlayer && !b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Render(m_pd3dCommandList, m_pCamera);
 	if (m_pInsidePlayer && b_Inside)for (int i = 0; i < 3; ++i) m_pInsidePlayer[i]->Render(m_pd3dCommandList, m_pInsideCamera);
 	if (m_pScene && !b_Inside) m_pScene->RenderUI(m_pd3dCommandList, m_pCamera);
+	if (m_pInsideScene && b_Inside)m_pInsideScene->RenderUIInside(m_pd3dCommandList, m_pInsideCamera);
 
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
