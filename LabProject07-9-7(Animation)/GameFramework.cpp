@@ -1150,6 +1150,18 @@ void CGameFramework::RecvServer()
 			m.unlock();
 			break;
 		}
+		case SC_REMOVE_MISSILE:
+		{
+			char subBuf[sizeof(char)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+
+			char miss_id;
+			memcpy(&miss_id, &subBuf, sizeof(char));
+			m_pScene->m_ppEnemyMissiles[miss_id]->m_bActive = false;
+			break;
+		}
 		case SC_ANIMATION_CHANGE:
 		{
 			char subBuf[sizeof(ANIMATION_INFO)]{};

@@ -202,6 +202,8 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 
 void CScene::CheckEnemyCollisions()
 {
+	//플레이어와
+	/*
 	for (int i = 0; i < ENEMIES; ++i)
 	{
 		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
@@ -236,32 +238,11 @@ void CScene::CheckEnemyCollisions()
 			}
 		}
 	}
-
-	// 적들끼리
-	for (int i = 0; i < ENEMIES; ++i)
-	{
-		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
-		for (int j = i + 1; j < ENEMIES; ++j) 
-		{
-			if (!m_ppEnemies[j]->GetisAlive()) { continue; }
-			if (m_ppEnemies[i]->HierarchyIntersects(m_ppEnemies[j]))
-			{
-				XMFLOAT3 xmf3Sub = m_ppEnemies[j]->GetPosition();
-				xmf3Sub = Vector3::Subtract(m_ppEnemies[i]->GetPosition(), xmf3Sub);
-				xmf3Sub = Vector3::Normalize(xmf3Sub);
-				XMFLOAT3 vel = m_ppEnemies[i]->GetVelocity();
-				float fLen = Vector3::Length(vel) / 30.f;
-				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, true);
-				XMFLOAT3 vel2 = m_ppEnemies[j]->GetVelocity();
-
-				m_ppEnemies[i]->SetVelocity(Vector3::Add(vel, xmf3Sub));
-				m_ppEnemies[j]->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
-			}
-		}
-	}
+	*/
 
 	//적&운석
 	for (int i = 0; i < METEOS; ++i) {
+		m_ppEnemies[i]->UpdateBoundingBox();
 		if (time(NULL) - m_ppMeteoObjects[i]->coll_time >= 1) {
 			m_ppMeteoObjects[i]->UpdateBoundingBox();
 			for (int j = 0; j < ENEMIES; ++j) {
@@ -290,6 +271,66 @@ void CScene::CheckEnemyCollisions()
 			}
 		}
 	}
+
+	// 적들끼리
+	for (int i = 0; i < ENEMIES; ++i)
+	{
+		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
+		for (int j = i + 1; j < ENEMIES; ++j) 
+		{
+			if (!m_ppEnemies[j]->GetisAlive()) { continue; }
+			if (m_ppEnemies[i]->HierarchyIntersects(m_ppEnemies[j]))
+			{
+				XMFLOAT3 xmf3Sub = m_ppEnemies[j]->GetPosition();
+				xmf3Sub = Vector3::Subtract(m_ppEnemies[i]->GetPosition(), xmf3Sub);
+				xmf3Sub = Vector3::Normalize(xmf3Sub);
+				XMFLOAT3 vel = m_ppEnemies[i]->GetVelocity();
+				float fLen = Vector3::Length(vel) / 30.f;
+				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, true);
+				XMFLOAT3 vel2 = m_ppEnemies[j]->GetVelocity();
+
+				m_ppEnemies[i]->SetVelocity(Vector3::Add(vel, xmf3Sub));
+				m_ppEnemies[j]->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+			}
+		}
+	}
+
+	
+}
+
+
+void CScene::CheckMissileCollisions()
+{
+	for (int i = 0; i < ENEMY_BULLETS; ++i) {
+		m_ppMissiles[i]->UpdateBoundingBox();
+
+		if (m_ppMissiles[i]->HierarchyIntersects(m_pSpaceship))
+		{
+			XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
+			xmf3Sub = Vector3::Subtract(m_ppMissiles[i]->GetPosition(), xmf3Sub);
+			xmf3Sub = Vector3::Normalize(xmf3Sub);
+			float fLen = 50.f;
+			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, true);
+
+			XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
+
+			m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+
+
+
+			short real_damage = m_ppMissiles[i]->GetDamage() - m_pSpaceship->def;
+			if (real_damage <= 0) { real_damage = 1; }
+			short new_hp = m_pSpaceship->GetHP() - real_damage;
+			m_pSpaceship->SetHP(new_hp);
+
+			for (auto& pl : clients)
+			{
+				// 미사일 제거 패킷
+				pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
+			}
+		}
+	}
+
 }
 
 void CScene::SpawnEnemy()
@@ -439,6 +480,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	CheckMeteoByPlayerCollisions();
 	CheckEnemyCollisions();
+	CheckMissileCollisions();
 	//CheckObjectByBulletCollisions();
 	//CheckEnemyByBulletCollisions();
 }

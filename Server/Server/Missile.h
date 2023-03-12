@@ -30,6 +30,7 @@ public:
 	void SetisActive(bool active);
 	bool GetisActive() { return isActive; }
 	XMFLOAT4 GetQuaternion();
+	char GetDamage() { return damage; }
 	void SetNewMissile(const MissileInfo& info);
 	void Reset();
 

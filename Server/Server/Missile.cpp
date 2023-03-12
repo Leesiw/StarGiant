@@ -36,10 +36,10 @@ void CMissile::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	new_pos = Vector3::TransformCoord(new_pos, inv_mat); // 타겟의 위치를 적 자체의 좌표계로 변환
 	new_pos = Vector3::Normalize(new_pos);
 
-	float pitch = asin(-new_pos.y);
-	float yaw = atan2(new_pos.x, new_pos.z);
+	float pitch = XMConvertToDegrees(asin(-new_pos.y));
+	float yaw = XMConvertToDegrees(atan2(new_pos.x, new_pos.z));
 
-	float rotate_angle = fTimeElapsed * 180.f; // 초당 90도 회전
+	float rotate_angle = fTimeElapsed * 180.f;
 
 	XMFLOAT3 p_y_r{ pitch, yaw, 0.f };
 	if (Vector3::Length(p_y_r) > rotate_angle) {
