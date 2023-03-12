@@ -173,16 +173,21 @@ void CEnemy::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	new_pos = Vector3::TransformCoord(new_pos, inv_mat); // 타겟의 위치를 적 자체의 좌표계로 변환
 	new_pos = Vector3::Normalize(new_pos);
 
-	float pitch = asin(-new_pos.y);
-	float yaw = atan2(new_pos.x, new_pos.z);
+	
+
+	float pitch = XMConvertToDegrees(asin(-new_pos.y));
+	float yaw = XMConvertToDegrees(atan2(new_pos.x, new_pos.z));
+
+	float rotate_angle = fTimeElapsed * 90.f;
 
 	XMFLOAT3 p_y_r{ pitch, yaw, 0.f };
-	if (Vector3::Length(p_y_r) > 0.1f) {
+	if (Vector3::Length(p_y_r) > rotate_angle) {
 		if (enemy_flags & option1) { enemy_flags &= ~option1; };
 		p_y_r = Vector3::Normalize(p_y_r);
-		Rotate(p_y_r.x * fTimeElapsed * 45.f, p_y_r.y * fTimeElapsed * 45.f, 0.f);
+		Rotate(p_y_r.x * rotate_angle, p_y_r.y * rotate_angle, 0.f);
 	}
 	else {
+		Rotate(pitch, yaw, 0.f);
 		if (!(enemy_flags & option1)) { enemy_flags |= option1; };
 	}
 }

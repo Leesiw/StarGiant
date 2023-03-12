@@ -311,6 +311,13 @@ struct SC_MISSILE_PACKET {
 	MISSILE_INFO data;
 };
 
+struct SC_REMOVE_MISSILE_PACKET {
+	unsigned char size;
+	char	type;
+
+	char id;
+};
+
 // enemy
 struct SC_MOVE_ENEMY_PACKET {
 	unsigned char size;

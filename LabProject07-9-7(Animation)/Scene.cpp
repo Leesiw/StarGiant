@@ -251,8 +251,6 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_ppEnemyMissiles[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_ppEnemyMissiles[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
 		m_ppEnemyMissiles[i]->SetScale(1.0f, 1.0f, 1.0f);
-
-		m_ppEnemyMissiles[i]->m_bActive = true;
 		if (pEnemyModel) delete pEnemyModel;
 	}
 
