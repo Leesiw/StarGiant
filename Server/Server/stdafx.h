@@ -38,6 +38,7 @@ static std::uniform_real_distribution<float> urdPos2(100, 200);
 static std::uniform_real_distribution<float> urdPos3(-100, 100);
 static std::uniform_real_distribution<float> urdScale(10, 15);
 static std::uniform_real_distribution<float> urdScale2(3, 5);
+static std::uniform_real_distribution<float> urdAngle(-4, 4);
 static std::uniform_int_distribution<int> urdEnemyAI(0, 100);
 static std::uniform_int_distribution<int> urdEnemyType(0, 2);
 

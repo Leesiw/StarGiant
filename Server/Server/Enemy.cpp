@@ -112,19 +112,26 @@ void CEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 	XMFLOAT3 xmf3Pos = GetPosition();
 	XMFLOAT3 player_pos = player->GetPosition();
 	XMFLOAT3 xmfToPlayer = Vector3::Subtract(player_pos, xmf3Pos);
+	xmfToPlayer = Vector3::TransformCoord(xmfToPlayer, Matrix4x4::RotationAxis(GetUp(), urdAngle(dree)));
 
-	for (auto& pl : clients)
-	{
-		pl.send_bullet_packet(0, xmf3Pos, xmfToPlayer);
-	}
+	XMFLOAT3 player_vel = player->GetVelocity();
+	float h_probability = hit_probability;
+	if (Vector3::Length(player_vel) > 0.f) { h_probability -= m_fAvoidReductionRate; }
 
-	if (urdEnemyAI(dree) < hit_probability) {	// 플레이어에게 공격 명중
+	if (urdEnemyAI(dree) < h_probability) {	// 플레이어에게 공격 명중
 		if (player->GetHP() <= 0) { return; }
 		short real_damage = damage - player->def;
 		if (real_damage <= 0) { real_damage = 1; }
 		player->SetHP(player->GetHP() - real_damage);
 		for (auto& pl : clients)
 		{
+			if (false == pl.in_use) continue;
+			pl.send_bullet_packet(0, xmf3Pos, xmfToPlayer);
+		}
+
+		for (auto& pl : clients)
+		{
+			if (false == pl.in_use) continue;
 			pl.send_bullet_hit_packet(0, -1, player->GetHP());
 		}
 	}
@@ -274,12 +281,13 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 
 void CEnemy::SendPos()
 {
+	ENEMY_INFO info;
+	info.id = id;
+	info.Quaternion = GetQuaternion();
+	info.pos = GetPosition();
 	for (auto& pl : clients)
 	{
-		ENEMY_INFO info;
-		info.id = id;
-		info.Quaternion = GetQuaternion();
-		info.pos = GetPosition();
+		if (false == pl.in_use) continue;
 		pl.send_enemy_packet(0, info);
 	}
 }

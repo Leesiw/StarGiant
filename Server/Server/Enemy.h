@@ -29,6 +29,7 @@ protected:
 
 	short						damage = 3;
 	short						hit_probability = 50;
+	short						m_fAvoidReductionRate = 20;
 
 	unsigned char enemy_flags = 0;	// 0 : 살아있는지 1 : 플레이어를 보고 있는지
 	// 2 : 미사일 발사 여부

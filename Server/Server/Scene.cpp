@@ -124,6 +124,7 @@ void CScene::CheckMeteoByPlayerCollisions()
 
 				for (auto& pl : clients)
 				{
+					if (pl.in_use == false) continue;
 					pl.send_meteo_direction_packet(0, i, m_ppMeteoObjects[i]);
 				}
 			}
@@ -147,6 +148,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 			m_ppEnemies[i]->hp -= m_pSpaceship->damage;
 			for (auto& pl : clients)
 			{
+				if (pl.in_use == false) continue;
 				pl.send_bullet_hit_packet(0, i, m_ppEnemies[i]->hp);
 			}
 
@@ -193,6 +195,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 				info.num = items[item_type];
 				for (auto& pl : clients)
 				{
+					if (pl.in_use == false) continue;
 					pl.send_item_packet(0, info);
 				}
 			}
@@ -232,6 +235,7 @@ void CScene::CheckEnemyCollisions()
 
 			for (auto& pl : clients)
 			{
+				if (pl.in_use == false) continue;
 				pl.send_bullet_hit_packet(0, i, m_ppEnemies[i]->hp);
 				if (m_pSpaceship->GetHP() <= 0) { continue; }
 				pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
@@ -265,6 +269,7 @@ void CScene::CheckEnemyCollisions()
 
 					for (auto& pl : clients)
 					{
+						if (pl.in_use == false) continue;
 						pl.send_meteo_direction_packet(0, i, m_ppMeteoObjects[i]);
 					}
 				}
@@ -325,6 +330,7 @@ void CScene::CheckMissileCollisions()
 
 			for (auto& pl : clients)
 			{
+				if (pl.in_use == false) continue;
 				pl.send_remove_missile_packet(0, i);
 				pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
 			}
@@ -472,7 +478,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		m_ppPlayers[i]->Update(fTimeElapsed, pos);
 		if (clients[i].in_use && clients[i].type == PlayerType::INSIDE) {
 			for (auto& pl : clients) {
-				if (!pl.in_use) continue;
+				if (pl.in_use == false) continue;
 				pl.send_inside_packet(i, m_ppPlayers[i]);
 			}
 		}

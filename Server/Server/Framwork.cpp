@@ -41,6 +41,7 @@ void CGameFramework::Init() {
 
 
 	for (auto& pl : clients) {
+		if (false == pl.in_use) continue;
 		pl.type = PlayerType::INSIDE;
 	}
 
@@ -214,6 +215,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 				m_pScene->CheckEnemyByBulletCollisions(p->data);
 				for (auto& pl : clients)
 				{
+					if (false == pl.in_use) continue;
 					pl.send_bullet_packet(0, p->data.pos, p->data.direction);
 				}
 			}
@@ -250,13 +252,13 @@ int CGameFramework::get_new_client_id()
 
 void CGameFramework::disconnect(int c_id)
 {
+	SC_REMOVE_PLAYER_PACKET p;
+	p.id = c_id;
+	p.size = sizeof(p);
+	p.type = SC_REMOVE_PLAYER;
 	for (auto& pl : clients) {
 		if (pl.in_use == false) continue;
 		if (pl._id == c_id) continue;
-		SC_REMOVE_PLAYER_PACKET p;
-		p.id = c_id;
-		p.size = sizeof(p);
-		p.type = SC_REMOVE_PLAYER;
 		pl.do_send(&p);
 	}
 	closesocket(clients[c_id]._socket);
