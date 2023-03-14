@@ -348,7 +348,7 @@ CLaserEnemy::CLaserEnemy()
 
 	enemy_flags &= ~option2;
 
-	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.0188516f, -0.336726f, -0.0989028f), XMFLOAT3(1.739f, 1.51158f, 1.67118f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.037703, -0.673452, -0.197806), XMFLOAT3(3.478002f, 3.023166f, 3.342354f), XMFLOAT4(0.0, 0.0, 0.0, 1.0f) };
 }
 
 CLaserEnemy::~CLaserEnemy()

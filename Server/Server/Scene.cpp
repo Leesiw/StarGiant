@@ -144,7 +144,6 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 	for (int i = 0; i < ENEMIES; ++i)
 	{
 		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
-		m_ppEnemies[i]->UpdateBoundingBox();
 		if (m_ppEnemies[i]->m_xmOOBB.Intersects(pos, dir, dist)) //총알/적 충돌시
 		{
 			printf("hit");
@@ -264,13 +263,16 @@ void CScene::CheckEnemyCollisions()
 	}
 	*/
 
+	for (int i = 0; i < ENEMIES; ++i) {
+		m_ppEnemies[i]->UpdateBoundingBox();
+	}
+
 	//적&운석
 	for (int i = 0; i < METEOS; ++i) {
-		m_ppEnemies[i]->UpdateBoundingBox();
 		if (time(NULL) - m_ppMeteoObjects[i]->coll_time >= 1) {
 			m_ppMeteoObjects[i]->UpdateBoundingBox();
 			for (int j = 0; j < ENEMIES; ++j) {
-
+				
 				if (m_ppEnemies[j]->HierarchyIntersects(m_ppMeteoObjects[i]))
 				{
 					m_ppMeteoObjects[i]->coll_time = time(NULL);
