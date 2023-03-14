@@ -121,11 +121,13 @@ void CScene::CheckMeteoByPlayerCollisions()
 				m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(finalVelX2, finalVelY2, finalVelZ2));
 
 				m_pSpaceship->Move(m_pSpaceship->GetVelocity(), true);
+				m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 2);
 
 				for (auto& pl : clients)
 				{
 					if (pl.in_use == false) continue;
 					pl.send_meteo_direction_packet(0, i, m_ppMeteoObjects[i]);
+					pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
 				}
 			}
 		}
