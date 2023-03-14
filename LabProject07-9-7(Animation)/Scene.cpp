@@ -1078,7 +1078,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	{
 		if (m_ppEnemyMissiles[i] && m_ppEnemyMissiles[i]->m_bActive)
 		{
-			m_ppEnemyMissiles[i]->Animate(m_fElapsedTime);
+			//m_ppEnemyMissiles[i]->Animate(m_fElapsedTime);
 			if (!m_ppEnemyMissiles[i]->m_pSkinnedAnimationController) m_ppEnemyMissiles[i]->UpdateTransform(NULL);
 			m_ppEnemyMissiles[i]->Render(pd3dCommandList, pCamera);
 		}
