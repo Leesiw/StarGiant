@@ -213,6 +213,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (clients[c_id].type >= PlayerType::ATTACK1 && clients[c_id].type <= PlayerType::ATTACK3) {
 			if (m_pScene->m_pSpaceship->CanAttack((short)clients[c_id].type - (short)PlayerType::ATTACK1)) {
 				m_pScene->CheckEnemyByBulletCollisions(p->data);
+				m_pScene->CheckMeteoByBulletCollisions(p->data);
 				for (auto& pl : clients)
 				{
 					if (false == pl.in_use) continue;

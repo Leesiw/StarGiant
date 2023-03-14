@@ -256,8 +256,6 @@ void CEnemy::Animate(float fTimeElapsed, CAirplanePlayer* player)
 
 void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 {
-	
-
 	float fLength = Vector3::Length(m_xmf3Velocity);
 	float fMaxVelocity = 200.f;
 	if (fLength > fMaxVelocity)

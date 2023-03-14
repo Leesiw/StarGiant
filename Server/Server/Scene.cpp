@@ -138,12 +138,12 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 {
 	float dist = 500.f; // 플레이어 사거리
 
+	XMVECTOR pos = XMLoadFloat3(&data.pos);
+	XMVECTOR dir = XMLoadFloat3(&data.direction);
+
 	for (int i = 0; i < ENEMIES; ++i)
 	{
 		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
-		XMVECTOR pos = XMLoadFloat3(&data.pos);
-		XMVECTOR dir = XMLoadFloat3(&data.direction);
-		m_ppEnemies[i]->UpdateBoundingBox();
 		if (m_ppEnemies[i]->m_xmOOBB.Intersects(pos, dir, dist)) //총알/적 충돌시
 		{
 			printf("hit");
@@ -201,6 +201,23 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 					pl.send_item_packet(0, info);
 				}
 			}
+			return;
+		}
+	}
+}
+
+void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
+{
+	float dist = 500.f; // 플레이어 사거리
+	XMVECTOR pos = XMLoadFloat3(&data.pos);
+	XMVECTOR dir = XMLoadFloat3(&data.direction);
+
+	for (int i = 0; i < METEOS; ++i)
+	{
+		if (m_ppMeteoObjects[i]->m_xmOOBB.Intersects(pos, dir, dist)) //총알/적 충돌시
+		{
+			SpawnMeteo(i);
+			return;
 		}
 	}
 }
@@ -375,6 +392,30 @@ void CScene::SpawnEnemy()
 	}
 }
 
+void CScene::SpawnMeteo(char i)
+{
+	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
+	m_ppMeteoObjects[i]->m_xmf4x4ToParent = Matrix4x4::Identity();
+	XMFLOAT3 random_pos{ urdPos(dree) , urdPos(dree), urdPos(dree) };
+	if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x; }
+	if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; }
+	if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; }
+	m_ppMeteoObjects[i]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
+
+	if (i < METEOS / 2) {
+		m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+	}
+	else {
+		m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
+	}
+	m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(urdPos3(dree), urdPos3(dree), urdPos3(dree)));
+
+	for (auto& pl : clients) {
+		if (false == pl.in_use) continue;
+		pl.send_spawn_meteo_packet(0, i, m_ppMeteoObjects[i]);
+	}
+}
+
 void CScene::AnimateObjects(float fTimeElapsed)
 {
 	m_fEnemySpawnTimeRemaining -= fTimeElapsed;
@@ -389,29 +430,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	{ 
 		XMFLOAT3 m_pos = m_ppMeteoObjects[i]->GetPosition();
 		float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
-		//XMFLOAT3 sub = Vector3::Subtract(m_pos, p_pos);
-		//if (fabs(sub.x) > 1000.0f || fabs(sub.y) > 1000.0f || fabs(sub.z) > 1000.0f) {
 		if (dist > 1500.0f){
-
-			m_ppMeteoObjects[i]->m_xmf4x4ToParent = Matrix4x4::Identity();
-			XMFLOAT3 random_pos{ urdPos(dree) , urdPos(dree), urdPos(dree)};
-			if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x; }
-			if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; }
-			if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; }
-			m_ppMeteoObjects[i]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
-
-			if (i < METEOS / 2) {
-				m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
-			}
-			else {
-				m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
-			}
-			m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(urdPos3(dree), urdPos3(dree), urdPos3(dree)));
-			
-			for (auto& pl : clients) {
-				if (false == pl.in_use) continue;
-				pl.send_spawn_meteo_packet(0, i, m_ppMeteoObjects[i]);
-			}
+			SpawnMeteo(i);
 		}
 		m_ppMeteoObjects[i]->Animate(fTimeElapsed, NULL); 
 	}

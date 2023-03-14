@@ -20,10 +20,12 @@ public:
 
 	void CheckMeteoByPlayerCollisions();
 	void CheckEnemyByBulletCollisions(BULLET_INFO& data);
+	void CheckMeteoByBulletCollisions(BULLET_INFO& data);
 	void CheckEnemyCollisions();
 	void CheckMissileCollisions();
 
 	void SpawnEnemy();
+	void SpawnMeteo(char i);
 
 	CAirplanePlayer* m_pSpaceship = NULL;
 	CTerrainPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
