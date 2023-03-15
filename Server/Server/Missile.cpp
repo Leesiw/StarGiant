@@ -21,7 +21,7 @@ void CMissile::Animate(float fTimeElapsed, CGameObject* target)
 		LookAtPosition(fTimeElapsed, target->GetPosition());
 	}
 
-	float fDistance = 50.f * fTimeElapsed;
+	float fDistance = 80.f * fTimeElapsed;
 	XMFLOAT3 xmf3Position = GetPosition();
 	XMFLOAT3 xmf3Movement = Vector3::ScalarProduct(GetLook(), fDistance, true);
 	xmf3Position = Vector3::Add(xmf3Position, xmf3Movement);
@@ -41,7 +41,7 @@ void CMissile::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	float pitch = XMConvertToDegrees(asin(-new_pos.y));
 	float yaw = XMConvertToDegrees(atan2(new_pos.x, new_pos.z));
 
-	float rotate_angle = fTimeElapsed * 180.f;
+	float rotate_angle = fTimeElapsed * 360.f;
 
 	XMFLOAT3 p_y_r{ pitch, yaw, 0.f };
 	if (Vector3::Length(p_y_r) > rotate_angle) {

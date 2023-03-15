@@ -111,7 +111,7 @@ void CPlayer::Update(float fTimeElapsed)
 	}
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
-	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 100.f, false);
+	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 50.f, false);
 	xmf3Velocity = Vector3::Add(xmf3Velocity, LookVelocity);
 	Move(xmf3Velocity, false);
 

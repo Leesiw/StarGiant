@@ -267,7 +267,7 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
 
-	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(player->GetLook(), fTimeElapsed * 100.f, false);
+	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(player->GetLook(), fTimeElapsed * 50.f, false);
 	xmf3Velocity = Vector3::Add(LookVelocity, xmf3Velocity);
 	XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
 	SetPosition(xmf3Position);
