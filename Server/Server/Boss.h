@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Object.h"
-#include "Camera.h"
+#include "Session.h"
 
-
-
+extern array<SESSION, MAX_USER> clients;
 
 class Boss : public CGameObject
 {
@@ -26,7 +25,10 @@ public:
 	int GetHP() { return BossHP; };
 	int SetHP(int hp) { return BossHP = hp; }
 
-	
+	void SendPosition();
+	void SendAnimation();
+
+	XMFLOAT4 GetQuaternion();
 protected:
 	/*XMFLOAT3					m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3					m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
@@ -41,7 +43,6 @@ protected:
 	float           			m_fMaxVelocityY = 0.0f;
 
 public:
-	void BossObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel);
 	void Boss_Ai(BossState CurState, XMFLOAT3 TargetPos, int bossHp);
 
 	void BossAi();

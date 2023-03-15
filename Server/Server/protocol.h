@@ -34,6 +34,9 @@ constexpr int NAME_SIZE = 20;
 constexpr int W_WIDTH = 8;
 constexpr int W_HEIGHT = 8;
 
+// boss id
+constexpr char BOSS_ID = ENEMIES + 1;
+
 // Packet ID
 constexpr char CS_CHANGE = 0;
 constexpr char CS_INSIDE_MOVE = 1;
@@ -187,7 +190,7 @@ struct ENEMY_INFO {
 
 // animation
 struct ANIMATION_INFO {
-	short id;
+	char id;
 	char animation;
 };
 

@@ -1069,6 +1069,14 @@ void CGameFramework::RecvServer()
 			ENEMY_INFO enemyInfo;
 			memcpy(&enemyInfo, &subBuf, sizeof(ENEMY_INFO));
 
+			if (enemyInfo.id == BOSS_ID) {
+				m.lock();
+				m_pScene->m_ppBoss->SetQuaternion(enemyInfo.Quaternion);
+				m_pScene->m_ppBoss->SetPosition(enemyInfo.pos);
+				m.unlock();
+				break;
+			}
+
 			if (!m_pScene->m_ppEnemies[enemyInfo.id]->isAlive) {
 				m_pScene->m_ppEnemies[enemyInfo.id]->isAlive = true;
 			}
@@ -1176,6 +1184,12 @@ void CGameFramework::RecvServer()
 				if (int(m_pInsidePlayer[ani_info.id]->motion) != ani_info.animation) {
 					m_pInsidePlayer[ani_info.id]->motion = (AnimationState)ani_info.animation;
 				}
+				break;
+			}
+			if (ani_info.id == BOSS_ID) {
+				m_pScene->m_ppBoss->CurMotion = (BossAnimation)ani_info.animation;
+				// 보스 State 변경??
+				break;
 			}
 			break;
 		}

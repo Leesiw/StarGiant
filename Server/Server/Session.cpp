@@ -249,3 +249,12 @@ void SESSION::send_item_packet(int c_id, ITEM_INFO& item)
 
 	do_send(&p);
 }
+
+void SESSION::send_animation_packet(char id, char animation)
+{
+	SC_ANIMATION_CHANGE_PACKET p;
+	p.size = sizeof(SC_ANIMATION_CHANGE_PACKET);
+	p.type = SC_ANIMATION_CHANGE;
+	p.data.id = id;
+	p.data.animation = animation;
+}

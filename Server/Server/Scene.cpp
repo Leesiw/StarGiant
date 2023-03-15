@@ -84,6 +84,10 @@ void CScene::BuildObjects()
 	for (int i = 0; i < ENEMY_BULLETS; ++i) {
 		m_ppMissiles[i] = new CMissile;
 	}
+
+	// boss
+	m_pBoss = new Boss();
+	m_pBoss->SetPosition(10.f, 250.f, 640.f);
 }
 
 void CScene::ReleaseObjects()
@@ -92,6 +96,7 @@ void CScene::ReleaseObjects()
 	if (m_ppPlayers) { delete[] m_ppPlayers; }
 	if (m_ppEnemies) { delete[] m_ppEnemies; }
 	if (m_ppMeteoObjects){ delete[] m_ppMeteoObjects; }
+	if (m_pBoss) { delete m_pBoss; }
 }
 
 void CScene::CheckMeteoByPlayerCollisions()
@@ -483,6 +488,11 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				}
 			}
 		}
+	}
+
+	if (m_pBoss) {
+		m_pBoss->Animate(fTimeElapsed);
+		m_pBoss->Boss_Ai(m_pBoss->GetState(), m_pSpaceship->GetPosition(), m_pBoss->GetHP());;
 	}
 
 	m_pSpaceship->Animate(fTimeElapsed);

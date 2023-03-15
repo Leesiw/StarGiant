@@ -100,4 +100,5 @@ public:
 	void send_meteo_packet(int c_id, CMeteoObject* []);
 	void send_bullet_hit_packet(int c_id, short id, short hp);
 	void send_item_packet(int c_id, ITEM_INFO& item);
+	void send_animation_packet(char id, char animation);
 };

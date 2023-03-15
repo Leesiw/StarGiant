@@ -348,6 +348,7 @@ public:
 	CGameObject 					*m_pChild = NULL;
 	CGameObject 					*m_pSibling = NULL;
 
+	XMFLOAT3						m_xmf3Scale = XMFLOAT3(1.f, 1.f, 1.f);
 
 
 	BoundingBox			aabb;
@@ -389,12 +390,12 @@ public:
 	XMFLOAT3 GetUp();
 	XMFLOAT3 GetRight();
 
-
-
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 xmf3Position);
 	void SetScale(float x, float y, float z);
 	void SetLookAt(XMFLOAT3 xmf3Target, XMFLOAT3 xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f));
+	void SetQuaternion(XMFLOAT4 Quaternion);
+
 
 	void MoveStrafe(float fDistance = 1.0f);
 	void MoveUp(float fDistance = 1.0f);
