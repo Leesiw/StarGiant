@@ -33,6 +33,8 @@
 #include <d3d11on12.h>
 #include <d2d1_3.h>
 #include <dxgi1_6.h>
+
+#include <wincodec.h>
 //
 using namespace std;
 

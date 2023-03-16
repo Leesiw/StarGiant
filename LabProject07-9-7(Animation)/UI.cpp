@@ -12,6 +12,7 @@ UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_vd2dRenderTargets.resize(nFrame);
     m_vTextBlocks.resize(1);
     Initialize(pd3dDevice, pd3dCommandQueue);
+    InitializeImage(pd3dDevice, pd3dCommandQueue);
 }
 
 void UILayer::Initialize(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue)
@@ -65,9 +66,51 @@ void UILayer::Initialize(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dComma
 
     m_pd2dDeviceContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), (ID2D1SolidColorBrush**)&m_pd2dTextBrush);
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &Dotbrush);
+
 
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), (IUnknown**)&m_pd2dWriteFactory);
     pdxgiDevice->Release();
+}
+
+void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue)
+{
+
+    ::CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, __uuidof(IWICImagingFactory), (void**)&m_pwicImagingFactory);
+
+    m_pd2dFactory->CreateDrawingStateBlock(&m_pd2dsbDrawingState);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize);
+
+
+
+    IWICBitmapDecoder* pwicBitmapDecoder;
+    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/mMap.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder);
+    
+    IWICBitmapFrameDecode* pwicFrameDecode;
+    pwicBitmapDecoder->GetFrame(0, &pwicFrameDecode);
+    m_pwicImagingFactory->CreateFormatConverter(&m_pwicFormatConverter);
+    m_pwicFormatConverter->Initialize(pwicFrameDecode, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
+    m_pd2dfxBitmapSource->SetValue(D2D1_BITMAPSOURCE_PROP_WIC_BITMAP_SOURCE, m_pwicFormatConverter);
+
+    m_pd2dfxGaussianBlur->SetInputEffect(0, m_pd2dfxBitmapSource);
+    m_pd2dfxGaussianBlur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 0.0f);
+
+
+
+    m_pd2dfxSize->SetInputEffect(0, m_pd2dfxBitmapSource);
+    m_pd2dfxSize->SetValue(D2D1_BITMAPSOURCE_PROP_SCALE, D2D1::Vector2F(0.1f, 0.1f));
+   
+    if (pwicBitmapDecoder) pwicBitmapDecoder->Release();
+    if (pwicFrameDecode) pwicFrameDecode->Release();
+}
+
+void UILayer::DrawDot(int dotCnt, XMFLOAT3[])
+{
+    for (int i= 0; i < dotCnt; ++i) {
+        m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(100.0f, FRAME_BUFFER_HEIGHT / 2.0f + 100.0f), 5.0f, 5.0f), Dotbrush); // 이게 중심
+    }
 }
 
 void UILayer::UpdateLabels(const wstring& strUIText)
@@ -75,7 +118,29 @@ void UILayer::UpdateLabels(const wstring& strUIText)
     m_vTextBlocks[0] = { strUIText, D2D1::RectF(0.0f, 0.0f, m_fWidth, m_fHeight), m_pdwTextFormat };
 }
 
-void UILayer::Render(UINT nFrame)
+void UILayer::UpdateDots(int id, XMFLOAT3 ppos, XMFLOAT3 epos)
+{
+   // m_enemyDot.push_back({ 100.0f, FRAME_BUFFER_HEIGHT / 2.0f + 100.0f });
+
+    XMFLOAT3 cpos;
+
+    cpos.x = ppos.x - epos.x;
+    cpos.z = ppos.z - epos.z;
+
+
+    m_enemyDot[id].x = cpos.x;
+    m_enemyDot[id].z = cpos.z;
+
+    m_enemyDot[0] = { 100.0f, 0.0f,  FRAME_BUFFER_HEIGHT / 2.0f + 100.0f };
+
+   //cout << id << "- id : " << m_enemyDot[id].x <<endl;
+   //cout << id << "- id : " << m_enemyDot[id].z << endl;
+
+
+
+}
+
+void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[])
 {
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
@@ -88,10 +153,34 @@ void UILayer::Render(UINT nFrame)
     { 
         m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBrush);
     }
+
+    D2D_POINT_2F d2dPoint = { 0.0f, FRAME_BUFFER_HEIGHT/2.0f };
+    D2D_RECT_F d2dRect = { 0.0f, 0.0f, 100.0f, 200.0f };
+
+    //int a = m_pd2dDeviceContext->GetSize().height;
+    //int b = m_pd2dDeviceContext->GetSize().width;
+    //cout << "height : " << a << endl;
+    //cout << "width : " << b << endl;
+
+    m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur, &d2dPoint);
+
+   // DrawDot(1);
+
+    for (auto& a : m_enemyDot)
+    {
+        //m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(100.0f, FRAME_BUFFER_HEIGHT / 2.0f + 100.0f), 5.0f, 5.0f), Dotbrush);
+        m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(a.x, a.z), 5.0f, 5.0f), Dotbrush);
+        //cout << a.x << endl;
+        //cout << a.y << endl;
+
+    }
+
     m_pd2dDeviceContext->EndDraw();
 
     m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
     m_pd3d11DeviceContext->Flush();
+
+
 }
 
 void UILayer::ReleaseResources()
@@ -109,6 +198,7 @@ void UILayer::ReleaseResources()
         m_vWrappedRenderTargets[i]->Release();
     }
     m_pd2dTextBrush->Release();
+    Dotbrush->Release();
     m_pd2dDeviceContext->Release();
     m_pdwTextFormat->Release();
     m_pd2dWriteFactory->Release();

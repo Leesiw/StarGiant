@@ -834,7 +834,13 @@ void CGameFramework::UpdateUI()
 		uiText += s;
 	}
 	m_pUILayer->UpdateLabels(uiText);
+
+	//for (int i = 0; i < ENEMIES; ++i)
+	//{
+	//	m_pUILayer->UpdateDots(i, { 0,0 });
+	//}
 }
+
 
 
 // ¼­¹ö
@@ -1081,6 +1087,9 @@ void CGameFramework::RecvServer()
 				m_pScene->m_ppEnemies[enemyInfo.id]->isAlive = true;
 			}
 			m_pScene->m_ppEnemies[enemyInfo.id]->SetPosition(enemyInfo.pos);
+			m_pUILayer->UpdateDots(enemyInfo.id, m_pPlayer[0]->GetPosition(), m_pScene->m_ppEnemies[enemyInfo.id]->GetPosition());
+
+			
 			m.lock();
 			m_pScene->m_ppEnemies[enemyInfo.id]->ResetRotate();
 			m_pScene->m_ppEnemies[enemyInfo.id]->Rotate(&enemyInfo.Quaternion);
