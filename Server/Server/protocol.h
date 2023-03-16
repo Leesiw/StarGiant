@@ -100,6 +100,8 @@ enum class UIType : char
 enum class UIInsideType : char
 {
 	FSIT = static_cast<int>(UIType::COUNT)
+	,NAME_1, NAME_2, NAME_3
+
 
 	, END, COUNT = END - static_cast<int>(UIType::COUNT)
 };

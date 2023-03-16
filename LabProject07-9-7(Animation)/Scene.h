@@ -151,7 +151,7 @@ public:
 
 	CUI								*m_ppUIInside[UI_INSIDE_CNT];
 
-
+	CUI* m_ppUIName[3];
 
 
 

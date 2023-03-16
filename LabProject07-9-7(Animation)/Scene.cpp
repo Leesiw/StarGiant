@@ -95,7 +95,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 230); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 362); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
 
 	CMaterial::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -305,6 +305,13 @@ void CScene::BuildUIInside(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	for (int i = 0; i < UI_INSIDE_CNT; ++i) {
 		m_ppUIInside[i] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIInsideType::FSIT), 15, 15, 0);
 	}
+
+	
+	m_ppUIName[0] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIInsideType::NAME_1), 5, 5, 0);
+	m_ppUIName[1] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIInsideType::NAME_2), 5, 5, 0);
+	m_ppUIName[2] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIInsideType::NAME_3), 5, 5, 0);
+
+	
 }
 
 void CScene::BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -330,7 +337,7 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 1, 76); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot() // �Ʒ������� �� �Լ��� �κ��̴�
+	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 1, 176); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot() // �Ʒ������� �� �Լ��� �κ��̴�
 
 	m_d3dCbvCPUDescriptorNextHandle = m_d3dCbvCPUDescriptorStartHandle = descriptor_heap->GetCPUDescriptorHandleForHeapStart();
 	m_d3dCbvGPUDescriptorNextHandle = m_d3dCbvGPUDescriptorStartHandle = descriptor_heap->GetGPUDescriptorHandleForHeapStart();
@@ -460,6 +467,11 @@ void CScene::ReleaseObjects()
 		delete[] m_ppEnemyMissiles;
 	}
 
+	if (m_pPlayer[g_myid]) {
+		m_pPlayer[g_myid]->ReleaseUploadBuffers();
+		delete[]m_pPlayer[g_myid];
+	}
+
 
 	if (m_ppUI)
 	{
@@ -473,6 +485,11 @@ void CScene::ReleaseObjects()
 		delete[] m_ppUIInside;
 	}
 
+	if (m_ppUIName)
+	{
+		for (int i = 0; i < 3; i++) if (m_ppUIName[i]) m_ppUIName[i]->Release();
+		delete[] m_ppUIName;
+	}
 
 
 	if (landob)
@@ -750,6 +767,9 @@ void CScene::ReleaseUploadBuffers()
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nHierarchicalGameObjects; i++) m_ppHierarchicalGameObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < METEOS; i++)if (m_ppMeteorObjects[i] != NULL) m_ppMeteorObjects[i]->ReleaseUploadBuffers();
+	for (int i = 0; i < ENEMIES; i++)if (m_ppEnemies[i])	m_ppEnemies[i]->ReleaseUploadBuffers();
+	if (m_pPlayer[g_myid])
+		m_pPlayer[g_myid]->ReleaseUploadBuffers();
 
 }
 
@@ -1084,6 +1104,15 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 	}
 
+	if (m_ppBoss) {
+		m_ppBoss->Animate(m_fElapsedTime);
+		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
+		m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
+		//m_ppBoss->BossAnimation(m_ppBoss->GetState());
+		m_ppBoss->Render(pd3dCommandList, pCamera);
+	}
+
+
 }
 
 void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -1130,12 +1159,7 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 		}
 	}
 
-	if (m_ppBoss) {
-		m_ppBoss->Animate(m_fElapsedTime);
-		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
-		m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
-		m_ppBoss->Render(pd3dCommandList, pCamera);
-	}
+
 	if (landob)landob->Render(pd3dCommandList, pCamera);
 }
 
@@ -1164,6 +1188,12 @@ void CScene::RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 	m_ppUIInside[2]->SetPosition(m_SitPos[2].x, m_SitPos[2].y + 10.0f, m_SitPos[2].z);
 	m_ppUIInside[3]->SetPosition(m_SitPos[3].x, m_SitPos[3].y + 10.0f, m_SitPos[3].z);
 
+
+	m_ppUIName[0]->SetPosition(m_pPlayer[0]->GetPosition().x, m_pPlayer[0]->GetPosition().y + 15.0f, m_pPlayer[0]->GetPosition().z);
+	m_ppUIName[1]->SetPosition(m_pPlayer[1]->GetPosition().x, m_pPlayer[1]->GetPosition().y + 15.0f, m_pPlayer[1]->GetPosition().z);
+	m_ppUIName[2]->SetPosition(m_pPlayer[2]->GetPosition().x, m_pPlayer[2]->GetPosition().y + 15.0f, m_pPlayer[2]->GetPosition().z);
+
+
 	for (int i = 0; i < UI_INSIDE_CNT; i++)
 	{
 		if (m_ppUIInside[i])
@@ -1171,6 +1201,16 @@ void CScene::RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 			m_ppUIInside[i]->SetScale(2.0f, 2.0f, 2.0f);
 			m_ppUIInside[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
 			m_ppUIInside[i]->Render(pd3dCommandList, pCamera);
+		}
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (m_ppUIName[i])
+		{
+			m_ppUIName[i]->SetScale(1.0f, 1.0f, 1.0f);
+			m_ppUIName[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
+			m_ppUIName[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
 }

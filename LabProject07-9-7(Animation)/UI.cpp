@@ -131,7 +131,7 @@ void UILayer::UpdateDots(int id, XMFLOAT3 ppos, XMFLOAT3 epos)
     m_enemyDot[id].x = cpos.x;
     m_enemyDot[id].z = cpos.z;
 
-    m_enemyDot[0] = { 100.0f, 0.0f,  FRAME_BUFFER_HEIGHT / 2.0f + 100.0f };
+    m_enemyDot[0] = { 100.0f, 0.0f,  FRAME_BUFFER_HEIGHT / 2.0f + 100.0f }; 
 
    //cout << id << "- id : " << m_enemyDot[id].x <<endl;
    //cout << id << "- id : " << m_enemyDot[id].z << endl;
@@ -284,6 +284,22 @@ CUI::CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, I
         m_ppUITexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/f.dds", 0);
     }
 
+    if (num == static_cast<int>(UIInsideType::NAME_1))
+    {
+        m_ppUITexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+        m_ppUITexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/1p.dds", 0);
+    }
+    if (num == static_cast<int>(UIInsideType::NAME_2))
+    {
+        m_ppUITexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+        m_ppUITexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/2p.dds", 0);
+    }   
+    if (num == static_cast<int>(UIInsideType::NAME_3))
+    {
+        m_ppUITexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+        m_ppUITexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/3p.dds", 0);
+    }
+
     /*m_ppUITexture[static_cast<int>(UIType::CROSSHAIR)] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
     m_ppUITexture[static_cast<int>(UIType::CROSSHAIR)]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/crosshair.dds", 0);
 
@@ -299,8 +315,8 @@ CUI::CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, I
     m_pUIShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
     m_pUIShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-    for (int i = 0; i < static_cast<int>(UIType::COUNT); i++)
-         CScene::CreateShaderResourceViews(pd3dDevice, m_ppUITexture, 15, false);
+  
+     CScene::CreateShaderResourceViews(pd3dDevice, m_ppUITexture, 15, false);
 
     m_pUIMaterial = new CMaterial(1);
     m_pUIMaterial->SetTexture(m_ppUITexture, 0);
