@@ -13,7 +13,8 @@ public:
     UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue);
 
     void UpdateLabels(const std::wstring& strUIText);
-    void UpdateDots(int id, XMFLOAT3 ppos, XMFLOAT3 epos);
+    void UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos);
+    XMFLOAT4X4 UpdateMat(const XMFLOAT3& ppos);
 
     void Render(UINT nFrame, int dotCnt = NULL, XMFLOAT3 [] = NULL);
     void ReleaseResources();

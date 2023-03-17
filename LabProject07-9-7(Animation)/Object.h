@@ -613,7 +613,7 @@ class CEnemyObject : public CGameObject
 public:
 	bool isAlive;
 	short hp;
-	short Maxhp;
+	short Maxhp = hp;
 
 
 	XMFLOAT4X4 m_xmf4x4Rotate;

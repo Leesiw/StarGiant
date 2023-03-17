@@ -118,26 +118,66 @@ void UILayer::UpdateLabels(const wstring& strUIText)
     m_vTextBlocks[0] = { strUIText, D2D1::RectF(0.0f, 0.0f, m_fWidth, m_fHeight), m_pdwTextFormat };
 }
 
-void UILayer::UpdateDots(int id, XMFLOAT3 ppos, XMFLOAT3 epos)
+void UILayer::UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos)
 {
-   // m_enemyDot.push_back({ 100.0f, FRAME_BUFFER_HEIGHT / 2.0f + 100.0f });
+   /* XMFLOAT3 subPos = Vector3::Subtract(ppos, epos);
+    float dist = Vector3::Length(subPos);*/
+
+    /*XMFLOAT4X4 nMat;
+    nMat = UpdateMat(epos);
+    XMMATRIX invMat = XMMatrixInverse(NULL, XMLoadFloat4x4(&nMat));*/
 
     XMFLOAT3 cpos;
+    cpos.x = epos.x - ppos.x;
+    cpos.z = epos.z - ppos.z;
 
-    cpos.x = ppos.x - epos.x;
-    cpos.z = ppos.z - epos.z;
+    float mapScale = 0.3f;
 
+    cpos.x = cpos.x * mapScale;
+    cpos.z = cpos.z * mapScale;
 
-    m_enemyDot[id].x = cpos.x;
-    m_enemyDot[id].z = cpos.z;
+    cpos.x = cpos.x + 100.0f;
+    cpos.z = cpos.z + FRAME_BUFFER_HEIGHT / 2.0f + 100.0f;
 
-    m_enemyDot[0] = { 100.0f, 0.0f,  FRAME_BUFFER_HEIGHT / 2.0f + 100.0f }; 
+    if (!(cpos.x > 200.0f || cpos.x <-200.0f || cpos.z > FRAME_BUFFER_HEIGHT / 2.0f + 200.0f || cpos.z < -(FRAME_BUFFER_HEIGHT / 2.0f + 200.0f)))
+    {
+        m_enemyDot[id].x = cpos.x;
+        m_enemyDot[id].z = cpos.z;
+    }
+    else
+    {
+        m_enemyDot[id].x = 100.0f;
+        m_enemyDot[id].z = FRAME_BUFFER_HEIGHT / 2.0f + 100.0f;
+    }
 
+   // m_enemyDot[0] = { 100.0f, 0.0f,  FRAME_BUFFER_HEIGHT / 2.0f + 100.0f }; //중점
    //cout << id << "- id : " << m_enemyDot[id].x <<endl;
    //cout << id << "- id : " << m_enemyDot[id].z << endl;
+}
+
+XMFLOAT4X4 UILayer::UpdateMat(const XMFLOAT3& pos)
+{
+    // XMFLOAT3을 XMFLOAT4로 변환
+    XMFLOAT4 position4(pos.x, pos.y, pos.z, 1.0f);
+
+    // XMFLOAT4X4를 초기화
+    XMFLOAT4X4 matrix;
+    memset(&matrix, 0, sizeof(matrix));
 
 
+    // 변환 행렬의 각 열에 XMFLOAT4를 대입
+    matrix._11 = 1.0f; matrix._12 = 0.0f; matrix._13 = 0.0f; matrix._14 = 0.0f;
+    matrix._21 = 0.0f; matrix._22 = 1.0f; matrix._23 = 0.0f; matrix._24 = 0.0f;
+    matrix._31 = 0.0f; matrix._32 = 0.0f; matrix._33 = 1.0f; matrix._34 = 0.0f;
+    matrix._41 = 0.0f; matrix._42 = 0.0f; matrix._43 = 0.0f; matrix._44 = 1.0f;
 
+    // 변환 행렬의 마지막 열에 XMFLOAT4를 대입
+    matrix._14 = position4.x;
+    matrix._24 = position4.y;
+    matrix._34 = position4.z;
+    matrix._44 = position4.w;
+
+    return matrix;
 }
 
 void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[])
@@ -164,15 +204,11 @@ void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[])
 
     m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur, &d2dPoint);
 
-   // DrawDot(1);
 
     for (auto& a : m_enemyDot)
     {
-        //m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(100.0f, FRAME_BUFFER_HEIGHT / 2.0f + 100.0f), 5.0f, 5.0f), Dotbrush);
-        m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(a.x, a.z), 5.0f, 5.0f), Dotbrush);
-        //cout << a.x << endl;
-        //cout << a.y << endl;
-
+        if(!(a.x == 100.0f && a.z == FRAME_BUFFER_HEIGHT / 2.0f + 100.0f))
+            m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(a.x, a.z), 5.0f, 5.0f), Dotbrush);
     }
 
     m_pd2dDeviceContext->EndDraw();

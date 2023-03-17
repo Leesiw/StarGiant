@@ -1553,7 +1553,7 @@ void CMeteorObject::Animate(float fTimeElapsed)
 CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
 {
 	isAlive = false;
-
+	Maxhp = hp;
 	m_xmf4x4Rotate = Matrix4x4::Identity();
 
 	CLoadedModelInfo* pEnemyModel = pModel;

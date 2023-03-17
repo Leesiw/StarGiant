@@ -1109,7 +1109,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
 		m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
 		//m_ppBoss->BossAnimation(m_ppBoss->GetState());
-		m_ppBoss->Render(pd3dCommandList, pCamera);
+		m_ppBoss->Render(pd3dCommandList, pCamera); 
 	}
 
 
@@ -1134,9 +1134,11 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 
 	for (int i = 2; i < ENEMIES + 2; i++) // hp bar
 	{
-		m_ppUI[i]->SetPosition(m_ppEnemies[i - 2]->GetPosition().x, m_ppEnemies[i - 2]->GetPosition().y + 10.0f, m_ppEnemies[i - 2]->GetPosition().z);
-		m_ppUI[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
-		m_ppUI[i]->HpbarUpdate(m_ppEnemies[i - 2]->GetPosition(), m_ppEnemies[i - 2]->GetMaxHp(), m_ppEnemies[i - 2]->GetcurHp());
+		if (m_ppEnemies[i- 2]&& m_ppEnemies[i - 2]->isAlive) {
+			m_ppUI[i]->SetPosition(m_ppEnemies[i - 2]->GetPosition().x, m_ppEnemies[i - 2]->GetPosition().y + 10.0f, m_ppEnemies[i - 2]->GetPosition().z);
+			m_ppUI[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
+			m_ppUI[i]->HpbarUpdate(m_ppEnemies[i - 2]->GetPosition(), m_ppEnemies[i - 2]->GetMaxHp(), m_ppEnemies[i - 2]->GetcurHp());
+		}
 	}
 
 
