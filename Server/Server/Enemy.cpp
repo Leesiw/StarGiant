@@ -305,9 +305,9 @@ CMissileEnemy::CMissileEnemy()
 {
 	type = EnemyType::MISSILE;
 	hp = 5;			
-	m_fCoolTime = 10.0f;		// 공격 간격
+	m_fCoolTime = 15.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
-	damage = 8;
+	damage = 6;
 
 	enemy_flags &= ~option2;
 
@@ -342,9 +342,9 @@ CLaserEnemy::CLaserEnemy()
 {
 	type = EnemyType::LASER;
 	hp = 3;
-	m_fCoolTime = 2.0f;		// 공격 간격
+	m_fCoolTime = 5.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
-	damage = 3;
+	damage = 2;
 
 	enemy_flags &= ~option2;
 
@@ -370,9 +370,9 @@ CPlasmaCannonEnemy::CPlasmaCannonEnemy()
 {
 	type = EnemyType::PLASMACANNON;
 	hp = 10;
-	m_fCoolTime = 5.0f;		// 공격 간격
+	m_fCoolTime = 10.0f;		// 공격 간격
 	m_fAttackRange = 300.0f;	// 사거리
-	damage = 6;
+	damage = 4;
 
 	enemy_flags &= ~option2;
 
