@@ -208,7 +208,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		if (pMeteoModel) delete pMeteoModel;
 	}
 	//=====================================
-	for (int i = 0; i < ENEMIES / 3; ++i) {
+	for (int i = 0; i < PLASMACANNON_ENEMY; ++i) {
 		CLoadedModelInfo* pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AlienDestroyer.bin", NULL);
 		m_ppEnemies[i] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
 		m_ppEnemies[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
@@ -216,7 +216,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_ppEnemies[i]->SetScale(5.0f, 5.0f, 5.0f);
 		if (pEnemyModel) delete pEnemyModel;
 	}
-	for (int i = ENEMIES / 3; i < ENEMIES / 3 * 2; ++i) {
+	for (int i = PLASMACANNON_ENEMY; i < PLASMACANNON_ENEMY + LASER_ENEMY; ++i) {
 		CLoadedModelInfo* pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/BioTorpedo.bin", NULL);
 		m_ppEnemies[i] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
 		m_ppEnemies[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
@@ -224,7 +224,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_ppEnemies[i]->SetScale(60.0f, 60.0f, 60.0f);
 		if (pEnemyModel) delete pEnemyModel;
 	}
-	for (int i = ENEMIES / 3 * 2; i < ENEMIES; ++i) {
+	for (int i = PLASMACANNON_ENEMY + LASER_ENEMY; i < ENEMIES; ++i) {
 		CLoadedModelInfo* pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/AlienFighter.bin", NULL);
 		m_ppEnemies[i] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEnemyModel, 1);
 		m_ppEnemies[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);

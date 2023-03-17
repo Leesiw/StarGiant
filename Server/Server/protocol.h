@@ -13,13 +13,17 @@ const unsigned char option5 = 0x20; // hex for 0010 0000
 const unsigned char option6 = 0x40; // hex for 0100 0000
 const unsigned char option7 = 0x80; // hex for 1000 0000
 
-#define BULLETS					50
-#define METEOS					20
-#define ENEMIES					27
-#define ENEMY_BULLETS			50
-#define GODRAY_SAMPLE			30
-#define UI_CNT					static_cast<int>(UIType::COUNT) + ENEMIES - 1
-#define UI_INSIDE_CNT			/*static_cast<int>(UIInsideType::COUNT) */ 4
+constexpr char BULLETS = 50;
+constexpr char METEOS = 20;
+
+constexpr char LASER_ENEMY = 12;
+constexpr char MISSILE_ENEMY = 5;
+constexpr char PLASMACANNON_ENEMY = 10;
+constexpr char ENEMIES = LASER_ENEMY + MISSILE_ENEMY + PLASMACANNON_ENEMY;
+constexpr char ENEMY_BULLETS =50;
+constexpr char GODRAY_SAMPLE = 30;
+#define UI_CNT static_cast<int>(UIType::COUNT) + ENEMIES - 1
+#define UI_INSIDE_CNT /*static_cast<int>(UIInsideType::COUNT) */ 4
 
 
 
