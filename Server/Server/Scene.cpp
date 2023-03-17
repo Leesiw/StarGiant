@@ -126,7 +126,9 @@ void CScene::CheckMeteoByPlayerCollisions()
 				m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(finalVelX2, finalVelY2, finalVelZ2));
 
 				m_pSpaceship->Move(m_pSpaceship->GetVelocity(), true);
-				m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 2);
+				if (m_pSpaceship->GetHP() > 0) {
+					m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 2);
+				}
 
 				for (auto& pl : clients)
 				{
@@ -349,11 +351,12 @@ void CScene::CheckMissileCollisions()
 			m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
 
 
-
-			short real_damage = m_ppMissiles[i]->GetDamage() - m_pSpaceship->def;
-			if (real_damage <= 0) { real_damage = 1; }
-			short new_hp = m_pSpaceship->GetHP() - real_damage;
-			m_pSpaceship->SetHP(new_hp);
+			if (m_pSpaceship->GetHP() > 0) {
+				short real_damage = m_ppMissiles[i]->GetDamage() - m_pSpaceship->def;
+				if (real_damage <= 0) { real_damage = 1; }
+				short new_hp = m_pSpaceship->GetHP() - real_damage;
+				m_pSpaceship->SetHP(new_hp);
+			}
 
 			for (auto& pl : clients)
 			{

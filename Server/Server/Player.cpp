@@ -323,6 +323,11 @@ bool CTerrainPlayer::CheckCollision(const XMFLOAT3 pos[])
 	if (396.46f < m_xmf3Position.x && m_xmf3Position.x < 411.03f && 668.5f < m_xmf3Position.z && m_xmf3Position.z < 684.32f) {
 		return true;
 	}
+
+	//Á¶°¢»ó
+	if (333.f < m_xmf3Position.x && m_xmf3Position.x < 351.f && 663.f < m_xmf3Position.z && m_xmf3Position.z < 681.75f) {
+		return true;
+	}
 	float x, z;
 
 	for (int i = 0; i < MAX_USER; ++i) {
