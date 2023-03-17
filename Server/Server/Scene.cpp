@@ -67,15 +67,15 @@ void CScene::BuildObjects()
 	}
 
 	// enemy
-	for (int i = 0; i < ENEMIES / 3; ++i) {
+	for (int i = 0; i < PLASMACANNON_ENEMY; ++i) {
 		m_ppEnemies[i] = new CPlasmaCannonEnemy;
 		m_ppEnemies[i]->id = i;
 	}
-	for (int i = ENEMIES / 3; i < ENEMIES / 3 * 2; ++i) {
+	for (int i = PLASMACANNON_ENEMY; i < PLASMACANNON_ENEMY + LASER_ENEMY; ++i) {
 		m_ppEnemies[i] = new CLaserEnemy;
 		m_ppEnemies[i]->id = i;
 	}
-	for (int i = ENEMIES / 3 * 2; i < ENEMIES; ++i) {
+	for (int i = PLASMACANNON_ENEMY + LASER_ENEMY; i < ENEMIES; ++i) {
 		m_ppEnemies[i] = new CMissileEnemy;
 		m_ppEnemies[i]->id = i;
 	}
