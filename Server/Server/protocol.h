@@ -16,8 +16,8 @@ const unsigned char option7 = 0x80; // hex for 1000 0000
 constexpr char BULLETS = 50;
 constexpr char METEOS = 20;
 
-constexpr char LASER_ENEMY = 12;
-constexpr char MISSILE_ENEMY = 5;
+constexpr char LASER_ENEMY = 13;
+constexpr char MISSILE_ENEMY = 4;
 constexpr char PLASMACANNON_ENEMY = 10;
 constexpr char ENEMIES = LASER_ENEMY + MISSILE_ENEMY + PLASMACANNON_ENEMY;
 constexpr char ENEMY_BULLETS =50;
@@ -27,7 +27,7 @@ constexpr char GODRAY_SAMPLE = 30;
 
 
 
-#define MAX_ITEM				15	// 보석 최대 레벨?
+constexpr char MAX_ITEM = 15;	// 보석 최대 레벨?
 
 constexpr int MAX_USER = 3;
 

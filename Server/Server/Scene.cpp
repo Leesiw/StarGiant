@@ -336,33 +336,37 @@ void CScene::CheckEnemyCollisions()
 void CScene::CheckMissileCollisions()
 {
 	for (int i = 0; i < ENEMY_BULLETS; ++i) {
-		m_ppMissiles[i]->UpdateBoundingBox();
-
-		if (m_ppMissiles[i]->HierarchyIntersects(m_pSpaceship))
-		{
-			XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
-			xmf3Sub = Vector3::Subtract(m_ppMissiles[i]->GetPosition(), xmf3Sub);
-			xmf3Sub = Vector3::Normalize(xmf3Sub);
-			float fLen = 50.f;
-			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, true);
-
-			XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
-
-			m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
-
-
-			if (m_pSpaceship->GetHP() > 0) {
-				short real_damage = m_ppMissiles[i]->GetDamage() - m_pSpaceship->def;
-				if (real_damage <= 0) { real_damage = 1; }
-				short new_hp = m_pSpaceship->GetHP() - real_damage;
-				m_pSpaceship->SetHP(new_hp);
-			}
-
-			for (auto& pl : clients)
+		if (m_ppMissiles[i]->GetisActive()) {
+			m_ppMissiles[i]->UpdateBoundingBox();
+			if (m_ppMissiles[i]->HierarchyIntersects(m_pSpaceship))
 			{
-				if (pl.in_use == false) continue;
-				pl.send_remove_missile_packet(0, i);
-				pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
+				// 충돌처리
+				/*
+				m_ppMissiles[i]->SetisActive(false);
+				XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
+				xmf3Sub = Vector3::Subtract(m_ppMissiles[i]->GetPosition(), xmf3Sub);
+				xmf3Sub = Vector3::Normalize(xmf3Sub);
+				float fLen = 50.f;
+				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+
+				XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
+
+				m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+				*/
+
+				if (m_pSpaceship->GetHP() > 0) {
+					short real_damage = m_ppMissiles[i]->GetDamage() - m_pSpaceship->def;
+					if (real_damage <= 0) { real_damage = 1; }
+					short new_hp = m_pSpaceship->GetHP() - real_damage;
+					m_pSpaceship->SetHP(new_hp);
+				}
+
+				for (auto& pl : clients)
+				{
+					if (pl.in_use == false) continue;
+					pl.send_remove_missile_packet(0, i);
+					pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
+				}
 			}
 		}
 	}
