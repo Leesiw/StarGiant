@@ -223,6 +223,29 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		break;
 	}
+	case CS_HEAL: {
+		CS_HEAL_PACKET* p = reinterpret_cast<CS_HEAL_PACKET*>(packet);
+		if (p->start && m_pScene->heal_player == -1) {
+			m_pScene->heal_start = std::chrono::system_clock::now();
+			m_pScene->heal_player = c_id;
+			clients[c_id].send_heal_packet();
+		}
+		else {
+			if (m_pScene->heal_player == c_id) {
+				std::chrono::duration<double>sec = std::chrono::system_clock::now() - m_pScene->heal_start;
+				m.lock();
+				m_pScene->m_pSpaceship->GetHeal(sec.count());
+				m.unlock();
+				m_pScene->heal_player = -1;
+				for (auto& pl : clients)
+				{
+					if (false == pl.in_use) continue;
+					pl.send_bullet_hit_packet(0, -1, m_pScene->m_pSpaceship->GetHP());
+				}
+			}
+		}
+		break;
+	}
 	}
 	//prev_process_time = chrono::system_clock::now();
 }

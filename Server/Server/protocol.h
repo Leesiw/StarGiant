@@ -46,25 +46,27 @@ constexpr char CS_CHANGE = 0;
 constexpr char CS_INSIDE_MOVE = 1;
 constexpr char CS_SPACESHIP_MOVE = 2;
 constexpr char CS_ATTACK = 3;
+constexpr char CS_HEAL = 4;
 
-constexpr char SC_LOGIN_INFO = 4;
-constexpr char SC_CHANGE = 5;
-constexpr char SC_ADD_PLAYER = 6;
-constexpr char SC_REMOVE_PLAYER = 7;
+constexpr char SC_LOGIN_INFO = 5;
+constexpr char SC_CHANGE = 6;
+constexpr char SC_ADD_PLAYER = 7;
+constexpr char SC_REMOVE_PLAYER = 8;
 
-constexpr char SC_SPAWN_METEO = 8;
-constexpr char SC_METEO_DIRECTION = 9;
-constexpr char SC_METEO = 10;
+constexpr char SC_SPAWN_METEO = 9;
+constexpr char SC_METEO_DIRECTION = 10;
+constexpr char SC_METEO = 11;
 
-constexpr char SC_MOVE_SPACESHIP = 11;
-constexpr char SC_MOVE_INSIDEPLAYER = 12;
-constexpr char SC_MOVE_INFO = 13;
-constexpr char SC_BULLET = 14;
-constexpr char SC_BULLET_HIT = 15;
-constexpr char SC_MISSILE = 16;
-constexpr char SC_REMOVE_MISSILE = 17;
-constexpr char SC_ITEM = 18;
-constexpr char SC_ANIMATION_CHANGE = 19;
+constexpr char SC_MOVE_SPACESHIP = 12;
+constexpr char SC_MOVE_INSIDEPLAYER = 13;
+constexpr char SC_MOVE_INFO = 14;
+constexpr char SC_BULLET = 15;
+constexpr char SC_BULLET_HIT = 16;
+constexpr char SC_MISSILE = 17;
+constexpr char SC_REMOVE_MISSILE = 18;
+constexpr char SC_ITEM = 19;
+constexpr char SC_ANIMATION_CHANGE = 20;
+constexpr char SC_HEAL = 21;
 
 enum class PlayerType : char
 {
@@ -243,6 +245,20 @@ struct SC_CHANGE_PACKET {
 
 	LOGIN_INFO	data;
 };
+
+// heal
+struct CS_HEAL_PACKET {
+	unsigned char size;
+	char	type;
+
+	bool start;
+};
+
+struct SC_HEAL_PACKET {
+	unsigned char size;
+	char	type;
+};
+
 
 // meteo
 struct SC_SPAWN_METEO_PACKET {

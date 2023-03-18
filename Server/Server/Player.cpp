@@ -194,6 +194,25 @@ bool CAirplanePlayer::FireBullet(short attack_num)
 	}*/
 }
 
+void CAirplanePlayer::GetAttack(char damage)
+{
+	char real_damage = damage - def;
+	if (real_damage <= 0) { real_damage = 1; }
+	hp -= real_damage;
+}
+
+void CAirplanePlayer::GetHeal(double sec)
+{
+	short heal_amount = heal * sec;
+	if (heal_amount + hp < max_hp) {
+		hp += heal * sec;
+	}
+	else {
+		hp = max_hp;
+	}
+
+}
+
 bool CAirplanePlayer::CanAttack(short num)
 {
 	if (m_fFireWaitingTime[num] > 0.0f) { return false; }

@@ -86,8 +86,8 @@ public:
 	short hp = 100;
 
 	short damage = 3;
-	short heal = 2;
-	short def = 0;
+	char heal = 10;
+	char def = 0;
 
 	float						m_fBulletEffectiveRange = 150.0f;
 
@@ -101,6 +101,9 @@ public:
 public:
 	void SetHP(short s) { hp = s; }
 	short GetHP() { return hp; }
+
+	void GetAttack(char damage);
+	void GetHeal(double sec);
 
 	void SetInputInfo(SPACESHIP_INPUT_INFO i_info) { input_info = i_info; is_update = false; }
 	bool CanAttack(short num);

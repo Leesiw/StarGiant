@@ -8,6 +8,7 @@ enum class EnemyState : char
 };
 
 extern array<SESSION, MAX_USER> clients;
+extern mutex m;
 
 class CEnemy : public CGameObject
 {

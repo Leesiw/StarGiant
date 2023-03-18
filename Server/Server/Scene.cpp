@@ -127,7 +127,9 @@ void CScene::CheckMeteoByPlayerCollisions()
 
 				m_pSpaceship->Move(m_pSpaceship->GetVelocity(), true);
 				if (m_pSpaceship->GetHP() > 0) {
+					m.lock();
 					m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 2);
+					m.unlock();
 				}
 
 				for (auto& pl : clients)
@@ -183,7 +185,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 				else if(num < 9){ 
 					item_type = ItemType::JEWEL_HEAL;
 					if (items[item_type] < MAX_ITEM) {
-						m_pSpaceship->heal = 3 + items[item_type];
+						m_pSpaceship->heal = 11 + items[item_type];
 					}
 					else { return; }
 				}
@@ -340,25 +342,23 @@ void CScene::CheckMissileCollisions()
 			m_ppMissiles[i]->UpdateBoundingBox();
 			if (m_ppMissiles[i]->HierarchyIntersects(m_pSpaceship))
 			{
+				m_ppMissiles[i]->SetisActive(false);
 				// 충돌처리
 				/*
-				m_ppMissiles[i]->SetisActive(false);
 				XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
 				xmf3Sub = Vector3::Subtract(m_ppMissiles[i]->GetPosition(), xmf3Sub);
 				xmf3Sub = Vector3::Normalize(xmf3Sub);
-				float fLen = 50.f;
+				float fLen = 100.f;
 				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
 
 				XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
 
 				m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
 				*/
-
 				if (m_pSpaceship->GetHP() > 0) {
-					short real_damage = m_ppMissiles[i]->GetDamage() - m_pSpaceship->def;
-					if (real_damage <= 0) { real_damage = 1; }
-					short new_hp = m_pSpaceship->GetHP() - real_damage;
-					m_pSpaceship->SetHP(new_hp);
+					m.lock();
+					m_pSpaceship->GetAttack(m_ppMissiles[i]->GetDamage());
+					m.unlock();
 				}
 
 				for (auto& pl : clients)

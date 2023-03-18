@@ -382,7 +382,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				b_Inside = !b_Inside;
 				std::cout << "씬 전환";
 				break;
-			case 0x46: //F키 상호작용 앉기
+			case 'F': //F키 상호작용 앉기
 				if (b_Inside || m_pInsidePlayer[g_myid]->GetSitState())
 				{
 					int State = m_pInsideScene->CheckSitCollisions();
@@ -413,18 +413,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 				}
 				break;
-			case 'X':
-				CS_CHANGE_PACKET my_packet;
-				my_packet.size = sizeof(CS_CHANGE_PACKET);
-				my_packet.type = CS_CHANGE;
-				if (player_type != PlayerType::INSIDE) {
-					my_packet.player_type = PlayerType::INSIDE;
-				}
-				else {
-					my_packet.player_type = PlayerType::MOVE;
-				}
-				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
-				break;
 			}
 			break;
 		default:
@@ -449,7 +437,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 			break;
 		case WM_LBUTTONDOWN:
 			if (player_type >= PlayerType::ATTACK1 && player_type <= PlayerType::ATTACK3) {
-				CS_ATTACK_PACKET packet{};
+				CS_ATTACK_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = CS_ATTACK;
 
@@ -457,14 +445,36 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 				packet.data.direction = m_pCamera->GetLookVector();
 				send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
 			}
+			else if (player_type == PlayerType::INSIDE && AroundSculpture()) {
+				CS_HEAL_PACKET my_packet;
+				my_packet.size = sizeof(CS_HEAL_PACKET);
+				my_packet.type = CS_HEAL;
+				my_packet.start = true;
+				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+			}
 			break;
         case WM_RBUTTONDOWN:
+			break;
         case WM_LBUTTONUP:
+			if (isHealing && player_type == PlayerType::INSIDE && AroundSculpture()) {
+				CS_HEAL_PACKET my_packet;
+				my_packet.size = sizeof(CS_HEAL_PACKET);
+				my_packet.type = CS_HEAL;
+				my_packet.start = false;
+				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+				isHealing = false;
+			}
+			break;
         case WM_RBUTTONUP:
         case WM_MOUSEMOVE:
 			OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
             break;
         case WM_KEYDOWN:
+			switch (nMessageID)
+			{
+			case 'F':
+				break;
+			}
         case WM_KEYUP:
 			OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
 			break;
@@ -489,6 +499,15 @@ void CGameFramework::CheckSceneChange(bool State, int num)
 	if (num == 2)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
 	if (num == 3)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
 //추가할 사항 없으면 F에 몰아넣기로 수정
+}
+
+bool CGameFramework::AroundSculpture()
+{
+	XMFLOAT3 xmf3Position = m_pInsidePlayer[g_myid]->GetPosition();
+	if (323.f < xmf3Position.x && xmf3Position.x < 361.f && 643.f < xmf3Position.z && xmf3Position.z < 691.75f) {
+		return true;
+	}
+	return false;
 }
 
 void CGameFramework::OnDestroy()
@@ -695,6 +714,15 @@ void CGameFramework::ProcessInput()
 	}
 	if(!b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Update(m_GameTimer.GetTimeElapsed());
 	else for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Update(m_GameTimer.GetTimeElapsed());
+
+	if (player_type == PlayerType::INSIDE && isHealing && !AroundSculpture()) {
+		CS_HEAL_PACKET my_packet;
+		my_packet.size = sizeof(CS_HEAL_PACKET);
+		my_packet.type = CS_HEAL;
+		my_packet.start = false;
+		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+		isHealing = false;
+	}
 }
 
 void CGameFramework::AnimateObjects()
@@ -1216,6 +1244,11 @@ void CGameFramework::RecvServer()
 			if (item_info.type == ItemType::JEWEL_HP) {
 				m_pPlayer[0]->max_hp = 100 + 10 * item_info.num;
 			}
+			break;
+		}
+		case SC_HEAL:
+		{
+			isHealing = true;
 			break;
 		}
 		default:

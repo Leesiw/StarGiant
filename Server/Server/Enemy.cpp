@@ -120,9 +120,9 @@ void CEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 
 	if (urdEnemyAI(dree) < h_probability) {	// 플레이어에게 공격 명중
 		if (player->GetHP() <= 0) { return; }
-		short real_damage = damage - player->def;
-		if (real_damage <= 0) { real_damage = 1; }
-		player->SetHP(player->GetHP() - real_damage);
+		m.lock();
+		player->GetAttack(damage);
+		m.unlock();
 		for (auto& pl : clients)
 		{
 			if (false == pl.in_use) continue;

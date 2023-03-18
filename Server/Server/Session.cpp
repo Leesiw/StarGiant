@@ -98,6 +98,15 @@ void SESSION::send_remove_missile_packet(int c_id, short id)
 	do_send(&p);
 }
 
+void SESSION::send_heal_packet()
+{
+	SC_HEAL_PACKET p;
+
+	p.size = sizeof(SC_HEAL_PACKET);
+	p.type = SC_HEAL;
+	do_send(&p);
+}
+
 /*
 void SESSION::send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 player_pos)
 {

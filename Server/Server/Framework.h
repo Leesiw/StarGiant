@@ -4,6 +4,7 @@
 #include "Scene.h"
 
 extern array<SESSION, MAX_USER> clients;
+extern mutex m;
 
 class CGameFramework
 {
@@ -28,7 +29,6 @@ private:
 	CScene* m_pScene = NULL;
 
 	std::chrono::duration<double> fps;
-	std::chrono::system_clock::time_point prev_process_time;
 
 	thread ClientProcessThread{};
 };

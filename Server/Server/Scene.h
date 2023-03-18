@@ -40,6 +40,9 @@ public:
 
 	std::unordered_map<ItemType, char>	items;
 
+	std::chrono::system_clock::time_point heal_start;
+	char heal_player = -1;
+
 	bool						m_bIsRunning = true;
 
 	float m_fEnemySpawnTime = 10.0f;

@@ -54,6 +54,7 @@ public:
 
 	//
 	void CheckSceneChange(bool State, int num);
+	bool AroundSculpture();
 
 private:
 	HINSTANCE					m_hInstance;
@@ -121,6 +122,8 @@ private:
 
 	thread    NetworkThread{};
 	SOCKET sock;
+
+	bool isHealing = false;
 	bool isConnect = false;
 
 
