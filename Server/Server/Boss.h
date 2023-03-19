@@ -17,8 +17,18 @@ public:
 	BossState NextState = CurState;
 
 	BossAnimation CurMotion = BossAnimation::SLEEP;
+	BossAnimation PastMotion = CurMotion;
+
 	int MAXBossHP = 100.0f;
 	int BossHP = 100.0f;
+	bool condition = false;
+	int attactCoolTime = 3;
+	float speed = 100.0f;
+
+	float randAttact = urdAttack(dree);
+
+	chrono::steady_clock::time_point stateStartTime;
+	chrono::steady_clock::time_point lastAttackTime;
 
 	BossState GetState() { return CurState; };
 	BossState SetState(BossState BState) { return CurState = BState; };
@@ -43,8 +53,9 @@ protected:
 	float           			m_fMaxVelocityY = 0.0f;
 
 public:
-	void Boss_Ai(BossState CurState, XMFLOAT3 TargetPos, int bossHp);
+	void MoveBoss(float fTimeElapsed, XMFLOAT3 TargetPos, float dist);
+	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
+	void Boss_Ai(float fTimeElapsed, BossState CurState, XMFLOAT3 TargetPos, int bossHp);
 
-	void BossAi();
 
 };

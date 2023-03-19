@@ -181,6 +181,8 @@ public:
 
 	int m_nScenePlayer = 1;
 	bool b_Inside = false;
+
+
 };
 
 class CInsideScene : public CScene

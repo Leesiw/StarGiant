@@ -266,4 +266,6 @@ void SESSION::send_animation_packet(char id, char animation)
 	p.type = SC_ANIMATION_CHANGE;
 	p.data.id = id;
 	p.data.animation = animation;
+
+	do_send(&p);
 }

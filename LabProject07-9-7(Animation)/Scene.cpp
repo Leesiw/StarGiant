@@ -1033,6 +1033,9 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	}
 }
 
+
+//chrono::steady_clock::time_point stateStartTime; //q
+
 void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
@@ -1107,8 +1110,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	if (m_ppBoss) {
 		m_ppBoss->Animate(m_fElapsedTime);
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
-		m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
-		//m_ppBoss->BossAnimation(m_ppBoss->GetState());
+		//m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
+		m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
 		m_ppBoss->Render(pd3dCommandList, pCamera); 
 	}
 

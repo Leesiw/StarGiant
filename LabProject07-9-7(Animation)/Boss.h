@@ -16,13 +16,27 @@ public:
 	BossState CurState = BossState::SLEEP;
 	BossState PastState = CurState;
 	BossState NextState = CurState;
+	bool condition = false;
+
+	chrono::steady_clock::time_point stateStartTime;
+	steady_clock::time_point lastAttackTime;
+	steady_clock::time_point BASIC_ATTACT_LastTime;
+	steady_clock::time_point CLAW_ATTACT_LastTime;
 
 	BossAnimation CurMotion = BossAnimation::SLEEP;
+	BossAnimation PastMotion = CurMotion;
+
 	int MAXBossHP = 100.0f;
 	int BossHP = 100.0f;
 
+	int attactCoolTime = 3;
+
 	BossState GetState() { return CurState; };
 	BossState SetState(BossState BState) { return CurState = BState; };
+	BossAnimation GetAnimation() { return CurMotion; };
+	BossAnimation SetAnimation(BossAnimation BMotion) { return CurMotion = BMotion; };
+
+
 	int GetHP() { return BossHP; };
 	int SetHP(int hp) { return BossHP = hp; }
 
@@ -45,5 +59,7 @@ public:
 	void Boss_Ai(BossState CurState, XMFLOAT3 TargetPos, int bossHp);
 
 	void BossAi();
+	void ChangeAnimation(BossAnimation CurState);
+
 
 };

@@ -24,6 +24,7 @@ public:
 	void CheckMeteoByBulletCollisions(BULLET_INFO& data);
 	void CheckEnemyCollisions();
 	void CheckMissileCollisions();
+	void CheckBossCollisions();
 
 	void SpawnEnemy();
 	void SpawnMeteo(char i);

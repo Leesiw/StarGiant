@@ -4,7 +4,8 @@
 #include <DirectXCollision.h>
 #include <DirectXMath.h>
 #include <array>
-#include <chrono>
+#include <chrono> 
+using namespace std::chrono;
 #include <iostream>
 #include <random>
 #include <mutex>
@@ -41,6 +42,10 @@ static std::uniform_real_distribution<float> urdScale2(3, 5);
 static std::uniform_real_distribution<float> urdAngle(-4, 4);
 static std::uniform_int_distribution<int> urdEnemyAI(0, 100);
 static std::uniform_int_distribution<int> urdEnemyType(0, 2);
+
+static std::uniform_real_distribution<float> urdAttack(0.0f, 1.0f);
+
+
 
 
 #define RANDOM_COLOR			XMFLOAT4(rand() / float(RAND_MAX), rand() / float(RAND_MAX), rand() / float(RAND_MAX), rand() / float(RAND_MAX))
