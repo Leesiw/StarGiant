@@ -41,6 +41,8 @@ private:
     ID2D1SolidColorBrush* m_pd2dTextBrush = NULL;
 
     ID2D1SolidColorBrush* Dotbrush = NULL;
+    ID2D1SolidColorBrush* DotBossbrush = NULL;
+
 
     IDWriteTextFormat* m_pdwTextFormat = NULL;
 
@@ -62,6 +64,8 @@ private:
     std::vector<TextBlock>          m_vTextBlocks;
 
     XMFLOAT3 m_enemyDot[ENEMIES];
+    XMFLOAT3 m_bossDot;
+
 };
 
 class CUI : public CGameObject

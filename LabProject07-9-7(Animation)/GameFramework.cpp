@@ -1107,6 +1107,8 @@ void CGameFramework::RecvServer()
 				m.lock();
 				m_pScene->m_ppBoss->SetQuaternion(enemyInfo.Quaternion);
 				m_pScene->m_ppBoss->SetPosition(enemyInfo.pos);
+				m_pUILayer->UpdateDots(BOSS_ID, m_pPlayer[0]->GetPosition(), enemyInfo.pos);
+
 				m.unlock();
 				break;
 			}

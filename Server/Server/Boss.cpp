@@ -115,6 +115,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, XMFLOAT3 TargetPos, i
 		CurMotion = BossAnimation::SLEEP;
 		if(CurMotion !=PastMotion)
 			SendAnimation();
+		SendPosition();
 		//만약에 플레이어가 가까이 오면 idle로 가기 
 		if (Dist < 200.0f) {
 			SetState(BossState::IDLE);
@@ -128,6 +129,9 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, XMFLOAT3 TargetPos, i
 		CurMotion = BossAnimation::IDLE;
 		if (CurMotion != PastMotion)
 			SendAnimation();
+
+		LookAtPosition(fTimeElapsed, TargetPos);
+		SendPosition();
 
 		/*if (Dist > 400.0f)
 			SetState(BossState::SIT_IDLE);*/
@@ -168,6 +172,9 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, XMFLOAT3 TargetPos, i
 	}
 
 	case BossState::ATTACT: {
+
+		LookAtPosition(fTimeElapsed, TargetPos);
+		SendPosition();
 
 		if (randAttact > 0.5f) {
 			CurMotion = BossAnimation::BASIC_ATTACT;
