@@ -344,7 +344,7 @@ void CScene::CheckMissileCollisions()
 			{
 				m_ppMissiles[i]->SetisActive(false);
 				// 충돌처리
-				/*
+				
 				XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
 				xmf3Sub = Vector3::Subtract(m_ppMissiles[i]->GetPosition(), xmf3Sub);
 				xmf3Sub = Vector3::Normalize(xmf3Sub);
@@ -354,7 +354,7 @@ void CScene::CheckMissileCollisions()
 				XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
 
 				m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
-				*/
+				
 				if (m_pSpaceship->GetHP() > 0) {
 					m.lock();
 					m_pSpaceship->GetAttack(m_ppMissiles[i]->GetDamage());
