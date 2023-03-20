@@ -247,11 +247,24 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, XMFLOAT3 TargetPos, i
 	}
 
 	case BossState::CHASE: {
-		CurMotion = BossAnimation::WALK;
 
-		if (CurMotion != PastMotion)
-			SendAnimation();
-		PastState = (BossState)(BossAnimation::WALK);
+		/*if(BossPos.z>=TargetPos.z - 10.0f && BossPos.z <= TargetPos.z + 10.0f)
+		{
+			CurMotion = BossAnimation::FLY_FORWARD;
+
+			if (CurMotion != PastMotion)
+				SendAnimation();
+			PastState = (BossState)(BossAnimation::FLY_FORWARD);
+
+		}*/
+
+		{
+			CurMotion = BossAnimation::FLY_FORWARD;
+
+			if (CurMotion != PastMotion)
+				SendAnimation();
+			PastState = (BossState)(BossAnimation::FLY_FORWARD);
+		}
 
 		MoveBoss(fTimeElapsed, TargetPos ,Dist);
 		SendPosition();
@@ -363,7 +376,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, XMFLOAT3 TargetPos, i
 		break;
 	}
 
-	if (CurState != BossState::ATTACT || CurState != BossState::CHASE)
+	if ((CurState != BossState::ATTACT) || (CurState != BossState::CHASE))
 		PastState = CurState;
 }
 
