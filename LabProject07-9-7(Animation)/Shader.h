@@ -48,6 +48,8 @@ public:
 	virtual void AnimateObjects(float fTimeElapsed) { }
 	virtual void ReleaseObjects() { }
 
+	virtual void SetPlayerPosition(XMFLOAT3 in) { };
+
 protected:
 	ID3DBlob							*m_pd3dVertexShaderBlob = NULL;
 	ID3DBlob							*m_pd3dPixelShaderBlob = NULL;
@@ -202,16 +204,23 @@ public:
 
 	CTexturedRectMesh*				pRayRectMesh[GODRAY_SAMPLE];
 	CTexture*						pNoiseTexture[2];
+	CTexture*						pMoonTexture;
 
 	CFrustrumCamera*				pLightCamera =NULL;
+
+	XMFLOAT3						cameraLookVector;
+	XMFLOAT3						PlayerPosition =XMFLOAT3(0.f,0.f,0.f);
+
+	int		renderDepth = 1000;
 
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
 	virtual D3D12_BLEND_DESC CreateBlendState();
 
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, void* pContext = NULL);
-	virtual void AnimateObjects(float fTimeElapsed);
+	virtual void AnimateObjects( CCamera* pCamera);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void SetPlayerPosition(XMFLOAT3 in) { PlayerPosition = in; };
 
 	//virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, int nPipelineState);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader();

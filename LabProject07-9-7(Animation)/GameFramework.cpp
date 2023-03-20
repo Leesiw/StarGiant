@@ -642,8 +642,8 @@ void CGameFramework::ProcessInput()
 				//ShowCursor(true); //커서 보이게 > 조종법을 이 방식으로 한다면 화면 전환시마다 이걸해줘야 함
 				float x = (float)(rect.right - rect.left) / 2;
 				float y = (float)(rect.bottom - rect.top) / 2;
-				cxDelta = (float)(ptCursorPos.x - x) / 100.0f;
-				cyDelta = (float)(ptCursorPos.y - y) / 100.0f;
+				cxDelta = (float)(ptCursorPos.x - x) / 200.0f;
+				cyDelta = (float)(ptCursorPos.y - y) / 200.0f;
 			}
 			else if(b_Inside && !isConnect || player_type == PlayerType::INSIDE && isConnect) { // 내부 플레이어. 이전 마우스 커서와 현재 마우스 커서 위치 차이에 따라 회전.
 				//ShowCursor(false); // 커서 안보이게 > 조종법을 이 방식으로 한다면 화면 전환시마다 이걸해줘야 함

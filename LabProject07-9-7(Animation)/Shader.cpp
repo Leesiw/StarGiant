@@ -676,11 +676,12 @@ CGodRayShader::~CGodRayShader()
 
 D3D12_INPUT_LAYOUT_DESC CGodRayShader::CreateInputLayout()
 {
-	UINT nInputElementDescs = 1;
+	UINT nInputElementDescs = 2;
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
 
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	//
+	pd3dInputElementDescs[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
 	d3dInputLayoutDesc.NumElements = nInputElementDescs;
@@ -713,12 +714,12 @@ D3D12_BLEND_DESC CGodRayShader::CreateBlendState()
 {
 	D3D12_BLEND_DESC d3dBlendDesc;
 	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
-	d3dBlendDesc.AlphaToCoverageEnable = FALSE;
+	d3dBlendDesc.AlphaToCoverageEnable = TRUE;
 	d3dBlendDesc.IndependentBlendEnable = FALSE;
-	d3dBlendDesc.RenderTarget[0].BlendEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;
 	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
-	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
@@ -732,13 +733,13 @@ D3D12_BLEND_DESC CGodRayShader::CreateBlendState()
 void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, void* pContext)
 {
 	//Frustom을 이용한 광원 범위 설정 ( scene light에서 설정한 광원위치 기준, 플레이어 방향기준 
-	int renderWidth = 1024;
-	int renderHeight = 1024;
-	int renderDepth = 1000;
+	int renderWidth = 2048;
+	int renderHeight = 2048;
+	renderDepth = 1000;
  
 	Vertex camera1Position = Vertex(400, 300, 600); //560 광원위치(-10, 00, 60);
 	Vertex camera1LookAt = Vertex(425, 250, 642); // 처음 젠위치로 합시다 (-1000, 600, -2000);
-	XMFLOAT3 cameraLookVector = Vector3::Normalize(Vector3::Subtract(XMFLOAT3(camera1Position.x, camera1Position.y, camera1Position.z), XMFLOAT3(camera1LookAt.x, camera1LookAt.y, camera1LookAt.z)));
+	cameraLookVector = Vector3::Normalize(Vector3::Subtract(XMFLOAT3(camera1Position.x, camera1Position.y, camera1Position.z), XMFLOAT3(camera1LookAt.x, camera1LookAt.y, camera1LookAt.z)));
 	pLightCamera =new CFrustrumCamera(renderWidth, renderHeight, camera1Position, camera1LookAt, 10, 1000);//원래 100000
 
 
@@ -752,11 +753,14 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 	pNoiseTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	pNoiseTexture[1] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pMoonTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	pNoiseTexture[0]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Noise01.dds", 0);
 	pNoiseTexture[1]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Noise02.dds", 0);
+	pMoonTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Moon.dds", 0);
 
 	CScene::CreateShaderResourceViews(pd3dDevice, pNoiseTexture[0], 16, false);
-	CScene::CreateShaderResourceViews(pd3dDevice, pNoiseTexture[1], 17, false); //수정 필요 
+	CScene::CreateShaderResourceViews(pd3dDevice, pNoiseTexture[1], 17, false); 
+	CScene::CreateShaderResourceViews(pd3dDevice, pMoonTexture, 15, false); //수정 필요 
 	//CScene::CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 2);
 
 	//우선 크기를 직접 맞춰주는 반복문으로 해보겠다. 
@@ -769,7 +773,7 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	CGameObject* pRayObject = new CGameObject(1);
 	
 
-	CSkyBoxShader* pSkyBoxShader = new CSkyBoxShader();
+	CGodRayShader* pSkyBoxShader = new CGodRayShader();
 	pSkyBoxShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	pSkyBoxShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
@@ -777,7 +781,7 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 		pRayObject = new CGameObject(1);
 		CMaterial* pRayMaterial = new CMaterial(1);
 		//종횡비 pLightCamera->aspect 을 이용해 N번째 사각형의 크기를 지정한다. 
-		nLen = ((GODRAY_SAMPLE - i) * zNear + (zFar * i)) / (GODRAY_SAMPLE - 1); //((N-a)*n + a*f)/(N-1) 
+		nLen = (i * zNear + (zFar * (GODRAY_SAMPLE - i))) / (GODRAY_SAMPLE - 1); //((N-a)*n + a*f)/(N-1) 
 
 		//구한 너비로 mesh만들기 
 		CTexturedRectMesh* NRayMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, nLen, nLen, 0.0f);
@@ -801,7 +805,28 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 		}
 
 	}
-	
+	CUIShader* pMoonShader = new CUIShader();
+	pMoonShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pMoonShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	pRayObject = new CGameObject(1);
+	CMaterial* pRayMaterial = new CMaterial(1);
+	CTexturedRectMesh* NRayMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 200, 200, 0.0f);
+	pRayObject->SetMesh(NRayMesh);
+
+	//Noise Texture 섞기 
+	pRayMaterial->SetTexture(pMoonTexture);
+	pRayMaterial->SetShader(pMoonShader);
+
+	if (pRayObject)
+	{
+		//시작점 - 광원사이의 직선을 중심(방향벡터)로 하는 점들의 평면과의 교차점
+		/*광원위치 - 프러스텀 길이 를 방향벡터로 N등분 하기, 임의로 길이 renderDepth 1000 설정  */
+		pRayObject->SetPosition(Vector3::Add(XMFLOAT3(camera1Position.x, camera1Position.y, camera1Position.z),
+			Vector3::ScalarProduct(cameraLookVector, (renderDepth / GODRAY_SAMPLE) * GODRAY_SAMPLE)));
+		pRayObject->SetMaterial(0, pRayMaterial);
+		pLightObject = pRayObject;
+	}
 	
 			//엔진만듬------------------------------------------------------ -
 			//	light 생성
@@ -830,11 +855,31 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 			//	3.광 산란이 없는 장면 렌더링
 			//	4.라이트 산란 효과를 위에 덧그린다.
 
-
 }
 
-void CGodRayShader::AnimateObjects(float fTimeElapsed)
+void CGodRayShader::AnimateObjects(CCamera * pCamera)
 {
+	renderDepth = 1000;
+	XMFLOAT3 newLookVector = XMFLOAT3(0.f, 0.f, 0.f);
+	XMFLOAT3 MoveVector = XMFLOAT3(0.f, 0.f, 0.f);
+	//기존 룩벡터 cameraLookVector //새로운 룩벡터 
+	newLookVector = Vector3::Normalize(Vector3::Subtract(XMFLOAT3(PlayerPosition.x, PlayerPosition.y, PlayerPosition.z), XMFLOAT3(m_ppObjects[GODRAY_SAMPLE - 1]->GetPosition().x, m_ppObjects[GODRAY_SAMPLE - 1]->GetPosition().y, m_ppObjects[GODRAY_SAMPLE - 1]->GetPosition().z)));
+	//std::cout << newLookVector.x << endl;
+	for (int i = 0; i < GODRAY_SAMPLE; i++) {
+		//길이 구하기 
+		int nLen = (renderDepth / GODRAY_SAMPLE)*(GODRAY_SAMPLE-i);
+		//이동할거 구하기 (길이 x 기존역방향 + 길이 x 새로운방향) 
+		//MoveVector =Vector3::Add((Vector3::ScalarProduct(newLookVector, nLen)), (Vector3::ScalarProduct((Vector3::ScalarProduct(cameraLookVector, -1)), nLen)));
+		XMFLOAT3 A = (Vector3::ScalarProduct(cameraLookVector, nLen));
+		XMFLOAT3 B = (Vector3::ScalarProduct(newLookVector, nLen));
+		m_ppObjects[i]->SetLookAt(PlayerPosition);
+		m_ppObjects[i]->SetPosition(B);
+		//if(i==10)std::cout << m_ppObjects[1]->GetPosition().x << endl;
+	}
+	pLightObject->SetLookAt(PlayerPosition);
+	pLightObject->SetPosition(m_ppObjects[GODRAY_SAMPLE-1]->GetPosition());
+	cameraLookVector = newLookVector;
+
 }
 
 void CGodRayShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -850,8 +895,9 @@ void CGodRayShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 	{
 		if (m_ppObjects[i]) {
 			//m_ppObjects[i]->UpdateTransform(NULL);
+			AnimateObjects(pCamera);
 			m_ppObjects[i]->Render(pd3dCommandList, pCamera);
-			//pLightObject->Render(pd3dCommandList, pCamera);
+			pLightObject->Render(pd3dCommandList, pCamera);
 		}
 	}
 }
