@@ -862,7 +862,7 @@ void CGameFramework::UpdateUI()
 		uiText += s;
 	}
 	m_pUILayer->UpdateLabels(uiText);
-
+	m_pUILayer->UpdateHp(m_pPlayer[0]->getHp());
 	//for (int i = 0; i < ENEMIES; ++i)
 	//{
 	//	m_pUILayer->UpdateDots(i, { 0,0 });

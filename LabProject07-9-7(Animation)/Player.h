@@ -130,6 +130,7 @@ public:
 	short							max_hp = 100;
 	virtual void OnPrepareAnimate();
 	virtual void Animate(float fTimeElapsed);
+	short getHp(){ return hp; }
 
 private:
 

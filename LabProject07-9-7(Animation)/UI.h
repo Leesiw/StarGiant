@@ -14,6 +14,8 @@ public:
 
     void UpdateLabels(const std::wstring& strUIText);
     void UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos);
+    void UpdateHp(short curhp, short maxHp = 100);
+
     XMFLOAT4X4 UpdateMat(const XMFLOAT3& ppos);
 
     void Render(UINT nFrame, int dotCnt = NULL, XMFLOAT3 [] = NULL);
@@ -28,9 +30,13 @@ private:
 
 
 
+    float hpbarLeft = FRAME_BUFFER_WIDTH - 200;
+
 
     float m_fWidth;
     float m_fHeight;
+
+    float hpBar = 0;
 
     ID3D11DeviceContext* m_pd3d11DeviceContext = NULL;
     ID3D11On12Device* m_pd3d11On12Device = NULL;
@@ -40,7 +46,8 @@ private:
     ID2D1DeviceContext2* m_pd2dDeviceContext = NULL;
     ID2D1SolidColorBrush* m_pd2dTextBrush = NULL;
 
-    ID2D1SolidColorBrush* Dotbrush = NULL;
+    ID2D1SolidColorBrush* Redbrush = NULL;
+    ID2D1SolidColorBrush* Whitebrush = NULL;
     ID2D1SolidColorBrush* DotBossbrush = NULL;
 
 

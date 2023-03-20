@@ -66,8 +66,10 @@ void UILayer::Initialize(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dComma
 
     m_pd2dDeviceContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), (ID2D1SolidColorBrush**)&m_pd2dTextBrush);
-    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &Dotbrush);
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &Redbrush);
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Yellow), &DotBossbrush);
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &Whitebrush);
+
 
 
 
@@ -111,7 +113,7 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
 void UILayer::DrawDot(int dotCnt, XMFLOAT3[])
 {
     for (int i= 0; i < dotCnt; ++i) {
-        m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(100.0f, FRAME_BUFFER_HEIGHT / 2.0f + 100.0f), 5.0f, 5.0f), Dotbrush); // 이게 중심
+        m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(100.0f, FRAME_BUFFER_HEIGHT / 2.0f + 100.0f), 5.0f, 5.0f), Redbrush); // 이게 중심
     }
 }
 
@@ -163,6 +165,13 @@ void UILayer::UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos)
    // m_enemyDot[0] = { 100.0f, 0.0f,  FRAME_BUFFER_HEIGHT / 2.0f + 100.0f }; //중점
    //cout << id << "- id : " << m_enemyDot[id].x <<endl;
    //cout << id << "- id : " << m_enemyDot[id].z << endl;
+}
+
+void UILayer::UpdateHp(short Hp, short maxHp)
+{
+    hpBar = float (maxHp - Hp) * 1.5;
+
+
 }
 
 XMFLOAT4X4 UILayer::UpdateMat(const XMFLOAT3& pos)
@@ -218,12 +227,19 @@ void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[])
     for (auto& a : m_enemyDot)
     {
         if(!(a.x == 100.0f && a.z == FRAME_BUFFER_HEIGHT / 2.0f + 100.0f))
-            m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(a.x, a.z), 5.0f, 5.0f), Dotbrush);
+            m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(a.x, a.z), 5.0f, 5.0f), Redbrush);
     }
 
 
   //  if (!(m_bossDot.x == 100.0f && m_bossDot.z == FRAME_BUFFER_HEIGHT / 2.0f + 100.0f))
     m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(m_bossDot.x, m_bossDot.z), 5.0f, 5.0f), DotBossbrush);
+
+
+
+    m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarLeft + 150, FRAME_BUFFER_HEIGHT - 50), Whitebrush); //배경
+    m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarLeft + 150 - hpBar, FRAME_BUFFER_HEIGHT - 50), Redbrush); // hp
+
+
    
 
     m_pd2dDeviceContext->EndDraw();
@@ -249,7 +265,9 @@ void UILayer::ReleaseResources()
         m_vWrappedRenderTargets[i]->Release();
     }
     m_pd2dTextBrush->Release();
-    Dotbrush->Release();
+    Redbrush->Release();
+    Whitebrush->Release();
+
     DotBossbrush->Release();
 
     m_pd2dDeviceContext->Release();
