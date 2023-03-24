@@ -905,10 +905,10 @@ void CGameFramework::RecvServer()
 {
 	if (isConnect) {
 		DWORD recv_byte = 0;
-		char recv_buf[BUF_SIZE];
+		char recv_buf[RECV_BUF_SIZE];
 		WSABUF mybuf_r;
 		mybuf_r.buf = recv_buf;//buf + buf_cur_size; 
-		mybuf_r.len = BUF_SIZE;
+		mybuf_r.len = RECV_BUF_SIZE;
 
 		DWORD recv_flag = 0;
 		int	RByte = WSARecv(sock, &mybuf_r, 1, &recv_byte, &recv_flag, 0, 0);

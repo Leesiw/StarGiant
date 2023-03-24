@@ -32,7 +32,8 @@ constexpr char MAX_ITEM = 15;	// 보석 최대 레벨?
 constexpr int MAX_USER = 3;
 
 constexpr int PORT_NUM = 4000;
-constexpr int BUF_SIZE = 500000;
+constexpr int RECV_BUF_SIZE = 10000;
+constexpr int SEND_BUF_SIZE = 200;
 constexpr int NAME_SIZE = 20;
 
 // boss id

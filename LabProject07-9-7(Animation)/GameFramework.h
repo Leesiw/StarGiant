@@ -123,7 +123,7 @@ private:
 
 	SOCKET sock;
 
-	char buf[BUF_SIZE * 2];
+	char buf[RECV_BUF_SIZE * 2];
 	int buf_cur_size = 0;
 
 	bool isHealing = false;

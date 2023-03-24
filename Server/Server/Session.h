@@ -18,11 +18,11 @@ class OVER_EXP {
 public:
 	WSAOVERLAPPED _over;
 	WSABUF _wsabuf;
-	char _send_buf[BUF_SIZE];
+	char _send_buf[SEND_BUF_SIZE];
 	COMP_TYPE _comp_type;
 	OVER_EXP()
 	{
-		_wsabuf.len = BUF_SIZE;
+		_wsabuf.len = SEND_BUF_SIZE;
 		_wsabuf.buf = _send_buf;
 		_comp_type = OP_RECV;
 		ZeroMemory(&_over, sizeof(_over));
@@ -65,7 +65,7 @@ public:
 	{
 		DWORD recv_flag = 0;
 		memset(&_recv_over._over, 0, sizeof(_recv_over._over));
-		_recv_over._wsabuf.len = BUF_SIZE - _prev_remain;
+		_recv_over._wsabuf.len = SEND_BUF_SIZE - _prev_remain;
 		_recv_over._wsabuf.buf = _recv_over._send_buf + _prev_remain;
 		WSARecv(_socket, &_recv_over._wsabuf, 1, 0, &recv_flag,
 			&_recv_over._over, 0);
