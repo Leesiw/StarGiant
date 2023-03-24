@@ -210,18 +210,10 @@ void SESSION::send_meteo_packet(int c_id, CMeteoObject* meteo[])
 	p.type = SC_METEO;
 
 	for (int i = 0; i < METEOS; ++i) {
-		p.meteo[i].pos = meteo[i]->GetPosition();
+		p.data.id = i;
+		p.data.pos = meteo[i]->GetPosition();
+		do_send(&p);
 	}
-	for (int i = 0; i < METEOS; ++i)
-	{
-		//printf("meteo %d : %f %f %f\n", i, p.meteo[i].pos.x, meteo[i].pos.y, meteo[i].pos.z);
-	}
-	char buf[sizeof(SC_METEO_PACKET)];
-	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
-	WSABUF wsabuf{ sizeof(buf), buf };
-	DWORD sent_byte;
-
-	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
 }
 
 void SESSION::send_bullet_hit_packet(int c_id, short id, short hp)

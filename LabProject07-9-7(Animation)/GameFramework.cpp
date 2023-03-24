@@ -54,8 +54,6 @@ CGameFramework::~CGameFramework()
 		packet.type = CS_PACKET_LOGOUT;
 		send(g_socket, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);*/
 
-		if (NetworkThread.joinable())
-			NetworkThread.join();
 		closesocket(sock);
 		WSACleanup();
 	}
@@ -76,7 +74,6 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	BuildObjects();
 	isConnect = ConnectServer();
-	NetworkThread = thread{ &CGameFramework::RecvServer, this };
 
 	return(true);
 }
@@ -727,6 +724,8 @@ void CGameFramework::ProcessInput()
 
 void CGameFramework::AnimateObjects()
 {
+	RecvServer();
+
 	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
 
 	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
@@ -877,13 +876,11 @@ bool CGameFramework::ConnectServer()
 	if (!isConnect) {
 
 		WSADATA wsa;
-		if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-			return false;
+		if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) { return false; }
 
 		// socket 생성
-		sock = socket(AF_INET, SOCK_STREAM, 0);
-		if (sock == INVALID_SOCKET)
-			return false;
+		sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, 0);
+		if (sock == INVALID_SOCKET) { return false; }
 
 		// connect
 		SOCKADDR_IN server_address{};
@@ -891,8 +888,14 @@ bool CGameFramework::ConnectServer()
 		server_address.sin_port = htons(PORT_NUM);
 		inet_pton(AF_INET, "127.0.0.1", &(server_address.sin_addr.s_addr));
 
-		if (connect(sock, reinterpret_cast<SOCKADDR*>(&server_address), sizeof(server_address)) == SOCKET_ERROR)
+		if(connect(sock, reinterpret_cast<sockaddr*>(&server_address), sizeof(server_address)) == SOCKET_ERROR)
+		{
 			return false;
+		}
+
+		// Non-blocking
+		unsigned long noblock = 1;
+		int nRet = ioctlsocket(sock, FIONBIO, &noblock);
 		return true;
 	}
 	return true;
@@ -900,342 +903,272 @@ bool CGameFramework::ConnectServer()
 
 void CGameFramework::RecvServer()
 {
-	while (isConnect) {
-		char buf[2];
-		WSABUF wsabuf{ sizeof(buf), buf };
-		DWORD recvByte{ 0 }, recvFlag{ 0 };
-		//recv(sock, buf, sizeof(buf), MSG_WAITALL);
-		int error_code = WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-		//if (error_code == SOCKET_ERROR) error_display("RecvSizeType");
+	if (isConnect) {
+		DWORD recv_byte = 0;
+		char recv_buf[BUF_SIZE];
+		WSABUF mybuf_r;
+		mybuf_r.buf = recv_buf;//buf + buf_cur_size; 
+		mybuf_r.len = BUF_SIZE;
 
-		UCHAR size{ static_cast<UCHAR>(buf[0]) };
-		UCHAR type{ static_cast<UCHAR>(buf[1]) };
-		switch (type)
-		{
-		case SC_LOGIN_INFO:
-		{
-			char subBuf[sizeof(LOGIN_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+		DWORD recv_flag = 0;
+		int	RByte = WSARecv(sock, &mybuf_r, 1, &recv_byte, &recv_flag, 0, 0);
+		if (RByte == SOCKET_ERROR || recv_byte == 0) {
+			if (WSAGetLastError() != WSA_IO_PENDING) {
+			}
+		}
+		else {
+			memcpy(buf + buf_cur_size, recv_buf, recv_byte);
+			buf_cur_size += recv_byte;
+			int packet_size;
 
-			LOGIN_INFO loginInfo;
-			memcpy(&loginInfo, &subBuf, sizeof(LOGIN_INFO));
-			g_myid = loginInfo.id;
-			m_pInsideCamera = m_pInsidePlayer[g_myid]->GetCamera();
-			player_type = loginInfo.player_type;
+			while (buf_cur_size) {
+				packet_size = buf[0];
+				if (buf_cur_size >= packet_size && buf[0] != 0) {
+					ProcessPacket(buf);
+					buf_cur_size -= buf[0];
+					memcpy(buf, &buf[packet_size], buf_cur_size);
+				}
+				else {
+					break;
+				}
+			}
+		}
 
-			player_type = loginInfo.player_type;
+	}
+}
+
+void CGameFramework::ProcessPacket(char* p)
+{
+	switch (p[1])
+	{
+	case SC_LOGIN_INFO:
+	{
+		SC_LOGIN_INFO_PACKET* packet = reinterpret_cast<SC_LOGIN_INFO_PACKET*>(p);
+		g_myid = packet->data.id;
+
+		m_pInsideCamera = m_pInsidePlayer[g_myid]->GetCamera();
+		player_type = packet->data.player_type;
+
+		if (player_type == PlayerType::INSIDE) {
+			b_Inside = true;
+		}
+		else {
+			b_Inside = false;
+		}
+
+		break;
+	}
+	case SC_CHANGE:
+	{
+		SC_CHANGE_PACKET* packet = reinterpret_cast<SC_CHANGE_PACKET*>(p);
+
+		// 여기서 온 정보에 따라 해당 캐릭터가 특정 자리에 앉게 하거나 일어나게 한다
+		if (packet->data.player_type == PlayerType::INSIDE) {
+			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = AnimationState::IDLE;
+			m_pInsidePlayer[packet->data.id]->SetSitState(false);
+		}
+		else if (packet->data.player_type == PlayerType::MOVE) {
+			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = AnimationState::SIT;
+			m_pInsidePlayer[packet->data.id]->SetPosition(m_pInsideScene->m_SitPos[3]);
+			m_pInsidePlayer[packet->data.id]->is_update = true;
+			m_pInsidePlayer[packet->data.id]->Rotate(0.f, 90.f - m_pInsidePlayer[packet->data.id]->GetYaw(), 0.f);
+			m_pInsidePlayer[packet->data.id]->SetSitState(true);
+		}
+		else {	// Attack
+			int i = (int)packet->data.player_type - 2;
+			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = AnimationState::SIT;
+			m_pInsidePlayer[packet->data.id]->SetPosition(m_pInsideScene->m_SitPos[i]);
+			m_pInsidePlayer[packet->data.id]->is_update = true;
+			m_pInsidePlayer[packet->data.id]->Rotate(0.f, 90.f * (float)i - m_pInsidePlayer[packet->data.id]->GetYaw(), 0.f);
+			m_pInsidePlayer[packet->data.id]->SetSitState(true);
+		}
+
+		if (packet->data.id == g_myid) {
+			// 정보에 따라 카메라/씬 전환 (MOVE : 3인칭 우주선 외부, ATTACK1/2/3 : 1인칭 공격 모드, INSIDE : 우주선 내부 3인칭)
+			player_type = packet->data.player_type;
 			if (player_type == PlayerType::INSIDE) {
 				b_Inside = true;
 			}
 			else {
 				b_Inside = false;
-			}
-
-			break;
-		}
-		case SC_CHANGE:
-		{
-			char subBuf[sizeof(LOGIN_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-
-			LOGIN_INFO l_info;
-			memcpy(&l_info, &subBuf, sizeof(LOGIN_INFO));
-			
-			// 여기서 온 정보에 따라 해당 캐릭터가 특정 자리에 앉게 하거나 일어나게 한다
-			if (l_info.player_type == PlayerType::INSIDE) {
-				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::IDLE;
-				m_pInsidePlayer[l_info.id]->SetSitState(false);
-			}
-			else if(l_info.player_type == PlayerType::MOVE) {
-				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::SIT;
-				m_pInsidePlayer[l_info.id]->SetPosition(m_pInsideScene->m_SitPos[3]);
-				//m_pPlayer[l_info.id]->SetLook(m_pInsideScene->m_LookCamera[3]);
-				m_pInsidePlayer[l_info.id]->is_update = true;
-				m_pInsidePlayer[l_info.id]->Rotate(0.f, 90.f - m_pInsidePlayer[l_info.id]->GetYaw(), 0.f);
-				m_pInsidePlayer[l_info.id]->SetSitState(true);
-			}
-			else {	// Attack
-				int i = (int)l_info.player_type - 2;
-				((CTerrainPlayer*)m_pInsidePlayer[l_info.id])->motion = AnimationState::SIT;
-				m_pInsidePlayer[l_info.id]->SetPosition(m_pInsideScene->m_SitPos[i]);
-				//m_pPlayer[l_info.id]->SetLook(m_pInsideScene->m_LookCamera[i]);
-				m_pInsidePlayer[l_info.id]->is_update = true;
-				m_pInsidePlayer[l_info.id]->Rotate(0.f, 90.f * (float)i -m_pInsidePlayer[l_info.id]->GetYaw(), 0.f);
-				m_pInsidePlayer[l_info.id]->SetSitState(true);
-			}
-
-			if (l_info.id == g_myid) {
-				// 정보에 따라 카메라/씬 전환 (MOVE : 3인칭 우주선 외부, ATTACK1/2/3 : 1인칭 공격 모드, INSIDE : 우주선 내부 3인칭)
-				player_type = l_info.player_type;
-				if (player_type == PlayerType::INSIDE) {
-					b_Inside = true;
+				if (player_type == PlayerType::MOVE) {
+					m_pCamera = m_pPlayer[0]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
 				}
-				else {
-					b_Inside = false;
-					if (player_type == PlayerType::MOVE) {
-						m_pCamera = m_pPlayer[0]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
-					}
-					else if (player_type == PlayerType::ATTACK1) {
-						m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_L, m_GameTimer.GetTimeElapsed());
-					}
-					else if (player_type == PlayerType::ATTACK2) {
-						m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_C, m_GameTimer.GetTimeElapsed());
-					}
-					else if (player_type == PlayerType::ATTACK3) {
-						m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
-					}
+				else if (player_type == PlayerType::ATTACK1) {
+					m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_L, m_GameTimer.GetTimeElapsed());
+				}
+				else if (player_type == PlayerType::ATTACK2) {
+					m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_C, m_GameTimer.GetTimeElapsed());
+				}
+				else if (player_type == PlayerType::ATTACK3) {
+					m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
 				}
 			}
+		}
+		break;
+	}
+	case SC_ADD_PLAYER:
+	{
+		break;
+	}
+	case SC_REMOVE_PLAYER:
+	{
+		break;
+	}
+	case SC_SPAWN_METEO:
+	{
+		SC_SPAWN_METEO_PACKET* packet = reinterpret_cast<SC_SPAWN_METEO_PACKET*>(p);
+		m_pScene->RespawnMeteor(m_pd3dDevice, m_pd3dCommandList, packet->data);
+		break;
+	}
+	case SC_METEO:
+	{
+		SC_METEO_PACKET* packet = reinterpret_cast<SC_METEO_PACKET*>(p);
+		m_pScene->TransformMeteor(packet->data);
+		break;
+	}
+	case SC_METEO_DIRECTION:
+	{
+		SC_METEO_DIRECTION_PACKET* packet = reinterpret_cast<SC_METEO_DIRECTION_PACKET*>(p);
+		m_pScene->m_ppMeteorObjects[packet->data.id]->m_xmf3MovingDirection = packet->data.dir;
+		break;
+	}
+	case SC_MOVE_SPACESHIP:
+	{
+		SC_MOVE_SPACESHIP_PACKET* packet = reinterpret_cast<SC_MOVE_SPACESHIP_PACKET*>(p);
+		m_pPlayer[0]->SetPlayerInfo(packet->data);
+		//m_pPlayer[0]->SetPosition(playerInfo.pos);
+		//m_pPlayer[0]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[0]->GetYaw(), 0.0f);
+		//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
+		//m_pPlayer->SetVelocity(playerInfo[3].velocity);
+		//m_pPlayer->SetShift(playerInfo.shift);
+		//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+		//m_pPlayer[g_myid]->SetPlayerInfo(playerInfo[3]);
+		break;
+	}
+	case SC_MOVE_INSIDEPLAYER:
+	{
+		SC_MOVE_INSIDE_PACKET* packet = reinterpret_cast<SC_MOVE_INSIDE_PACKET*>(p);
+		m_pInsidePlayer[packet->data.id]->SetPlayerInfo(packet->data);
+		if (int(m_pInsidePlayer[packet->data.id]->motion) != (int)packet->data.animation) {
+			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = (AnimationState)packet->data.animation;
+		}
+		//m_pInsidePlayer[playerInfo.id]->SetPosition(playerInfo.pos);
+		//m_pInsidePlayer[playerInfo.id]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[playerInfo.id]->GetYaw(), 0.0f);
+		break;
+	}
+	case SC_MOVE_INFO:
+	{
+		SC_MOVE_ENEMY_PACKET* packet = reinterpret_cast<SC_MOVE_ENEMY_PACKET*>(p);
+
+		if (packet->data.id == BOSS_ID) {
+			m_pScene->m_ppBoss->SetQuaternion(packet->data.Quaternion);
+			m_pScene->m_ppBoss->SetPosition(packet->data.pos);
+			m_pUILayer->UpdateDots(BOSS_ID, m_pPlayer[0]->GetPosition(), packet->data.pos);
 			break;
 		}
-		case SC_ADD_PLAYER:
-		{
-			break;
+
+		if (!m_pScene->m_ppEnemies[packet->data.id]->isAlive) {
+			m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
 		}
-		case SC_REMOVE_PLAYER:
-		{
-			break;
-		}
-		case SC_SPAWN_METEO:
-		{
-			char subBuf[sizeof(SPAWN_METEO_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);
+		m_pUILayer->UpdateDots(packet->data.id, m_pPlayer[0]->GetPosition(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
 
-			SPAWN_METEO_INFO m_info;
-			memcpy(&m_info, &subBuf, sizeof(SPAWN_METEO_INFO));
+		m_pScene->m_ppEnemies[packet->data.id]->ResetRotate();
+		m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
+		break;
+	}
+	case SC_BULLET:
+	{
+		SC_BULLET_PACKET* packet = reinterpret_cast<SC_BULLET_PACKET*>(p);
 
-			m_pScene->RespawnMeteor(m_pd3dDevice, m_pd3dCommandList, m_info);
-			break;
-		}
-		case SC_METEO:
-		{
-			char subBuf[sizeof(METEO_INFO) * METEOS]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-
-			METEO_INFO meteoInfo[METEOS];
-			memcpy(&meteoInfo, &subBuf, sizeof(METEO_INFO) * METEOS);
-
-			m_pScene->TransformMeteor(meteoInfo);
-			break;
-		}
-		case SC_METEO_DIRECTION:
-		{
-			char subBuf[sizeof(METEO_DIRECTION_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-
-			METEO_DIRECTION_INFO meteoInfo;
-			memcpy(&meteoInfo, &subBuf, sizeof(METEO_DIRECTION_INFO));
-
-			m_pScene->m_ppMeteorObjects[meteoInfo.id]->m_xmf3MovingDirection = meteoInfo.dir;
-			break;
-		}
-		case SC_MOVE_SPACESHIP:
-		{
-			char subBuf[sizeof(SPACESHIP_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-			SPACESHIP_INFO playerInfo;
-			memcpy(&playerInfo, &subBuf, sizeof(SPACESHIP_INFO));
-
-			m_pPlayer[0]->SetPlayerInfo(playerInfo);
-			//m_pPlayer[0]->SetPosition(playerInfo.pos);
-			//m_pPlayer[0]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[0]->GetYaw(), 0.0f);
-			//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
-			//m_pPlayer->SetVelocity(playerInfo[3].velocity);
-			//m_pPlayer->SetShift(playerInfo.shift);
-			//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
-			//m_pPlayer[g_myid]->SetPlayerInfo(playerInfo[3]);
-			break;
-		}
-		case SC_MOVE_INSIDEPLAYER:
-		{
-			char subBuf[sizeof(INSIDE_PLAYER_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-			INSIDE_PLAYER_INFO playerInfo;
-			memcpy(&playerInfo, &subBuf, sizeof(INSIDE_PLAYER_INFO));
-
-			m_pInsidePlayer[playerInfo.id]->SetPlayerInfo(playerInfo);
-			if (int(m_pInsidePlayer[playerInfo.id]->motion) != (int)playerInfo.animation) {
-				((CTerrainPlayer*)m_pInsidePlayer[playerInfo.id])->motion = (AnimationState)playerInfo.animation;
-			}
-			//m_pInsidePlayer[playerInfo.id]->SetPosition(playerInfo.pos);
-			//m_pInsidePlayer[playerInfo.id]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[playerInfo.id]->GetYaw(), 0.0f);
-			break;
-		}
-		case SC_MOVE_INFO:
-		{
-			char subBuf[sizeof(ENEMY_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-			ENEMY_INFO enemyInfo;
-			memcpy(&enemyInfo, &subBuf, sizeof(ENEMY_INFO));
-
-			if (enemyInfo.id == BOSS_ID) {
-				m.lock();
-				m_pScene->m_ppBoss->SetQuaternion(enemyInfo.Quaternion);
-				m_pScene->m_ppBoss->SetPosition(enemyInfo.pos);
-				m_pUILayer->UpdateDots(BOSS_ID, m_pPlayer[0]->GetPosition(), enemyInfo.pos);
-
-				m.unlock();
+		for (int i = 0; i < ENEMY_BULLETS; ++i) {
+			if (!m_pScene->m_ppEnemyBullets[i]->m_bActive) {
+				m_pScene->m_ppEnemyBullets[i]->SetFirePosition(packet->data.pos);
+				m_pScene->m_ppEnemyBullets[i]->SetMovingDirection(packet->data.direction);
+				m_pScene->m_ppEnemyBullets[i]->SetEnemyFire4x4(m_pPlayer[0]->GetPosition());
+				m_pScene->m_ppEnemyBullets[i]->SetActive(true);
 				break;
 			}
-
-			if (!m_pScene->m_ppEnemies[enemyInfo.id]->isAlive) {
-				m_pScene->m_ppEnemies[enemyInfo.id]->isAlive = true;
-			}
-			m_pScene->m_ppEnemies[enemyInfo.id]->SetPosition(enemyInfo.pos);
-			m_pUILayer->UpdateDots(enemyInfo.id, m_pPlayer[0]->GetPosition(), m_pScene->m_ppEnemies[enemyInfo.id]->GetPosition());
-
-			
-			m.lock();
-			m_pScene->m_ppEnemies[enemyInfo.id]->ResetRotate();
-			m_pScene->m_ppEnemies[enemyInfo.id]->Rotate(&enemyInfo.Quaternion);
-			m.unlock();
-			break;
 		}
-		case SC_BULLET:
-		{
-			char subBuf[sizeof(BULLET_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+		break;
+	}
+	case SC_BULLET_HIT:
+	{
+		SC_BULLET_HIT_PACKET* packet = reinterpret_cast<SC_BULLET_HIT_PACKET*>(p);
 
-			BULLET_INFO bulletInfo;
-			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_INFO));
-
-			//((CAirplanePlayer*)m_pPlayer[0])->SetBulletFromServer(bulletInfo);
-			for (int i = 0; i < ENEMY_BULLETS; ++i) {
-				if (!m_pScene->m_ppEnemyBullets[i]->m_bActive) {
-					m_pScene->m_ppEnemyBullets[i]->SetFirePosition(bulletInfo.pos);
-					m_pScene->m_ppEnemyBullets[i]->SetMovingDirection(bulletInfo.direction);
-					m_pScene->m_ppEnemyBullets[i]->SetEnemyFire4x4(m_pPlayer[0]->GetPosition());
-					m_pScene->m_ppEnemyBullets[i]->SetActive(true);
-					break;
-				}
+		// 적/플레이어 hp 감소. 폭발 애니메이션/소리/죽음 등
+		if (packet->data.id >= 0) {
+			if (packet->data.hp <= 0) {
+				m_pScene->m_ppEnemies[packet->data.id]->isAlive = false;
 			}
-			break;
+			else {
+				m_pScene->m_ppEnemies[packet->data.id]->hp = packet->data.hp;
+			}
 		}
-		case SC_BULLET_HIT:
-		{
-			char subBuf[sizeof(BULLET_HIT_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-
-			BULLET_HIT_INFO bulletInfo;
-			memcpy(&bulletInfo, &subBuf, sizeof(BULLET_HIT_INFO));
-
-			// 적/플레이어 hp 감소. 폭발 애니메이션/소리/죽음 등
-			if (bulletInfo.id >= 0) {
-				if (bulletInfo.hp <= 0) {
-					m_pScene->m_ppEnemies[bulletInfo.id]->isAlive = false;
-				}
-				else {
-					m_pScene->m_ppEnemies[bulletInfo.id]->hp = bulletInfo.hp;
-				}
+		else { // 플레이어 타격
+			m_pPlayer[0]->hp = packet->data.hp;
+			if (packet->data.hp <= 0)
+			{
+				// 게임 오버 
 			}
-			else { // 플레이어 타격
-				m_pPlayer[0]->hp = bulletInfo.hp;
-				if(bulletInfo.hp <= 0)
-				{ 
-					// 게임 오버 
-				}
+		}
+		break;
+	}
+	case SC_MISSILE:
+	{
+		SC_MISSILE_PACKET* packet = reinterpret_cast<SC_MISSILE_PACKET*>(p);
+
+		m_pScene->m_ppEnemyMissiles[packet->data.id]->SetPosition(packet->data.pos);
+
+		if (!m_pScene->m_ppEnemyMissiles[packet->data.id]->m_bActive) {
+			m_pScene->m_ppEnemyMissiles[packet->data.id]->m_bActive = true;
+		}
+		m_pScene->m_ppEnemyMissiles[packet->data.id]->SetPosition(packet->data.pos);
+		m_pScene->m_ppEnemyMissiles[packet->data.id]->ResetRotate();
+		m_pScene->m_ppEnemyMissiles[packet->data.id]->Rotate(&packet->data.Quaternion);
+		break;
+	}
+	case SC_REMOVE_MISSILE:
+	{
+		SC_REMOVE_MISSILE_PACKET* packet = reinterpret_cast<SC_REMOVE_MISSILE_PACKET*>(p);
+		m_pScene->m_ppEnemyMissiles[packet->id]->m_bActive = false;
+		break;
+	}
+	case SC_ANIMATION_CHANGE:
+	{
+		SC_ANIMATION_CHANGE_PACKET* packet = reinterpret_cast<SC_ANIMATION_CHANGE_PACKET*>(p);
+
+		if (packet->data.id < 3) {	// 내부 플레이어
+			if (int(m_pInsidePlayer[packet->data.id]->motion) != packet->data.animation) {
+				m_pInsidePlayer[packet->data.id]->motion = (AnimationState)packet->data.animation;
 			}
 			break;
 		}
-		case SC_MISSILE:
-		{
-			char subBuf[sizeof(MISSILE_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-
-			MISSILE_INFO miss_info;
-			memcpy(&miss_info, &subBuf, sizeof(MISSILE_INFO));
-			m_pScene->m_ppEnemyMissiles[miss_info.id]->SetPosition(miss_info.pos);
-
-
-			if (!m_pScene->m_ppEnemyMissiles[miss_info.id]->m_bActive) {
-				m_pScene->m_ppEnemyMissiles[miss_info.id]->m_bActive = true;
-			}
-			m_pScene->m_ppEnemyMissiles[miss_info.id]->SetPosition(miss_info.pos);
-			m.lock();
-			m_pScene->m_ppEnemyMissiles[miss_info.id]->ResetRotate();
-			m_pScene->m_ppEnemyMissiles[miss_info.id]->Rotate(&miss_info.Quaternion);
-			m.unlock();
+		if (packet->data.id == BOSS_ID) {
+			m_pScene->m_ppBoss->CurMotion = (BossAnimation)packet->data.animation;
+			// 보스 State 변경??
 			break;
 		}
-		case SC_REMOVE_MISSILE:
-		{
-			char subBuf[sizeof(char)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+		break;
+	}
+	case SC_ITEM:
+	{
+		SC_ITEM_PACKET* packet = reinterpret_cast<SC_ITEM_PACKET*>(p);
+		items[packet->data.type] = packet->data.num;
 
-			char miss_id;
-			memcpy(&miss_id, &subBuf, sizeof(char));
-			m_pScene->m_ppEnemyMissiles[miss_id]->m_bActive = false;
-			break;
+		if (packet->data.type == ItemType::JEWEL_HP) {
+			m_pPlayer[0]->max_hp = 100 + 10 * packet->data.num;
 		}
-		case SC_ANIMATION_CHANGE:
-		{
-			char subBuf[sizeof(ANIMATION_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-
-			ANIMATION_INFO ani_info;
-			memcpy(&ani_info, &subBuf, sizeof(ANIMATION_INFO));
-			if (ani_info.id < 3) {	// 내부 플레이어
-				if (int(m_pInsidePlayer[ani_info.id]->motion) != ani_info.animation) {
-					m_pInsidePlayer[ani_info.id]->motion = (AnimationState)ani_info.animation;
-				}
-				break;
-			}
-			if (ani_info.id == BOSS_ID) {
-				m_pScene->m_ppBoss->CurMotion = (BossAnimation)ani_info.animation;
-				// 보스 State 변경??
-				break;
-			}
-			break;
-		}
-		case SC_ITEM:
-		{
-			char subBuf[sizeof(ITEM_INFO)]{};
-			WSABUF wsabuf{ sizeof(subBuf), subBuf };
-			DWORD recvByte{}, recvFlag{};
-			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-
-			ITEM_INFO item_info;
-			memcpy(&item_info, &subBuf, sizeof(ITEM_INFO));
-			items[item_info.type] = item_info.num;
-
-			if (item_info.type == ItemType::JEWEL_HP) {
-				m_pPlayer[0]->max_hp = 100 + 10 * item_info.num;
-			}
-			break;
-		}
-		case SC_HEAL:
-		{
-			isHealing = true;
-			break;
-		}
-		default:
-			printf("Unknown PACKET type [%d]\n", type);
-		}
+		break;
+	}
+	case SC_HEAL:
+	{
+		isHealing = true;
+		break;
+	}
+	default:
+		break;
+		//printf("Unknown PACKET type [%d]\n", p[1]);
 	}
 }

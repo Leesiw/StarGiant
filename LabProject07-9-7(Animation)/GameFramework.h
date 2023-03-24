@@ -44,6 +44,7 @@ public:
 	// 서버
 	bool ConnectServer();
 	void RecvServer();
+	void ProcessPacket(char* p);
 
 	void WaitForGpuComplete();
 	void MoveToNextFrame();
@@ -120,8 +121,10 @@ private:
 	// 보석 개수 > ItemType : 무슨 보석인지 / char : 해당 보석 개수
 	std::unordered_map<ItemType, char> items;
 
-	thread    NetworkThread{};
 	SOCKET sock;
+
+	char buf[BUF_SIZE * 2];
+	int buf_cur_size = 0;
 
 	bool isHealing = false;
 	bool isConnect = false;

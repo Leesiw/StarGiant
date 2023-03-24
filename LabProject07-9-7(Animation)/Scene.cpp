@@ -784,13 +784,10 @@ void CScene::RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	}
 }
 
-void CScene::TransformMeteor(METEO_INFO m_info[])
+void CScene::TransformMeteor(METEO_INFO m_info)
 {
-	for (int i = 0; i < METEOS; ++i)
-	{
-		if (m_ppMeteorObjects[i]) {
-			m_ppMeteorObjects[i]->SetPosition(m_info[i].pos);
-		}
+	if (m_ppMeteorObjects[m_info.id]) {
+		m_ppMeteorObjects[m_info.id]->SetPosition(m_info.pos);
 	}
 }
 

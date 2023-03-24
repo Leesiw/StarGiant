@@ -179,7 +179,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		{
 			bool exists = std::any_of(std::begin(clients), std::end(clients),
 				[&](SESSION pl) {
-				return pl.type == p->player_type;
+				return pl.in_use && pl.type == p->player_type;
 			});
 
 			if (!exists) {

@@ -87,7 +87,7 @@ public:
 
 	// ����
 	void RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info);
-	void TransformMeteor(METEO_INFO[]);
+	void TransformMeteor(METEO_INFO m_info);
 
 protected:
 	ID3D12RootSignature					*m_pd3dGraphicsRootSignature = NULL;

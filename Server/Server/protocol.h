@@ -32,7 +32,7 @@ constexpr char MAX_ITEM = 15;	// 보석 최대 레벨?
 constexpr int MAX_USER = 3;
 
 constexpr int PORT_NUM = 4000;
-constexpr int BUF_SIZE = 200;
+constexpr int BUF_SIZE = 500000;
 constexpr int NAME_SIZE = 20;
 
 // boss id
@@ -127,16 +127,17 @@ struct LOGIN_INFO {
 
 // meteo
 struct METEO_INFO {
+	char id;
 	XMFLOAT3 pos;
 };
 
 struct METEO_DIRECTION_INFO {
-	short id;
+	char id;
 	XMFLOAT3 dir;
 };
 
 struct SPAWN_METEO_INFO {
-	short	id;
+	char id;
 
 	XMFLOAT3 pos;
 	XMFLOAT3 scale;
@@ -150,7 +151,7 @@ struct BULLET_INFO {
 };
 
 struct BULLET_HIT_INFO {
-	short id;
+	char id;
 	short hp;
 };
 
@@ -169,7 +170,7 @@ struct INSIDE_INPUT_INFO {
 };
 
 struct INSIDE_PLAYER_INFO {
-	short id;
+	char id;
 
 	XMFLOAT3					pos;
 	float           			m_fYaw;
@@ -189,7 +190,7 @@ struct SPACESHIP_INFO {
 
 // enemy
 struct ENEMY_INFO {
-	short id;
+	char id;
 
 	XMFLOAT3 pos;
 	XMFLOAT4 Quaternion;
@@ -275,7 +276,7 @@ struct SC_METEO_DIRECTION_PACKET {
 struct SC_METEO_PACKET {
 	unsigned char size;
 	char	type;
-	METEO_INFO meteo[METEOS];
+	METEO_INFO data;
 };
 
 // spaceship

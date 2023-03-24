@@ -27,7 +27,6 @@
 #include <chrono>
 using namespace std::chrono;
 #include <thread>
-#include <mutex>
 
 //ui추가
 #include <dwrite.h>
@@ -83,10 +82,6 @@ extern HINSTANCE						ghAppInstance;
 #pragma comment(lib, "d2d1.lib")
 //
 #pragma comment(lib, "dxguid.lib")
-
-
-
-static mutex m;
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
 
