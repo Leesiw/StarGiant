@@ -35,9 +35,6 @@ constexpr int PORT_NUM = 4000;
 constexpr int BUF_SIZE = 200;
 constexpr int NAME_SIZE = 20;
 
-constexpr int W_WIDTH = 8;
-constexpr int W_HEIGHT = 8;
-
 // boss id
 constexpr char BOSS_ID = ENEMIES + 1;
 
@@ -267,12 +264,6 @@ struct SC_SPAWN_METEO_PACKET {
 	unsigned char size;
 	char	type;
 	SPAWN_METEO_INFO data;
-};
-
-struct SC_SPAWN_ALL_METEO_PACKET {
-	unsigned char size;
-	char	type;
-	SPAWN_METEO_INFO data[METEOS];
 };
 
 struct SC_METEO_DIRECTION_PACKET {

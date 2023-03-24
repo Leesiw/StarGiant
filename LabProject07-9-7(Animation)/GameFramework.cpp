@@ -1002,34 +1002,15 @@ void CGameFramework::RecvServer()
 		}
 		case SC_SPAWN_METEO:
 		{
-			if (size == sizeof(SC_SPAWN_METEO_PACKET))
-			{
-				char subBuf[sizeof(SPAWN_METEO_INFO)]{};
-				WSABUF wsabuf{ sizeof(subBuf), subBuf };
-				DWORD recvByte{}, recvFlag{};
-				WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
+			char subBuf[sizeof(SPAWN_METEO_INFO)]{};
+			WSABUF wsabuf{ sizeof(subBuf), subBuf };
+			DWORD recvByte{}, recvFlag{};
+			WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
 
-				SPAWN_METEO_INFO m_info;
-				memcpy(&m_info, &subBuf, sizeof(SPAWN_METEO_INFO));
+			SPAWN_METEO_INFO m_info;
+			memcpy(&m_info, &subBuf, sizeof(SPAWN_METEO_INFO));
 
-				m_pScene->RespawnMeteor(m_pd3dDevice, m_pd3dCommandList, m_info);
-			}
-			else
-			{
-				char subBuf[sizeof(SPAWN_METEO_INFO[METEOS])]{};
-				WSABUF wsabuf{ sizeof(subBuf), subBuf };
-				DWORD recvByte{}, recvFlag{};
-				WSARecv(sock, &wsabuf, 1, &recvByte, &recvFlag, nullptr, nullptr);
-
-				SPAWN_METEO_INFO m_info[METEOS];
-				memcpy(&m_info, &subBuf, sizeof(SPAWN_METEO_INFO[METEOS]));
-
-				for (int i = 0; i < METEOS; ++i)
-				{
-					m_info[i].id = i;
-					m_pScene->RespawnMeteor(m_pd3dDevice, m_pd3dCommandList, m_info[i]);
-				}
-			}
+			m_pScene->RespawnMeteor(m_pd3dDevice, m_pd3dCommandList, m_info);
 			break;
 		}
 		case SC_METEO:

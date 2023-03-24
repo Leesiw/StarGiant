@@ -170,31 +170,18 @@ void SESSION::send_spawn_meteo_packet(int c_id, short id, CMeteoObject* meteo)
 	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
 }
 
-void SESSION::send_spawn_all_meteo_packet(int c_id, CMeteoObject* meteo[])
+void SESSION::send_spawn_all_meteo_packet(int c_id, CMeteoObject* meteo[]) 
 {
-	SC_SPAWN_ALL_METEO_PACKET p;
-	p.size = sizeof(SC_SPAWN_ALL_METEO_PACKET);
-	p.type = SC_SPAWN_METEO;
-
 	for (int i = 0; i < METEOS; ++i) {
-		p.data[i].pos = meteo[i]->GetPosition();
-		p.data[i].scale = meteo[i]->GetScale();
-		p.data[i].direction = meteo[i]->GetMovingDirection();
+		send_spawn_meteo_packet(0, i, meteo[i]);
 	}
-
-	char buf[sizeof(SC_SPAWN_ALL_METEO_PACKET)];
-	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
-	WSABUF wsabuf{ sizeof(buf), buf };
-	DWORD sent_byte;
-
-	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
 }
 
 void SESSION::send_all_enemy_packet(int c_id, ENEMY_INFO e_info[], bool alive[])
 {
 	for (int i = 0; i < ENEMIES; ++i) {
 		if (alive[i]) {
-			send_enemy_packet(c_id, e_info[i]);
+			send_enemy_packet(i, e_info[i]);
 		}
 	}
 }
