@@ -536,6 +536,10 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		if (false == pl.in_use) continue;
 		pl.send_spaceship_packet(3, m_pSpaceship);
 		pl.send_meteo_packet(0, m_ppMeteoObjects);
+		for (int i = 0; i < MAX_USER; ++i) {
+			if (clients[i].in_use == false) { continue; }
+			pl.send_change_packet(i,clients[i].type);
+		}
 		// Àû À§Ä¡?
 	}
 

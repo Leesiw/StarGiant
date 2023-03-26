@@ -164,7 +164,7 @@ public:
 	INSIDE_PLAYER_INFO					player_info;
 	bool						is_update = true;
 
-
+	PlayerType type;
 public:
 	//¼­¹ö 
 	void SetPlayerInfo(INSIDE_PLAYER_INFO p_info) { player_info = p_info; is_update = false; }

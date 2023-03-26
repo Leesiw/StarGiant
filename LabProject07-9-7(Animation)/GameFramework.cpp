@@ -955,12 +955,15 @@ void CGameFramework::ProcessPacket(char* p)
 		else {
 			b_Inside = false;
 		}
-
+		m_pInsidePlayer[g_myid]->type = player_type;
 		break;
 	}
 	case SC_CHANGE:
 	{
 		SC_CHANGE_PACKET* packet = reinterpret_cast<SC_CHANGE_PACKET*>(p);
+
+		if (m_pInsidePlayer[packet->data.id]->type == packet->data.player_type) { break; }
+		m_pInsidePlayer[packet->data.id]->type = packet->data.player_type;
 
 		// 여기서 온 정보에 따라 해당 캐릭터가 특정 자리에 앉게 하거나 일어나게 한다
 		if (packet->data.player_type == PlayerType::INSIDE) {
