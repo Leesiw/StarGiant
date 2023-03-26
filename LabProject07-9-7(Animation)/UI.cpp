@@ -119,7 +119,7 @@ void UILayer::DrawDot(int dotCnt, XMFLOAT3[])
 
 void UILayer::UpdateLabels(const wstring& strUIText)
 {
-    m_vTextBlocks[0] = { strUIText, D2D1::RectF(0.0f, 0.0f, m_fWidth, m_fHeight), m_pdwTextFormat };
+    m_vTextBlocks[0] = { strUIText, D2D1::RectF(0.0f, 25.0f, m_fWidth, m_fHeight), m_pdwTextFormat }; 
 }
 
 void UILayer::UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos)
@@ -302,8 +302,8 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
     if (m_pd2dTextBrush) m_pd2dTextBrush->Release();
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &m_pd2dTextBrush);
 
-    const float fFontSize = m_fHeight / 25.0f;
-    const float fSmallFontSize = m_fHeight / 40.0f;
+    const float fFontSize = m_fHeight / 20.0f;
+    const float fSmallFontSize = m_fHeight / 35.0f;
 
     m_pd2dWriteFactory->CreateTextFormat(L"±¼¸²Ã¼", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize, L"en-us", &m_pdwTextFormat);
 

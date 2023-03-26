@@ -285,9 +285,8 @@ void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	float fx = FRAME_BUFFER_WIDTH / 2;
 	float fy = FRAME_BUFFER_HEIGHT / 2;
 
-	m_ppUI[0] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::CROSSHAIR), 10, 10, 0);
+	m_ppUI[0] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::CROSSHAIR), 2, 2, 0);
 	m_ppUI[0]->SetPosition(fx, fy, 0.0f);
-	m_ppUI[0]->SetScale(10.0f, 10.0f, 10.0f);
 
 	m_ppUI[1] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::MINIMAP), 1, 1, 0);
 	m_ppUI[1]->SetPosition(fx + 10.0f, fy, 10.0f);

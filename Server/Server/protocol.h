@@ -118,6 +118,11 @@ enum class ItemType : char
 	// 공격력/방어력/회복력/최대HP
 };
 
+enum class MissionType : char
+{
+	TUTORIAL, Kill_MONSTER, FIND_MAP, FIND_BOSS, 
+};
+
 #pragma pack (push, 1)
 
 // login

@@ -856,16 +856,59 @@ void CGameFramework::UpdateUI()
 	_stprintf_s(position_ui, _countof(position_ui), _T("UI 테스트\n"));
 
 	wstring uiText = L"UI 테스트";
-	for (auto s : labels)
+	/*for (auto s : labels)
 	{
 		uiText += s;
-	}
+	}*/
+
+	uiText = ChangeMission(m_pPlayer[0]->missionType);
+
 	m_pUILayer->UpdateLabels(uiText);
 	m_pUILayer->UpdateHp(m_pPlayer[0]->getHp());
 	//for (int i = 0; i < ENEMIES; ++i)
 	//{
 	//	m_pUILayer->UpdateDots(i, { 0,0 });
 	//}
+}
+
+wstring CGameFramework::ChangeMission(MissionType mType)
+{
+	wstring uiText = L"미션 - ";
+	short cnt = m_pPlayer[0]->killCnt;
+	wstring enemyCountStr;
+	enemyCountStr = to_wstring(cnt);
+	wstring uiTextSpace = L" ";
+	wstring uiTextCnt = L" / 20";
+
+
+	switch (mType) {
+	case MissionType::Kill_MONSTER:
+	{
+		uiText = L"미션 - 적을 처치하라 ";
+		uiText += enemyCountStr;
+		uiText += uiTextCnt;
+
+		break;
+	}
+	case MissionType::FIND_MAP:
+	{
+		uiText = L"미션 - 몬스터를 처치해서 보스의 흔적을 찾아라";
+		break;
+	}
+	case MissionType::FIND_BOSS:
+	{
+		uiText = L"미션 - 보스를 찾아라";
+		break;
+	}
+
+
+	default:
+		uiText = L"미션 검색중";
+		break;
+	};
+
+	return uiText;
+
 }
 
 

@@ -28,6 +28,9 @@ CPlayer::CPlayer()
 	m_fRoll = 0.0f;
 	m_fYaw = 0.0f;
 
+	missionType = MissionType::TUTORIAL;
+	killCnt = 0;
+
 	m_pPlayerUpdatedContext = NULL;
 	m_pCameraUpdatedContext = NULL;
 }

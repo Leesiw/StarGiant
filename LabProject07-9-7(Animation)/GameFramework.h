@@ -38,6 +38,7 @@ public:
     void FrameAdvance();
 
 	void UpdateUI();
+	wstring ChangeMission(MissionType mT);
 
 
 
