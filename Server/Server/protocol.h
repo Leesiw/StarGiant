@@ -120,7 +120,7 @@ enum class ItemType : char
 
 enum class MissionType : char
 {
-	TUTORIAL, Kill_MONSTER, FIND_MAP, FIND_BOSS, 
+	TU_SIT, TU_KILL, TU_HILL, TU_END,  Kill_MONSTER, GO_PLANET, FIND_BOSS, GET_JEWELS, KILL_MONSTER_ONE_MORE_TIME
 };
 
 #pragma pack (push, 1)

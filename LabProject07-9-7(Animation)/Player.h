@@ -47,8 +47,6 @@ protected:
 
 public:
 	AnimationState motion;
-	MissionType missionType;
-	short killCnt; //일단 플레이어한테
 	
 public:
 	CPlayer();

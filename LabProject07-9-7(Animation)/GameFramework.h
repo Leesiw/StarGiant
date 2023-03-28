@@ -106,6 +106,11 @@ private:
 	UILayer* m_pUILayer = NULL;
 	CUI* m_pUI = NULL;
 
+
+	//
+	short killCnt = 0; 
+	MissionType curMissionType = MissionType::TU_SIT;
+
 	// ³»ºÎ 
 	CScene* m_pInsideScene = NULL;
 	CTerrainPlayer* m_pInsidePlayer[3] = {};

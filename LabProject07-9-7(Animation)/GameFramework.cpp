@@ -861,7 +861,7 @@ void CGameFramework::UpdateUI()
 		uiText += s;
 	}*/
 
-	uiText = ChangeMission(m_pPlayer[0]->missionType);
+	uiText = ChangeMission(curMissionType);
 
 	m_pUILayer->UpdateLabels(uiText);
 	m_pUILayer->UpdateHp(m_pPlayer[0]->getHp());
@@ -874,30 +874,70 @@ void CGameFramework::UpdateUI()
 wstring CGameFramework::ChangeMission(MissionType mType)
 {
 	wstring uiText = L"미션 - ";
-	short cnt = m_pPlayer[0]->killCnt;
 	wstring enemyCountStr;
-	enemyCountStr = to_wstring(cnt);
+	enemyCountStr = to_wstring(killCnt);
 	wstring uiTextSpace = L" ";
 	wstring uiTextCnt = L" / 20";
 
 
 	switch (mType) {
-	case MissionType::Kill_MONSTER:
+	case MissionType::TU_SIT:
 	{
-		uiText = L"미션 - 적을 처치하라 ";
-		uiText += enemyCountStr;
-		uiText += uiTextCnt;
+		uiText = L"튜토리얼 - 조종석에서 상호작용으로 우주선 조종하기 ( ";
+
+		uiText += L" / 1 )";
+		break;
+	}
+	case MissionType::TU_KILL:
+	{
+		uiText = L"튜토리얼 - 공격석에서 몬스터 처치 ( ";
+		enemyCountStr = to_wstring(killCnt);
+		uiText += L" / 1 )";
+		break;
+	}
+	case MissionType::TU_HILL:
+	{
+		uiText = L"튜토리얼 - 조각상에서 상호작용으로 체력 회복하기 ( ";
+
+		uiText += L" / 4 )";
+		break;
+	}
+	case MissionType::GET_JEWELS:
+	{
+		uiText = L"미션 - 보석 4종류 1개 이상씩 얻기 ( ";
+		//uiText += enemyCountStr;
+		uiText += L" / 1 )";
 
 		break;
 	}
-	case MissionType::FIND_MAP:
+	case MissionType::Kill_MONSTER:
 	{
-		uiText = L"미션 - 몬스터를 처치해서 보스의 흔적을 찾아라";
+		uiText = L"미션 - 몬스터를 처치하라 (";
+		uiText += enemyCountStr;
+		uiText += L" / 15 )";
+		break;
+	}
+	case MissionType::GO_PLANET:
+	{
+		uiText = L"미션 - 목표 지점으로 도달하라 ( ";
+		
+		uiText += L"m 남음";
+
+		break;
+	}
+	case MissionType::KILL_MONSTER_ONE_MORE_TIME:
+	{
+		uiText = L"미션 - 몬스터를 처치하라 (";
+		uiText += enemyCountStr;
+		uiText += L" / 20 )";
 		break;
 	}
 	case MissionType::FIND_BOSS:
 	{
-		uiText = L"미션 - 보스를 찾아라";
+		uiText = L"미션 - 보스를 처치하라 ( ";
+
+		uiText += L"0 / 1 )";
+
 		break;
 	}
 
