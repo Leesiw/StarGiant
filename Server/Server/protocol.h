@@ -22,6 +22,7 @@ constexpr char PLASMACANNON_ENEMY = 10;
 constexpr char ENEMIES = LASER_ENEMY + MISSILE_ENEMY + PLASMACANNON_ENEMY;
 constexpr char ENEMY_BULLETS =50;
 constexpr char GODRAY_SAMPLE = 30;
+constexpr char SPRITE_CNT = 1;
 #define UI_CNT static_cast<int>(UIType::COUNT) + ENEMIES - 1
 #define UI_INSIDE_CNT /*static_cast<int>(UIInsideType::COUNT) */ 4
 

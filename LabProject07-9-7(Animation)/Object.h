@@ -36,6 +36,11 @@ struct SRVROOTARGUMENTINFO
 	D3D12_GPU_DESCRIPTOR_HANDLE		m_d3dSrvGpuDescriptorHandle;
 };
 
+struct CB_PLUS_INFO
+{
+	XMFLOAT4X4 Texture_size;
+};
+
 class CTexture
 {
 public:
@@ -343,6 +348,7 @@ public:
 
 	XMFLOAT4X4						m_xmf4x4ToParent;
 	XMFLOAT4X4						m_xmf4x4World;
+	XMFLOAT4X4						m_xmf4x4Texture;
 
 	CGameObject 					*m_pParent = NULL;
 	CGameObject 					*m_pChild = NULL;
@@ -724,5 +730,27 @@ public:
 	CUIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual ~CUIObject() {};
 
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
+};
+
+class CSpriteObject : public CGameObject
+{
+public:
+	CSpriteObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Center,XMFLOAT3 Size,int type =0);
+	virtual ~CSpriteObject() {};
+
+	float m_fSpeed = 0.1f;
+	float m_fTime = 0.0f;
+	int m_nRow = 0;
+	int m_nCol = 0;
+	int m_nRows = 1;
+	int m_nCols = 1;
+
+	CB_PLUS_INFO* m_pcbPlusInfo = NULL;
+
+	virtual void Animate(float fElapsedTime);
+	void SetRowColumn(int nRow, int nCol) { m_nRows = nRow; m_nCols = nCol; }
+	void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
+	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 };

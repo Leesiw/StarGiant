@@ -61,7 +61,6 @@ public:
 	void BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap);
-	//�� ���̶� ������ ���Ű����� ������ �� ���� ���� �����. �����ϰ� ������ �ڵ��� �ްԸ���.(���� ������ ��ũ���� ��������� �ʿ��ҽ� �̰� ���ְ� �����ؾ��ҰŰ���) 
 	void ReleaseObjects();
 
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
@@ -70,8 +69,8 @@ public:
 
 
 	void CheckObjectByBulletCollisions();
-	void CheckMEByObjectCollisions(); // ���ΰǹ� - �÷��̾� �浹üũ (����) 
-	int CheckSitCollisions(); // ���ΰǹ� - �÷��̾� �浹üũ (����) 
+	void CheckMEByObjectCollisions(); 
+	int CheckSitCollisions(); 
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
     void AnimateObjects(float fTimeElapsed);
@@ -153,6 +152,8 @@ public:
 
 	CUI* m_ppUIName[3];
 
+	CSpriteObject					* m_ppSprite[SPRITE_CNT];
+
 
 
 	int									m_nShaders = 0;
@@ -169,6 +170,7 @@ public:
 	XMFLOAT4							m_xmf4GlobalAmbient;
 
 	ID3D12Resource						*m_pd3dcbLights = NULL;
+	ID3D12Resource						* m_pd3dcbPlusInfo = NULL;
 	LIGHTS								*m_pcbMappedLights = NULL;
 
 

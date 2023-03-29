@@ -283,6 +283,45 @@ float4 PS_UI(VS_UI_OUTPUT input) : SV_TARGET
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+cbuffer cbPlusInfo : register(b9)//b2
+{
+	matrix		gmtxTexture : packoffset(c0);
+	
+};
+
+struct VS_SPRITE_INPUT
+{
+	float3 position : POSITION;
+	float2 uv : TEXCOORD;
+
+};
+
+struct VS_SPRITE_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD0;
+};
+
+
+//스프라이트 VS
+VS_SPRITE_OUTPUT VS_SPRITE(VS_SPRITE_INPUT input)
+{
+	VS_SPRITE_OUTPUT output;
+
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.uv = mul(float3(input.uv, 1.0f), (float3x3)(gmtxTexture)).xy;
+	//output.uv = input.uv;
+	return(output);
+}
+Texture2D gtxtSPRITETexture : register(t17);
+
+float4 PS_SPRITE(VS_SPRITE_OUTPUT input) : SV_TARGET
+{
+	float4 cColor = gtxtSPRITETexture.Sample(gssWrap, input.uv);
+	return (cColor);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 struct VS_GOD_INPUT
 {
 	float3 position : POSITION;
