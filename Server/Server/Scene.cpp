@@ -26,8 +26,10 @@ void CScene::Init()
 {
 }
 
-void CScene::BuildObjects()
+void CScene::BuildObjects(std::array<Level, MISSION_NUM>::iterator beg)
 {
+	level_iter = beg;
+
 	// player
 	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
 	pAirplanePlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
@@ -377,6 +379,40 @@ void CScene::CheckBossCollisions()
 {
 	if (m_pBoss)
 		m_pBoss->UpdateBoundingBox();
+}
+
+void CScene::CheckMissionComplete()
+{
+	switch (level_iter->Mission) {
+	case MissionType::TU_SIT: {
+		break;
+	}
+	case MissionType::TU_KILL: {
+		break;
+	}
+	case MissionType::TU_HILL: {
+		break;
+	}
+	case MissionType::TU_END: {
+		break;
+	}
+	case MissionType::GET_JEWELS: {
+		break;
+	}
+	case MissionType::Kill_MONSTER: {
+		break;
+	}
+	case MissionType::GO_PLANET: {
+		break;
+	}
+	case MissionType::KILL_MONSTER_ONE_MORE_TIME: {
+		break;
+	}
+	case MissionType::FIND_BOSS: {
+		break;
+	}
+	}
+	
 }
 
 void CScene::SpawnEnemy()

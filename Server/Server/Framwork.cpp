@@ -3,8 +3,73 @@
 CGameFramework::CGameFramework()
 {
 	m_pScene = NULL;
-	//m_pSpaceship = NULL;
-	//m_Enemy = NULL;
+	
+	levels[0].Mission = MissionType::TU_SIT;
+	levels[1].Mission = MissionType::TU_KILL;
+	levels[2].Mission = MissionType::TU_HILL;
+	levels[3].Mission = MissionType::TU_END;
+
+	for (int i = 0; i < 4; ++i) {
+		levels[i].MaxMonsterNum = 10;
+		levels[i].SpawnMonsterNum = 5;
+		levels[i].Laser.MAX_HP = 3;
+		levels[i].Laser.ATK = 2;
+		levels[i].Missile.MAX_HP = 5;
+		levels[i].Missile.ATK = 3;
+		levels[i].PlasmaCannon.MAX_HP = 10;
+		levels[i].PlasmaCannon.ATK = 4;
+	}
+
+	levels[4].Mission = MissionType::GET_JEWELS;
+	levels[4].MaxMonsterNum = 15;
+	levels[4].SpawnMonsterNum = 7;
+	levels[4].Laser.MAX_HP = 5;
+	levels[4].Laser.ATK = 3;
+	levels[4].Missile.MAX_HP = 7;
+	levels[4].Missile.ATK = 4;
+	levels[4].PlasmaCannon.MAX_HP = 12;
+	levels[4].PlasmaCannon.ATK = 5;
+
+	levels[5].Mission = MissionType::Kill_MONSTER;
+	levels[5].MaxMonsterNum = 20;
+	levels[5].SpawnMonsterNum = 9;
+	levels[5].Laser.MAX_HP = 10;
+	levels[5].Laser.ATK = 6;
+	levels[5].Missile.MAX_HP = 14;
+	levels[5].Missile.ATK = 8;
+	levels[5].PlasmaCannon.MAX_HP = 15;
+	levels[5].PlasmaCannon.ATK = 7;
+
+	levels[6].Mission = MissionType::GO_PLANET;
+	levels[6].MaxMonsterNum = ENEMIES;
+	levels[6].SpawnMonsterNum = 9;
+	levels[6].Laser.MAX_HP = 15;
+	levels[6].Laser.ATK = 10;
+	levels[6].Missile.MAX_HP = 17;
+	levels[6].Missile.ATK = 12;
+	levels[6].PlasmaCannon.MAX_HP = 20;
+	levels[6].PlasmaCannon.ATK = 11;
+
+	levels[7].Mission = MissionType::KILL_MONSTER_ONE_MORE_TIME;
+	levels[7].MaxMonsterNum = ENEMIES;
+	levels[7].SpawnMonsterNum = 9;
+	levels[7].Laser.MAX_HP = 20;
+	levels[7].Laser.ATK = 18;
+	levels[7].Missile.MAX_HP = 35;
+	levels[7].Missile.ATK = 20;
+	levels[7].PlasmaCannon.MAX_HP = 40;
+	levels[7].PlasmaCannon.ATK = 30;
+
+	levels[8].Mission = MissionType::FIND_BOSS;
+	levels[8].MaxMonsterNum = ENEMIES;
+	levels[8].SpawnMonsterNum = 9;
+	levels[8].Laser.MAX_HP = 20;
+	levels[8].Laser.ATK = 18;
+	levels[8].Missile.MAX_HP = 35;
+	levels[8].Missile.ATK = 20;
+	levels[8].PlasmaCannon.MAX_HP = 40;
+	levels[8].PlasmaCannon.ATK = 30;
+
 }
 
 CGameFramework::~CGameFramework()
@@ -136,7 +201,7 @@ void CGameFramework::BuildObjects()
 {
 	m_pScene = new CScene();
 
-	if (m_pScene) m_pScene->BuildObjects();
+	if (m_pScene) m_pScene->BuildObjects(levels.begin());
 }
 
 void CGameFramework::ReleaseObjects()

@@ -120,8 +120,11 @@ enum class ItemType : char
 
 enum class MissionType : char
 {
-	TU_SIT, TU_KILL, TU_HILL, TU_END,  Kill_MONSTER, GO_PLANET, FIND_BOSS, GET_JEWELS, KILL_MONSTER_ONE_MORE_TIME
+	TU_SIT, TU_KILL, TU_HILL, TU_END, GET_JEWELS, Kill_MONSTER, GO_PLANET, KILL_MONSTER_ONE_MORE_TIME, FIND_BOSS, COUNT
 };
+
+constexpr int MISSION_NUM = static_cast<int>(MissionType::COUNT);
+
 
 #pragma pack (push, 1)
 

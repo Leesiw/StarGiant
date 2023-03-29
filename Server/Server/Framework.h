@@ -30,6 +30,8 @@ private:
 
 	std::chrono::duration<double> fps;
 
+	std::array<Level, MISSION_NUM> levels;
+
 	thread ClientProcessThread{};
 };
 

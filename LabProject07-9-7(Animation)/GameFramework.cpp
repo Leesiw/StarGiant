@@ -1185,7 +1185,7 @@ void CGameFramework::ProcessPacket(char* p)
 
 		// 적/플레이어 hp 감소. 폭발 애니메이션/소리/죽음 등
 		if (packet->data.id >= 0) {
-			if (packet->data.hp <= 0) {
+			if (packet->data.hp <= 0) { // 죽음
 				m_pScene->m_ppEnemies[packet->data.id]->isAlive = false;
 			}
 			else {

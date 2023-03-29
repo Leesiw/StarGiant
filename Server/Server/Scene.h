@@ -14,7 +14,7 @@ public:
 
 	void Init();
 
-	void BuildObjects();
+	void BuildObjects(std::array<Level, MISSION_NUM>::iterator beg);
 	void ReleaseObjects();
 
 	void AnimateObjects(float fTimeElapsed);
@@ -25,6 +25,8 @@ public:
 	void CheckEnemyCollisions();
 	void CheckMissileCollisions();
 	void CheckBossCollisions();
+
+	void CheckMissionComplete();
 
 	void SpawnEnemy();
 	void SpawnMeteo(char i);
@@ -45,6 +47,8 @@ public:
 	char heal_player = -1;
 
 	bool						m_bIsRunning = true;
+
+	std::array<Level, MISSION_NUM>::iterator level_iter;
 
 	float m_fEnemySpawnTime = 10.0f;
 	float m_fEnemySpawnTimeRemaining = 0.0f;

@@ -12,6 +12,7 @@ using namespace std::chrono;
 #include <string>
 #include <thread>
 #include <vector>
+#include <array>
 #include <unordered_map>
 #include <fstream>
 #include <sqlext.h>
@@ -31,6 +32,21 @@ using namespace std;
 #include <MSWSock.h>
 
 #pragma comment(lib, "ws2_32") // ws2_32.lib ¸µÅ©
+
+struct MonsterStatus {
+	char MAX_HP;
+	char ATK;
+};
+
+struct Level {
+	MissionType Mission;
+	MonsterStatus PlasmaCannon;
+	MonsterStatus Missile;
+	MonsterStatus Laser;
+
+	char MaxMonsterNum;
+	char SpawnMonsterNum;
+};
 
 static std::random_device rdd;
 static std::default_random_engine dree(rdd());
