@@ -542,6 +542,7 @@ CGameObject::CGameObject()
 {
 	m_xmf4x4ToParent = Matrix4x4::Identity();
 	m_xmf4x4World = Matrix4x4::Identity();
+	m_xmf4x4Texture = Matrix4x4::Identity();
 }
 
 CGameObject::CGameObject(int nMaterials) : CGameObject()
@@ -1821,4 +1822,97 @@ void CUIObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCam
 	SetPosition(xmf3CameraPos.x, xmf3CameraPos.y, xmf3CameraPos.z);
 
 	CGameObject::Render(pd3dCommandList, pCamera);
+}
+
+//============================================================================================================================
+
+CSpriteObject::CSpriteObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Center, XMFLOAT3 Size, int type) : CGameObject(1)
+{
+	CTexturedRectMesh* SpriteMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 10.0f, 10.0f, 0.0f);//Size.x, Size.y, 0.0f);
+	SetMesh(SpriteMesh);
+
+	CTexture* pSpriteTexture = new CTexture(1, RESOURCE_TEXTURE_CUBE, 0);
+	pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/base-color.dds", 0);
+
+	CSpriteShader* CSpriteObjectShader = new CSpriteShader();
+	CSpriteObjectShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	CSpriteObjectShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 18, false); //PS를 UI  
+
+	CMaterial* pStriteMaterial = new CMaterial(1);
+	pStriteMaterial->SetTexture(pSpriteTexture);
+	pStriteMaterial->SetShader(CSpriteObjectShader);
+
+	SetRowColumn(8, 8);
+	Animate(0.0f);
+	SetMaterial(0, pStriteMaterial);
+}
+
+void CSpriteObject::Animate(float fElapsedTime)
+{
+	
+	if (m_ppMaterials[0] && m_ppMaterials[0]->m_ppTextures[0])
+	{
+		m_fTime += fElapsedTime * 0.5f;
+		if (m_fTime >= m_fSpeed) m_fTime = 0.0f;
+
+		m_xmf4x4Texture._11 = 1.0f / float(m_nRows);
+		m_xmf4x4Texture._22 = 1.0f / float(m_nCols);
+		m_xmf4x4Texture._31 = float(m_nRow) / float(m_nRows);
+		m_xmf4x4Texture._32 = float(m_nCol) / float(m_nCols);
+		if (m_fTime == 0.0f)
+		{
+			if (++m_nCol == m_nCols) { m_nRow++; m_nCol = 0; }
+			if (m_nRow == m_nRows) { m_nRow = 0;}// , FullAnimated = true; 
+		}
+	}
+
+}
+
+//void CSpriteObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+//{
+//	XMFLOAT4X4 xmf4x4World, xmf4x4Texture;
+//	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+//	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4World, 0);
+//
+//	XMStoreFloat4x4(&xmf4x4Texture, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Texture)));
+//	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4Texture, 16);
+//}
+
+void CSpriteObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+
+	CGameObject::Render(pd3dCommandList, pCamera);
+
+	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+	UpdateTransform(NULL);
+
+	
+}
+
+void CSpriteObject::CreateShaderVariables(ID3D12Device* pd3dDevice,ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo)
+{ 
+	//only do once time
+
+	UINT ncbElementBytes = ((sizeof(CB_PLUS_INFO) + 255) & ~255); //256의 배수
+	m_pd3dcbPlusInfo = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER | D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
+
+	m_pd3dcbPlusInfo->Map(0, NULL, (void**)&m_pcbPlusInfo);
+}
+
+
+
+void CSpriteObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo)
+{
+	//float fCurrentTime = m_GameTimer.GetTotalTime();
+	////std::cout << fCurrentTime << std::endl;
+	//m_pd3dCommandList->SetGraphicsRoot32BitConstants(13, 1, &fCurrentTime, 0);
+
+	m_pcbPlusInfo->Texture_size = m_xmf4x4Texture;
+
+	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbPlusInfo->GetGPUVirtualAddress();
+	pd3dCommandList->SetGraphicsRootConstantBufferView(19, d3dGpuVirtualAddress);
+
 }
