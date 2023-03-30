@@ -214,6 +214,10 @@ void CEnemy::SetisAlive(bool i_a)
 	}
 }
 
+void CEnemy::SetStatus(MissionType cur_mission)
+{
+}
+
 void CEnemy::SetDestination()
 {
 	switch (urdEnemyAI(dree) % 4) {	// 목적지 설정
@@ -327,6 +331,12 @@ void CMissileEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 	info.damage = missile_damage;
 }
 
+void CMissileEnemy::SetStatus(MissionType cur_mission)
+{
+	hp = levels[cur_mission].Missile.MAX_HP;
+	damage = levels[cur_mission].Missile.ATK;
+}
+
 void CMissileEnemy::Animate(float fTimeElapsed)
 {
 }
@@ -355,6 +365,12 @@ CLaserEnemy::~CLaserEnemy()
 {
 }
 
+void CLaserEnemy::SetStatus(MissionType cur_mission)
+{
+	hp = levels[cur_mission].Laser.MAX_HP;
+	damage = levels[cur_mission].Laser.ATK;
+}
+
 void CLaserEnemy::Animate(float fTimeElapsed)
 {
 }
@@ -381,6 +397,12 @@ CPlasmaCannonEnemy::CPlasmaCannonEnemy()
 
 CPlasmaCannonEnemy::~CPlasmaCannonEnemy()
 {
+}
+
+void CPlasmaCannonEnemy::SetStatus(MissionType cur_mission)
+{
+	hp = levels[cur_mission].PlasmaCannon.MAX_HP;
+	damage = levels[cur_mission].PlasmaCannon.ATK;
 }
 
 void CPlasmaCannonEnemy::Animate(float fTimeElapsed)

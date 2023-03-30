@@ -8,6 +8,7 @@ enum class EnemyState : char
 };
 
 extern array<SESSION, MAX_USER> clients;
+extern unordered_map<MissionType, Level> levels;
 extern mutex m;
 
 class CEnemy : public CGameObject
@@ -35,7 +36,7 @@ protected:
 	unsigned char enemy_flags = 0;	// 0 : 살아있는지 1 : 플레이어를 보고 있는지
 	// 2 : 미사일 발사 여부
 public:
-	short id;
+	char id;
 	EnemyType type;
 
 	short hp;
@@ -44,6 +45,9 @@ public:
 public:
 	bool GetisAlive() { return enemy_flags & option0; }
 	void SetisAlive(bool i_a);
+
+	char GetID() { return id; }
+	virtual void SetStatus(MissionType cur_mission);
 
 	bool GetLaunchMissile() { return enemy_flags & option2; }
 
@@ -92,6 +96,8 @@ public:
 	virtual MissileInfo GetMissileInfo() { enemy_flags &= ~option2; return info; }
 	virtual void Attack(float fTimeElapsed, CAirplanePlayer* player);
 
+	virtual void SetStatus(MissionType cur_mission);
+
 	virtual void Animate(float fTimeElapsed);
 	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);
 };
@@ -105,6 +111,8 @@ public:
 	float m_fHitProbability;		// 명중 확률
 	float m_fAvoidReductionRate;	// 상대 가속/방향 전환 시 명중률 떨어지는 정도
 public:
+	virtual void SetStatus(MissionType cur_mission);
+
 	virtual void Animate(float fTimeElapsed);
 	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);
 };
@@ -115,6 +123,8 @@ public:
 	CPlasmaCannonEnemy();
 	virtual ~CPlasmaCannonEnemy();
 public:
+	virtual void SetStatus(MissionType cur_mission);
+
 	virtual void Animate(float fTimeElapsed);
 	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);
 };
