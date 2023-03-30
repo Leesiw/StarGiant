@@ -7,9 +7,19 @@
 
 CScene::CScene()
 {
-	for (int i = 0; i < ENEMIES; ++i)
+	for (int i = 0; i < m_ppEnemies.size(); ++i)
 	{
 		m_ppEnemies[i] = NULL;
+	}
+
+	for (int i = 0; i < m_ppMeteoObjects.size(); ++i)
+	{
+		m_ppMeteoObjects[i] = NULL;
+	}
+
+	for (int i = 0; i < m_ppMissiles.size(); ++i)
+	{
+		m_ppMissiles[i] = NULL;
 	}
 
 	items[ItemType::JEWEL_ATT] = 0;
@@ -26,9 +36,9 @@ void CScene::Init()
 {
 }
 
-void CScene::BuildObjects(std::array<Level, MISSION_NUM>::iterator beg)
+void CScene::BuildObjects()
 {
-	level_iter = beg;
+	cur_mission = MissionType::TU_SIT;
 
 	// player
 	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
@@ -96,8 +106,20 @@ void CScene::ReleaseObjects()
 {
 	if (m_pSpaceship) { delete m_pSpaceship; }
 	if (m_ppPlayers) { delete[] m_ppPlayers; }
-	if (m_ppEnemies) { delete[] m_ppEnemies; }
-	if (m_ppMeteoObjects){ delete[] m_ppMeteoObjects; }
+	for (int i = 0; i < m_ppEnemies.size(); ++i)
+	{
+		if (m_ppEnemies[i]) { delete m_ppEnemies[i]; }
+	}
+
+	for (int i = 0; i < m_ppMeteoObjects.size(); ++i)
+	{
+		if (m_ppMeteoObjects[i]) { delete m_ppMeteoObjects[i]; }
+	}
+
+	for (int i = 0; i < m_ppMissiles.size(); ++i)
+	{
+		if (m_ppMissiles[i]) { delete m_ppMissiles[i]; }
+	}
 	if (m_pBoss) { delete m_pBoss; }
 }
 
@@ -162,11 +184,12 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 			for (auto& pl : clients)
 			{
 				if (pl.in_use == false) continue;
-				pl.send_bullet_hit_packet(0, i, m_ppEnemies[i]->hp);
+				pl.send_bullet_hit_packet(0, m_ppEnemies[i]->GetID(), m_ppEnemies[i]->hp);
 			}
 
 			if (m_ppEnemies[i]->hp <= 0) { 
 				m_ppEnemies[i]->SetisAlive(false);
+				--cur_monster_num;
 
 				short num = urdEnemyAI(dree);
 				ItemType item_type;
@@ -383,7 +406,7 @@ void CScene::CheckBossCollisions()
 
 void CScene::CheckMissionComplete()
 {
-	switch (level_iter->Mission) {
+	switch (cur_mission) {
 	case MissionType::TU_SIT: {
 		break;
 	}
@@ -415,15 +438,29 @@ void CScene::CheckMissionComplete()
 	
 }
 
+void CScene::MissionClear()
+{
+	if (cur_mission != levels[cur_mission].NextMission) 
+	{
+		cur_mission = levels[cur_mission].NextMission;
+		// 현재 미션 완료 패킷
+		// 다음 미션 시작 패킷
+	}
+	else {
+
+	}
+}
+
 void CScene::SpawnEnemy()
 {
 	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
-	for (int i = 0; i < 9; ++i)
+	for (int i = 0; i < levels[cur_mission].SpawnMonsterNum; ++i)
 	{
-		int enemy_num = ENEMIES / 3;
-		int type = urdEnemyType(dree) * enemy_num;
+		if (cur_monster_num >= levels[cur_mission].MaxMonsterNum) { return; }
+		
+		std::random_shuffle(m_ppEnemies.begin(), m_ppEnemies.end());
 
-		for (int j = type; j < type + enemy_num; ++j) {
+		for (int j = 0; j < ENEMIES; ++j) {
 			if (!m_ppEnemies[j]->GetisAlive()) {
 				XMFLOAT3 random_pos{ urdPos(dree), urdPos(dree), urdPos(dree) / 5.f };
 				if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x; }
@@ -433,8 +470,9 @@ void CScene::SpawnEnemy()
 				m_ppEnemies[j]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
 				m_ppEnemies[j]->state = EnemyState::IDLE;
 				m_ppEnemies[j]->SetDestination();
+				m_ppEnemies[j]->SetStatus(cur_mission);
 				ENEMY_INFO e_info;
-				e_info.id = j;
+				e_info.id = m_ppEnemies[j]->GetID();
 				e_info.Quaternion = m_ppEnemies[j]->GetQuaternion();
 				e_info.pos = m_ppEnemies[j]->GetPosition();
 
@@ -442,7 +480,7 @@ void CScene::SpawnEnemy()
 					if (false == pl.in_use) continue;
 					pl.send_enemy_packet(0, e_info);
 				}
-	
+				++cur_monster_num;
 				break;
 			}
 		}
@@ -582,6 +620,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	CheckMeteoByPlayerCollisions();
 	CheckEnemyCollisions();
 	CheckMissileCollisions();
+
+	CheckMissionComplete();
 	//CheckObjectByBulletCollisions();
 	//CheckEnemyByBulletCollisions();
 }

@@ -95,10 +95,10 @@ public:
 	void send_heal_packet();
 	//void send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 player_pos);
 	void send_spawn_meteo_packet(int c_id, short id, CMeteoObject* meteo);
-	void send_spawn_all_meteo_packet(int c_id, CMeteoObject* meteo[]);
+	void send_spawn_all_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> meteo);
 	void send_all_enemy_packet(int c_id, ENEMY_INFO[], bool[]);
 	void send_meteo_direction_packet(int c_id, short id, CMeteoObject* meteo);
-	void send_meteo_packet(int c_id, CMeteoObject* []);
+	void send_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> meteo);
 	void send_bullet_hit_packet(int c_id, short id, short hp);
 	void send_item_packet(int c_id, ITEM_INFO& item);
 	void send_animation_packet(char id, char animation);

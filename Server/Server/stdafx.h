@@ -39,7 +39,7 @@ struct MonsterStatus {
 };
 
 struct Level {
-	MissionType Mission;
+	MissionType NextMission;
 	MonsterStatus PlasmaCannon;
 	MonsterStatus Missile;
 	MonsterStatus Laser;

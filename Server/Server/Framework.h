@@ -4,6 +4,7 @@
 #include "Scene.h"
 
 extern array<SESSION, MAX_USER> clients;
+extern std::unordered_map<MissionType, Level> levels;
 extern mutex m;
 
 class CGameFramework
@@ -13,6 +14,7 @@ public:
 	~CGameFramework();
 
 	void Init();
+	void SetMission();
 
 	void BuildObjects();
 	void ReleaseObjects();
@@ -29,8 +31,6 @@ private:
 	CScene* m_pScene = NULL;
 
 	std::chrono::duration<double> fps;
-
-	std::array<Level, MISSION_NUM> levels;
 
 	thread ClientProcessThread{};
 };

@@ -5,6 +5,7 @@
 #include "Missile.h"
 
 extern array<SESSION, MAX_USER> clients;
+extern std::unordered_map<MissionType, Level> levels;
 
 class CScene
 {
@@ -14,7 +15,7 @@ public:
 
 	void Init();
 
-	void BuildObjects(std::array<Level, MISSION_NUM>::iterator beg);
+	void BuildObjects();
 	void ReleaseObjects();
 
 	void AnimateObjects(float fTimeElapsed);
@@ -27,6 +28,7 @@ public:
 	void CheckBossCollisions();
 
 	void CheckMissionComplete();
+	void MissionClear();
 
 	void SpawnEnemy();
 	void SpawnMeteo(char i);
@@ -35,22 +37,25 @@ public:
 	CTerrainPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
 
 public:
-	CMeteoObject*				m_ppMeteoObjects[METEOS];
-	CEnemy*						m_ppEnemies[ENEMIES];
-	CMissile*					m_ppMissiles[ENEMY_BULLETS];
-
-	Boss*						m_pBoss;
+	std::array<CMeteoObject*, METEOS>			m_ppMeteoObjects;
+	std::array<CEnemy*, ENEMIES>				m_ppEnemies;
+	std::array<CMissile*, ENEMY_BULLETS>		m_ppMissiles;
 
 	std::unordered_map<ItemType, char>	items;
+
+	Boss* m_pBoss;
 
 	std::chrono::system_clock::time_point heal_start;
 	char heal_player = -1;
 
 	bool						m_bIsRunning = true;
 
-	std::array<Level, MISSION_NUM>::iterator level_iter;
+	char						kill_monster_num = 0;
+	char						cur_monster_num = 0;
 
-	float m_fEnemySpawnTime = 10.0f;
+	MissionType cur_mission;
+
+	float m_fEnemySpawnTime = 20.0f;
 	float m_fEnemySpawnTimeRemaining = 0.0f;
 };
 

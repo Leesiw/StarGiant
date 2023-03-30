@@ -222,16 +222,6 @@ bool CAirplanePlayer::CanAttack(short num)
 
 void CAirplanePlayer::Animate(float fTimeElapsed)
 {
-	/*
-	for (int i = 0; i < BULLETS; i++)
-	{
-		if (m_ppBullets[i]->m_bActive) {
-			std::cout << "b¾Ö´Ï- ";
-			m_ppBullets[i]->Animate(fTimeElapsed);
-		};
-	}
-	*/
-	CPlayer::Animate(fTimeElapsed);
 }
 
 void CAirplanePlayer::Update(float fTimeElapsed)

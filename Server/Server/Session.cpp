@@ -48,12 +48,7 @@ void SESSION::send_enemy_packet(int c_id, ENEMY_INFO& enemy_info)
 	p.data.Quaternion = enemy_info.Quaternion;
 	p.data.pos = enemy_info.pos;
 
-	char buf[sizeof(SC_MOVE_ENEMY_PACKET)];
-	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
-	WSABUF wsabuf{ sizeof(buf), buf };
-	DWORD sent_byte;
-
-	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
+	do_send(&p);
 }
 
 void SESSION::send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction)
@@ -66,12 +61,7 @@ void SESSION::send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction)
 	p.data.direction = direction;
 	p.data.pos = pos;
 
-	char buf[sizeof(SC_BULLET_PACKET)];
-	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
-	WSABUF wsabuf{ sizeof(buf), buf };
-	DWORD sent_byte;
-
-	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
+	do_send(&p);
 }
 
 void SESSION::send_missile_packet(int c_id, MISSILE_INFO& info)
@@ -162,15 +152,10 @@ void SESSION::send_spawn_meteo_packet(int c_id, short id, CMeteoObject* meteo)
 	p.data.scale = meteo->GetScale();
 	p.data.direction = meteo->GetMovingDirection();
 
-	char buf[sizeof(SC_SPAWN_METEO_PACKET)];
-	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
-	WSABUF wsabuf{ sizeof(buf), buf };
-	DWORD sent_byte;
-
-	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
+	do_send(&p);
 }
 
-void SESSION::send_spawn_all_meteo_packet(int c_id, CMeteoObject* meteo[]) 
+void SESSION::send_spawn_all_meteo_packet(int c_id, std::array<CMeteoObject*,METEOS> meteo) 
 {
 	for (int i = 0; i < METEOS; ++i) {
 		send_spawn_meteo_packet(0, i, meteo[i]);
@@ -195,15 +180,10 @@ void SESSION::send_meteo_direction_packet(int c_id, short id, CMeteoObject* mete
 	p.data.id = id;
 	p.data.dir = meteo->GetMovingDirection();
 
-	char buf[sizeof(SC_METEO_DIRECTION_PACKET)];
-	memcpy(buf, reinterpret_cast<char*>(&p), sizeof(p));
-	WSABUF wsabuf{ sizeof(buf), buf };
-	DWORD sent_byte;
-
-	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
+	do_send(&p);
 }
 
-void SESSION::send_meteo_packet(int c_id, CMeteoObject* meteo[])
+void SESSION::send_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> meteo)
 {
 	SC_METEO_PACKET p;
 	p.size = sizeof(SC_METEO_PACKET);
