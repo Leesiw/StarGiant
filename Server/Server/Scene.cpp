@@ -196,6 +196,35 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 				{
 					MissionClear();
 				}
+
+				// 미션
+				else if (cur_mission == MissionType::Kill_MONSTER)
+				{
+					++kill_monster_num;
+					for (auto& pl : clients) {
+						if (false == pl.in_use) continue;
+						pl.send_kill_num_packet(kill_monster_num);
+					}
+					if (kill_monster_num == 15) {
+						kill_monster_num = 0;
+						MissionClear();
+					}
+				}
+
+				// 미션
+				else if (cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME)
+				{
+					++kill_monster_num;
+					for (auto& pl : clients) {
+						if (false == pl.in_use) continue;
+						pl.send_kill_num_packet(kill_monster_num);
+					}
+					if (kill_monster_num == 20) {
+						kill_monster_num = 0;
+						MissionClear();
+					}
+				}
+
 				GetJewels();
 			}
 			return;
@@ -420,28 +449,28 @@ void CScene::GetJewels()
 
 	short num = urdEnemyAI(dree);
 	ItemType item_type;
-	if (num < 10) {
+	if (num < 15) {
 		item_type = ItemType::JEWEL_ATT;
 		if (items[item_type] < MAX_ITEM) {
 			m_pSpaceship->damage = 4 + items[item_type];
 		}
 		else { return; }
 	}
-	else if (num < 20) {
+	else if (num < 30) {
 		item_type = ItemType::JEWEL_DEF;
 		if (items[item_type] < MAX_ITEM) {
 			m_pSpaceship->def = 1 + items[item_type];
 		}
 		else { return; }
 	}
-	else if (num < 30) {
+	else if (num < 45) {
 		item_type = ItemType::JEWEL_HEAL;
 		if (items[item_type] < MAX_ITEM) {
 			m_pSpaceship->heal = 11 + items[item_type];
 		}
 		else { return; }
 	}
-	else if (num < 40) {
+	else if (num < 60) {
 		item_type = ItemType::JEWEL_HP;
 		if (items[item_type] < MAX_ITEM) {
 			m_pSpaceship->max_hp = 110 + 10 * items[item_type];
