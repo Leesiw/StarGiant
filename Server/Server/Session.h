@@ -93,7 +93,6 @@ public:
 	void send_missile_packet(int c_id, MISSILE_INFO& info);
 	void send_remove_missile_packet(int c_id, short id);
 	void send_heal_packet();
-	//void send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 player_pos);
 	void send_spawn_meteo_packet(int c_id, short id, CMeteoObject* meteo);
 	void send_spawn_all_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> meteo);
 	void send_all_enemy_packet(int c_id, ENEMY_INFO[], bool[]);

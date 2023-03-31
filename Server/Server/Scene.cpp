@@ -191,6 +191,12 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 				m_ppEnemies[i]->SetisAlive(false);
 				--cur_monster_num;
 
+				// 미션
+				if (cur_mission == MissionType::TU_KILL) 
+				{
+					MissionClear();
+				}
+
 				short num = urdEnemyAI(dree);
 				ItemType item_type;
 				if (num < 3) { 
@@ -233,6 +239,17 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 				{
 					if (pl.in_use == false) continue;
 					pl.send_item_packet(0, info);
+				}
+
+				// 미션
+				if (cur_mission == MissionType::GET_JEWELS)
+				{
+					if (std::find_if(items.begin(), items.end(),		
+						[](const auto& item) {
+						return item.second == 0;
+					}) == items.end()) {	// 0이 없을 때
+						MissionClear();
+					}
 				}
 			}
 			return;

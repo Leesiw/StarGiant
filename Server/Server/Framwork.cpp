@@ -265,6 +265,12 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			if (!exists) {
 				clients[c_id].type = p->player_type;
 
+				// 미션
+				if (m_pScene->cur_mission == MissionType::TU_SIT && p->player_type == PlayerType::MOVE)
+				{
+					m_pScene->MissionClear();
+				}
+
 				for (auto& pl : clients) {
 					if (false == pl.in_use) continue;
 					pl.send_change_packet(c_id, p->player_type);
@@ -317,6 +323,14 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 				m_pScene->m_pSpaceship->GetHeal(sec.count());
 				m.unlock();
 				m_pScene->heal_player = -1;
+
+				// 미션
+				if (m_pScene->cur_mission == MissionType::TU_HILL)
+				{
+					m_pScene->MissionClear();
+					m_pScene->MissionClear(); // 일단 TU_END 건너뜀
+				}
+
 				for (auto& pl : clients)
 				{
 					if (false == pl.in_use) continue;
