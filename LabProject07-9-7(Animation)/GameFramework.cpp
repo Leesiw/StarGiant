@@ -899,14 +899,14 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	{
 		uiText = L"튜토리얼 - 조각상에서 상호작용으로 체력 회복하기 ( ";
 
-		uiText += L" / 4 )";
+		uiText += L" / 1 )";
 		break;
 	}
 	case MissionType::GET_JEWELS:
 	{
 		uiText = L"미션 - 보석 4종류 1개 이상씩 얻기 ( ";
 		//uiText += enemyCountStr;
-		uiText += L" / 1 )";
+		uiText += L" / 4 )";
 
 		break;
 	}
@@ -934,13 +934,20 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	}
 	case MissionType::FIND_BOSS:
 	{
+		uiText = L"미션 - 보스를 추적하라 ( ";
+
+		uiText += L"0 / 1 )";
+
+		break;
+	}
+	case MissionType::DEFEAT_BOSS:
+	{
 		uiText = L"미션 - 보스를 처치하라 ( ";
 
 		uiText += L"0 / 1 )";
 
 		break;
 	}
-
 
 	default:
 		uiText = L"미션 검색중";
@@ -1253,8 +1260,20 @@ void CGameFramework::ProcessPacket(char* p)
 		isHealing = true;
 		break;
 	}
-	default:
+	case SC_MISSION_START:
+	{
+		SC_MISSION_START_PACKET* packet = reinterpret_cast<SC_MISSION_START_PACKET*>(p);
+		curMissionType = packet->next_mission;
 		break;
-		//printf("Unknown PACKET type [%d]\n", p[1]);
+	}
+	case SC_KILL_NUM:
+	{
+		SC_KILL_NUM_PACKET* packet = reinterpret_cast<SC_KILL_NUM_PACKET*>(p);
+		killCnt = packet->num;
+		break;
+	}
+	default:
+		printf("Unknown PACKET type [%d]\n", p[1]);
+		break;
 	}
 }

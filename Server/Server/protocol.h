@@ -66,6 +66,8 @@ constexpr char SC_REMOVE_MISSILE = 18;
 constexpr char SC_ITEM = 19;
 constexpr char SC_ANIMATION_CHANGE = 20;
 constexpr char SC_HEAL = 21;
+constexpr char SC_MISSION_START = 22;
+constexpr char SC_KILL_NUM = 23;
 
 enum class PlayerType : char
 {
@@ -121,11 +123,8 @@ enum class ItemType : char
 
 enum class MissionType : char
 {
-	TU_SIT, TU_KILL, TU_HILL, TU_END, GET_JEWELS, Kill_MONSTER, GO_PLANET, KILL_MONSTER_ONE_MORE_TIME, FIND_BOSS, COUNT
+	TU_SIT, TU_KILL, TU_HILL, TU_END, GET_JEWELS, Kill_MONSTER, GO_PLANET, KILL_MONSTER_ONE_MORE_TIME, FIND_BOSS, DEFEAT_BOSS
 };
-
-constexpr int MISSION_NUM = static_cast<int>(MissionType::COUNT);
-
 
 #pragma pack (push, 1)
 
@@ -381,5 +380,18 @@ struct SC_ITEM_PACKET {
 	ITEM_INFO data;
 };
 
+// mission
+struct SC_MISSION_START_PACKET {
+	unsigned char size;
+	char type;
 
+	MissionType next_mission;
+};
+
+struct SC_KILL_NUM_PACKET {
+	unsigned char size;
+	char type;
+
+	char num;
+};
 #pragma pack (pop)

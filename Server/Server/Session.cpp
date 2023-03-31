@@ -228,3 +228,23 @@ void SESSION::send_animation_packet(char id, char animation)
 
 	do_send(&p);
 }
+
+void SESSION::send_mission_start_packet(MissionType mission)
+{
+	SC_MISSION_START_PACKET p;
+	p.size = sizeof(SC_MISSION_START_PACKET);
+	p.type = SC_MISSION_START;
+	p.next_mission = mission;
+	
+	do_send(&p);
+}
+
+void SESSION::send_kill_num_packet(char num)
+{
+	SC_KILL_NUM_PACKET p;
+	p.size = sizeof(SC_KILL_NUM_PACKET);
+	p.type = SC_KILL_NUM;
+	p.num = num;
+
+	do_send(&p);
+}

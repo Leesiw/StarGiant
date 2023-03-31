@@ -190,7 +190,7 @@ void CGameFramework::SetMission()
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].PlasmaCannon.MAX_HP = 40;
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].PlasmaCannon.ATK = 30;
 
-	levels[MissionType::FIND_BOSS].NextMission = MissionType::COUNT;
+	levels[MissionType::FIND_BOSS].NextMission = MissionType::DEFEAT_BOSS;
 	levels[MissionType::FIND_BOSS].MaxMonsterNum = ENEMIES;
 	levels[MissionType::FIND_BOSS].SpawnMonsterNum = 9;
 	levels[MissionType::FIND_BOSS].Laser.MAX_HP = 20;
@@ -199,6 +199,16 @@ void CGameFramework::SetMission()
 	levels[MissionType::FIND_BOSS].Missile.ATK = 20;
 	levels[MissionType::FIND_BOSS].PlasmaCannon.MAX_HP = 40;
 	levels[MissionType::FIND_BOSS].PlasmaCannon.ATK = 30;
+
+	levels[MissionType::DEFEAT_BOSS].NextMission = MissionType::DEFEAT_BOSS;
+	levels[MissionType::DEFEAT_BOSS].MaxMonsterNum = 0;
+	levels[MissionType::DEFEAT_BOSS].SpawnMonsterNum = 0;
+	levels[MissionType::DEFEAT_BOSS].Laser.MAX_HP = 20;
+	levels[MissionType::DEFEAT_BOSS].Laser.ATK = 18;
+	levels[MissionType::DEFEAT_BOSS].Missile.MAX_HP = 35;
+	levels[MissionType::DEFEAT_BOSS].Missile.ATK = 20;
+	levels[MissionType::DEFEAT_BOSS].PlasmaCannon.MAX_HP = 40;
+	levels[MissionType::DEFEAT_BOSS].PlasmaCannon.ATK = 30;
 }
 
 

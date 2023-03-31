@@ -443,8 +443,9 @@ void CScene::MissionClear()
 	if (cur_mission != levels[cur_mission].NextMission) 
 	{
 		cur_mission = levels[cur_mission].NextMission;
-		// 현재 미션 완료 패킷
-		// 다음 미션 시작 패킷
+		for (auto& pl : clients) {
+			pl.send_mission_start_packet(cur_mission);
+		}
 	}
 	else {
 
