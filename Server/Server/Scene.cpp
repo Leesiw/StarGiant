@@ -196,61 +196,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 				{
 					MissionClear();
 				}
-
-				short num = urdEnemyAI(dree);
-				ItemType item_type;
-				if (num < 3) { 
-					item_type = ItemType::JEWEL_ATT;
-					if (items[item_type] < MAX_ITEM) {
-						m_pSpaceship->damage = 4 + items[item_type];
-					}
-					else { return; }
-				}
-				else if(num < 6){ 
-					item_type = ItemType::JEWEL_DEF;
-					if (items[item_type] < MAX_ITEM) {
-						m_pSpaceship->def = 1 + items[item_type];
-					}
-					else { return; }
-				}
-				else if(num < 9){ 
-					item_type = ItemType::JEWEL_HEAL;
-					if (items[item_type] < MAX_ITEM) {
-						m_pSpaceship->heal = 11 + items[item_type];
-					}
-					else { return; }
-				}
-				else if (num < 12) { 
-					item_type = ItemType::JEWEL_HP;
-					if (items[item_type] < MAX_ITEM) {
-						m_pSpaceship->max_hp = 110 + 10 * items[item_type];
-					}
-					else { return; }
-				}
-				else {
-					return;
-				}
-				
-				++items[item_type];
-				ITEM_INFO info;
-				info.type = item_type;
-				info.num = items[item_type];
-				for (auto& pl : clients)
-				{
-					if (pl.in_use == false) continue;
-					pl.send_item_packet(0, info);
-				}
-
-				// 미션
-				if (cur_mission == MissionType::GET_JEWELS)
-				{
-					if (std::find_if(items.begin(), items.end(),		
-						[](const auto& item) {
-						return item.second == 0;
-					}) == items.end()) {	// 0이 없을 때
-						MissionClear();
-					}
-				}
+				GetJewels();
 			}
 			return;
 		}
@@ -466,6 +412,66 @@ void CScene::MissionClear()
 	}
 	else {
 
+	}
+}
+
+void CScene::GetJewels()
+{
+
+	short num = urdEnemyAI(dree);
+	ItemType item_type;
+	if (num < 10) {
+		item_type = ItemType::JEWEL_ATT;
+		if (items[item_type] < MAX_ITEM) {
+			m_pSpaceship->damage = 4 + items[item_type];
+		}
+		else { return; }
+	}
+	else if (num < 20) {
+		item_type = ItemType::JEWEL_DEF;
+		if (items[item_type] < MAX_ITEM) {
+			m_pSpaceship->def = 1 + items[item_type];
+		}
+		else { return; }
+	}
+	else if (num < 30) {
+		item_type = ItemType::JEWEL_HEAL;
+		if (items[item_type] < MAX_ITEM) {
+			m_pSpaceship->heal = 11 + items[item_type];
+		}
+		else { return; }
+	}
+	else if (num < 40) {
+		item_type = ItemType::JEWEL_HP;
+		if (items[item_type] < MAX_ITEM) {
+			m_pSpaceship->max_hp = 110 + 10 * items[item_type];
+		}
+		else { return; }
+	}
+	else {
+		return;
+	}
+
+	printf("%d\n", item_type);
+	++items[item_type];
+	ITEM_INFO info;
+	info.type = item_type;
+	info.num = items[item_type];
+	for (auto& pl : clients)
+	{
+		if (pl.in_use == false) continue;
+		pl.send_item_packet(0, info);
+	}
+
+	// 미션
+	if (cur_mission == MissionType::GET_JEWELS)
+	{
+		if (std::find_if(items.begin(), items.end(),
+			[](const auto& item) {
+			return item.second == 0;
+		}) == items.end()) {	// 0이 없을 때
+			MissionClear();
+		}
 	}
 }
 

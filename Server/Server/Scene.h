@@ -30,6 +30,8 @@ public:
 	void CheckMissionComplete();
 	void MissionClear();
 
+	void GetJewels();
+
 	void SpawnEnemy();
 	void SpawnMeteo(char i);
 
