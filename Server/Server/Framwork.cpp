@@ -89,6 +89,13 @@ void CGameFramework::Init() {
 					}
 				}
 				clients[client_id].send_all_enemy_packet(0, e_info, Alive);
+				clients[client_id].send_mission_start_packet(m_pScene->cur_mission);
+
+				if (m_pScene->cur_mission == MissionType::Kill_MONSTER ||
+					m_pScene->cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME) {
+					clients[client_id].send_kill_num_packet(m_pScene->kill_monster_num);
+				}
+
 
 				c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 			}
