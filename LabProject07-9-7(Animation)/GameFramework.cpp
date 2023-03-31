@@ -1264,6 +1264,10 @@ void CGameFramework::ProcessPacket(char* p)
 	{
 		SC_MISSION_START_PACKET* packet = reinterpret_cast<SC_MISSION_START_PACKET*>(p);
 		curMissionType = packet->next_mission;
+
+		if (curMissionType == MissionType::KILL_MONSTER_ONE_MORE_TIME) {
+			killCnt = 0;
+		}
 		break;
 	}
 	case SC_KILL_NUM:
