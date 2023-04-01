@@ -325,10 +325,6 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		else {
 			if (m_pScene->heal_player == c_id) {
-				std::chrono::duration<double>sec = std::chrono::system_clock::now() - m_pScene->heal_start;
-				m.lock();
-				m_pScene->m_pSpaceship->GetHeal(sec.count());
-				m.unlock();
 				m_pScene->heal_player = -1;
 
 				// 미션
@@ -336,12 +332,6 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 				{
 					m_pScene->MissionClear();
 					m_pScene->MissionClear(); // 일단 TU_END 건너뜀
-				}
-
-				for (auto& pl : clients)
-				{
-					if (false == pl.in_use) continue;
-					pl.send_bullet_hit_packet(0, -1, m_pScene->m_pSpaceship->GetHP());
 				}
 			}
 		}

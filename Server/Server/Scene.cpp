@@ -151,9 +151,7 @@ void CScene::CheckMeteoByPlayerCollisions()
 
 				m_pSpaceship->Move(m_pSpaceship->GetVelocity(), true);
 				if (m_pSpaceship->GetHP() > 0) {
-					m.lock();
 					m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 2);
-					m.unlock();
 				}
 
 				for (auto& pl : clients)
@@ -373,9 +371,7 @@ void CScene::CheckMissileCollisions()
 				m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
 				
 				if (m_pSpaceship->GetHP() > 0) {
-					m.lock();
 					m_pSpaceship->GetAttack(m_ppMissiles[i]->GetDamage());
-					m.unlock();
 				}
 
 				for (auto& pl : clients)
@@ -680,6 +676,18 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			pl.send_change_packet(i,clients[i].type);
 		}
 		// Àû À§Ä¡?
+	}
+
+	if (heal_player != -1) {
+		std::chrono::duration<double>sec = std::chrono::system_clock::now() - heal_start;
+		heal_start = std::chrono::system_clock::now();
+		if (m_pSpaceship->GetHeal(sec.count())) {
+			for (auto& pl : clients)
+			{
+				if (false == pl.in_use) continue;
+				pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
+			}
+		}
 	}
 
 	CheckMeteoByPlayerCollisions();

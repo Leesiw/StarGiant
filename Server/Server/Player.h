@@ -97,13 +97,15 @@ public:
 
 	bool FireBullet(short attack_num);
 
+	float heal_amount = 0.f;
+
 	SPACESHIP_INPUT_INFO input_info;
 public:
 	void SetHP(short s) { hp = s; }
 	short GetHP() { return hp; }
 
 	void GetAttack(char damage);
-	void GetHeal(double sec);
+	bool GetHeal(double sec);
 
 	void SetInputInfo(SPACESHIP_INPUT_INFO i_info) { input_info = i_info; is_update = false; }
 	bool CanAttack(short num);
