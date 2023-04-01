@@ -1253,6 +1253,11 @@ void CGameFramework::ProcessPacket(char* p)
 		if (packet->data.type == ItemType::JEWEL_HP) {
 			m_pPlayer[0]->max_hp = 100 + 10 * packet->data.num;
 		}
+
+		if (packet->data.type == ItemType::JEWEL_HEAL) {
+			healAmount = 10 + packet->data.num;
+		}
+
 		break;
 	}
 	case SC_HEAL:

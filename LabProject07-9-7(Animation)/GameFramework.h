@@ -135,6 +135,8 @@ private:
 	bool isHealing = false;
 	bool isConnect = false;
 
+	// 현재 회복량
+	char healAmount = 10;
 
 };
 
