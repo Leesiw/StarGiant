@@ -15,7 +15,7 @@ public:
     void UpdateLabels(const std::wstring& strUIText);
     void UpdateLabels_Scripts(const std::wstring& strUIText);
 
-    void UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos);
+    void UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos, bool live = true);
     void UpdateHp(short curhp, short maxHp = 100);
 
     XMFLOAT4X4 UpdateMat(const XMFLOAT3& ppos);

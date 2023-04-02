@@ -781,6 +781,7 @@ void CGameFramework::FrameAdvance()
 
 	UpdateUI();
 
+
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
@@ -1326,6 +1327,8 @@ void CGameFramework::ProcessPacket(char* p)
 		if (packet->data.id >= 0) {
 			if (packet->data.hp <= 0) { // Á×À½
 				m_pScene->m_ppEnemies[packet->data.id]->isAlive = false;
+				m_pUILayer->UpdateDots(packet->data.id, m_pPlayer[0]->GetPosition(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition(), false);
+
 			}
 			else {
 				m_pScene->m_ppEnemies[packet->data.id]->hp = packet->data.hp;

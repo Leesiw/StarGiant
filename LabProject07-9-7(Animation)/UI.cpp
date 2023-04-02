@@ -128,18 +128,22 @@ void UILayer::UpdateLabels_Scripts(const std::wstring& strUIText)
     m_vScriptsBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT - 100, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwScriptsFormat };
 }
 
-void UILayer::UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos)
+void UILayer::UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos, bool live)
 {
-   /* XMFLOAT3 subPos = Vector3::Subtract(ppos, epos);
-    float dist = Vector3::Length(subPos);*/
+    XMMATRIX playerTransform = XMMatrixTranslation(ppos.x, ppos.y, ppos.z);
+    XMMATRIX playerInverse = XMMatrixInverse(nullptr, playerTransform);
 
-    /*XMFLOAT4X4 nMat;
-    nMat = UpdateMat(epos);
-    XMMATRIX invMat = XMMatrixInverse(NULL, XMLoadFloat4x4(&nMat));*/
+    XMVECTOR enemyPosVector = XMLoadFloat3(&epos);
+    XMVECTOR relativePosVector = XMVector3TransformCoord(enemyPosVector, playerInverse);
+    XMFLOAT3 relativePos;
+    XMStoreFloat3(&relativePos, relativePosVector);
+
 
     XMFLOAT3 cpos;
-    cpos.x = epos.x - ppos.x;
-    cpos.z = epos.z - ppos.z;
+    /*cpos.x = epos.x - ppos.x;
+    cpos.z = epos.z - ppos.z;*/
+
+    cpos = relativePos;
 
     float mapScale = 0.3f;
 
@@ -155,7 +159,14 @@ void UILayer::UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos)
         m_bossDot.z = cpos.z;
     }
 
-    if (!(cpos.x > 200.0f || cpos.x <-200.0f || cpos.z > FRAME_BUFFER_HEIGHT / 2.0f + 200.0f || cpos.z < -(FRAME_BUFFER_HEIGHT / 2.0f + 200.0f))&& id!=BOSS_ID)
+
+    if (live == false)
+    {
+        m_enemyDot[id].x = 100.0f;
+        m_enemyDot[id].z = FRAME_BUFFER_HEIGHT / 2.0f + 100.0f;
+    }
+
+    else if (!(cpos.x > 200.0f || cpos.x <-200.0f || cpos.z > FRAME_BUFFER_HEIGHT / 2.0f + 200.0f || cpos.z < -(FRAME_BUFFER_HEIGHT / 2.0f + 200.0f))&& id!=BOSS_ID)
     {
         m_enemyDot[id].x = cpos.x;
         m_enemyDot[id].z = cpos.z;
