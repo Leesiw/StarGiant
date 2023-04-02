@@ -71,6 +71,8 @@ public:
 	void CheckObjectByBulletCollisions();
 	void CheckMEByObjectCollisions(); 
 	int CheckSitCollisions(); 
+	bool CheckMascotCollisions(); 
+
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
     void AnimateObjects(float fTimeElapsed);
@@ -145,6 +147,8 @@ public:
 
 	CMissileObject						*m_ppEnemyMissiles[ENEMY_BULLETS];
 
+	CMascotObject* m_ppMascot;
+
 
 	CUI								*m_ppUI[UI_CNT];
 
@@ -180,6 +184,7 @@ public:
 	XMFLOAT3 m_LookCamera[4];
 	XMFLOAT3 m_SitPos[4];
 
+	BoundingBox xm_Mascot;
 
 	int m_nScenePlayer = 1;
 	bool b_Inside = false;

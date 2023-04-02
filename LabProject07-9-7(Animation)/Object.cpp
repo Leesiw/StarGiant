@@ -1916,3 +1916,16 @@ void CSpriteObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	pd3dCommandList->SetGraphicsRootConstantBufferView(19, d3dGpuVirtualAddress);
 
 }
+
+CMascotObject::CMascotObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
+{
+	CLoadedModelInfo* pMascotModel = pModel;
+	if (!pMascotModel) pMascotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Doggy_V0.bin", NULL);
+
+	SetChild(pMascotModel->m_pModelRootObject, true);
+	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pMascotModel);
+}
+
+CMascotObject::~CMascotObject()
+{
+}

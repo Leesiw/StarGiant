@@ -39,8 +39,11 @@ public:
 
 	void UpdateUI();
 	wstring ChangeMission(MissionType mT);
+	wstring ChangeScripts(MissionType mT);
 
 
+	chrono::steady_clock::time_point scriptsStartTime;
+	bool scriptsOn = false;
 
 	// 서버
 	bool ConnectServer();
@@ -109,7 +112,13 @@ private:
 
 	//
 	short killCnt = 0; 
+	short jewelCnt=0;
+
+	short firstSc = 0;
 	MissionType curMissionType = MissionType::TU_SIT;
+	MissionType pastMissionType = MissionType::TU_END;
+
+
 
 	// 내부 
 	CScene* m_pInsideScene = NULL;

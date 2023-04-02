@@ -378,9 +378,15 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	m_ppHierarchicalGameObjects[1]->SetScale(1.0f, 1.0f, 1.0f);
 	if (pSeatModel) delete pSeatModel;
 
+	//=====================================
+	CLoadedModelInfo* pMascotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Doggy_V0.bin", NULL);
+	m_ppMascot = new CMascotObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMascotModel, 1);
+	m_ppMascot->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	m_ppMascot->SetPosition(530.219f, 250.f - 30.0f, 593.263f);
+	m_ppMascot->SetScale(10.0f, 10.0f, 10.0f);
+	if (pMascotModel) delete pMascotModel;
 
-
-
+	//=====================================
 	//���Ƿ� �����ϴ� �ٿ���ڽ� (���� ���� Height���� ���� �浹�˻�� �ٲٰ����) 
 	b_Inside = true;
 	xm_MapAABB = BoundingBox(XMFLOAT3(m_ppHierarchicalGameObjects[0]->GetPosition().x, m_ppHierarchicalGameObjects[0]->GetPosition().y, m_ppHierarchicalGameObjects[0]->GetPosition().z + 90.f), XMFLOAT3(125.f, 100.0f, 110.0f));
@@ -389,6 +395,9 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	xm_SitAABB[1] = BoundingBox(XMFLOAT3(505.f, 224.f, 676.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //UP
 	xm_SitAABB[2] = BoundingBox(XMFLOAT3(416.f, 224.f, 620.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //RIGHT
 	xm_SitAABB[3] = BoundingBox(XMFLOAT3(404.f, 224.f, 677.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //CENTER
+
+
+	xm_Mascot = BoundingBox(XMFLOAT3(530.219f, 250.f - 30.0f, 593.263f), XMFLOAT3(10.0f, 10.0f, 10.0f));
 
 	m_LookCamera[0] = XMFLOAT3(0.0f, -0.0f, 1.0f);  //LEFT
 	m_LookCamera[1] = XMFLOAT3(1.0f, -0.0f, 0.0f);	  //UP
@@ -510,6 +519,11 @@ void CScene::ReleaseObjects()
 		delete[] m_ppBoss;
 	}
 
+	if(m_ppMascot)
+	{
+		m_ppMascot->Release();
+		delete[] m_ppMascot;
+	}
 
 
 	ReleaseShaderVariables();
@@ -791,8 +805,8 @@ void CScene::ReleaseUploadBuffers()
 	for (int i = 0; i < m_nHierarchicalGameObjects; i++) m_ppHierarchicalGameObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < METEOS; i++)if (m_ppMeteorObjects[i] != NULL) m_ppMeteorObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < ENEMIES; i++)if (m_ppEnemies[i])	m_ppEnemies[i]->ReleaseUploadBuffers();
-	if (m_pPlayer[g_myid])
-		m_pPlayer[g_myid]->ReleaseUploadBuffers();
+	if (m_pPlayer[g_myid])m_pPlayer[g_myid]->ReleaseUploadBuffers();
+
 
 }
 
@@ -1010,6 +1024,14 @@ int CScene::CheckSitCollisions()
 	return -1;
 }
 
+bool CScene::CheckMascotCollisions()
+{
+	if (m_pPlayer[g_myid]->aabb.Intersects(xm_Mascot))
+	{
+		return true;
+	}
+}
+
 bool CScene::ProcessInput(UCHAR* pKeysBuffer)
 {
 	return(false);
@@ -1135,6 +1157,13 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
 		m_ppBoss->Render(pd3dCommandList, pCamera); 
 	}
+
+	if (m_ppMascot) {
+		m_ppMascot->Animate(m_fElapsedTime);
+		if (!m_ppMascot->m_pSkinnedAnimationController) m_ppMascot->UpdateTransform(NULL);
+		m_ppMascot->Render(pd3dCommandList, pCamera);
+	}
+
 	for (int i = 0; i < SPRITE_CNT; i++) {
 		//m_ppSprite[i]->Animate(m_fElapsedTime);
 		//m_ppSprite[i]->UpdateShaderVariables(pd3dCommandList, m_pd3dcbPlusInfo);

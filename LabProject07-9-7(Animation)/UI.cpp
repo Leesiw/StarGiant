@@ -11,6 +11,7 @@ UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_vWrappedRenderTargets.resize(nFrame);
     m_vd2dRenderTargets.resize(nFrame);
     m_vTextBlocks.resize(1);
+    m_vScriptsBlocks.resize(1);
     Initialize(pd3dDevice, pd3dCommandQueue);
     InitializeImage(pd3dDevice, pd3dCommandQueue);
 }
@@ -122,6 +123,11 @@ void UILayer::UpdateLabels(const wstring& strUIText)
     m_vTextBlocks[0] = { strUIText, D2D1::RectF(0.0f, 25.0f, m_fWidth, m_fHeight), m_pdwTextFormat }; 
 }
 
+void UILayer::UpdateLabels_Scripts(const std::wstring& strUIText)
+{
+    m_vScriptsBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT - 100, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwScriptsFormat };
+}
+
 void UILayer::UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos)
 {
    /* XMFLOAT3 subPos = Vector3::Subtract(ppos, epos);
@@ -213,6 +219,12 @@ void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[])
         m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBrush);
     }
 
+    for (auto textBlock : m_vScriptsBlocks)
+    {
+        m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBrush);
+    }
+
+
     D2D_POINT_2F d2dPoint = { 0.0f, FRAME_BUFFER_HEIGHT/2.0f };
     D2D_RECT_F d2dRect = { 0.0f, 0.0f, 100.0f, 200.0f };
 
@@ -272,6 +284,8 @@ void UILayer::ReleaseResources()
 
     m_pd2dDeviceContext->Release();
     m_pdwTextFormat->Release();
+    m_pdwScriptsFormat->Release();
+
     m_pd2dWriteFactory->Release();
     m_pd2dDevice->Release();
     m_pd2dFactory->Release();
@@ -303,12 +317,21 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &m_pd2dTextBrush);
 
     const float fFontSize = m_fHeight / 25.0f;
+    const float fFontSize_Scripts = m_fHeight / 25.0f;
+
     const float fSmallFontSize = m_fHeight / 40.0f;
 
     m_pd2dWriteFactory->CreateTextFormat(L"±¼¸²Ã¼", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize, L"en-us", &m_pdwTextFormat);
 
     m_pdwTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     m_pdwTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
+    m_pd2dWriteFactory->CreateTextFormat(L"±¼¸²Ã¼", nullptr, DWRITE_FONT_WEIGHT_MEDIUM, DWRITE_FONT_STYLE_ITALIC, DWRITE_FONT_STRETCH_NORMAL, fFontSize_Scripts, L"en-us", &m_pdwScriptsFormat);
+
+    m_pdwScriptsFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+    m_pdwScriptsFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
+
     //    m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
 }
 

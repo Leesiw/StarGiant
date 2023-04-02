@@ -40,7 +40,9 @@ CGameFramework::CGameFramework()
 	items[ItemType::JEWEL_DEF] = 0;
 	items[ItemType::JEWEL_HEAL] = 0;
 	items[ItemType::JEWEL_HP] = 0;
+	
 
+	scriptsStartTime = steady_clock::now();
 	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
 }
 
@@ -379,6 +381,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				b_Inside = !b_Inside;
 				std::cout << "씬 전환";
 				break;
+
 			case 'F': //F키 상호작용 앉기
 				if (b_Inside || m_pInsidePlayer[g_myid]->GetSitState())
 				{
@@ -401,6 +404,11 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 					}
 				}
+
+				if (b_Inside) {
+					scriptsOn = true;
+				}
+
 
 				if (player_type != PlayerType::INSIDE) {
 					CS_CHANGE_PACKET my_packet;
@@ -856,6 +864,8 @@ void CGameFramework::UpdateUI()
 	_stprintf_s(position_ui, _countof(position_ui), _T("UI 테스트\n"));
 
 	wstring uiText = L"UI 테스트";
+	wstring uiScripts = L"UI 테스트";
+
 	/*for (auto s : labels)
 	{
 		uiText += s;
@@ -863,7 +873,27 @@ void CGameFramework::UpdateUI()
 
 	uiText = ChangeMission(curMissionType);
 
+
+
+	if (scriptsOn) {
+		scriptsStartTime = steady_clock::now();
+		cout << "대사 시작\n";
+		scriptsOn = false;
+	}
+
+	uiScripts = ChangeScripts(curMissionType);
+
+
+	if (duration_cast<seconds>(steady_clock::now() - scriptsStartTime).count() >= 5)
+	{
+		uiScripts = L"...";
+	}
+	
+
+
 	m_pUILayer->UpdateLabels(uiText);
+	m_pUILayer->UpdateLabels_Scripts(uiScripts);
+
 	m_pUILayer->UpdateHp(m_pPlayer[0]->getHp());
 	//for (int i = 0; i < ENEMIES; ++i)
 	//{
@@ -875,37 +905,35 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 {
 	wstring uiText = L"미션 - ";
 	wstring enemyCountStr;
+	wstring jewelCntStr;
+
 	enemyCountStr = to_wstring(killCnt);
+	jewelCntStr = to_wstring(jewelCnt);
+
 	wstring uiTextSpace = L" ";
 	wstring uiTextCnt = L" / 20";
-
 
 	switch (mType) {
 	case MissionType::TU_SIT:
 	{
-		uiText = L"튜토리얼 - 조종석에서 상호작용으로 우주선 조종하기 ( ";
-
-		uiText += L" / 1 )";
+		uiText = L"튜토리얼 - 조종석에서 상호작용으로 우주선 조종하기";
 		break;
 	}
 	case MissionType::TU_KILL:
 	{
-		uiText = L"튜토리얼 - 공격석에서 몬스터 처치 ( ";
+		uiText = L"튜토리얼 - 공격석에서 몬스터 처치하기";
 		enemyCountStr = to_wstring(killCnt);
-		uiText += L" / 1 )";
 		break;
 	}
 	case MissionType::TU_HILL:
 	{
-		uiText = L"튜토리얼 - 조각상에서 상호작용으로 체력 회복하기 ( ";
-
-		uiText += L" / 1 )";
+		uiText = L"튜토리얼 - 조각상에서 좌클릭으로 체력 회복하기";
 		break;
 	}
 	case MissionType::GET_JEWELS:
 	{
-		uiText = L"미션 - 보석 4종류 1개 이상씩 얻기 ( ";
-		//uiText += enemyCountStr;
+		uiText = L"미션 - 보석 4종류 1개 이상씩 얻어라 ( ";
+		uiText += jewelCntStr;
 		uiText += L" / 4 )";
 
 		break;
@@ -936,8 +964,6 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	{
 		uiText = L"미션 - 보스를 추적하라 ( ";
 
-		uiText += L"0 / 1 )";
-
 		break;
 	}
 	case MissionType::DEFEAT_BOSS:
@@ -956,6 +982,112 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 
 	return uiText;
 
+}
+
+wstring CGameFramework::ChangeScripts(MissionType mType)
+{
+	wstring uiScripts = L" ";
+
+	/*if (pastMissionType == curMissionType)
+	{
+		uiScripts = L" ";
+		return uiScripts;
+	}*/
+
+	switch (mType) {
+	case MissionType::TU_SIT:
+	{
+		uiScripts = L"우선 조종석에 앉아서 우주선을 조종해 봐!";
+		if (firstSc == 0) {
+			cout << "0";
+			firstSc = 1;
+			scriptsOn = true;
+		}
+	
+		break;
+	}
+	case MissionType::TU_KILL:
+	{
+		uiScripts = L"잘했어! 다음은 공격석에 앉아서 적을 처치해 봐!";
+		if (firstSc == 1) {
+			cout << "1";
+			firstSc = 2;
+			scriptsOn = true;
+		}
+		break;
+	}
+	case MissionType::TU_HILL:
+	{
+		uiScripts = L"이런! 우주선의 체력이 감소했어!\n조각상에서 좌클릭을 해서 체력을 회복시켜 봐!";
+		if (firstSc == 2) {
+			firstSc = 3;
+			scriptsOn = true;
+		}
+		break;
+	}
+	case MissionType::GET_JEWELS:
+	{
+		uiScripts = L"기본 조작은 설명해 줬으니 이제 본격적으로 들어가야겠지?\n드래곤을 물리치기 위해선우리 우주선을 강화해야 해.\n특별한 에너지를 가진 보석을 모아서 능력치를 올려보자!";
+		if (firstSc == 3) {
+			firstSc = 4;
+			scriptsOn = true;
+		}
+		break;
+	}
+	case MissionType::Kill_MONSTER:
+	{
+		uiScripts = L"이런... 우주선을 방해하는 놈들이 있어,\n저놈들을 해치우고 앞으로 나아가자";
+		if (firstSc == 4) {
+			firstSc = 5;
+			scriptsOn = true;
+		}
+		break;
+	}
+	case MissionType::GO_PLANET:
+	{
+		uiScripts = L"좋았어! 00행성에 보스가 있다는 정보를 입수했어! \n00행성까지 가자!";
+		if (firstSc == 5) {
+			firstSc = 6;
+			scriptsOn = true;
+		}
+
+		break;
+	}
+	case MissionType::KILL_MONSTER_ONE_MORE_TIME:
+	{
+		uiScripts = L"발 빠른 드래곤 같으니, 벌써 도망쳤나봐.\n새로운 위치 갱신을 위해 잠시만 기다려줄래?";
+		if (firstSc == 6) {
+			firstSc = 7;
+			scriptsOn = true;
+		}
+		break;
+	}
+	case MissionType::FIND_BOSS:
+	{
+		uiScripts = L"계산 완료! 이번엔 진짜야. 내비게이션 정보를 업데이트해줄게,\n우주의 평화를 위해서 부탁할게";
+		if (firstSc == 7) {
+			firstSc = 8;
+			scriptsOn = true;
+		}
+		break;
+	}
+	case MissionType::DEFEAT_BOSS:
+	{
+		uiScripts = L"우주의 평화를 위해서 드래곤을 처치해 줘!!!";
+		if (firstSc == 8) {
+			firstSc = 9;
+			scriptsOn = true;
+		}
+		break;
+	}
+
+	default:
+		uiScripts = L"파이팅! 파이팅!";
+		break;
+	};
+
+
+	return uiScripts;
 }
 
 
@@ -1257,6 +1389,8 @@ void CGameFramework::ProcessPacket(char* p)
 		if (packet->data.type == ItemType::JEWEL_HEAL) {
 			healAmount = 10 + packet->data.num;
 		}
+
+		jewelCnt += items[packet->data.type];
 
 		break;
 	}

@@ -13,6 +13,8 @@ public:
     UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue);
 
     void UpdateLabels(const std::wstring& strUIText);
+    void UpdateLabels_Scripts(const std::wstring& strUIText);
+
     void UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos);
     void UpdateHp(short curhp, short maxHp = 100);
 
@@ -52,6 +54,8 @@ private:
 
 
     IDWriteTextFormat* m_pdwTextFormat = NULL;
+    IDWriteTextFormat* m_pdwScriptsFormat = NULL;
+
 
 
     IWICImagingFactory* m_pwicImagingFactory = NULL;
@@ -69,6 +73,8 @@ private:
     std::vector<ID3D11Resource*>    m_vWrappedRenderTargets;
     std::vector<ID2D1Bitmap1*>      m_vd2dRenderTargets;
     std::vector<TextBlock>          m_vTextBlocks;
+    std::vector<TextBlock>          m_vScriptsBlocks;
+
 
     XMFLOAT3 m_enemyDot[ENEMIES];
     XMFLOAT3 m_bossDot;
