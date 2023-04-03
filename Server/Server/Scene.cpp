@@ -334,10 +334,12 @@ void CScene::CheckEnemyCollisions()
 			{
 				XMFLOAT3 xmf3Sub = m_ppEnemies[j]->GetPosition();
 				xmf3Sub = Vector3::Subtract(m_ppEnemies[i]->GetPosition(), xmf3Sub);
-				xmf3Sub = Vector3::Normalize(xmf3Sub);
+				if (Vector3::Length(xmf3Sub) > 0.0001f) {
+					xmf3Sub = Vector3::Normalize(xmf3Sub);
+				}
 				XMFLOAT3 vel = m_ppEnemies[i]->GetVelocity();
 				float fLen = Vector3::Length(vel) / 30.f;
-				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, true);
+				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
 				XMFLOAT3 vel2 = m_ppEnemies[j]->GetVelocity();
 
 				m_ppEnemies[i]->SetVelocity(Vector3::Add(vel, xmf3Sub));
@@ -362,7 +364,9 @@ void CScene::CheckMissileCollisions()
 				
 				XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
 				xmf3Sub = Vector3::Subtract(m_ppMissiles[i]->GetPosition(), xmf3Sub);
-				xmf3Sub = Vector3::Normalize(xmf3Sub);
+				if (Vector3::Length(xmf3Sub) > 0.0001f) {
+					xmf3Sub = Vector3::Normalize(xmf3Sub);
+				}
 				float fLen = 100.f;
 				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
 

@@ -176,8 +176,9 @@ void CEnemy::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// 역행렬
 
 	new_pos = Vector3::TransformCoord(new_pos, inv_mat); // 타겟의 위치를 적 자체의 좌표계로 변환
-	new_pos = Vector3::Normalize(new_pos);
-
+	if (Vector3::Length(new_pos) > 0.0001f) {
+		new_pos = Vector3::Normalize(new_pos);
+	}
 	
 
 	float pitch = XMConvertToDegrees(asin(-new_pos.y));
@@ -276,7 +277,9 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 
 	float fDeceleration = (100.0f * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
-	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+	if (Vector3::Length(m_xmf3Velocity) > 0.00001f) {
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+	}
 }
 
 void CEnemy::SendPos()
