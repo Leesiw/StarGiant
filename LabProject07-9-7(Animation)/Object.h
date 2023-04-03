@@ -689,6 +689,7 @@ public:
 	void SetRotationSpeed(float fSpeed) { m_fRotationSpeed = fSpeed; }
 	void SetMovingSpeed(float fSpeed) { m_fMovingSpeed = fSpeed; }
 	void SetMovingDirection(XMFLOAT3& xmf3MovingDirection) { m_xmf3MovingDirection = Vector3::Normalize(xmf3MovingDirection); }
+	XMFLOAT3 GetDirection() { return m_xmf3MovingDirection; }
 
 	void SetFirePosition(XMFLOAT3 xmf3FirePosition){
 		m_xmf3FirePosition = xmf3FirePosition; SetPosition(xmf3FirePosition);

@@ -866,6 +866,8 @@ void CGameFramework::UpdateUI()
 
 	wstring uiText = L"UI 테스트";
 	wstring uiScripts = L"UI 테스트";
+	wstring uiJew = L"";
+
 
 	/*for (auto s : labels)
 	{
@@ -891,9 +893,28 @@ void CGameFramework::UpdateUI()
 	}
 	
 
+	wstring JEWEL_ATT;
+	JEWEL_ATT = to_wstring(items[ItemType::JEWEL_ATT]);
+	wstring JEWEL_DEF;
+	JEWEL_DEF = to_wstring(items[ItemType::JEWEL_DEF]);
+	wstring JEWEL_HEAL;
+	JEWEL_HEAL = to_wstring(items[ItemType::JEWEL_HEAL]);
+	wstring JEWEL_HP;
+	JEWEL_HP = to_wstring(items[ItemType::JEWEL_HP]);
+
+	uiJew += JEWEL_ATT;
+	uiJew += L"     ";
+	uiJew += JEWEL_DEF;
+	uiJew += L"\n";
+	uiJew += JEWEL_HEAL;
+	uiJew += L"     ";
+	uiJew += JEWEL_HP;
 
 	m_pUILayer->UpdateLabels(uiText);
 	m_pUILayer->UpdateLabels_Scripts(uiScripts);
+
+	m_pUILayer->UpdateLabels_Jew(uiJew);
+
 
 	m_pUILayer->UpdateHp(m_pPlayer[0]->getHp());
 	//for (int i = 0; i < ENEMIES; ++i)

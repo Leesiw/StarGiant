@@ -12,6 +12,8 @@ UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_vd2dRenderTargets.resize(nFrame);
     m_vTextBlocks.resize(1);
     m_vScriptsBlocks.resize(1);
+    m_vJewBlocks.resize(1);
+
     Initialize(pd3dDevice, pd3dCommandQueue);
     InitializeImage(pd3dDevice, pd3dCommandQueue);
 }
@@ -85,30 +87,60 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
 
     m_pd2dFactory->CreateDrawingStateBlock(&m_pd2dsbDrawingState);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource);
-    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur);
-    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_jew);
 
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_jew);
+
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_jew);
+
+    
 
 
     IWICBitmapDecoder* pwicBitmapDecoder;
     m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/mMap.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder);
-    
+
     IWICBitmapFrameDecode* pwicFrameDecode;
     pwicBitmapDecoder->GetFrame(0, &pwicFrameDecode);
-    m_pwicImagingFactory->CreateFormatConverter(&m_pwicFormatConverter);
-    m_pwicFormatConverter->Initialize(pwicFrameDecode, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
-    m_pd2dfxBitmapSource->SetValue(D2D1_BITMAPSOURCE_PROP_WIC_BITMAP_SOURCE, m_pwicFormatConverter);
+
+    m_pwicImagingFactory->CreateFormatConverter(&m_pwicFormatConverter[0]);
+    m_pwicFormatConverter[0]->Initialize(pwicFrameDecode, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
+
+    m_pd2dfxBitmapSource->SetValue(D2D1_BITMAPSOURCE_PROP_WIC_BITMAP_SOURCE, m_pwicFormatConverter[0]);
 
     m_pd2dfxGaussianBlur->SetInputEffect(0, m_pd2dfxBitmapSource);
     m_pd2dfxGaussianBlur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 0.0f);
 
-
-
     m_pd2dfxSize->SetInputEffect(0, m_pd2dfxBitmapSource);
     m_pd2dfxSize->SetValue(D2D1_BITMAPSOURCE_PROP_SCALE, D2D1::Vector2F(0.1f, 0.1f));
-   
+
     if (pwicBitmapDecoder) pwicBitmapDecoder->Release();
     if (pwicFrameDecode) pwicFrameDecode->Release();
+
+
+    IWICBitmapDecoder* pwicBitmapDecoder_jewel;
+    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/jew.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_jewel);
+
+    IWICBitmapFrameDecode* pwicFrameDecode_j;
+    pwicBitmapDecoder_jewel->GetFrame(0, &pwicFrameDecode_j);
+
+    m_pwicImagingFactory->CreateFormatConverter(&m_pwicFormatConverter[1]);
+    m_pwicFormatConverter[1]->Initialize(pwicFrameDecode_j, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
+
+    m_pd2dfxBitmapSource_jew->SetValue(D2D1_BITMAPSOURCE_PROP_WIC_BITMAP_SOURCE, m_pwicFormatConverter[1]);
+
+    m_pd2dfxGaussianBlur_jew->SetInputEffect(0, m_pd2dfxBitmapSource_jew);
+    m_pd2dfxGaussianBlur_jew->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 0.0f);
+
+
+    m_pd2dfxSize_jew->SetInputEffect(0, m_pd2dfxBitmapSource_jew);
+    m_pd2dfxSize_jew->SetValue(D2D1_BITMAPSOURCE_PROP_SCALE, D2D1::Vector2F(0.1f, 0.1f));
+
+   
+    if (pwicBitmapDecoder_jewel) pwicBitmapDecoder_jewel->Release();
+    if (pwicFrameDecode_j) pwicFrameDecode_j->Release();
+
 }
 
 void UILayer::DrawDot(int dotCnt, XMFLOAT3[])
@@ -126,6 +158,11 @@ void UILayer::UpdateLabels(const wstring& strUIText)
 void UILayer::UpdateLabels_Scripts(const std::wstring& strUIText)
 {
     m_vScriptsBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT - 100, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwScriptsFormat };
+}
+
+void UILayer::UpdateLabels_Jew(const std::wstring& strUIText)
+{
+    m_vJewBlocks[0] = { strUIText, D2D1::RectF(15.0f, 75.0f, 110.0f, 150.0f), m_pdwJewFormat };
 }
 
 void UILayer::UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos, bool live)
@@ -235,8 +272,16 @@ void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[])
         m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBrush);
     }
 
+    for (auto textBlock : m_vJewBlocks)
+    {
+        m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBrush);
+    }
 
     D2D_POINT_2F d2dPoint = { 0.0f, FRAME_BUFFER_HEIGHT/2.0f };
+
+    D2D_POINT_2F d2dPoint_jew = { 0.0f, 50.0f };
+
+
     D2D_RECT_F d2dRect = { 0.0f, 0.0f, 100.0f, 200.0f };
 
     //int a = m_pd2dDeviceContext->GetSize().height;
@@ -245,6 +290,8 @@ void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[])
     //cout << "width : " << b << endl;
 
     m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur, &d2dPoint);
+    m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_jew, &d2dPoint_jew);
+
 
 
     for (auto& a : m_enemyDot)
@@ -296,6 +343,8 @@ void UILayer::ReleaseResources()
     m_pd2dDeviceContext->Release();
     m_pdwTextFormat->Release();
     m_pdwScriptsFormat->Release();
+    m_pdwJewFormat->Release();
+
 
     m_pd2dWriteFactory->Release();
     m_pd2dDevice->Release();
@@ -341,6 +390,12 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
 
     m_pdwScriptsFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     m_pdwScriptsFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
+
+    m_pd2dWriteFactory->CreateTextFormat(L"±¼¸²Ã¼", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize, L"en-us", &m_pdwJewFormat);
+
+    m_pdwJewFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+    m_pdwJewFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
 
     //    m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);

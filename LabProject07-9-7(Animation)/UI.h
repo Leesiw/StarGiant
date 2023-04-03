@@ -14,6 +14,8 @@ public:
 
     void UpdateLabels(const std::wstring& strUIText);
     void UpdateLabels_Scripts(const std::wstring& strUIText);
+    void UpdateLabels_Jew(const std::wstring& strUIText);
+
 
     void UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos, bool live = true);
     void UpdateHp(short curhp, short maxHp = 100);
@@ -55,18 +57,27 @@ private:
 
     IDWriteTextFormat* m_pdwTextFormat = NULL;
     IDWriteTextFormat* m_pdwScriptsFormat = NULL;
+    IDWriteTextFormat* m_pdwJewFormat = NULL;
+
 
 
 
     IWICImagingFactory* m_pwicImagingFactory = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource = NULL;
+    ID2D1Effect* m_pd2dfxBitmapSource_jew = NULL;
+
     ID2D1Effect* m_pd2dfxGaussianBlur = NULL;
+    ID2D1Effect* m_pd2dfxGaussianBlur_jew = NULL;
+
 
     ID2D1Effect* m_pd2dfxSize = NULL;
+    ID2D1Effect* m_pd2dfxSize_jew = NULL;
+
 
 
     ID2D1DrawingStateBlock1* m_pd2dsbDrawingState = NULL;
-    IWICFormatConverter* m_pwicFormatConverter = NULL;
+    IWICFormatConverter* m_pwicFormatConverter[2] = {};
+
     int							m_nDrawEffectImage = 0;
 
 
@@ -74,6 +85,8 @@ private:
     std::vector<ID2D1Bitmap1*>      m_vd2dRenderTargets;
     std::vector<TextBlock>          m_vTextBlocks;
     std::vector<TextBlock>          m_vScriptsBlocks;
+    std::vector<TextBlock>          m_vJewBlocks;
+
 
 
     XMFLOAT3 m_enemyDot[ENEMIES];
