@@ -746,12 +746,14 @@ public:
 	int m_nCol = 0;
 	int m_nRows = 1;
 	int m_nCols = 1;
+	int SpriteMode = 0;
 
 	CB_PLUS_INFO* m_pcbPlusInfo = NULL;
 
 	virtual void Animate(float fElapsedTime);
 	void SetRowColumn(int nRow, int nCol) { m_nRows = nRow; m_nCols = nCol; }
-	void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
+	void SetSpeed(float Speed) { m_fSpeed = Speed; }
+	ID3D12Resource* CreateShaderVariable(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 };

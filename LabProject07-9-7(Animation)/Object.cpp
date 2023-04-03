@@ -1828,32 +1828,32 @@ void CUIObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCam
 
 CSpriteObject::CSpriteObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Center, XMFLOAT3 Size, int type) : CGameObject(1)
 {
-	CTexturedRectMesh* SpriteMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 10.0f, 10.0f, 0.0f);//Size.x, Size.y, 0.0f);
+	CTexturedRectMesh* SpriteMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 50.0f, 50.0f, 0.0f);//Size.x, Size.y, 0.0f);
 	SetMesh(SpriteMesh);
 
-	CTexture* pSpriteTexture = new CTexture(1, RESOURCE_TEXTURE_CUBE, 0);
-	pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/base-color.dds", 0);
+	CTexture* pSpriteTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Explode_8x8.dds", 0);//Explode_8x8
 
 	CSpriteShader* CSpriteObjectShader = new CSpriteShader();
 	CSpriteObjectShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	CSpriteObjectShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 18, false); //PS를 UI  
+	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 18, false); //PS를 UI  18
 
 	CMaterial* pStriteMaterial = new CMaterial(1);
 	pStriteMaterial->SetTexture(pSpriteTexture);
 	pStriteMaterial->SetShader(CSpriteObjectShader);
 
 	SetRowColumn(8, 8);
+	SetSpeed(3.0f / (8 * 8));
 	Animate(0.0f);
 	SetMaterial(0, pStriteMaterial);
+	SpriteMode = 0;
 }
 
 void CSpriteObject::Animate(float fElapsedTime)
 {
 	
-	if (m_ppMaterials[0] && m_ppMaterials[0]->m_ppTextures[0])
-	{
 		m_fTime += fElapsedTime * 0.5f;
 		if (m_fTime >= m_fSpeed) m_fTime = 0.0f;
 
@@ -1866,7 +1866,6 @@ void CSpriteObject::Animate(float fElapsedTime)
 			if (++m_nCol == m_nCols) { m_nRow++; m_nCol = 0; }
 			if (m_nRow == m_nRows) { m_nRow = 0;}// , FullAnimated = true; 
 		}
-	}
 
 }
 
@@ -1887,19 +1886,26 @@ void CSpriteObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 	CGameObject::Render(pd3dCommandList, pCamera);
 
 	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+	switch (SpriteMode) {
+		case 0:
+			//위치 고정
+			break;
+		default: break;
+	}
 	UpdateTransform(NULL);
 
 	
 }
 
-void CSpriteObject::CreateShaderVariables(ID3D12Device* pd3dDevice,ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo)
+ID3D12Resource* CSpriteObject::CreateShaderVariable(ID3D12Device* pd3dDevice,ID3D12GraphicsCommandList* pd3dCommandList)
 { 
 	//only do once time
-
+	ID3D12Resource* m_pd3dcbPlusInfo = NULL;
 	UINT ncbElementBytes = ((sizeof(CB_PLUS_INFO) + 255) & ~255); //256의 배수
 	m_pd3dcbPlusInfo = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER | D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
 
-	m_pd3dcbPlusInfo->Map(0, NULL, (void**)&m_pcbPlusInfo);
+	m_pd3dcbPlusInfo->Map(0, NULL, (void**)&m_pcbPlusInfo); 
+	return m_pd3dcbPlusInfo;
 }
 
 
@@ -1911,10 +1917,17 @@ void CSpriteObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	//m_pd3dCommandList->SetGraphicsRoot32BitConstants(13, 1, &fCurrentTime, 0);
 
 	m_pcbPlusInfo->Texture_size = m_xmf4x4Texture;
+	//m_pcbPlusInfo->gfCurrentTime = m_fTime;
 
 	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbPlusInfo->GetGPUVirtualAddress();
 	pd3dCommandList->SetGraphicsRootConstantBufferView(19, d3dGpuVirtualAddress);
-
+	//if (m_fTime > 0.5) {
+	//	HRESULT hr = pd3dCommandList->Close();
+	//	if (FAILED(hr)) {
+	//		// 오류 처리
+	//		cout << "Failed to Set Graphics Constant BufferView - 19" << endl;
+	//	}
+	//}
 }
 
 CMascotObject::CMascotObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)

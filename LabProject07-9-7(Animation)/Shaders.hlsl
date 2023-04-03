@@ -6,6 +6,7 @@ struct MATERIAL
 	float4					m_cEmissive;
 };
 
+
 cbuffer cbCameraInfo : register(b1)
 {
 	matrix					gmtxView : packoffset(c0);
@@ -18,6 +19,13 @@ cbuffer cbGameObjectInfo : register(b2)
 	matrix					gmtxGameObject : packoffset(c0);
 	MATERIAL				gMaterial : packoffset(c4);
 	uint					gnTexturesMask : packoffset(c8);
+};
+
+cbuffer cbPlusInfo : register(b9)//b2
+{
+	matrix		gmtxTexture : packoffset(c0);
+	//float		gfCurrentTime : packoffset(c4); //테스트용
+
 };
 
 #include "Light.hlsl"
@@ -283,11 +291,6 @@ float4 PS_UI(VS_UI_OUTPUT input) : SV_TARGET
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-cbuffer cbPlusInfo : register(b9)//b2
-{
-	matrix		gmtxTexture : packoffset(c0);
-	
-};
 
 struct VS_SPRITE_INPUT
 {
@@ -307,9 +310,9 @@ struct VS_SPRITE_OUTPUT
 VS_SPRITE_OUTPUT VS_SPRITE(VS_SPRITE_INPUT input)
 {
 	VS_SPRITE_OUTPUT output;
-
 	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
 	output.uv = mul(float3(input.uv, 1.0f), (float3x3)(gmtxTexture)).xy;
+	//input.position.y += test.y * 10000;
 	//output.uv = input.uv;
 	return(output);
 }

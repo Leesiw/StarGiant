@@ -260,7 +260,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_ppSprite[i] = new CSpriteObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(0,0,0), XMFLOAT3(0.f,0.f,0.f));
 		m_ppSprite[i]->SetPosition(435.f, 250.f, 640.f);
 	}
-	//m_ppSprite[0]->CreateShaderVariables(pd3dDevice, pd3dCommandList, m_pd3dcbPlusInfo);
+	m_pd3dcbPlusInfo =m_ppSprite[0]->CreateShaderVariable(pd3dDevice, pd3dCommandList);
 	//=====================================XMFLOAT3(425.0f, 250.0f, 640.0f);
 	BuildBoss(pd3dDevice, pd3dCommandList);
 	BuildUI(pd3dDevice, pd3dCommandList);
@@ -611,17 +611,17 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 
 	pd3dDescriptorRanges[12].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	pd3dDescriptorRanges[12].NumDescriptors = 1;
-	pd3dDescriptorRanges[12].BaseShaderRegister = 16; //t15: gtxtGODNoiseTexture2
+	pd3dDescriptorRanges[12].BaseShaderRegister = 16; //t16: gtxtGODNoiseTexture2
 	pd3dDescriptorRanges[12].RegisterSpace = 0;
 	pd3dDescriptorRanges[12].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	pd3dDescriptorRanges[13].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	pd3dDescriptorRanges[13].NumDescriptors = 1;
-	pd3dDescriptorRanges[13].BaseShaderRegister = 17; //t15: gtxtSpriteTexture
+	pd3dDescriptorRanges[13].BaseShaderRegister = 17; //t17: gtxtSpriteTexture
 	pd3dDescriptorRanges[13].RegisterSpace = 0;
 	pd3dDescriptorRanges[13].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER pd3dRootParameters[19];
+	D3D12_ROOT_PARAMETER pd3dRootParameters[20];
 
 	pd3dRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	pd3dRootParameters[0].Descriptor.ShaderRegister = 1; //Camera
@@ -719,11 +719,11 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	pd3dRootParameters[18].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[13]); //Sprite texture
 	pd3dRootParameters[18].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
-	//pd3dRootParameters[19].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
-	//pd3dRootParameters[19].Constants.Num32BitValues = 1;
-	//pd3dRootParameters[19].Constants.ShaderRegister = 9; //plus
-	//pd3dRootParameters[19].Constants.RegisterSpace = 0;
-	//pd3dRootParameters[19].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	pd3dRootParameters[19].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+	pd3dRootParameters[19].Constants.Num32BitValues = 2;
+	pd3dRootParameters[19].Constants.ShaderRegister = 9; //plus
+	pd3dRootParameters[19].Constants.RegisterSpace = 0;
+	pd3dRootParameters[19].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
 	D3D12_STATIC_SAMPLER_DESC pd3dSamplerDescs[2];
 

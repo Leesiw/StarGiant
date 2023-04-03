@@ -204,7 +204,7 @@ public:
 
 	CTexturedRectMesh*				pRayRectMesh[GODRAY_SAMPLE];
 	CTexture*						pNoiseTexture[2];
-	CTexture*						pMoonTexture;
+	
 
 	CFrustrumCamera*				pLightCamera =NULL;
 
@@ -256,6 +256,7 @@ public:
 
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState();
 	virtual D3D12_BLEND_DESC CreateBlendState();
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
 
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader();

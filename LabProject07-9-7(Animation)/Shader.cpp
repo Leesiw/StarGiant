@@ -750,7 +750,7 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	pLightObject->SetPosition(430.0f, 320.0f, 700.0f);
 	pLightObject->SetScale(3.0f, 3.0f, 3.0f);
 	if (pMeteoModel) delete pMeteoModel;
-
+	CTexture* pMoonTexture;
 	pNoiseTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	pNoiseTexture[1] = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	pMoonTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
@@ -855,7 +855,6 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 			//	3.광 산란이 없는 장면 렌더링
 			//	4.라이트 산란 효과를 위에 덧그린다.
 	//delete pRayObject;
-
 }
 
 void CGodRayShader::AnimateObjects(CCamera * pCamera)
@@ -1043,6 +1042,28 @@ D3D12_BLEND_DESC CSpriteShader::CreateBlendState()
 	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 	return(d3dBlendDesc);
+}
+
+D3D12_DEPTH_STENCIL_DESC CSpriteShader::CreateDepthStencilState()
+{
+	D3D12_DEPTH_STENCIL_DESC d3dDepthStencilDesc;
+	::ZeroMemory(&d3dDepthStencilDesc, sizeof(D3D12_DEPTH_STENCIL_DESC));
+	d3dDepthStencilDesc.DepthEnable = FALSE;
+	d3dDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	d3dDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+	d3dDepthStencilDesc.StencilEnable = FALSE;
+	d3dDepthStencilDesc.StencilReadMask = 0x00;
+	d3dDepthStencilDesc.StencilWriteMask = 0x00;
+	d3dDepthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
+	d3dDepthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+	d3dDepthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_NEVER;
+
+	return(d3dDepthStencilDesc);
 }
 
 D3D12_SHADER_BYTECODE CSpriteShader::CreateVertexShader()
