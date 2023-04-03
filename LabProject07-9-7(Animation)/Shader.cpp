@@ -904,13 +904,13 @@ void CGodRayShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 
 D3D12_SHADER_BYTECODE CGodRayShader::CreateVertexShader()
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VS_GOD", "vs_5_1", &m_pd3dVertexShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VS_GODMain", "vs_5_1", &m_pd3dVertexShaderBlob));
 }
 
 
 D3D12_SHADER_BYTECODE CGodRayShader::CreatePixelShader()
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_GOD", "ps_5_1", &m_pd3dPixelShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_GODMain", "ps_5_1", &m_pd3dPixelShaderBlob));
 }
 
 //======================================

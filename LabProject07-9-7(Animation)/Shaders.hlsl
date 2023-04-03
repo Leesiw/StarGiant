@@ -339,7 +339,7 @@ struct VS_GOD_OUTPUT
 	//float4 ChannelMask :COLOR0;
 };
 
-VS_GOD_OUTPUT VS_GOD(VS_GOD_INPUT input)
+VS_GOD_OUTPUT VS_GODMain(VS_GOD_INPUT input)
 {
 	/*VS_UI_OUTPUT output;
 
@@ -365,7 +365,7 @@ Texture2D gtxtGODTexture1 : register(t15);
 Texture2D gtxtGODTexture2 : register(t16);
 
 
-float4 PS_GOD(VS_GOD_OUTPUT input) : SV_TARGET
+float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 {
 	/*float compositeNoise = 0.015f;
 	float shadow = 1.0f;
@@ -403,31 +403,96 @@ float4 PS_GOD(VS_GOD_OUTPUT input) : SV_TARGET
 		*/
 
 	float4 cookie = float4(1.0f, 1.0f, 1.0f, 1.0f); // 조명 빌보드 텍스처색 (그려지는 조명색)
-	float4 lightColor = float4(1.0f, 1.0f, 1.0f, 1.0f); //진짜 조명색 
+	float4 lightColor = float4(0.85f, 0.98f, 1.0f, 1.0f); //진짜 조명색 
 	//float scale = 9.0f / fFractionOfMaxShells;
 	//float atten = 0.25f + 20000.0f / dot(IsPos_depth.xyz, IsPos_Depthxyz);
 
 	float4 cColor = compositeNoise * float4(cookie.r, cookie.g, cookie.b, 0.0f) * lightColor;
+
 	cColor.a = saturate(dot(float3(cColor.a, cColor.g, cColor.b), float3(1.0f, 1.0f, 1.0f)));
+	if (cColor.a > 0.8) cColor.rgb *= 1.4f + (cColor.a - 0.8);
+	else if (cColor.a >0.6) cColor.rgb *= 1.3f + (cColor.a - 0.6);
+	else if (cColor.a >0.4)cColor.rgb *= 1.1f + (cColor.a - 0.4);
+	else cColor.rgb *= 1.f + (cColor.a);
 
 	return(cColor);
 
 }
 
-/*/ 첫 번째 렌더 타겟 설정
-float4 main() : SV_Target
+
+//// 두 번째 버텍스 쉐이더
+//struct VS_Line_OUTPUT {
+//	float4 position : SV_POSITION; // 정점 좌표
+//	float2 uv : TEXCOORD0; // 텍스처 좌표
+//};
+//
+//VS_Line_OUTPUT VS_Line(float4 input) {
+//	VS_Line_OUTPUT output;
+//	output.position = input.position;
+//	output.uv = output.position.xy;
+//	return output;
+//}
+//
+//// 두 번째 픽셀 쉐이더
+//struct PS_Line_INPUT {
+//	float4 position : SV_POSITION; // 정점 좌표
+//	float2 uv : TEXCOORD0; // 텍스처 좌표
+//};
+//
+//float4 PS_Line(PS_Line_INPUT input) : SV_TARGET1{
+//	if (input.uv.y >= 0.5) { // 픽셀 좌표가 윗쪽 반절에 위치한 경우
+//		return float4(1.0, 0.0, 0.0, 1.0); // 빨간색으로 설정
+//	}
+//	else { // 픽셀 좌표가 아랫쪽 반절에 위치한 경우
+//		return float4(0.0, 1.0, 0.0, 1.0); // 초록색으로 설정
+//	}
+//}
+//
+//
+//float4 Combine(float4 color1 : SV_TARGET, float4 color2 : SV_TARGET1) : SV_TARGET
+//{
+//	// 두 개의 픽셀 색상 값을 합쳐서 출력
+//	return color1 + color2;
+//}
+
+/*
+struct VS_OUTPUT
 {
-    // 사각형을 그리는 셰이더 코드
+	float4 Position : SV_POSITION;
+	float2 TexCoord : TEXCOORD0;
+};
+
+VS_OUTPUT VSMain(float4 position : POSITION, float2 texCoord : TEXCOORD0)
+{
+	VS_OUTPUT output;
+	output.Position = position;
+	output.TexCoord = texCoord;
+	return output;
 }
 
-// 새로운 렌더 타겟 설정
-float4 main() : SV_Target1
+float4 PSMain(float2 texCoord : TEXCOORD0) : SV_TARGET
 {
-    // 추가로 그릴 픽셀들을 그리는 셰이더 코드
+	// 텍스처 샘플링해서 화면에 그리기
+	float4 color = tex.Sample(sampler, texCoord);
+	return color;
 }
 
-// 원래의 렌더 타겟으로 돌아오기
-float4 main() : SV_Target
+float4 PSMain2(float2 texCoord : TEXCOORD0) : SV_TARGET1
 {
-    // 추가로 그릴 픽셀들을 그리는 셰이더 코드
+	// 투명하지 않은 픽셀의 위치 구하기
+	float4 color = tex2.Sample(sampler2, texCoord);
+	if (color.a > 0.5)
+	{
+		return float4(texCoord, 0.0, 1.0);
+	}
+	else
+	{
+		return float4(0.0, 0.0, 0.0, 0.0);
+	}
+}
+
+float4 Combine(float4 color1 : SV_TARGET, float4 color2 : SV_TARGET1) : SV_TARGET
+{
+	// 두 개의 픽셀 색상 값을 합쳐서 출력
+	return color1 + color2;
 }*/
