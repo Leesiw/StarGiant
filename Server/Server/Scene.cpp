@@ -493,7 +493,6 @@ void CScene::GetJewels()
 		return;
 	}
 
-	printf("%d\n", item_type);
 	++items[item_type];
 	ITEM_INFO info;
 	info.type = item_type;

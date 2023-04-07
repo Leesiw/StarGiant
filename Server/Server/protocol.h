@@ -131,8 +131,10 @@ enum class MissionType : char
 
 // login
 struct LOGIN_INFO {
-	short	id;
+	char	id;
 	PlayerType player_type;
+	float x, z;
+	float yaw;
 };
 
 // meteo
@@ -238,10 +240,8 @@ struct SC_LOGIN_INFO_PACKET {
 
 struct SC_ADD_PLAYER_PACKET {
 	unsigned char size;
-	char	type;
-	short	id;
-	short	x, y;
-	char	name[NAME_SIZE];
+	char type;
+	LOGIN_INFO	data;
 };
 
 struct SC_REMOVE_PLAYER_PACKET {

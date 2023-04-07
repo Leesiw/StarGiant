@@ -1,5 +1,18 @@
 #include "Session.h"
 
+void SESSION::send_add_player_packet(LOGIN_INFO& info)
+{
+	SC_ADD_PLAYER_PACKET p;
+	p.data.id = info.id;
+	p.data.player_type = info.player_type;
+	p.data.x = info.x;
+	p.data.z = info.z;
+	p.data.yaw = info.yaw;
+	p.size = sizeof(SC_ADD_PLAYER_PACKET);
+	p.type = SC_ADD_PLAYER;
+	do_send(&p);
+}
+
 void SESSION::send_change_packet(int c_id, PlayerType p_type)
 {
 	SC_LOGIN_INFO_PACKET p;

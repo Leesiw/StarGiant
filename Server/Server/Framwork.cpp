@@ -78,6 +78,32 @@ void CGameFramework::Init() {
 				clients[client_id].send_login_info_packet();
 				clients[client_id].send_spawn_all_meteo_packet(0, m_pScene->m_ppMeteoObjects);
 
+				LOGIN_INFO info;
+				info.id = client_id;
+				info.player_type = clients[client_id].type;
+				info.x = m_pScene->m_ppPlayers[client_id]->GetPosition().x;
+				info.z = m_pScene->m_ppPlayers[client_id]->GetPosition().z;
+				info.yaw = m_pScene->m_ppPlayers[client_id]->GetYaw();
+
+				for (auto& pl : clients) {
+					if (false == pl.in_use) continue;
+				//	if (pl._id == client_id) continue;
+					pl.send_add_player_packet(info);
+				}
+
+				for (auto& pl : clients) {
+					if (false == pl.in_use) continue;
+					if (pl._id == client_id) continue;
+					LOGIN_INFO linfo;
+					linfo.id = pl._id;
+					linfo.player_type = pl.type;
+					linfo.x = m_pScene->m_ppPlayers[pl._id]->GetPosition().x;
+					linfo.z = m_pScene->m_ppPlayers[pl._id]->GetPosition().z;
+					linfo.yaw = m_pScene->m_ppPlayers[pl._id]->GetYaw();
+
+					clients[client_id].send_add_player_packet(linfo);
+				}
+
 				ENEMY_INFO e_info[ENEMIES];
 				bool Alive[ENEMIES];
 				for (int i = 0; i < ENEMIES; ++i) {
@@ -371,6 +397,8 @@ int CGameFramework::get_new_client_id()
 
 void CGameFramework::disconnect(int c_id)
 {
+	clients[c_id].type = PlayerType::INSIDE;
+
 	SC_REMOVE_PLAYER_PACKET p;
 	p.id = c_id;
 	p.size = sizeof(p);

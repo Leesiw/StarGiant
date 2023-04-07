@@ -81,10 +81,13 @@ public:
 		SC_LOGIN_INFO_PACKET p;
 		p.data.id = _id;
 		p.data.player_type = type;
+
 		p.size = sizeof(SC_LOGIN_INFO_PACKET);
 		p.type = SC_LOGIN_INFO;
 		do_send(&p);
 	}
+	void send_add_player_packet(LOGIN_INFO& info);
+
 	void send_change_packet(int c_id, PlayerType p_type);
 	void send_spaceship_packet(int c_id, CAirplanePlayer* m_pPlayer);
 	void send_inside_packet(int c_id, CTerrainPlayer* m_pPlayer);

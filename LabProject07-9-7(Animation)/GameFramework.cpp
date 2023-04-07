@@ -814,7 +814,11 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
 	if (m_pPlayer && !b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Render(m_pd3dCommandList, m_pCamera);
-	if (m_pInsidePlayer && b_Inside)for (int i = 0; i < 3; ++i) m_pInsidePlayer[i]->Render(m_pd3dCommandList, m_pInsideCamera);
+	if (m_pInsidePlayer && b_Inside)for (int i = 0; i < 3; ++i) {
+		if (m_pInsidePlayer[i]->isAlive) {
+			m_pInsidePlayer[i]->Render(m_pd3dCommandList, m_pInsideCamera);
+		}
+	}
 	if (m_pScene && !b_Inside) m_pScene->RenderUI(m_pd3dCommandList, m_pCamera);
 	if (m_pInsideScene && b_Inside)m_pInsideScene->RenderUIInside(m_pd3dCommandList, m_pInsideCamera);
 
@@ -1200,6 +1204,9 @@ void CGameFramework::ProcessPacket(char* p)
 			b_Inside = false;
 		}
 		m_pInsidePlayer[g_myid]->type = player_type;
+		m_pInsidePlayer[g_myid]->isAlive = true;
+	//	float y = m_pInsidePlayer[g_myid]->GetPosition().y;
+	//	m_pInsidePlayer[g_myid]->SetPosition({ packet->data.x, y, packet->data.z });
 		break;
 	}
 	case SC_CHANGE:
@@ -1256,10 +1263,19 @@ void CGameFramework::ProcessPacket(char* p)
 	}
 	case SC_ADD_PLAYER:
 	{
+		SC_LOGIN_INFO_PACKET* packet = reinterpret_cast<SC_LOGIN_INFO_PACKET*>(p);
+		
+		m_pInsidePlayer[packet->data.id]->isAlive = true;
+		m_pInsidePlayer[packet->data.id]->type = player_type;
+		float y = m_pInsidePlayer[packet->data.id]->GetPosition().y;
+		m_pInsidePlayer[packet->data.id]->SetPosition({ packet->data.x, y, packet->data.z });
+		m_pInsidePlayer[packet->data.id]->Rotate(0.f, packet->data.yaw - m_pInsidePlayer[packet->data.id]->GetYaw(), 0.f);
 		break;
 	}
 	case SC_REMOVE_PLAYER:
 	{
+		SC_REMOVE_PLAYER_PACKET* packet = reinterpret_cast<SC_REMOVE_PLAYER_PACKET*>(p);
+		m_pInsidePlayer[packet->id]->isAlive = false;
 		break;
 	}
 	case SC_SPAWN_METEO:
@@ -1309,7 +1325,6 @@ void CGameFramework::ProcessPacket(char* p)
 		SC_SPAWN_ENEMY_PACKET* packet = reinterpret_cast<SC_SPAWN_ENEMY_PACKET*>(p);
 
 		if (!m_pScene->m_ppEnemies[packet->data.id]->isAlive) {
-			printf("spawn\n");
 			m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
 		}
 		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);

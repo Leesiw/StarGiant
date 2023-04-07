@@ -164,6 +164,7 @@ public:
 
 	INSIDE_PLAYER_INFO					player_info;
 	bool						is_update = true;
+	bool						isAlive = false;
 
 	PlayerType type;
 public:
