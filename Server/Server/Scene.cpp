@@ -536,14 +536,16 @@ void CScene::SpawnEnemy()
 				m_ppEnemies[j]->state = EnemyState::IDLE;
 				m_ppEnemies[j]->SetDestination();
 				m_ppEnemies[j]->SetStatus(cur_mission);
-				ENEMY_INFO e_info;
+				SPAWN_ENEMY_INFO e_info;
 				e_info.id = m_ppEnemies[j]->GetID();
 				e_info.Quaternion = m_ppEnemies[j]->GetQuaternion();
 				e_info.pos = m_ppEnemies[j]->GetPosition();
+				e_info.destination = m_ppEnemies[j]->GetDestination();
+				e_info.max_hp = m_ppEnemies[j]->GetHP();
 
 				for (auto& pl : clients) {
 					if (false == pl.in_use) continue;
-					pl.send_enemy_packet(0, e_info);
+					pl.send_spawn_enemy_packet(0, e_info);
 				}
 				++cur_monster_num;
 				break;

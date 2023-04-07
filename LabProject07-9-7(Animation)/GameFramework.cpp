@@ -1304,7 +1304,26 @@ void CGameFramework::ProcessPacket(char* p)
 		//m_pInsidePlayer[playerInfo.id]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[playerInfo.id]->GetYaw(), 0.0f);
 		break;
 	}
-	case SC_MOVE_INFO:
+	case SC_SPAWN_ENEMY:
+	{
+		SC_SPAWN_ENEMY_PACKET* packet = reinterpret_cast<SC_SPAWN_ENEMY_PACKET*>(p);
+
+		if (!m_pScene->m_ppEnemies[packet->data.id]->isAlive) {
+			printf("spawn\n");
+			m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
+		}
+		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);
+		m_pUILayer->UpdateDots(packet->data.id, m_pPlayer[0]->GetPosition(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
+
+		m_pScene->m_ppEnemies[packet->data.id]->ResetRotate();
+		m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
+		m_pScene->m_ppEnemies[packet->data.id]->destination = packet->data.destination;
+
+		m_pScene->m_ppEnemies[packet->data.id]->Maxhp = packet->data.max_hp;
+		m_pScene->m_ppEnemies[packet->data.id]->hp = packet->data.max_hp;
+		break;
+	}
+	case SC_MOVE_ENEMY:
 	{
 		SC_MOVE_ENEMY_PACKET* packet = reinterpret_cast<SC_MOVE_ENEMY_PACKET*>(p);
 
@@ -1315,9 +1334,9 @@ void CGameFramework::ProcessPacket(char* p)
 			break;
 		}
 
-		if (!m_pScene->m_ppEnemies[packet->data.id]->isAlive) {
-			m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
-		}
+		//if (!m_pScene->m_ppEnemies[packet->data.id]->isAlive) {
+			//m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
+		//}
 		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);
 		m_pUILayer->UpdateDots(packet->data.id, m_pPlayer[0]->GetPosition(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
 

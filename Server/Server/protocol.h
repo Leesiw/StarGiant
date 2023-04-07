@@ -58,16 +58,17 @@ constexpr char SC_METEO = 11;
 
 constexpr char SC_MOVE_SPACESHIP = 12;
 constexpr char SC_MOVE_INSIDEPLAYER = 13;
-constexpr char SC_MOVE_INFO = 14;
-constexpr char SC_BULLET = 15;
-constexpr char SC_BULLET_HIT = 16;
-constexpr char SC_MISSILE = 17;
-constexpr char SC_REMOVE_MISSILE = 18;
-constexpr char SC_ITEM = 19;
-constexpr char SC_ANIMATION_CHANGE = 20;
-constexpr char SC_HEAL = 21;
-constexpr char SC_MISSION_START = 22;
-constexpr char SC_KILL_NUM = 23;
+constexpr char SC_SPAWN_ENEMY = 14;
+constexpr char SC_MOVE_ENEMY = 15;
+constexpr char SC_BULLET = 16;
+constexpr char SC_BULLET_HIT = 17;
+constexpr char SC_MISSILE = 18;
+constexpr char SC_REMOVE_MISSILE = 19;
+constexpr char SC_ITEM = 20;
+constexpr char SC_ANIMATION_CHANGE = 21;
+constexpr char SC_HEAL = 22;
+constexpr char SC_MISSION_START = 23;
+constexpr char SC_KILL_NUM = 24;
 
 enum class PlayerType : char
 {
@@ -198,6 +199,15 @@ struct SPACESHIP_INFO {
 };
 
 // enemy
+struct SPAWN_ENEMY_INFO {
+	char id;
+
+	XMFLOAT3 pos;
+	XMFLOAT4 Quaternion;
+	XMFLOAT3 destination;
+	char max_hp;
+};
+
 struct ENEMY_INFO {
 	char id;
 
@@ -357,6 +367,13 @@ struct SC_REMOVE_MISSILE_PACKET {
 };
 
 // enemy
+struct SC_SPAWN_ENEMY_PACKET {
+	unsigned char size;
+	char	type;
+
+	SPAWN_ENEMY_INFO data;
+};
+
 struct SC_MOVE_ENEMY_PACKET {
 	unsigned char size;
 	char	type;

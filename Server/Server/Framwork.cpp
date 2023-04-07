@@ -83,12 +83,16 @@ void CGameFramework::Init() {
 				for (int i = 0; i < ENEMIES; ++i) {
 					Alive[i] = m_pScene->m_ppEnemies[i]->GetisAlive();
 					if (Alive[i]) {
-						e_info[i].id = m_pScene->m_ppEnemies[i]->GetID();
-						e_info[i].Quaternion = m_pScene->m_ppEnemies[i]->GetQuaternion();
-						e_info[i].pos = m_pScene->m_ppEnemies[i]->GetPosition();
+						SPAWN_ENEMY_INFO e_info;
+						e_info.id = m_pScene->m_ppEnemies[i]->GetID();
+						e_info.Quaternion = m_pScene->m_ppEnemies[i]->GetQuaternion();
+						e_info.pos = m_pScene->m_ppEnemies[i]->GetPosition();
+						e_info.destination = m_pScene->m_ppEnemies[i]->GetDestination();
+						e_info.max_hp = m_pScene->m_ppEnemies[i]->GetHP();
+
+						clients[client_id].send_spawn_enemy_packet(0, e_info);
 					}
 				}
-				clients[client_id].send_all_enemy_packet(0, e_info, Alive);
 				clients[client_id].send_mission_start_packet(m_pScene->cur_mission);
 
 				if (m_pScene->cur_mission == MissionType::Kill_MONSTER ||

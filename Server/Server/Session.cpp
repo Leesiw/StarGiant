@@ -42,11 +42,27 @@ void SESSION::send_enemy_packet(int c_id, ENEMY_INFO& enemy_info)
 	SC_MOVE_ENEMY_PACKET p;
 
 	p.size = sizeof(SC_MOVE_ENEMY_PACKET);
-	p.type = SC_MOVE_INFO;
+	p.type = SC_MOVE_ENEMY;
 
 	p.data.id = enemy_info.id;
 	p.data.Quaternion = enemy_info.Quaternion;
 	p.data.pos = enemy_info.pos;
+
+	do_send(&p);
+}
+
+void SESSION::send_spawn_enemy_packet(int c_id, SPAWN_ENEMY_INFO& enemy_info)
+{
+	SC_SPAWN_ENEMY_PACKET p;
+
+	p.size = sizeof(SC_SPAWN_ENEMY_PACKET);
+	p.type = SC_SPAWN_ENEMY;
+
+	p.data.id = enemy_info.id;
+	p.data.Quaternion = enemy_info.Quaternion;
+	p.data.pos = enemy_info.pos;
+	p.data.max_hp = enemy_info.max_hp;
+	p.data.destination = enemy_info.destination;
 
 	do_send(&p);
 }

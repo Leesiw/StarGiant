@@ -39,12 +39,14 @@ public:
 	char id;
 	EnemyType type;
 
-	short hp;
+	char hp;
 	EnemyState state;
 
 public:
 	bool GetisAlive() { return enemy_flags & option0; }
 	void SetisAlive(bool i_a);
+
+	char GetHP() { return hp; }
 
 	char GetID() { return id; }
 	virtual void SetStatus(MissionType cur_mission);
@@ -52,6 +54,7 @@ public:
 	bool GetLaunchMissile() { return enemy_flags & option2; }
 
 	void SetDestination();
+	const XMFLOAT3& GetDestination() const { return(m_xmf3Destination); }
 	virtual void AI(float fTimeElapsed, CAirplanePlayer* player);
 	virtual void MoveAI(float fTimeElapsed, CAirplanePlayer* player);
 	virtual void AimingAI(float fTimeElapsed, CAirplanePlayer* player);
