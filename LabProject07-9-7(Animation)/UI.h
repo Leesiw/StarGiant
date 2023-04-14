@@ -1,4 +1,5 @@
 #pragma once
+#include "Player.h"
 
 struct TextBlock
 {
@@ -17,7 +18,7 @@ public:
     void UpdateLabels_Jew(const std::wstring& strUIText);
 
 
-    void UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos, bool live = true);
+    void UpdateDots(float fTimeElapsed, int id, CAirplanePlayer* player, XMFLOAT3& epos, bool live = true);
     void UpdateHp(short curhp, short maxHp = 100);
 
     XMFLOAT4X4 UpdateMat(const XMFLOAT3& ppos);

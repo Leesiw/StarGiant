@@ -4,6 +4,7 @@
 #include "Scene.h"
 
 
+
 UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue)
 {
     m_fWidth = 0.0f;
@@ -165,22 +166,29 @@ void UILayer::UpdateLabels_Jew(const std::wstring& strUIText)
     m_vJewBlocks[0] = { strUIText, D2D1::RectF(15.0f, 75.0f, 110.0f, 150.0f), m_pdwJewFormat };
 }
 
-void UILayer::UpdateDots(int id, XMFLOAT3& ppos, XMFLOAT3& epos, bool live)
+void UILayer::UpdateDots(float fTimeElapsed, int id, CAirplanePlayer* player, XMFLOAT3& epos, bool live)
 {
-    XMMATRIX playerTransform = XMMatrixTranslation(ppos.x, ppos.y, ppos.z);
-    XMMATRIX playerInverse = XMMatrixInverse(nullptr, playerTransform);
+    XMFLOAT3 ppos = player->GetPosition();
 
-    XMVECTOR enemyPosVector = XMLoadFloat3(&epos);
-    XMVECTOR relativePosVector = XMVector3TransformCoord(enemyPosVector, playerInverse);
-    XMFLOAT3 relativePos;
-    XMStoreFloat3(&relativePos, relativePosVector);
+    XMFLOAT3 playerf = player->GetLookVector();
+    XMVECTOR playerPos = XMLoadFloat3(&ppos);
+    XMVECTOR enemyPos = XMLoadFloat3(&epos);
+
+    //플레이어의 방향 벡터를 이용하여 상대적인 위치 벡터를 계산
+    XMVECTOR playerForward = XMLoadFloat3(&playerf);  // 플레이어의 방향 벡터
+    XMVECTOR enemyRelativePos = enemyPos - playerPos;  // 상대적인 위치 벡터
+    enemyRelativePos = XMVector3InverseRotate(enemyRelativePos, playerForward); //적의 위치 벡터를 플레이어의 방향 벡터의 역방향으로 회전시켜 상대적인 위치 벡터를 계산
+
+    // 미니맵 중심점을 원점으로 하는 극좌표계로 변환
+    float enemyDistance = XMVectorGetX(XMVector3Length(enemyRelativePos));  // 적과의 거리
+    float enemyAngle = atan2f(XMVectorGetZ(enemyRelativePos), XMVectorGetX(enemyRelativePos));  // 적과의 각도
+    XMFLOAT2 enemyMapPos = XMFLOAT2(enemyDistance * cosf(enemyAngle), enemyDistance * sinf(enemyAngle));  // 극좌표를 직교좌표로 변환
+
+    XMFLOAT3 enemyMap3Pos(enemyMapPos.x, 0.0f, enemyMapPos.y);
 
 
     XMFLOAT3 cpos;
-    /*cpos.x = epos.x - ppos.x;
-    cpos.z = epos.z - ppos.z;*/
-
-    cpos = relativePos;
+    cpos = enemyMap3Pos;
 
     float mapScale = 0.3f;
 

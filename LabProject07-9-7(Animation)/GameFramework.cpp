@@ -925,6 +925,12 @@ void CGameFramework::UpdateUI()
 	//{
 	//	m_pUILayer->UpdateDots(i, { 0,0 });
 	//}
+	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
+
+	for (int i = 0; i < ENEMIES; ++i) {
+		m_pUILayer->UpdateDots(fTimeElapsed, i, m_pPlayer[0], m_pScene->m_ppEnemies[i]->GetPosition());
+	}
+
 }
 
 wstring CGameFramework::ChangeMission(MissionType mType)
@@ -1328,7 +1334,6 @@ void CGameFramework::ProcessPacket(char* p)
 			m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
 		}
 		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);
-		m_pUILayer->UpdateDots(packet->data.id, m_pPlayer[0]->GetPosition(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
 
 		m_pScene->m_ppEnemies[packet->data.id]->ResetRotate();
 		m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
@@ -1345,7 +1350,6 @@ void CGameFramework::ProcessPacket(char* p)
 		if (packet->data.id == BOSS_ID) {
 			m_pScene->m_ppBoss->SetQuaternion(packet->data.Quaternion);
 			m_pScene->m_ppBoss->SetPosition(packet->data.pos);
-			m_pUILayer->UpdateDots(BOSS_ID, m_pPlayer[0]->GetPosition(), packet->data.pos);
 			break;
 		}
 
@@ -1353,7 +1357,6 @@ void CGameFramework::ProcessPacket(char* p)
 			//m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
 		//}
 		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);
-		m_pUILayer->UpdateDots(packet->data.id, m_pPlayer[0]->GetPosition(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
 
 		m_pScene->m_ppEnemies[packet->data.id]->ResetRotate();
 		m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
@@ -1382,7 +1385,6 @@ void CGameFramework::ProcessPacket(char* p)
 		if (packet->data.id >= 0) {
 			if (packet->data.hp <= 0) { // Á×À½
 				m_pScene->m_ppEnemies[packet->data.id]->isAlive = false;
-				m_pUILayer->UpdateDots(packet->data.id, m_pPlayer[0]->GetPosition(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition(), false);
 
 			}
 			else {
