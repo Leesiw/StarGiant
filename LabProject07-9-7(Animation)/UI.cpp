@@ -89,12 +89,18 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_pd2dFactory->CreateDrawingStateBlock(&m_pd2dsbDrawingState);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_jew);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_nevi);
+
 
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_jew);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_nevi);
+
 
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_jew);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_nevi);
+
 
     
 
@@ -142,6 +148,31 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     if (pwicBitmapDecoder_jewel) pwicBitmapDecoder_jewel->Release();
     if (pwicFrameDecode_j) pwicFrameDecode_j->Release();
 
+    //==
+
+    IWICBitmapDecoder* pwicBitmapDecoder_nevi;
+    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/nevi.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_nevi);
+
+    IWICBitmapFrameDecode* pwicFrameDecode_n;
+    pwicBitmapDecoder_nevi->GetFrame(0, &pwicFrameDecode_n);
+
+    m_pwicImagingFactory->CreateFormatConverter(&m_pwicFormatConverter[2]);
+    m_pwicFormatConverter[2]->Initialize(pwicFrameDecode_n, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
+
+    m_pd2dfxBitmapSource_nevi->SetValue(D2D1_BITMAPSOURCE_PROP_WIC_BITMAP_SOURCE, m_pwicFormatConverter[2]);
+
+    m_pd2dfxGaussianBlur_nevi->SetInputEffect(0, m_pd2dfxBitmapSource_nevi);
+    m_pd2dfxGaussianBlur_nevi->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 0.0f);
+
+
+    m_pd2dfxSize_nevi->SetInputEffect(0, m_pd2dfxBitmapSource_nevi);
+    m_pd2dfxSize_nevi->SetValue(D2D1_BITMAPSOURCE_PROP_SCALE, D2D1::Vector2F(0.1f, 0.1f));
+
+
+
+    if (pwicBitmapDecoder_nevi) pwicBitmapDecoder_nevi->Release();
+    if (pwicFrameDecode_n) pwicFrameDecode_n->Release();
+
 }
 
 void UILayer::DrawDot(int dotCnt, XMFLOAT3[])
@@ -166,7 +197,7 @@ void UILayer::UpdateLabels_Jew(const std::wstring& strUIText)
     m_vJewBlocks[0] = { strUIText, D2D1::RectF(15.0f, 75.0f, 110.0f, 150.0f), m_pdwJewFormat };
 }
 
-void UILayer::UpdateDots(float fTimeElapsed, int id, CAirplanePlayer* player, XMFLOAT3& epos, bool live)
+void UILayer::UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool live)
 {
     XMFLOAT3 ppos = player->GetPosition();
 
@@ -174,15 +205,26 @@ void UILayer::UpdateDots(float fTimeElapsed, int id, CAirplanePlayer* player, XM
     XMVECTOR playerPos = XMLoadFloat3(&ppos);
     XMVECTOR enemyPos = XMLoadFloat3(&epos);
 
+
+    XMMATRIX playerTransform = XMMatrixTranslation(ppos.x, ppos.y, ppos.z);
+    XMMATRIX playerInverse = XMMatrixInverse(nullptr, playerTransform);
+
+    XMVECTOR enemyPosVector = XMLoadFloat3(&epos);
+    XMVECTOR relativePosVector = XMVector3TransformCoord(enemyPosVector, playerInverse);
+    XMFLOAT3 relativePos;
+    XMStoreFloat3(&relativePos, relativePosVector);
+
+
     //플레이어의 방향 벡터를 이용하여 상대적인 위치 벡터를 계산
     XMVECTOR playerForward = XMLoadFloat3(&playerf);  // 플레이어의 방향 벡터
-    XMVECTOR enemyRelativePos = enemyPos - playerPos;  // 상대적인 위치 벡터
-    enemyRelativePos = XMVector3InverseRotate(enemyRelativePos, playerForward); //적의 위치 벡터를 플레이어의 방향 벡터의 역방향으로 회전시켜 상대적인 위치 벡터를 계산
+    XMVECTOR enemyRelativePos/* = enemyPos - playerPos*/;  // 상대적인 위치 벡터
+    enemyRelativePos = XMVector3InverseRotate(relativePosVector, playerForward); //적의 위치 벡터를 플레이어의 방향 벡터의 역방향으로 회전시켜 상대적인 위치 벡터를 계산
 
     // 미니맵 중심점을 원점으로 하는 극좌표계로 변환
     float enemyDistance = XMVectorGetX(XMVector3Length(enemyRelativePos));  // 적과의 거리
     float enemyAngle = atan2f(XMVectorGetZ(enemyRelativePos), XMVectorGetX(enemyRelativePos));  // 적과의 각도
     XMFLOAT2 enemyMapPos = XMFLOAT2(enemyDistance * cosf(enemyAngle), enemyDistance * sinf(enemyAngle));  // 극좌표를 직교좌표로 변환
+
 
     XMFLOAT3 enemyMap3Pos(enemyMapPos.x, 0.0f, enemyMapPos.y);
 
@@ -229,6 +271,25 @@ void UILayer::UpdateDots(float fTimeElapsed, int id, CAirplanePlayer* player, XM
    //cout << id << "- id : " << m_enemyDot[id].z << endl;
 }
 
+void UILayer::UpdateBossNevi(int id, CAirplanePlayer* player, XMFLOAT3& bossPos)
+{
+
+    XMFLOAT3 ppos = player->GetPosition();
+    XMFLOAT3 direction = player->GetLookVector();
+
+    XMFLOAT3 playerToBoss = XMFLOAT3(bossPos.x - ppos.x, bossPos.y - ppos.y, bossPos.z - ppos.z);
+
+    XMVECTOR playerToBossVec = XMLoadFloat3(&playerToBoss);
+    XMVECTOR playerDirectionVec = XMLoadFloat3(&direction);
+    playerToBossVec = XMVector3Normalize(playerToBossVec);
+    playerDirectionVec = XMVector3Normalize(playerDirectionVec);
+
+    angle = XMVectorGetX(XMVector3AngleBetweenNormals(playerToBossVec, playerDirectionVec));
+
+    angle = XMConvertToDegrees(angle);
+
+}
+
 void UILayer::UpdateHp(short Hp, short maxHp)
 {
     hpBar = float (maxHp - Hp) * 1.5;
@@ -261,7 +322,7 @@ XMFLOAT4X4 UILayer::UpdateMat(const XMFLOAT3& pos)
     return matrix;
 }
 
-void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[])
+void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[], MissionType mty)
 {
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
@@ -289,16 +350,31 @@ void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[])
 
     D2D_POINT_2F d2dPoint_jew = { 0.0f, 50.0f };
 
+    D2D_POINT_2F d2dPoint_nevi = { -25, -75 };
+
+
 
     D2D_RECT_F d2dRect = { 0.0f, 0.0f, 100.0f, 200.0f };
 
+    D2D1::Matrix3x2F matScale, matTranslation, matRot, matTM;
+    matScale = D2D1::Matrix3x2F::Scale(0.05f, 0.05f);
+    matTranslation = D2D1::Matrix3x2F::Translation(FRAME_BUFFER_WIDTH / 2.0f, FRAME_BUFFER_HEIGHT / 2.0f);
+    matRot = D2D1::Matrix3x2F::Rotation(angle);
+    matTM = matRot * matTranslation ;
     //int a = m_pd2dDeviceContext->GetSize().height;
     //int b = m_pd2dDeviceContext->GetSize().width;
     //cout << "height : " << a << endl;
     //cout << "width : " << b << endl;
-
+    m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
     m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur, &d2dPoint);
     m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_jew, &d2dPoint_jew);
+    m_pd2dDeviceContext->SetTransform(matTM);
+
+   // m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Rotation(angle, a));
+    if(mty==MissionType::FIND_BOSS)
+     m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_nevi, &d2dPoint_nevi);
+    m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
+
 
 
 

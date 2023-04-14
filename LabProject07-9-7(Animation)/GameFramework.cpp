@@ -925,11 +925,15 @@ void CGameFramework::UpdateUI()
 	//{
 	//	m_pUILayer->UpdateDots(i, { 0,0 });
 	//}
-	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
+
 
 	for (int i = 0; i < ENEMIES; ++i) {
-		m_pUILayer->UpdateDots(fTimeElapsed, i, m_pPlayer[0], m_pScene->m_ppEnemies[i]->GetPosition());
+		m_pUILayer->UpdateDots(i, m_pPlayer[0], m_pScene->m_ppEnemies[i]->GetPosition());
 	}
+
+	if(curMissionType ==MissionType::FIND_BOSS)
+		m_pUILayer->UpdateBossNevi(BOSS_ID, m_pPlayer[0], m_pScene->m_ppBoss->GetPosition());
+	
 
 }
 
