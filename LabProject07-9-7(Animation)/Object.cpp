@@ -1612,6 +1612,137 @@ void CEnemyObject::Rotate(XMFLOAT4* pxmf4Quaternion)
 	UpdateTransform(NULL);
 }
 
+
+void CEnemyObject::VelocityUpdate(float fTimeElapsed, XMFLOAT3& player_look)
+{
+	float fLength = Vector3::Length(m_xmf3Velocity);
+	float fMaxVelocity = 200.f;
+	if (fLength > fMaxVelocity)
+	{
+		m_xmf3Velocity.x *= (fMaxVelocity / fLength) * fTimeElapsed * 30;
+		m_xmf3Velocity.y *= (fMaxVelocity / fLength) * fTimeElapsed * 30;
+		m_xmf3Velocity.z *= (fMaxVelocity / fLength) * fTimeElapsed * 30;
+	}
+
+	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
+
+	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(player_look, fTimeElapsed * 50.f, false);
+	xmf3Velocity = Vector3::Add(LookVelocity, xmf3Velocity);
+	XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
+	SetPosition(xmf3Position);
+
+	float fDeceleration = (100.0f * fTimeElapsed);
+	if (fDeceleration > fLength) fDeceleration = fLength;
+	if (Vector3::Length(m_xmf3Velocity) > 0.00001f) {
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+	}
+}
+
+
+void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
+{
+	XMFLOAT3 new_pos = pos;
+	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// 역행렬
+
+	new_pos = Vector3::TransformCoord(new_pos, inv_mat); // 타겟의 위치를 적 자체의 좌표계로 변환
+	if (Vector3::Length(new_pos) > 0.0001f) {
+		new_pos = Vector3::Normalize(new_pos);
+	}
+
+
+	float pitch = XMConvertToDegrees(asin(-new_pos.y));
+	float yaw = XMConvertToDegrees(atan2(new_pos.x, new_pos.z));
+
+	float rotate_angle = fTimeElapsed * 90.f;
+
+	XMFLOAT3 p_y_r{ pitch, yaw, 0.f };
+	if (Vector3::Length(p_y_r) > rotate_angle) {
+		p_y_r = Vector3::Normalize(p_y_r);
+		Rotate(p_y_r.x * rotate_angle, p_y_r.y * rotate_angle, 0.f);
+	}
+	else {
+		Rotate(pitch, yaw, 0.f);
+	}
+}
+
+
+void CEnemyObject::AI(float fTimeElapsed, XMFLOAT3& pl_look, XMFLOAT3& pl_pos)
+{
+	VelocityUpdate(fTimeElapsed, pl_look);
+	XMFLOAT3 player_pos = pl_pos;
+
+	XMFLOAT3 pos = GetPosition();
+	float dist;
+	dist = Vector3::Length(Vector3::Subtract(pos, player_pos));
+
+	if (dist < 100.f)
+	{
+		XMFLOAT3 ToGo = Vector3::Subtract(pos, player_pos);
+		ToGo = Vector3::ScalarProduct(ToGo, 100.f);
+		ToGo = Vector3::Add(player_pos, ToGo);
+		SetPosition(ToGo);
+	}
+
+	switch (state)
+	{
+	case EnemyState::IDLE:
+		if (dist > m_fAttackRange)	// 사거리 충족 안되면 이동
+		{
+			state = EnemyState::MOVE;
+		}
+		else
+		{
+			state = EnemyState::AIMING;
+		}
+		break;
+	case EnemyState::AIMING:	// 플레이어 방향을 바라보도록 한다
+		AimingAI(fTimeElapsed, pl_pos);
+		break;
+	case EnemyState::MOVE:
+		MoveAI(fTimeElapsed, pl_pos);
+		break;
+	}
+}
+
+void CEnemyObject::MoveAI(float fTimeElapsed, XMFLOAT3& pl_pos)
+{
+	XMFLOAT3 xmf3Position = GetPosition();
+	XMFLOAT3 player_pos = pl_pos;
+	XMFLOAT3 destination = Vector3::Add(m_xmf3Destination, player_pos);
+
+	XMFLOAT3 vec = Vector3::Subtract(destination, xmf3Position);
+	float dist = Vector3::Length(vec);
+
+	if (dist > 50.f)
+	{
+		LookAtPosition(fTimeElapsed, destination);
+
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), fTimeElapsed * 150.f);
+		UpdateTransform();
+	}
+	else {
+		state = EnemyState::AIMING;
+	}
+}
+
+void CEnemyObject::AimingAI(float fTimeElapsed, XMFLOAT3& pl_pos)
+{
+	XMFLOAT3 player_pos = pl_pos;
+	LookAtPosition(fTimeElapsed, player_pos);	// 플레이어를 보도록 회전
+
+	XMFLOAT3 destination = Vector3::Add(m_xmf3Destination, player_pos);
+	XMFLOAT3 xmf3Position = GetPosition();
+	XMFLOAT3 vec = Vector3::Subtract(destination, xmf3Position);
+	float dist = Vector3::Length(vec);
+
+	if (dist > 30.f)
+	{
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, vec, fTimeElapsed * 5.f);
+		UpdateTransform();
+	}
+}
+
+
 //============================================================================================
 CInsideShipObject::CInsideShipObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
 {

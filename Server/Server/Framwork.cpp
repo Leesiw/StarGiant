@@ -115,6 +115,7 @@ void CGameFramework::Init() {
 						e_info.pos = m_pScene->m_ppEnemies[i]->GetPosition();
 						e_info.destination = m_pScene->m_ppEnemies[i]->GetDestination();
 						e_info.max_hp = m_pScene->m_ppEnemies[i]->GetHP();
+						e_info.state = m_pScene->m_ppEnemies[i]->GetState();
 
 						clients[client_id].send_spawn_enemy_packet(0, e_info);
 					}

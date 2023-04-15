@@ -541,7 +541,7 @@ void CScene::SpawnEnemy()
 				e_info.pos = m_ppEnemies[j]->GetPosition();
 				e_info.destination = m_ppEnemies[j]->GetDestination();
 				e_info.max_hp = m_ppEnemies[j]->GetHP();
-
+				e_info.state = EnemyState::IDLE;
 				for (auto& pl : clients) {
 					if (false == pl.in_use) continue;
 					pl.send_spawn_enemy_packet(0, e_info);
@@ -675,13 +675,24 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
 		if (false == pl.in_use) continue;
 		pl.send_spaceship_packet(3, m_pSpaceship);
-		pl.send_meteo_packet(0, m_ppMeteoObjects);
-		for (int i = 0; i < MAX_USER; ++i) {
-			if (clients[i].in_use == false) { continue; }
-			pl.send_change_packet(i,clients[i].type);
-		}
 		// 적 위치?
 	}
+
+//	if (send_time % 30 == 0) {
+		for (int i = 0; i < ENEMIES; ++i) {
+			m_ppEnemies[i]->SendPos();
+		}
+
+		for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
+			if (false == pl.in_use) continue;
+			pl.send_meteo_packet(0, m_ppMeteoObjects);
+			for (int i = 0; i < MAX_USER; ++i) {
+				if (clients[i].in_use == false) { continue; }
+				pl.send_change_packet(i, clients[i].type);
+			}
+		}
+		send_time = 0;
+//	}
 
 	if (heal_player != -1) {
 		std::chrono::duration<double>sec = std::chrono::system_clock::now() - heal_start;
@@ -702,4 +713,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	CheckMissionComplete();
 	//CheckObjectByBulletCollisions();
 	//CheckEnemyByBulletCollisions();
+
+	++send_time;
 }
