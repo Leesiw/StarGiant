@@ -20,8 +20,12 @@ public:
 
     void UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool live = true);
     void UpdateBossNevi(int id, CAirplanePlayer* player, XMFLOAT3& bpos);
+    void UpdatePlanetNevi(CAirplanePlayer* player, XMFLOAT3& lpos);
+
     D2D1_POINT_2F a = {};
     float angle = 0;
+    float angle2 = 0;
+
 
     void UpdateHp(short curhp, short maxHp = 100);
 
@@ -71,23 +75,30 @@ private:
     ID2D1Effect* m_pd2dfxBitmapSource = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource_jew = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource_nevi = NULL;
+    ID2D1Effect* m_pd2dfxBitmapSource_nevi2 = NULL;
+
+
 
 
     ID2D1Effect* m_pd2dfxGaussianBlur = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_jew = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_nevi = NULL;
+    ID2D1Effect* m_pd2dfxGaussianBlur_nevi2 = NULL;
+
 
 
 
     ID2D1Effect* m_pd2dfxSize = NULL;
     ID2D1Effect* m_pd2dfxSize_jew = NULL;
     ID2D1Effect* m_pd2dfxSize_nevi = NULL;
+    ID2D1Effect* m_pd2dfxSize_nevi2 = NULL;
+
 
 
 
 
     ID2D1DrawingStateBlock1* m_pd2dsbDrawingState = NULL;
-    IWICFormatConverter* m_pwicFormatConverter[3] = {};
+    IWICFormatConverter* m_pwicFormatConverter[4] = {};
 
     int							m_nDrawEffectImage = 0;
 

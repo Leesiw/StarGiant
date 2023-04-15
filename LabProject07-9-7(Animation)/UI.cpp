@@ -90,16 +90,22 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_jew);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_nevi);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_nevi2);
+
 
 
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_jew);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_nevi);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_nevi2);
+
 
 
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_jew);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_nevi);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_nevi2);
+
 
 
     
@@ -172,6 +178,31 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
 
     if (pwicBitmapDecoder_nevi) pwicBitmapDecoder_nevi->Release();
     if (pwicFrameDecode_n) pwicFrameDecode_n->Release();
+
+    //==
+    IWICBitmapDecoder* pwicBitmapDecoder_nevi2;
+    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/nevi2.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_nevi2);
+
+    IWICBitmapFrameDecode* pwicFrameDecode_n2;
+    pwicBitmapDecoder_nevi2->GetFrame(0, &pwicFrameDecode_n2);
+
+    m_pwicImagingFactory->CreateFormatConverter(&m_pwicFormatConverter[3]);
+    m_pwicFormatConverter[3]->Initialize(pwicFrameDecode_n2, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
+
+    m_pd2dfxBitmapSource_nevi2->SetValue(D2D1_BITMAPSOURCE_PROP_WIC_BITMAP_SOURCE, m_pwicFormatConverter[3]);
+
+    m_pd2dfxGaussianBlur_nevi2->SetInputEffect(0, m_pd2dfxBitmapSource_nevi2);
+    m_pd2dfxGaussianBlur_nevi2->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 0.0f);
+
+
+    m_pd2dfxSize_nevi2->SetInputEffect(0, m_pd2dfxBitmapSource_nevi2);
+    m_pd2dfxSize_nevi2->SetValue(D2D1_BITMAPSOURCE_PROP_SCALE, D2D1::Vector2F(0.1f, 0.1f));
+
+
+
+    if (pwicBitmapDecoder_nevi2) pwicBitmapDecoder_nevi2->Release();
+    if (pwicFrameDecode_n2) pwicFrameDecode_n2->Release();
+
 
 }
 
@@ -290,6 +321,25 @@ void UILayer::UpdateBossNevi(int id, CAirplanePlayer* player, XMFLOAT3& bossPos)
 
 }
 
+void UILayer::UpdatePlanetNevi(CAirplanePlayer* player, XMFLOAT3& lpos)
+{
+    XMFLOAT3 ppos = player->GetPosition();
+    XMFLOAT3 direction = player->GetLookVector();
+
+    XMFLOAT3 playerToPlanet = XMFLOAT3(lpos.x - ppos.x, lpos.y - ppos.y, lpos.z - ppos.z);
+
+    XMVECTOR playerToBossVec = XMLoadFloat3(&playerToPlanet);
+    XMVECTOR playerDirectionVec = XMLoadFloat3(&direction);
+    playerToBossVec = XMVector3Normalize(playerToBossVec);
+    playerDirectionVec = XMVector3Normalize(playerDirectionVec);
+
+    angle2 = XMVectorGetX(XMVector3AngleBetweenNormals(playerToBossVec, playerDirectionVec));
+
+    angle2 = XMConvertToDegrees(angle2);
+}
+
+
+
 void UILayer::UpdateHp(short Hp, short maxHp)
 {
     hpBar = float (maxHp - Hp) * 1.5;
@@ -356,11 +406,16 @@ void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[], MissionType mty)
 
     D2D_RECT_F d2dRect = { 0.0f, 0.0f, 100.0f, 200.0f };
 
-    D2D1::Matrix3x2F matScale, matTranslation, matRot, matTM;
+    D2D1::Matrix3x2F matScale, matTranslation, matRot, matRot2, matTM, matTM2;
     matScale = D2D1::Matrix3x2F::Scale(0.05f, 0.05f);
     matTranslation = D2D1::Matrix3x2F::Translation(FRAME_BUFFER_WIDTH / 2.0f, FRAME_BUFFER_HEIGHT / 2.0f);
     matRot = D2D1::Matrix3x2F::Rotation(angle);
     matTM = matRot * matTranslation ;
+
+    matRot2 = D2D1::Matrix3x2F::Rotation(angle2);
+    matTM2 = matRot2 * matTranslation;
+
+
     //int a = m_pd2dDeviceContext->GetSize().height;
     //int b = m_pd2dDeviceContext->GetSize().width;
     //cout << "height : " << a << endl;
@@ -374,6 +429,11 @@ void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[], MissionType mty)
     if(mty==MissionType::FIND_BOSS)
      m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_nevi, &d2dPoint_nevi);
     m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
+    m_pd2dDeviceContext->SetTransform(matTM2);
+    if (mty == MissionType::GO_PLANET)
+     m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_nevi2, &d2dPoint_nevi);
+    m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
+
 
 
 

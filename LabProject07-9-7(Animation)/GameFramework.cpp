@@ -41,6 +41,7 @@ CGameFramework::CGameFramework()
 	items[ItemType::JEWEL_HEAL] = 0;
 	items[ItemType::JEWEL_HP] = 0;
 	
+	planetPos = { 1000.0f,1000.0f,1000.0f };
 
 	scriptsStartTime = steady_clock::now();
 	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
@@ -933,6 +934,10 @@ void CGameFramework::UpdateUI()
 
 	if(curMissionType ==MissionType::FIND_BOSS)
 		m_pUILayer->UpdateBossNevi(BOSS_ID, m_pPlayer[0], m_pScene->m_ppBoss->GetPosition());
+
+	if (curMissionType == MissionType::GO_PLANET)
+		m_pUILayer->UpdatePlanetNevi(m_pPlayer[0],planetPos);
+
 	
 
 }

@@ -118,7 +118,7 @@ private:
 	MissionType curMissionType = MissionType::TU_SIT;
 	MissionType pastMissionType = MissionType::TU_END;
 
-
+	XMFLOAT3 planetPos = {};
 
 	// ³»ºÎ 
 	CScene* m_pInsideScene = NULL;
