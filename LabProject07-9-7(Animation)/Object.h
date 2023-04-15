@@ -621,8 +621,14 @@ public:
 	short hp;
 	short Maxhp = hp;
 
+	bool isUpdate = false;
 
-	XMFLOAT3 destination;
+	float						m_fAttackRange = 300.0f;
+
+	XMFLOAT3					m_xmf3Velocity;
+	XMFLOAT3					m_xmf3Destination;
+
+	EnemyState state;
 
 	XMFLOAT4X4 m_xmf4x4Rotate;
 	float m_fPitch, m_fYaw, m_fRoll;
@@ -635,6 +641,13 @@ public:
 	virtual void Rotate(float x, float y, float z);
 	virtual void Rotate(XMFLOAT3* pxmf3Axis, float fAngle);
 	virtual void Rotate(XMFLOAT4* pxmf4Quaternion);
+
+	virtual void AI(float fTimeElapsed, XMFLOAT3& pl_look, XMFLOAT3& pl_pos);
+	virtual void MoveAI(float fTimeElapsed, XMFLOAT3& pl_pos);
+	virtual void AimingAI(float fTimeElapsed, XMFLOAT3& pl_pos);
+	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
+
+	void VelocityUpdate(float fTimeElapsed, XMFLOAT3& pos);
 
 	void ResetRotate();
 	short GetcurHp() { return hp; }

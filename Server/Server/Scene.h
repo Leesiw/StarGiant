@@ -59,5 +59,8 @@ public:
 
 	float m_fEnemySpawnTime = 20.0f;
 	float m_fEnemySpawnTimeRemaining = 0.0f;
+
+	// юс╫ц
+	int send_time = 0;
 };
 

@@ -2,11 +2,6 @@
 #include "Session.h"
 #include "Missile.h"
 
-enum class EnemyState : char
-{
-	IDLE, MOVE, AIMING
-};
-
 extern array<SESSION, MAX_USER> clients;
 extern unordered_map<MissionType, Level> levels;
 extern mutex m;
@@ -71,6 +66,8 @@ public:
 	float GetPitch() { return m_fPitch; }
 	float GetYaw() { return m_fYaw; }
 	float GetRoll() { return m_fRoll; }
+
+	EnemyState GetState() { return state; }
 
 	void SetVelocity(const XMFLOAT3& xmf3Velocity) { m_xmf3Velocity = xmf3Velocity; }
 	const XMFLOAT3& GetVelocity() const { return(m_xmf3Velocity); }

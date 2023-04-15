@@ -75,6 +75,11 @@ enum class PlayerType : char
 	INSIDE, MOVE, ATTACK1, ATTACK2, ATTACK3
 };
 
+enum class EnemyState : char
+{
+	IDLE, MOVE, AIMING
+};
+
 enum class BossState : char
 {
 	SLEEP, IDLE, SIT_IDLE, SCREAM, GET_HIT, WALK, RUN, BASIC_ATTACT, CLAW_ATTACT, FLAME_ATTACK, DEFEND,
@@ -204,6 +209,7 @@ struct SPACESHIP_INFO {
 struct SPAWN_ENEMY_INFO {
 	char id;
 
+	EnemyState state;
 	XMFLOAT3 pos;
 	XMFLOAT4 Quaternion;
 	XMFLOAT3 destination;
@@ -215,6 +221,7 @@ struct ENEMY_INFO {
 
 	XMFLOAT3 pos;
 	XMFLOAT4 Quaternion;
+	XMFLOAT3 velocity;
 };
 
 // animation

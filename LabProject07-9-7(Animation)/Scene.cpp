@@ -1066,6 +1066,18 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	}
 
 
+	for (int i = 0; i < ENEMIES; ++i) {
+		if (m_ppEnemies[i] && m_ppEnemies[i]->isAlive){// && !m_ppEnemies[i]->isUpdate) {
+			m_ppEnemies[i]->AI(fTimeElapsed, m_pPlayer[0]->GetLook(), m_pPlayer[0]->GetPosition());
+
+		}
+		else {
+			if (m_ppEnemies[i]) {
+				m_ppEnemies[i]->isUpdate = false;
+			}
+		}
+	}
+
 	for (int i = 0; i < UI_CNT; i++)
 	{
 		if (m_ppUI[i])

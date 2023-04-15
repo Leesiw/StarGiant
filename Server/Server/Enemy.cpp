@@ -58,7 +58,7 @@ void CEnemy::AI(float fTimeElapsed, CAirplanePlayer* player)
 		break;
 	}
 
-	SendPos();
+	//SendPos();
 }
 
 void CEnemy::MoveAI(float fTimeElapsed, CAirplanePlayer* player)
@@ -284,14 +284,17 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 
 void CEnemy::SendPos()
 {
-	ENEMY_INFO info;
-	info.id = id;
-	info.Quaternion = GetQuaternion();
-	info.pos = GetPosition();
-	for (auto& pl : clients)
-	{
-		if (false == pl.in_use) continue;
-		pl.send_enemy_packet(0, info);
+	if (enemy_flags & option0) {
+		ENEMY_INFO info;
+		info.id = id;
+		info.Quaternion = GetQuaternion();
+		info.pos = GetPosition();
+		info.velocity = GetVelocity();
+		for (auto& pl : clients)
+		{
+			if (false == pl.in_use) continue;
+			pl.send_enemy_packet(0, info);
+		}
 	}
 }
 
