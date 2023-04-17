@@ -113,6 +113,8 @@ private:
 	//
 	short killCnt = 0; 
 	short jewelCnt=0;
+	float pDist = 0;
+
 
 	short firstSc = 0;
 	MissionType curMissionType = MissionType::TU_SIT;

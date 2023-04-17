@@ -22,6 +22,8 @@ public:
     void UpdateBossNevi(int id, CAirplanePlayer* player, XMFLOAT3& bpos);
     void UpdatePlanetNevi(CAirplanePlayer* player, XMFLOAT3& lpos);
 
+    float UpdatePlanetDist(CAirplanePlayer* player, XMFLOAT3& lpos);
+
     D2D1_POINT_2F a = {};
     float angle = 0;
     float angle2 = 0;
@@ -31,7 +33,7 @@ public:
 
     XMFLOAT4X4 UpdateMat(const XMFLOAT3& ppos);
 
-    void Render(UINT nFrame, int dotCnt = NULL, XMFLOAT3 [] = NULL, MissionType mty = MissionType::TU_SIT);
+    void Render(UINT nFrame, MissionType mty = MissionType::TU_SIT);
     void ReleaseResources();
     void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height);
 

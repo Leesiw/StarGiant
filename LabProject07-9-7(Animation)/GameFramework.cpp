@@ -835,7 +835,7 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
-	m_pUILayer->Render(m_nSwapChainBufferIndex);
+	m_pUILayer->Render(m_nSwapChainBufferIndex, curMissionType);
 
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
@@ -935,8 +935,10 @@ void CGameFramework::UpdateUI()
 	if(curMissionType ==MissionType::FIND_BOSS)
 		m_pUILayer->UpdateBossNevi(BOSS_ID, m_pPlayer[0], m_pScene->m_ppBoss->GetPosition());
 
-	if (curMissionType == MissionType::GO_PLANET)
-		m_pUILayer->UpdatePlanetNevi(m_pPlayer[0],planetPos);
+	if (curMissionType == MissionType::GO_PLANET) {
+		m_pUILayer->UpdatePlanetNevi(m_pPlayer[0], planetPos);
+		pDist = m_pUILayer->UpdatePlanetDist(m_pPlayer[0], planetPos);
+	}
 
 	
 
@@ -947,9 +949,14 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	wstring uiText = L"미션 - ";
 	wstring enemyCountStr;
 	wstring jewelCntStr;
+	wstring planetDist;
+
 
 	enemyCountStr = to_wstring(killCnt);
 	jewelCntStr = to_wstring(jewelCnt);
+	planetDist = to_wstring(pDist);
+
+	
 
 	wstring uiTextSpace = L" ";
 	wstring uiTextCnt = L" / 20";
@@ -989,7 +996,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	case MissionType::GO_PLANET:
 	{
 		uiText = L"미션 - 목표 지점으로 도달하라 ( ";
-		
+		uiText += planetDist;
 		uiText += L"m 남음";
 
 		break;

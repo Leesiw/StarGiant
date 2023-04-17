@@ -338,6 +338,20 @@ void UILayer::UpdatePlanetNevi(CAirplanePlayer* player, XMFLOAT3& lpos)
     angle2 = XMConvertToDegrees(angle2);
 }
 
+float UILayer::UpdatePlanetDist(CAirplanePlayer* player, XMFLOAT3& lpos)
+{
+    XMFLOAT3 ppos = player->GetPosition();
+
+    XMVECTOR v1 = XMLoadFloat3(&ppos);
+    XMVECTOR v2 = XMLoadFloat3(&lpos);
+    XMVECTOR dist = XMVector3Length(XMVectorSubtract(v2, v1));
+
+    float distance;
+    XMStoreFloat(&distance, dist);
+
+    return distance;
+}
+
 
 
 void UILayer::UpdateHp(short Hp, short maxHp)
@@ -372,7 +386,7 @@ XMFLOAT4X4 UILayer::UpdateMat(const XMFLOAT3& pos)
     return matrix;
 }
 
-void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[], MissionType mty)
+void UILayer::Render(UINT nFrame, MissionType mty)
 {
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
@@ -430,8 +444,9 @@ void UILayer::Render(UINT nFrame, int dotCnt, XMFLOAT3[], MissionType mty)
      m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_nevi, &d2dPoint_nevi);
     m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
     m_pd2dDeviceContext->SetTransform(matTM2);
-    if (mty == MissionType::GO_PLANET)
-     m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_nevi2, &d2dPoint_nevi);
+    if (mty == MissionType::GO_PLANET) {
+        m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_nevi2, &d2dPoint_nevi);
+    }
     m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
 
 
