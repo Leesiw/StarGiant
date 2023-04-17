@@ -1560,6 +1560,7 @@ CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	CLoadedModelInfo* pEnemyModel = pModel;
 	if (!pEnemyModel) pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
 
+
 	SetChild(pEnemyModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pEnemyModel);
 }
@@ -1638,6 +1639,22 @@ void CEnemyObject::VelocityUpdate(float fTimeElapsed, XMFLOAT3& player_look)
 	}
 }
 
+void CEnemyObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	CGameObject::Render(pd3dCommandList, pCamera);
+	if (isDied) {
+		m_pDieSprite->Render(pd3dCommandList, pCamera);
+		m_pDieSprite->SetCntTime(0.0f);
+		if (m_pDieSprite->GetCntTime() < 0)
+		{
+			//delete m_pDieSprite;
+			//m_pDieSprite = NULL; //여기 오류나면 고쳐야함. 
+			//isDied = false;
+			//cout << "sprite delete" << endl;
+		}
+	}
+}
+
 
 void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 {
@@ -1663,6 +1680,15 @@ void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	else {
 		Rotate(pitch, yaw, 0.f);
 	}
+}
+
+void CEnemyObject::DieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+	CSpriteObject* m_pSpritdump = new CSpriteObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, XMFLOAT3(0, 0, 0), XMFLOAT3(0.f, 0.f, 0.f), static_cast<int>(SpriteType::EnemyBoom));
+	m_pSpritdump->SetPosition(GetPosition());
+	m_pDieSprite = m_pSpritdump;
+	isDied = true;
+	//m_pDieSprite 의 함수를 발동하면, 그만큼 있다가 알아서 사라지게하기. 
 }
 
 
@@ -1979,14 +2005,16 @@ CSpriteObject::CSpriteObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	SetSpeed(3.0f / (8 * 8));
 	Animate(0.0f);
 	SetMaterial(0, pStriteMaterial);
-	SpriteMode = 0;
+	SpriteMode = type;
+
 }
 
 void CSpriteObject::Animate(float fElapsedTime)
 {
-	
 		m_fTime += fElapsedTime * 0.5f;
-		if (m_fTime >= m_fSpeed) m_fTime = 0.0f;
+		if (m_fTime >= m_fSpeed) {
+			m_fTime = 0.0f;
+		}
 
 		m_xmf4x4Texture._11 = 1.0f / float(m_nRows);
 		m_xmf4x4Texture._22 = 1.0f / float(m_nCols);
@@ -2000,32 +2028,50 @@ void CSpriteObject::Animate(float fElapsedTime)
 
 }
 
-//void CSpriteObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
-//{
-//	XMFLOAT4X4 xmf4x4World, xmf4x4Texture;
-//	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
-//	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4World, 0);
-//
-//	XMStoreFloat4x4(&xmf4x4Texture, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Texture)));
-//	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4Texture, 16);
-//}
 
 void CSpriteObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
 
-	CGameObject::Render(pd3dCommandList, pCamera);
-
-	SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 	switch (SpriteMode) {
-		case 0:
-			//위치 고정
+		case static_cast<int>(SpriteType::Ship):
+			CGameObject::Render(pd3dCommandList, pCamera);
+			SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+			break;
+
+		case static_cast<int>(SpriteType::EnemyBoom):
+			CGameObject::Render(pd3dCommandList, pCamera);
+			SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f)); 
+			//시간 제한 코드 
+			CountDiedTime(3.0f);
 			break;
 		default: break;
 	}
 	UpdateTransform(NULL);
 
 	
+}
+
+void CSpriteObject::CountDiedTime(float dieTime)
+{
+	m_fCntTime += m_fTime;
+	if (m_fCntTime >=dieTime){
+		m_fCntTime = -1.0f; //삭제용 
+	}
+	cout << m_fCntTime << endl;
+}
+
+
+
+void CSpriteObject::SetfollowPosition(XMFLOAT3 Target, XMFLOAT3 Distance,XMFLOAT3 LookAt)
+{
+	//주인공 객체로부터 떨어져야 하는 위치 벡터
+	XMFLOAT3 offset = XMFLOAT3(-LookAt.x * Distance.x, -LookAt.y * Distance.y, -LookAt.z * Distance.z);
+
+	// 주인공 객체의 위치 벡터와 계산된 위치 벡터를 더하기
+	XMFLOAT3 spaceshipPosition = XMFLOAT3(Target.x + offset.x, Target.y + offset.y, Target.z + offset.z);
+	SetPosition(spaceshipPosition);
+	//왜이러냐 진짜 
 }
 
 ID3D12Resource* CSpriteObject::CreateShaderVariable(ID3D12Device* pd3dDevice,ID3D12GraphicsCommandList* pd3dCommandList)
@@ -2047,18 +2093,14 @@ void CSpriteObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommand
 	////std::cout << fCurrentTime << std::endl;
 	//m_pd3dCommandList->SetGraphicsRoot32BitConstants(13, 1, &fCurrentTime, 0);
 
-	m_pcbPlusInfo->Texture_size = m_xmf4x4Texture;
+ 	//m_pcbPlusInfo->Texture_size = m_xmf4x4Texture;
+	XMStoreFloat4x4(&m_pcbPlusInfo->gmtxTexture, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Texture)));
+
 	//m_pcbPlusInfo->gfCurrentTime = m_fTime;
 
 	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbPlusInfo->GetGPUVirtualAddress();
 	pd3dCommandList->SetGraphicsRootConstantBufferView(19, d3dGpuVirtualAddress);
-	//if (m_fTime > 0.5) {
-	//	HRESULT hr = pd3dCommandList->Close();
-	//	if (FAILED(hr)) {
-	//		// 오류 처리
-	//		cout << "Failed to Set Graphics Constant BufferView - 19" << endl;
-	//	}
-	//}
+
 }
 
 CMascotObject::CMascotObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)

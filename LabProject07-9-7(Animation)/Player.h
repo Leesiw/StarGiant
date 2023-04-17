@@ -77,6 +77,7 @@ public:
 	float GetYaw() const { return(m_fYaw); }
 	float GetPitch() const { return(m_fPitch); }
 	float GetRoll() const { return(m_fRoll); }
+	XMFLOAT3 GetYawPitchRoll() { return XMFLOAT3(m_fYaw,m_fPitch,m_fRoll); }
 
 	CCamera *GetCamera() { return(m_pCamera); }
 	void SetCamera(CCamera *pCamera) { m_pCamera = pCamera; }

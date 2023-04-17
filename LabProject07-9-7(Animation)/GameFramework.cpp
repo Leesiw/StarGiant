@@ -405,6 +405,8 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 					}
 				}
+				//m_pScene->m_ppEnemies[0]->DieSprite(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+				//m_pScene->m_ppSprite[0]->CountDiedTime(3.0f);
 
 				if (b_Inside) {
 					scriptsOn = true;

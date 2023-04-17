@@ -862,12 +862,15 @@ void CGodRayShader::AnimateObjects(CCamera * pCamera)
 	renderDepth = 1000;
 	XMFLOAT3 newLookVector = XMFLOAT3(0.f, 0.f, 0.f);
 	XMFLOAT3 MoveVector = XMFLOAT3(0.f, 0.f, 0.f);
+
 	//기존 룩벡터 cameraLookVector //새로운 룩벡터 
 	newLookVector = Vector3::Normalize(Vector3::Subtract(XMFLOAT3(PlayerPosition.x, PlayerPosition.y, PlayerPosition.z), XMFLOAT3(m_ppObjects[GODRAY_SAMPLE - 1]->GetPosition().x, m_ppObjects[GODRAY_SAMPLE - 1]->GetPosition().y, m_ppObjects[GODRAY_SAMPLE - 1]->GetPosition().z)));
 	//std::cout << newLookVector.x << endl;
+
 	for (int i = 0; i < GODRAY_SAMPLE; i++) {
 		//길이 구하기 
 		int nLen = (renderDepth / GODRAY_SAMPLE)*(GODRAY_SAMPLE-i);
+
 		//이동할거 구하기 (길이 x 기존역방향 + 길이 x 새로운방향) 
 		//MoveVector =Vector3::Add((Vector3::ScalarProduct(newLookVector, nLen)), (Vector3::ScalarProduct((Vector3::ScalarProduct(cameraLookVector, -1)), nLen)));
 		XMFLOAT3 A = (Vector3::ScalarProduct(cameraLookVector, nLen));
@@ -1048,7 +1051,7 @@ D3D12_DEPTH_STENCIL_DESC CSpriteShader::CreateDepthStencilState()
 {
 	D3D12_DEPTH_STENCIL_DESC d3dDepthStencilDesc;
 	::ZeroMemory(&d3dDepthStencilDesc, sizeof(D3D12_DEPTH_STENCIL_DESC));
-	d3dDepthStencilDesc.DepthEnable = FALSE;
+	d3dDepthStencilDesc.DepthEnable = TRUE;
 	d3dDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	d3dDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
 	d3dDepthStencilDesc.StencilEnable = FALSE;
