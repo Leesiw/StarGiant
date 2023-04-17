@@ -203,6 +203,7 @@ public:
 	CGameObject*					pGameObject =new CGameObject(1);
 
 	CTexturedRectMesh*				pRayRectMesh[GODRAY_SAMPLE];
+	CRayLineMesh*					pRayLineMesh[GODRAY_SAMPLE];
 	CTexture*						pNoiseTexture[2];
 	
 
@@ -217,7 +218,7 @@ public:
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
 	virtual D3D12_BLEND_DESC CreateBlendState();
 
-	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, void* pContext = NULL);
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel=NULL, void* pContext = NULL);
 	virtual void AnimateObjects( CCamera* pCamera);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual void SetPlayerPosition(XMFLOAT3 in) { PlayerPosition = in; };
@@ -227,6 +228,7 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
 protected:
 	CGameObject**					m_ppObjects = 0;
+	CGameObject**					m_ppLineObjects = 0;
 	int								m_nObjects = 0;
 };
 

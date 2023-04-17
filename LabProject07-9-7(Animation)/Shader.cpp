@@ -738,6 +738,8 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	renderDepth = 1000;
  
 	Vertex camera1Position = Vertex(400, 300, 600); //560 광원위치(-10, 00, 60);
+	//Vertex camera1LookAt = Vertex(425, 250, 642); // 처음 젠위치로 합시다 (-1000, 600, -2000);
+	//Vertex camera1Position = Vertex(PlayerPosition.x, PlayerPosition.y, PlayerPosition.z); //560 광원위치(-10, 00, 60);
 	Vertex camera1LookAt = Vertex(425, 250, 642); // 처음 젠위치로 합시다 (-1000, 600, -2000);
 	cameraLookVector = Vector3::Normalize(Vector3::Subtract(XMFLOAT3(camera1Position.x, camera1Position.y, camera1Position.z), XMFLOAT3(camera1LookAt.x, camera1LookAt.y, camera1LookAt.z)));
 	pLightCamera =new CFrustrumCamera(renderWidth, renderHeight, camera1Position, camera1LookAt, 10, 1000);//원래 100000
@@ -766,23 +768,26 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	//우선 크기를 직접 맞춰주는 반복문으로 해보겠다. 
 	m_nObjects = GODRAY_SAMPLE;
 	m_ppObjects = new CGameObject * [m_nObjects];
+	m_ppLineObjects = new CGameObject * [m_nObjects];
 
 	int zNear = pLightCamera->GetzNear();
 	int zFar = pLightCamera->GetzFar();
 	int nLen = 0; 
+	XMFLOAT3 nVector=XMFLOAT3(0,0,0);
+	XMFLOAT3 nPosition=XMFLOAT3(0,0,0);
 	CGameObject* pRayObject = new CGameObject(1);
+	CGameObject* pLineObject = new CGameObject(1);
 	
-
 	CGodRayShader* pSkyBoxShader = new CGodRayShader();
 	pSkyBoxShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	pSkyBoxShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	for (int i = 0; i < GODRAY_SAMPLE; i++) {
 		pRayObject = new CGameObject(1);
+		
 		CMaterial* pRayMaterial = new CMaterial(1);
 		//종횡비 pLightCamera->aspect 을 이용해 N번째 사각형의 크기를 지정한다. 
 		nLen = (i * zNear + (zFar * (GODRAY_SAMPLE - i))) / (GODRAY_SAMPLE - 1); //((N-a)*n + a*f)/(N-1) 
-
 		//구한 너비로 mesh만들기 
 		CTexturedRectMesh* NRayMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, nLen, nLen, 0.0f);
 		pRayObject->SetMesh(NRayMesh);
@@ -792,16 +797,30 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 		else pRayMaterial->SetTexture(pNoiseTexture[1]);
 
 		pRayMaterial->SetShader(pSkyBoxShader);
-			
+		//////////////////////////////////////////////////////////
+
+		nPosition = Vector3::Add(XMFLOAT3(camera1Position.x, camera1Position.y, camera1Position.z),
+			Vector3::ScalarProduct(cameraLookVector, (renderDepth / GODRAY_SAMPLE) * i));
+
+		////////////////////////////////////////////////////////
+		pLineObject = new CGameObject(1);
+
+		CRayLineMesh* NLineMesh = new CRayLineMesh(pd3dDevice, pd3dCommandList, cameraLookVector, nLen, nLen, (renderDepth / GODRAY_SAMPLE), nPosition.x, nPosition.y, nPosition.z);
+		pLineObject->SetMesh(NLineMesh);
 
 		if (pRayObject)
 		{
 			//시작점 - 광원사이의 직선을 중심(방향벡터)로 하는 점들의 평면과의 교차점
 			/*광원위치 - 프러스텀 길이 를 방향벡터로 N등분 하기, 임의로 길이 renderDepth 1000 설정  */
-			pRayObject->SetPosition(Vector3::Add(XMFLOAT3(camera1Position.x, camera1Position.y, camera1Position.z),
-						Vector3::ScalarProduct(cameraLookVector, (renderDepth / GODRAY_SAMPLE) * i)));
+			pRayObject->SetPosition(nPosition);
 			pRayObject->SetMaterial(0,pRayMaterial);
 			m_ppObjects[i] = pRayObject;
+		}
+		if (pLineObject)
+		{
+			pLineObject->SetPosition(nPosition);
+			pLineObject->SetMaterial(0, pRayMaterial);
+			m_ppLineObjects[i] = pLineObject;
 		}
 
 	}
@@ -876,7 +895,9 @@ void CGodRayShader::AnimateObjects(CCamera * pCamera)
 		XMFLOAT3 A = (Vector3::ScalarProduct(cameraLookVector, nLen));
 		XMFLOAT3 B = (Vector3::ScalarProduct(newLookVector, nLen));
 		m_ppObjects[i]->SetLookAt(PlayerPosition);
+		m_ppLineObjects[i]->SetLookAt(PlayerPosition);
 		m_ppObjects[i]->SetPosition(B);
+		m_ppLineObjects[i]->SetPosition(B);
 		//if(i==10)std::cout << m_ppObjects[1]->GetPosition().x << endl;
 	}
 	pLightObject->SetLookAt(PlayerPosition);
@@ -901,6 +922,7 @@ void CGodRayShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 			AnimateObjects(pCamera);
 			m_ppObjects[i]->Render(pd3dCommandList, pCamera);
 			pLightObject->Render(pd3dCommandList, pCamera);
+			m_ppLineObjects[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
 }

@@ -271,3 +271,23 @@ public:
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSet);
 };
+
+//////////////////////////////////////////////////////////////////////
+class CRayLineMesh : public CMesh
+{
+public:
+	CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 Vector, float fWidth = 20.0f, float fHeight = 20.0f, float fDepth = 20.0f, float fxPosition = 0.0f, float fyPosition = 0.0f, float fzPosition = 0.0f);
+	virtual ~CRayLineMesh();
+
+protected:
+	XMFLOAT2* m_pxmf2TextureCoords0 = NULL;
+	XMFLOAT3* m_pxmf2Vector = NULL;
+
+	ID3D12Resource* m_pd3dTextureCoord0Buffer = NULL;
+	ID3D12Resource* m_pd3dTextureCoord0UploadBuffer = NULL;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord0BufferView;
+
+public:
+	virtual void ReleaseUploadBuffers();
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSet);
+};

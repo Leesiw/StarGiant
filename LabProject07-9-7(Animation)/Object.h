@@ -623,7 +623,6 @@ public:
 	short Maxhp = hp;
 
 	bool isUpdate = false;
-	bool isDied = false;
 
 	float						m_fAttackRange = 300.0f;
 
@@ -635,7 +634,6 @@ public:
 	XMFLOAT4X4 m_xmf4x4Rotate;
 	float m_fPitch, m_fYaw, m_fRoll;
 
-	CSpriteObject* m_pDieSprite = NULL;
 
 	CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks);
 	virtual ~CEnemyObject();
@@ -650,10 +648,9 @@ public:
 	virtual void MoveAI(float fTimeElapsed, XMFLOAT3& pl_pos);
 	virtual void AimingAI(float fTimeElapsed, XMFLOAT3& pl_pos);
 	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
-	virtual void DieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
-
+	virtual XMFLOAT3 GetEnemyPosition() { return XMFLOAT3(m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43); }
+	
 	void VelocityUpdate(float fTimeElapsed, XMFLOAT3& pos);
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 
 	void ResetRotate();
 	short GetcurHp() { return hp; }
@@ -769,8 +766,10 @@ public:
 	int m_nRows = 1;
 	int m_nCols = 1;
 	int SpriteMode = 0;
+	bool is_Alive = false;
 
 	CB_PLUS_INFO* m_pcbPlusInfo = NULL;
+	ID3D12Resource* m_pcbplusShaderVariable = NULL;
 
 	virtual void Animate(float fElapsedTime);
 	void SetRowColumn(int nRow, int nCol) { m_nRows = nRow; m_nCols = nCol; }
@@ -779,9 +778,11 @@ public:
 	void SetfollowPosition(XMFLOAT3 Target, XMFLOAT3 Distance, XMFLOAT3 LookAt);
 
 	float GetCntTime() {return m_fCntTime;};
+	virtual ID3D12Resource* GetShaderVariables() { return m_pcbplusShaderVariable; }
 
-	ID3D12Resource* CreateShaderVariable(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
+
+	virtual void CreateShaderVariable(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 	void CountDiedTime(float dieTime);
 };

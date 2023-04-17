@@ -878,3 +878,78 @@ void CTexturedRectMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, int n
 
 	pd3dCommandList->DrawInstanced(m_nVertices, 1, m_nOffset, 0);
 }
+//--------------------------------------------------------------------------------------------------
+
+CRayLineMesh::CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 Vector, float fWidth, float fHeight, float fDepth, float fxPosition, float fyPosition, float fzPosition) : CMesh(pd3dDevice, pd3dCommandList)
+{
+	int m_nNumber = 30;//사각형 각 변을 이만큼 쪼개겟다. 
+	m_nVertices = 2 * m_nNumber * m_nNumber; //사각형에서 라인을 100개씩 그리려고한다. (10x10 인듯? 그럼) 
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+	//중심의 좌표가 float fxPosition, float fyPosition, float fzPosition
+	//사각형의 너비가 float fWidth, float fHeight, float fDepth
+	//float fDepth가 그려야할 길이라고 설정한다. 
+
+	m_pxmf3Positions = new XMFLOAT3[m_nVertices];
+	m_pxmf2TextureCoords0 = new XMFLOAT2[m_nVertices];
+	m_pxmf2Vector = new XMFLOAT3[m_nVertices];
+
+	/*	XMVECTOR dirVector = XMLoadFloat3(&Vector);
+	XMVECTOR upVector = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);  // 임의의 위쪽 벡터
+	upVector = XMVector3Cross(dirVector, upVector);  // 방향 벡터와 위쪽 벡터의 외적 계산
+	upVector = XMVector3Normalize(upVector);  // 벡터 정규화
+	XMFLOAT3 perpendicular;
+	XMStoreFloat3(&perpendicular, upVector);
+
+	float fx = Vector3::ScalarProduct(perpendicular, -(fWidth * 0.5f)).x + fxPosition, fy = Vector3::ScalarProduct(perpendicular, -(fHeight * 0.5f)).y + fyPosition; //시작점
+	float fz = Vector3::ScalarProduct(XMFLOAT3(fxPosition, fyPosition, fzPosition), fDepth).z; //끝점 //fzPosition +Vector3::ScalarProduct(Vector, fDepth).z;
+	*/
+
+	float fx = -(fWidth * 0.5f) + fxPosition, fy = -(fHeight * 0.5f) + fyPosition; //시작점
+	float fz = Vector3::ScalarProduct(XMFLOAT3(fxPosition, fyPosition, fzPosition), fDepth).z; //끝점 //fzPosition +Vector3::ScalarProduct(Vector, fDepth).z;
+	float dx = fWidth / m_nNumber, dy = fHeight / m_nNumber;
+
+	//시작점인듯 
+	int num = 0;
+	for (int i = 0; i < m_nNumber; i++) {
+		for (int z = 0; z < m_nNumber; z++) {
+			m_pxmf3Positions[num] = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x, Vector3::ScalarProduct(Vector, fy + (dy * z)).y, Vector3::ScalarProduct(Vector,fzPosition).z); m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3();
+			m_pxmf3Positions[num] = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x, Vector3::ScalarProduct(Vector, fy + (dy * z)).y, Vector3::ScalarProduct(Vector, fz).z); m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3(); ;
+		}
+	}
+
+	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
+
+	m_d3dPositionBufferView.BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
+	m_d3dPositionBufferView.StrideInBytes = sizeof(XMFLOAT3);
+	m_d3dPositionBufferView.SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
+
+	m_pd3dTextureCoord0Buffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf2TextureCoords0, sizeof(XMFLOAT2) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dTextureCoord0UploadBuffer);
+
+	m_d3dTextureCoord0BufferView.BufferLocation = m_pd3dTextureCoord0Buffer->GetGPUVirtualAddress();
+	m_d3dTextureCoord0BufferView.StrideInBytes = sizeof(XMFLOAT2);
+	m_d3dTextureCoord0BufferView.SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
+}
+
+CRayLineMesh::~CRayLineMesh()
+{
+	if (m_pd3dTextureCoord0Buffer) m_pd3dTextureCoord0Buffer->Release();
+	if (m_pxmf2TextureCoords0) delete[] m_pxmf2TextureCoords0;
+}
+
+void CRayLineMesh::ReleaseUploadBuffers()
+{
+	CMesh::ReleaseUploadBuffers();
+
+	if (m_pd3dTextureCoord0UploadBuffer) m_pd3dTextureCoord0UploadBuffer->Release();
+	m_pd3dTextureCoord0UploadBuffer = NULL;
+}
+
+void CRayLineMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSet)
+{
+	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);
+
+	D3D12_VERTEX_BUFFER_VIEW pVertexBufferViews[2] = { m_d3dPositionBufferView, m_d3dTextureCoord0BufferView };
+	pd3dCommandList->IASetVertexBuffers(m_nSlot, 2, pVertexBufferViews);
+
+	pd3dCommandList->DrawInstanced(m_nVertices, 1, m_nOffset, 0);
+}

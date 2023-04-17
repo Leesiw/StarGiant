@@ -1639,21 +1639,6 @@ void CEnemyObject::VelocityUpdate(float fTimeElapsed, XMFLOAT3& player_look)
 	}
 }
 
-void CEnemyObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
-{
-	CGameObject::Render(pd3dCommandList, pCamera);
-	if (isDied) {
-		m_pDieSprite->Render(pd3dCommandList, pCamera);
-		m_pDieSprite->SetCntTime(0.0f);
-		if (m_pDieSprite->GetCntTime() < 0)
-		{
-			//delete m_pDieSprite;
-			//m_pDieSprite = NULL; //여기 오류나면 고쳐야함. 
-			//isDied = false;
-			//cout << "sprite delete" << endl;
-		}
-	}
-}
 
 
 void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
@@ -1680,15 +1665,6 @@ void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	else {
 		Rotate(pitch, yaw, 0.f);
 	}
-}
-
-void CEnemyObject::DieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
-{
-	CSpriteObject* m_pSpritdump = new CSpriteObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, XMFLOAT3(0, 0, 0), XMFLOAT3(0.f, 0.f, 0.f), static_cast<int>(SpriteType::EnemyBoom));
-	m_pSpritdump->SetPosition(GetPosition());
-	m_pDieSprite = m_pSpritdump;
-	isDied = true;
-	//m_pDieSprite 의 함수를 발동하면, 그만큼 있다가 알아서 사라지게하기. 
 }
 
 
@@ -2006,6 +1982,7 @@ CSpriteObject::CSpriteObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	Animate(0.0f);
 	SetMaterial(0, pStriteMaterial);
 	SpriteMode = type;
+	is_Alive = true;
 
 }
 
@@ -2056,7 +2033,7 @@ void CSpriteObject::CountDiedTime(float dieTime)
 {
 	m_fCntTime += m_fTime;
 	if (m_fCntTime >=dieTime){
-		m_fCntTime = -1.0f; //삭제용 
+		is_Alive = false; //삭제용 
 	}
 	cout << m_fCntTime << endl;
 }
@@ -2074,15 +2051,14 @@ void CSpriteObject::SetfollowPosition(XMFLOAT3 Target, XMFLOAT3 Distance,XMFLOAT
 	//왜이러냐 진짜 
 }
 
-ID3D12Resource* CSpriteObject::CreateShaderVariable(ID3D12Device* pd3dDevice,ID3D12GraphicsCommandList* pd3dCommandList)
+void CSpriteObject::CreateShaderVariable(ID3D12Device* pd3dDevice,ID3D12GraphicsCommandList* pd3dCommandList)
 { 
 	//only do once time
-	ID3D12Resource* m_pd3dcbPlusInfo = NULL;
+	m_pcbplusShaderVariable = NULL;
 	UINT ncbElementBytes = ((sizeof(CB_PLUS_INFO) + 255) & ~255); //256의 배수
-	m_pd3dcbPlusInfo = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER | D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
+	m_pcbplusShaderVariable = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER | D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
 
-	m_pd3dcbPlusInfo->Map(0, NULL, (void**)&m_pcbPlusInfo); 
-	return m_pd3dcbPlusInfo;
+	m_pcbplusShaderVariable->Map(0, NULL, (void**)&m_pcbPlusInfo);
 }
 
 

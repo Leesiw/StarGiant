@@ -366,14 +366,21 @@ float4					m_cEmissive;
 Texture2D gtxtGODTexture1 : register(t15);
 Texture2D gtxtGODTexture2 : register(t16);
 
-float3 LINE(float3 screenPos, float3 screenDir)
+float4 CalculateLineColor(float3 pixelPos)
 {
-	return (screenPos + screenDir);
+	// 픽셀 위치를 노이즈 텍스처 좌표계로 변환합니다.
+	float2 noiseCoord = pixelPos.xy / 10.0;
+
+	// 노이즈 텍스처에서 샘플링한 값을 노이즈 값으로 사용합니다.
+	float noiseValue = gtxtGODTexture1.Sample(gssWrap, noiseCoord).r * 0.5;
+
+	// 직선의 색상값을 계산합니다.
+	float4 lineColor = float4(noiseValue, noiseValue, noiseValue, 1.0);
+	//float4 lineColor = float4(0,0,0, 1.0);
+
+	return lineColor;
 }
-float4 Draw(float3 screenPos, float4 screenCol) : SV_TARGET
-{
-	return(float4(1.0,0.0f,0.0f,1.0f));
-}
+
 float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 {
 	/*float compositeNoise = 0.015f;
@@ -424,15 +431,7 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 	else if (cColor.a >0.4)cColor.rgb *= 1.1f + (cColor.a - 0.4);
 	else cColor.rgb *= 1.f + (cColor.a);
 	//
-	float DIR = LINE(input.position, float3(0.0f, 0.0f, -1.0f));
-	float3 pixelPos = input.position;
-	for (int i = 0; i < 10; ++i) {
-		// D 만큼 이동한 위치
-		pixelPos += DIR * 0.1f;
-		// 픽셀 그리기
-		Draw(pixelPos, cColor);
-	}
-	//
+
 	return(cColor);
 
 }

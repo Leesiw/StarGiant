@@ -89,6 +89,8 @@ public:
 	// ����
 	void RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info);
 	void TransformMeteor(METEO_INFO m_info);
+	virtual void AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position);
+
 
 protected:
 	ID3D12RootSignature					*m_pd3dGraphicsRootSignature = NULL;
@@ -157,7 +159,7 @@ public:
 	CUI* m_ppUIName[3];
 
 	CSpriteObject					* m_ppSprite[SPRITE_CNT];
-
+	std::list<CSpriteObject*> m_pDieSprite;
 
 
 	int									m_nShaders = 0;
@@ -174,7 +176,6 @@ public:
 	XMFLOAT4							m_xmf4GlobalAmbient;
 
 	ID3D12Resource						*m_pd3dcbLights = NULL;
-	ID3D12Resource						* m_pd3dcbPlusInfo = NULL;
 	LIGHTS								*m_pcbMappedLights = NULL;
 
 
@@ -188,6 +189,9 @@ public:
 
 	int m_nScenePlayer = 1;
 	bool b_Inside = false;
+	bool isDiedSprite = false;
+
+	int m_temp = 2;
 
 
 };
