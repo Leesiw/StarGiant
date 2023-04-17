@@ -1647,10 +1647,10 @@ void CEnemyObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* p
 		m_pDieSprite->SetCntTime(0.0f);
 		if (m_pDieSprite->GetCntTime() < 0)
 		{
-			delete m_pDieSprite;
-			m_pDieSprite = NULL; //여기 오류나면 고쳐야함. 
-			isDied = false;
-			cout << "sprite delete" << endl;
+			//delete m_pDieSprite;
+			//m_pDieSprite = NULL; //여기 오류나면 고쳐야함. 
+			//isDied = false;
+			//cout << "sprite delete" << endl;
 		}
 	}
 }
