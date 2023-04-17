@@ -164,23 +164,23 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_ppHierarchicalGameObjects[7]->SetScale(1.0f, 1.0f, 1.0f);
 	if (pZebraModel) delete pZebraModel;
 
-	CLoadedModelInfo* pLionModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Lion.bin", NULL);
+	CLoadedModelInfo* pLionModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/arrow.bin", NULL);
 	m_ppHierarchicalGameObjects[8] = new CLionObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pLionModel, 1);
 	m_ppHierarchicalGameObjects[8]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppHierarchicalGameObjects[8]->SetPosition(300.0f, m_pTerrain->GetHeight(300.0f, 650.0f), 630.0f);
-	m_ppHierarchicalGameObjects[8]->SetScale(1.0f, 1.0f, 1.0f);
+	m_ppHierarchicalGameObjects[8]->SetPosition(420.0f, 420.0f, 420.0f);
+	m_ppHierarchicalGameObjects[8]->SetScale(100.0f, 100.0f, 100.0f);
 	m_ppHierarchicalGameObjects[9] = new CLionObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pLionModel, 1);
-	m_ppHierarchicalGameObjects[9]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
-	m_ppHierarchicalGameObjects[9]->SetPosition(310.0f, m_pTerrain->GetHeight(310.0f, 630.0f), 630.0f);
-	m_ppHierarchicalGameObjects[9]->SetScale(1.0f, 1.0f, 1.0f);
+	m_ppHierarchicalGameObjects[9]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	m_ppHierarchicalGameObjects[9]->SetPosition(420.0f,250.0f, 640.0f);
+	m_ppHierarchicalGameObjects[9]->SetScale(1500.0f, 15.0f, 1500.0f);
 	m_ppHierarchicalGameObjects[10] = new CLionObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pLionModel, 1);
-	m_ppHierarchicalGameObjects[10]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
+	m_ppHierarchicalGameObjects[10]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppHierarchicalGameObjects[10]->SetPosition(250.0f, m_pTerrain->GetHeight(250.0f, 600.0f), 600.0f);
-	m_ppHierarchicalGameObjects[10]->SetScale(1.0f, 1.0f, 1.0f);
+	m_ppHierarchicalGameObjects[10]->SetScale(100.0f, 100.0f, 100.0f);
 	m_ppHierarchicalGameObjects[11] = new CLionObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pLionModel, 1);
-	m_ppHierarchicalGameObjects[11]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 3);
+	m_ppHierarchicalGameObjects[11]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppHierarchicalGameObjects[11]->SetPosition(270.0f, m_pTerrain->GetHeight(270.0f, 620.0f), 620.0f);
-	m_ppHierarchicalGameObjects[11]->SetScale(1.0f, 1.0f, 1.0f);
+	m_ppHierarchicalGameObjects[11]->SetScale(100.0f, 100.0f, 100.0f);
 	if (pLionModel) delete pLionModel;
 
 	CLoadedModelInfo* pMeteoModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo2.bin", NULL);
@@ -1120,6 +1120,31 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	for (int i = 0; i < m_nShaders; i++) if (m_ppShaders[i]) m_ppShaders[i]->Render(pd3dCommandList, pCamera);
 	if (m_nShaders>1) m_ppShaders[1]->SetPlayerPosition(m_pPlayer[0]->GetPosition());
 
+
+	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+	XMFLOAT3 xmf3CameraLook = pCamera->GetLookVector();
+	XMFLOAT3 xmf3Position = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 50.0f, false));
+
+
+	XMFLOAT3 xmf3Position2 = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 10.0f, false));
+	XMFLOAT3 tar = { 1000.0f,1000.0f,1000.0f };
+	if (m_pPlayer[0]->curMissionType == MissionType::GO_PLANET) {
+		m_ppHierarchicalGameObjects[9]->SetPosition(xmf3Position2);
+		m_ppHierarchicalGameObjects[9]->SetLookAt(tar, XMFLOAT3(0.0f, 1.0f, 0.0f));
+		m_ppHierarchicalGameObjects[9]->Rotate(90, 0, 0);
+		m_ppHierarchicalGameObjects[9]->SetScale(10, 5, 10);
+	}
+
+	if (m_pPlayer[0]->curMissionType == MissionType::FIND_BOSS) {
+		m_ppHierarchicalGameObjects[9]->SetPosition(xmf3Position2);
+		m_ppHierarchicalGameObjects[9]->SetLookAt(m_ppBoss->GetPosition(), XMFLOAT3(0.0f, 0.5f, 0.0f));
+		m_ppHierarchicalGameObjects[9]->Rotate(90, 0, 0);
+		m_ppHierarchicalGameObjects[9]->SetScale(10, 5, 10);
+	}
+
+
+
+
 	for (int i = 0; i < m_nHierarchicalGameObjects; i++)
 	{
 		if (m_ppHierarchicalGameObjects[i])
@@ -1213,9 +1238,15 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
 	XMFLOAT3 xmf3CameraLook = pCamera->GetLookVector();
 	XMFLOAT3 xmf3Position = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 50.0f, false));
+
+	
+
+
 	
 	m_ppUI[0]->SetPosition(xmf3Position); //static_cast<int>(UIType::CROSSHAIR)
 	m_ppUI[0]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+
+
 
 	for (int i = 2; i < ENEMIES + 2; i++) // hp bar
 	{

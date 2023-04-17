@@ -784,6 +784,7 @@ void CGameFramework::FrameAdvance()
 
 	UpdateUI();
 
+	m_pPlayer[0]->curMissionType = curMissionType;
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
@@ -882,7 +883,6 @@ void CGameFramework::UpdateUI()
 	}*/
 
 	uiText = ChangeMission(curMissionType);
-
 
 
 	if (scriptsOn) {

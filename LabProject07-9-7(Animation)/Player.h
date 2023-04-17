@@ -47,6 +47,7 @@ protected:
 
 public:
 	AnimationState motion;
+	MissionType curMissionType;
 	
 public:
 	CPlayer();
