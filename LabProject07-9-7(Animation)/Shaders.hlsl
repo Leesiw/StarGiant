@@ -305,14 +305,15 @@ struct VS_SPRITE_OUTPUT
 	float2 uv : TEXCOORD0;
 };
 
-
 //스프라이트 VS
 VS_SPRITE_OUTPUT VS_SPRITE(VS_SPRITE_INPUT input)
 {
 	VS_SPRITE_OUTPUT output;
+
 	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
-	output.uv = mul(float3(input.uv, 1.0f), (float3x3)(gmtxTexture)).xy;
-	//input.position.y += test.y * 10000;
+	output.uv = mul(float3(input.uv, 1.0f), (float3x3)(gmtxTexture)).xy;//gmtxTexture
+	 // 디버그 스트링 출력
+
 	//output.uv = input.uv;
 	return(output);
 }
@@ -321,6 +322,7 @@ Texture2D gtxtSPRITETexture : register(t17);
 float4 PS_SPRITE(VS_SPRITE_OUTPUT input) : SV_TARGET
 {
 	float4 cColor = gtxtSPRITETexture.Sample(gssWrap, input.uv);
+	//cColor = float4(1.0,1.0,1.0,1.0);
 	return (cColor);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,7 +366,14 @@ float4					m_cEmissive;
 Texture2D gtxtGODTexture1 : register(t15);
 Texture2D gtxtGODTexture2 : register(t16);
 
-
+float3 LINE(float3 screenPos, float3 screenDir)
+{
+	return (screenPos + screenDir);
+}
+float4 Draw(float3 screenPos, float4 screenCol) : SV_TARGET
+{
+	return(float4(1.0,0.0f,0.0f,1.0f));
+}
 float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 {
 	/*float compositeNoise = 0.015f;
@@ -414,7 +423,16 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 	else if (cColor.a >0.6) cColor.rgb *= 1.3f + (cColor.a - 0.6);
 	else if (cColor.a >0.4)cColor.rgb *= 1.1f + (cColor.a - 0.4);
 	else cColor.rgb *= 1.f + (cColor.a);
-
+	//
+	float DIR = LINE(input.position, float3(0.0f, 0.0f, -1.0f));
+	float3 pixelPos = input.position;
+	for (int i = 0; i < 10; ++i) {
+		// D 만큼 이동한 위치
+		pixelPos += DIR * 0.1f;
+		// 픽셀 그리기
+		Draw(pixelPos, cColor);
+	}
+	//
 	return(cColor);
 
 }
@@ -454,45 +472,20 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 //	// 두 개의 픽셀 색상 값을 합쳐서 출력
 //	return color1 + color2;
 //}
-
 /*
-struct VS_OUTPUT
+float3 LINE(float2 screenPos, float2 screenSize, float4x4 invProjMatrix, float4x4 invViewMatrix)
 {
-	float4 Position : SV_POSITION;
-	float2 TexCoord : TEXCOORD0;
-};
+	// Compute clip space coordinates
+	float2 clipPos = (screenPos / screenSize) * 2.0f - 1.0f;
+	clipPos.y = -clipPos.y;
 
-VS_OUTPUT VSMain(float4 position : POSITION, float2 texCoord : TEXCOORD0)
-{
-	VS_OUTPUT output;
-	output.Position = position;
-	output.TexCoord = texCoord;
-	return output;
-}
+	// Compute view space position
+	float4 viewPos = mul(invProjMatrix, float4(clipPos, 0.0f, 1.0f));
+	viewPos.xyz /= viewPos.w;
 
-float4 PSMain(float2 texCoord : TEXCOORD0) : SV_TARGET
-{
-	// 텍스처 샘플링해서 화면에 그리기
-	float4 color = tex.Sample(sampler, texCoord);
-	return color;
-}
+	// Compute world space position
+	float4 worldPos = mul(invViewMatrix, viewPos);
 
-float4 PSMain2(float2 texCoord : TEXCOORD0) : SV_TARGET1
-{
-	// 투명하지 않은 픽셀의 위치 구하기
-	float4 color = tex2.Sample(sampler2, texCoord);
-	if (color.a > 0.5)
-	{
-		return float4(texCoord, 0.0, 1.0);
-	}
-	else
-	{
-		return float4(0.0, 0.0, 0.0, 0.0);
-	}
-}
-
-float4 Combine(float4 color1 : SV_TARGET, float4 color2 : SV_TARGET1) : SV_TARGET
-{
-	// 두 개의 픽셀 색상 값을 합쳐서 출력
-	return color1 + color2;
+	return worldPos.xyz;
 }*/
+

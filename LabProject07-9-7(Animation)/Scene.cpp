@@ -257,7 +257,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	//=====================================
 	for (int i = 0; i < SPRITE_CNT; ++i) {
-		m_ppSprite[i] = new CSpriteObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(0,0,0), XMFLOAT3(0.f,0.f,0.f));
+		m_ppSprite[i] = new CSpriteObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(0,0,0), XMFLOAT3(0.f,0.f,0.f), static_cast<int>(SpriteType::Ship));
 		m_ppSprite[i]->SetPosition(435.f, 250.f, 640.f);
 	}
 	m_pd3dcbPlusInfo =m_ppSprite[0]->CreateShaderVariable(pd3dDevice, pd3dCommandList);
@@ -387,6 +387,7 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	if (pMascotModel) delete pMascotModel;
 
 	//=====================================
+	
 	//���Ƿ� �����ϴ� �ٿ���ڽ� (���� ���� Height���� ���� �浹�˻�� �ٲٰ����) 
 	b_Inside = true;
 	xm_MapAABB = BoundingBox(XMFLOAT3(m_ppHierarchicalGameObjects[0]->GetPosition().x, m_ppHierarchicalGameObjects[0]->GetPosition().y, m_ppHierarchicalGameObjects[0]->GetPosition().z + 90.f), XMFLOAT3(125.f, 100.0f, 110.0f));
@@ -466,7 +467,10 @@ void CScene::ReleaseObjects()
 
 	if (m_ppEnemies)
 	{
-		for (int i = 0; i < ENEMIES; i++) if (m_ppEnemies[i]) m_ppEnemies[i]->Release();
+		for (int i = 0; i < ENEMIES; i++) {
+			if (m_ppEnemies[i]->m_pDieSprite) m_ppEnemies[i]->m_pDieSprite->Release();//
+			if (m_ppEnemies[i]) m_ppEnemies[i]->Release();
+		}
 		delete[] m_ppEnemies;
 	}
 
@@ -504,6 +508,11 @@ void CScene::ReleaseObjects()
 	{
 		for (int i = 0; i < 3; i++) if (m_ppUIName[i]) m_ppUIName[i]->Release();
 		delete[] m_ppUIName;
+	}
+	if (m_ppSprite)
+	{
+		for (int i = 0; i < SPRITE_CNT; i++) if (m_ppSprite[i]) m_ppSprite[i]->Release();
+		delete[] m_ppSprite;
 	}
 
 
@@ -719,9 +728,9 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	pd3dRootParameters[18].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[13]); //Sprite texture
 	pd3dRootParameters[18].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
-	pd3dRootParameters[19].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
-	pd3dRootParameters[19].Constants.Num32BitValues = 2;
-	pd3dRootParameters[19].Constants.ShaderRegister = 9; //plus
+	pd3dRootParameters[19].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	//pd3dRootParameters[19].Constants.Num32BitValues = 2;
+	pd3dRootParameters[19].Constants.ShaderRegister = 9; //plus SpriteTransform
 	pd3dRootParameters[19].Constants.RegisterSpace = 0;
 	pd3dRootParameters[19].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
@@ -1175,11 +1184,17 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (!m_ppMascot->m_pSkinnedAnimationController) m_ppMascot->UpdateTransform(NULL);
 		m_ppMascot->Render(pd3dCommandList, pCamera);
 	}
+	//우선 내부일떄 안써서 제한해놓음. 
+	if (!b_Inside) {
+		for (int i = 0; i < SPRITE_CNT; i++) {
 
-	for (int i = 0; i < SPRITE_CNT; i++) {
-		//m_ppSprite[i]->Animate(m_fElapsedTime);
-		//m_ppSprite[i]->UpdateShaderVariables(pd3dCommandList, m_pd3dcbPlusInfo);
-		//m_ppSprite[i]->Render(pd3dCommandList, pCamera);
+			m_ppSprite[i]->Animate(m_fElapsedTime);
+			m_ppSprite[i]->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(30.0f, -60.0f, 0.0f), m_pPlayer[0]->GetLook());
+			m_ppSprite[i]->UpdateShaderVariables(pd3dCommandList, m_pd3dcbPlusInfo);
+			m_ppSprite[i]->Render(pd3dCommandList, pCamera);
+
+
+		}
 	}
 
 }

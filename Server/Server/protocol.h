@@ -132,6 +132,11 @@ enum class MissionType : char
 	TU_SIT, TU_KILL, TU_HILL, TU_END, GET_JEWELS, Kill_MONSTER, GO_PLANET, KILL_MONSTER_ONE_MORE_TIME, FIND_BOSS, DEFEAT_BOSS
 };
 
+enum class SpriteType : char
+{
+	Ship, EnemyBoom
+};
+
 #pragma pack (push, 1)
 
 // login
