@@ -70,6 +70,8 @@ constexpr char SC_HEAL = 22;
 constexpr char SC_MISSION_START = 23;
 constexpr char SC_KILL_NUM = 24;
 
+constexpr char CS_NEXT_MISSION = 25;
+
 enum class PlayerType : char
 {
 	INSIDE, MOVE, ATTACK1, ATTACK2, ATTACK3
@@ -241,6 +243,13 @@ struct ITEM_INFO {
 	char num;
 };
 //-----------------------------------------------------------------------
+
+// cheat / debugging
+struct CS_NEXT_MISSION_PACKET {
+	unsigned char size;
+	char	type;
+};
+
 
 // login
 struct SC_LOGIN_INFO_PACKET {

@@ -368,6 +368,11 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		break;
 	}
+	case CS_NEXT_MISSION: {
+		CS_NEXT_MISSION_PACKET* p = reinterpret_cast<CS_NEXT_MISSION_PACKET*>(packet);
+		m_pScene->MissionClear();
+		break;
+	}
 	}
 	//prev_process_time = chrono::system_clock::now();
 }

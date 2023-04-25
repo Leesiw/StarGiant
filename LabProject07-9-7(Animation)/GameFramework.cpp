@@ -382,6 +382,12 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				b_Inside = !b_Inside;
 				std::cout << "¾À ÀüÈ¯";
 				break;
+			case 'N':
+				CS_NEXT_MISSION_PACKET my_packet;
+				my_packet.size = sizeof(CS_NEXT_MISSION_PACKET);
+				my_packet.type = CS_NEXT_MISSION;
+				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+				break;
 
 			case 'F': //FÅ° »óÈ£ÀÛ¿ë ¾É±â
 				if (b_Inside || m_pInsidePlayer[g_myid]->GetSitState())
