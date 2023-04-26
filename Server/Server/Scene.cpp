@@ -228,6 +228,18 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 			return;
 		}
 	}
+
+	m_pBoss->UpdateBoundingBox();
+	if (m_pBoss->m_xmOOBB.Intersects(pos, dir, dist)) // 보스 충돌처리
+	{
+		m_pBoss->BossHP -= m_pSpaceship->damage;
+		for (auto& pl : clients)
+		{
+			if (pl.in_use == false) continue;
+			pl.send_bullet_hit_packet(0, BOSS_ID, m_pBoss->BossHP);
+		}
+		return;
+	}
 }
 
 void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)

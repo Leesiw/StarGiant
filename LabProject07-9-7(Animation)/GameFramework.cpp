@@ -1410,7 +1410,17 @@ void CGameFramework::ProcessPacket(char* p)
 		SC_BULLET_HIT_PACKET* packet = reinterpret_cast<SC_BULLET_HIT_PACKET*>(p);
 
 		// 적/플레이어 hp 감소. 폭발 애니메이션/소리/죽음 등
-		if (packet->data.id >= 0) {
+		if (packet->data.id >= 0) {	// 적 + 보스
+			if (packet->data.id == BOSS_ID)	// 보스
+			{
+				if (packet->data.hp <= 0) {
+					// 보스 죽음 (게임 클리어?)
+				}
+				m_pScene->m_ppBoss->BossHP = packet->data.hp;
+
+				break;
+			}
+
 			if (packet->data.hp <= 0) { // 죽음
 				m_pScene->m_ppEnemies[packet->data.id]->isAlive = false;
 				m_pScene->AddDieSprite(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition());

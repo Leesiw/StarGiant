@@ -11,7 +11,7 @@ Boss::Boss()
 	CurMotion = BossAnimation::SLEEP;
 	CurState = BossState::SLEEP;
 
-	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.000326785f, 0.000591403f, 0.00025633), XMFLOAT3(0.0121736f, 0.0124823f, 0.00240084f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 34.65389f, -10.1982f), XMFLOAT3(65.5064392f, 35.0004547f, 77.9787476f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 }
 
 
