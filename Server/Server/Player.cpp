@@ -100,6 +100,18 @@ void CPlayer::Rotate(float x, float y, float z)
 
 void CPlayer::Update(float fTimeElapsed)
 {
+	XMFLOAT3 pos = GetPosition();
+	float dist;
+	dist = Vector3::Length(Vector3::Subtract(pos, XMFLOAT3(1000.f, 1000.f, 1000.f)));
+
+	if (dist < 800.f)
+	{
+		XMFLOAT3 ToGo = Vector3::Subtract(pos, XMFLOAT3(1000.f, 1000.f, 1000.f));
+		ToGo = Vector3::ScalarProduct(ToGo, 800.f);
+		ToGo = Vector3::Add(XMFLOAT3(1000.f, 1000.f, 1000.f), ToGo);
+		SetPosition(ToGo);
+	}
+
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
 	float fLength = Vector3::Length(m_xmf3Velocity);
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;

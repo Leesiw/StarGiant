@@ -435,7 +435,7 @@ void CScene::CheckMissionComplete()
 		XMFLOAT3 planet_pos{ 1000.f, 1000.f, 1000.f }; // юс╫ц абг╔
 
 		float dist = Vector3::Length(Vector3::Subtract(player_pos, planet_pos));
-		if (dist < 500.f) {
+		if (dist < 1000.f) {
 			MissionClear();
 		}
 		break;
