@@ -1237,7 +1237,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			object->Animate(m_fElapsedTime);
 			object->UpdateShaderVariables(pd3dCommandList, object->GetShaderVariables());
 			object->Render(pd3dCommandList, pCamera);
-			for (std::list<CSpriteObject*>::iterator i = m_pDieSprite.begin(); i != m_pDieSprite.end();)
+			/*for (std::list<CSpriteObject*>::iterator i = m_pDieSprite.begin(); i != m_pDieSprite.end();)
 			{
 				if (!(*i)->is_Alive)
 				{
@@ -1245,7 +1245,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 					i = m_pDieSprite.erase(i);
 				}
 				else i++;
-			}
+			}*/
 		}
 	}
 
@@ -1264,9 +1264,6 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
 	XMFLOAT3 xmf3CameraLook = pCamera->GetLookVector();
 	XMFLOAT3 xmf3Position = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 50.0f, false));
-
-	
-
 
 	
 	m_ppUI[0]->SetPosition(xmf3Position); //static_cast<int>(UIType::CROSSHAIR)
@@ -1362,7 +1359,7 @@ void CScene::RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 
 void CScene::AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position)
 {
-	CSpriteObject* m_pSpritdump = new CSpriteObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, XMFLOAT3(0, 0, 0), XMFLOAT3(0.f, 0.f, 0.f), static_cast<int>(SpriteType::Ship));
+	CSpriteObject* m_pSpritdump = new CSpriteObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, XMFLOAT3(0, 0, 0), XMFLOAT3(0.f, 0.f, 0.f), static_cast<int>(SpriteType::EnemyBoom));
 	m_pSpritdump->SetPosition(Position);
 	m_pSpritdump->CreateShaderVariable(pd3dDevice, pd3dCommandList);
 	m_pDieSprite.push_back(m_pSpritdump);

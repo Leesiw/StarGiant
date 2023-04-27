@@ -905,7 +905,7 @@ CRayLineMesh::CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	*/
 
 	float fx = -(fWidth * 0.5f) + fxPosition, fy = -(fHeight * 0.5f) + fyPosition; //시작점
-	float fz = Vector3::ScalarProduct(XMFLOAT3(fxPosition, fyPosition, fzPosition), fDepth).z; //끝점 //fzPosition +Vector3::ScalarProduct(Vector, fDepth).z;
+	float fz = fzPosition + Vector3::ScalarProduct(Vector, fDepth).z;//Vector3::ScalarProduct(XMFLOAT3(fxPosition, fyPosition, fzPosition), fDepth).z; //끝점 //
 	float dx = fWidth / m_nNumber, dy = fHeight / m_nNumber;
 
 	//시작점인듯 

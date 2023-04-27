@@ -920,7 +920,7 @@ void CGodRayShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 		if (m_ppObjects[i]) {
 			//m_ppObjects[i]->UpdateTransform(NULL);
 			AnimateObjects(pCamera);
-			m_ppObjects[i]->Render(pd3dCommandList, pCamera);
+			//m_ppObjects[i]->Render(pd3dCommandList, pCamera);
 			pLightObject->Render(pd3dCommandList, pCamera);
 			m_ppLineObjects[i]->Render(pd3dCommandList, pCamera);
 		}
@@ -1116,4 +1116,3 @@ D3D12_INPUT_LAYOUT_DESC CSpriteShader::CreateInputLayout()
 
 	return(d3dInputLayoutDesc);
 }
-

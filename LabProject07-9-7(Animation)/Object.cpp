@@ -1773,8 +1773,31 @@ CBulletObject::CBulletObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	CLoadedModelInfo* pBulletModel = pModel;
 	if (!pBulletModel) pBulletModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/cube.bin", NULL);
 
+	/*CcolorShader* pBulletShader = new CcolorShader();
+	pBulletShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pBulletShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CMaterial* pBulletMaterial = new CMaterial(1);
+	pBulletMaterial->SetShader(pBulletShader);
+
+	pBulletMaterial->m_xmf4AlbedoColor = XMFLOAT4(0.8, 0.8, 0.8, 1);
+	pBulletMaterial->m_xmf4EmissiveColor = XMFLOAT4(0.2, 0.2, 0.2, 1);
+	pBulletMaterial->m_xmf4AmbientColor = XMFLOAT4(0.8, 0.8, 0.8, 1);
+
+	pBulletModel->m_pModelRootObject->SetMaterial(0, pBulletMaterial);*/
+
+	if (pBulletModel->m_pModelRootObject->m_ppMaterials[0])
+	{
+		//pBulletModel->m_pModelRootObject->m_ppMaterials[0]->m_xmf4AlbedoColor = XMFLOAT4(1, 1, 1, 1);
+		pBulletModel->m_pModelRootObject->m_ppMaterials[0]->m_xmf4EmissiveColor = XMFLOAT4(1,1,1,1);
+		pBulletModel->m_pModelRootObject->m_ppMaterials[0]->m_xmf4AmbientColor = XMFLOAT4(1,1,1, 1); 
+		pBulletModel->m_pModelRootObject->m_ppMaterials[0]->m_xmf4SpecularColor = XMFLOAT4(1,1,1, 1); 
+	}
+
 	SetChild(pBulletModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pBulletModel);
+	
+
 }
 
 void CBulletObject::Animate(float fElapsedTime)
