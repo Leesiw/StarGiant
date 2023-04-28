@@ -201,7 +201,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	}
 
 	for (int i = METEOS / 2; i < METEOS; ++i) {
-		CLoadedModelInfo* pMeteoModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
+		CLoadedModelInfo* pMeteoModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Rock.bin", NULL);
 		m_ppMeteorObjects[i] = new CMeteorObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMeteoModel, 1);
 		m_ppMeteorObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_ppMeteorObjects[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);

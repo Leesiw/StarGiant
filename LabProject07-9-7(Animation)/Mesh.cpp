@@ -443,7 +443,6 @@ void CStandardMesh::LoadMeshFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 
 			m_xmOOBB = BoundingOrientedBox(m_xmf3AABBCenter, m_xmf3AABBExtents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)); //바운딩 박스
 
-
 		}
 		else if (!strcmp(pstrToken, "<Positions>:"))
 		{
