@@ -1273,10 +1273,14 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 
 	for (int i = 2; i < ENEMIES + 2; i++) // hp bar
 	{
-		if (m_ppEnemies[i- 2]&& m_ppEnemies[i - 2]->isAlive) {
+		if (m_ppEnemies[i- 2]&& m_ppEnemies[i - 2]->isAlive == true) {
 			m_ppUI[i]->SetPosition(m_ppEnemies[i - 2]->GetPosition().x, m_ppEnemies[i - 2]->GetPosition().y + 10.0f, m_ppEnemies[i - 2]->GetPosition().z);
 			m_ppUI[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
 			m_ppUI[i]->HpbarUpdate(m_ppEnemies[i - 2]->GetPosition(), m_ppEnemies[i - 2]->GetMaxHp(), m_ppEnemies[i - 2]->GetcurHp());
+		}
+		else if (m_ppEnemies[i - 2]->isAlive == false)
+		{
+			m_ppUI[i]->HpbarUpdate(m_ppEnemies[i - 2]->GetPosition(), m_ppEnemies[i - 2]->GetMaxHp(), 0);
 		}
 	}
 
