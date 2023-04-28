@@ -70,8 +70,21 @@ extern HINSTANCE						ghAppInstance;
 
 //#define _WITH_SWAPCHAIN_FULLSCREEN_STATE
 
-#define FRAME_BUFFER_WIDTH				640
-#define FRAME_BUFFER_HEIGHT				480
+
+
+//HDC hScrDC = ::GetDC(NULL);
+//int nddWidth = ::GetDeviceCaps(hScrDC, HORZRES);
+//int nddHeight = ::GetDeviceCaps(hScrDC, VERTRES);
+
+
+#define FRAME_BUFFER_WIDTH		1600
+#define FRAME_BUFFER_HEIGHT		900
+
+
+
+
+// (±¸)640 X 480 VGA
+
 
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "d3d12.lib")

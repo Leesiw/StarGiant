@@ -916,11 +916,11 @@ void CGameFramework::UpdateUI()
 	JEWEL_HP = to_wstring(items[ItemType::JEWEL_HP]);
 
 	uiJew += JEWEL_ATT;
-	uiJew += L"     ";
+	uiJew += L"\n\n";
 	uiJew += JEWEL_DEF;
-	uiJew += L"\n";
+	uiJew += L"\n\n";
 	uiJew += JEWEL_HEAL;
-	uiJew += L"     ";
+	uiJew += L"\n\n";
 	uiJew += JEWEL_HP;
 
 	m_pUILayer->UpdateLabels(uiText);

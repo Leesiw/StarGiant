@@ -133,7 +133,7 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
 
 
     IWICBitmapDecoder* pwicBitmapDecoder_jewel;
-    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/jew.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_jewel);
+    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/jew1.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_jewel);
 
     IWICBitmapFrameDecode* pwicFrameDecode_j;
     pwicBitmapDecoder_jewel->GetFrame(0, &pwicFrameDecode_j);
@@ -225,7 +225,7 @@ void UILayer::UpdateLabels_Scripts(const std::wstring& strUIText)
 
 void UILayer::UpdateLabels_Jew(const std::wstring& strUIText)
 {
-    m_vJewBlocks[0] = { strUIText, D2D1::RectF(15.0f, 75.0f, 110.0f, 150.0f), m_pdwJewFormat };
+    m_vJewBlocks[0] = { strUIText, D2D1::RectF(15.0f, FRAME_BUFFER_HEIGHT / 9, FRAME_BUFFER_WIDTH / 16, FRAME_BUFFER_HEIGHT), m_pdwJewFormat };
 }
 
 void UILayer::UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool live)
@@ -269,7 +269,7 @@ void UILayer::UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool l
     cpos.z = cpos.z * mapScale;
 
     cpos.x = cpos.x + 100.0f;
-    cpos.z = cpos.z + FRAME_BUFFER_HEIGHT / 2.0f + 100.0f;
+    cpos.z = cpos.z + FRAME_BUFFER_HEIGHT / 2.0f * 1.75;
 
     if (id == BOSS_ID)
     {
@@ -284,15 +284,20 @@ void UILayer::UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool l
         m_enemyDot[id].z = FRAME_BUFFER_HEIGHT / 2.0f + 100.0f;
     }
 
-    else if (!(cpos.x > 200.0f || cpos.x <-200.0f || cpos.z > FRAME_BUFFER_HEIGHT / 2.0f + 200.0f || cpos.z < -(FRAME_BUFFER_HEIGHT / 2.0f + 200.0f))&& id!=BOSS_ID)
-    {
+    //else if (!(cpos.x > 200.0f || cpos.x <-200.0f || cpos.z > FRAME_BUFFER_HEIGHT / 2.0f * 3.0 || cpos.z < -(FRAME_BUFFER_HEIGHT / 2.0f * 3.0))&& id!=BOSS_ID)
+    //{
+    //    m_enemyDot[id].x = cpos.x;
+    //    m_enemyDot[id].z = cpos.z;
+    //}
+    //else if (id != BOSS_ID)
+    //{
+    //    m_enemyDot[id].x = 100.0f;
+    //    m_enemyDot[id].z = FRAME_BUFFER_HEIGHT / 2.0f  + 100.0f;
+    //}
+
+    else {
         m_enemyDot[id].x = cpos.x;
         m_enemyDot[id].z = cpos.z;
-    }
-    else if (id != BOSS_ID)
-    {
-        m_enemyDot[id].x = 100.0f;
-        m_enemyDot[id].z = FRAME_BUFFER_HEIGHT / 2.0f + 100.0f;
     }
 
 
@@ -410,9 +415,9 @@ void UILayer::Render(UINT nFrame, MissionType mty)
         m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBrush);
     }
 
-    D2D_POINT_2F d2dPoint = { 0.0f, FRAME_BUFFER_HEIGHT/2.0f };
+    D2D_POINT_2F d2dPoint = { 0.0f, FRAME_BUFFER_HEIGHT/2 * 1.5f };
 
-    D2D_POINT_2F d2dPoint_jew = { 0.0f, 50.0f };
+    D2D_POINT_2F d2dPoint_jew = { 0.0f, 55.0f };
 
     D2D_POINT_2F d2dPoint_nevi = { -25, -75 };
 

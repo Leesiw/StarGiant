@@ -1,7 +1,6 @@
 #pragma once
 
-#define FRAME_BUFFER_WIDTH		640
-#define FRAME_BUFFER_HEIGHT		480
+// (±¸)640 X 480 VGA
 
 
 #include "Timer.h"
