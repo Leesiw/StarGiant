@@ -284,20 +284,20 @@ void UILayer::UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool l
         m_enemyDot[id].z = FRAME_BUFFER_HEIGHT / 2.0f + 100.0f;
     }
 
-    //else if (!(cpos.x > 200.0f || cpos.x <-200.0f || cpos.z > FRAME_BUFFER_HEIGHT / 2.0f * 3.0 || cpos.z < -(FRAME_BUFFER_HEIGHT / 2.0f * 3.0))&& id!=BOSS_ID)
-    //{
-    //    m_enemyDot[id].x = cpos.x;
-    //    m_enemyDot[id].z = cpos.z;
-    //}
-    //else if (id != BOSS_ID)
-    //{
-    //    m_enemyDot[id].x = 100.0f;
-    //    m_enemyDot[id].z = FRAME_BUFFER_HEIGHT / 2.0f  + 100.0f;
-    //}
-
-    else {
+    else if (!(cpos.x > 200.0f || cpos.x <-200.0f || cpos.z > FRAME_BUFFER_HEIGHT / 2.0f * 3.0 || cpos.z < -(FRAME_BUFFER_HEIGHT / 2.0f * 3.0))&& id!=BOSS_ID)
+    {
         m_enemyDot[id].x = cpos.x;
         m_enemyDot[id].z = cpos.z;
+    }
+    else if (id != BOSS_ID)
+    {
+        m_enemyDot[id].x = 100.0f;
+        m_enemyDot[id].z = FRAME_BUFFER_HEIGHT / 2.0f  + 100.0f;
+    }
+
+    else {
+        m_enemyDot[id].x = 0;
+        m_enemyDot[id].z = 0;
     }
 
 
