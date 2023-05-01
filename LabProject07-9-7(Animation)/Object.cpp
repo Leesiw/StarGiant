@@ -2043,7 +2043,7 @@ void CSpriteObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 			CGameObject::Render(pd3dCommandList, pCamera);
 			SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f)); 
 			//시간 제한 코드 
-			CountDiedTime(3.0f);
+			CountDiedTime(1.0f);
 			break;
 		default: break;
 	}
