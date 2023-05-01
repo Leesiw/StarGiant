@@ -445,13 +445,15 @@ void UILayer::Render(UINT nFrame, MissionType mty)
     m_pd2dDeviceContext->SetTransform(matTM);
 
    // m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Rotation(angle, a));
-    if(mty==MissionType::FIND_BOSS)
+
+   /* if(mty==MissionType::FIND_BOSS)
      m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_nevi, &d2dPoint_nevi);
     m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
     m_pd2dDeviceContext->SetTransform(matTM2);
     if (mty == MissionType::GO_PLANET) {
         m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_nevi2, &d2dPoint_nevi);
-    }
+    }*/
+
     m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
 
 
