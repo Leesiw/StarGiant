@@ -261,6 +261,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_ppSprite[i] = new CSpriteObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(0,0,0), XMFLOAT3(0.f,0.f,0.f), static_cast<int>(SpriteType::Ship));
 		m_ppSprite[i]->SetPosition(435.f, 250.f, 640.f);
 		m_ppSprite[i]->CreateShaderVariable(pd3dDevice, pd3dCommandList);
+		AddDieSprite(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(435.f, 250.f, 640.f));
 	}
 	//=====================================XMFLOAT3(425.0f, 250.0f, 640.0f);
 	BuildBoss(pd3dDevice, pd3dCommandList);
@@ -1228,25 +1229,29 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppSprite[i]->Animate(m_fElapsedTime);
 			m_ppSprite[0]->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(30.0f, -60.0f, 0.0f), m_pPlayer[0]->GetLook());
 			m_ppSprite[i]->UpdateShaderVariables(pd3dCommandList, m_ppSprite[i]->GetShaderVariables());
-			m_ppSprite[i]->Render(pd3dCommandList, pCamera);
+			//m_ppSprite[i]->Render(pd3dCommandList, pCamera);
 		}
 		m_ppSprite[1]->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(-30.0f, -80.0f, 0.0f), m_pPlayer[0]->GetLook());
 	}
 	if (!m_pDieSprite.empty()) {
+		for (std::list<CSpriteObject*>::iterator i = m_pDieSprite.begin(); i != m_pDieSprite.end();)
+		{
+			if (!(*i)->is_Alive)
+			{
+				delete (*i);
+				i = m_pDieSprite.erase(i);
+			}
+			else i++;
+		}
+		int i = 0;
 		for (auto object : m_pDieSprite) {
 			object->Animate(m_fElapsedTime);
 			object->UpdateShaderVariables(pd3dCommandList, object->GetShaderVariables());
+			object->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(30.0f, -60.0f+20.0f*i, 0.0f), m_pPlayer[0]->GetLook());
 			object->Render(pd3dCommandList, pCamera);
-			/*for (std::list<CSpriteObject*>::iterator i = m_pDieSprite.begin(); i != m_pDieSprite.end();)
-			{
-				if (!(*i)->is_Alive)
-				{
-					delete (*i);
-					i = m_pDieSprite.erase(i);
-				}
-				else i++;
-			}*/
+			i++;
 		}
+		
 	}
 
 }
