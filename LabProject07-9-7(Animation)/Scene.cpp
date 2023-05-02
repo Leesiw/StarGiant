@@ -1300,8 +1300,15 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 	//m_ppUI[4]->SetPosition(m_ppEnemies[0]->GetPosition().x, m_ppEnemies[0]->GetPosition().y + 10.0f, m_ppEnemies[0]->GetPosition().z);
 	//m_ppUI[4]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
 
+	CCamera a = m_pPlayer[0]->GetCamera();
+	
+	if (m_ppUI[0]&& !(a.GetMode()== DRIVE_CAMERA))
+	{
+		m_ppUI[0]->Render(pd3dCommandList, pCamera);
 
-	for (int i = 0; i < UI_CNT; i++)
+	}
+
+	for (int i = 1; i < UI_CNT; i++)
 	{
 		if (m_ppUI[i])
 		{
