@@ -426,10 +426,10 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 	float4 cColor = compositeNoise * float4(cookie.r, cookie.g, cookie.b, 0.0f) * lightColor;
 
 	cColor.a = saturate(dot(float3(cColor.a, cColor.g, cColor.b), float3(1.0f, 1.0f, 1.0f)));
-	if (cColor.a > 0.8) cColor.rgb *= 1.4f + (cColor.a - 0.8);
+	/*if (cColor.a > 0.8) cColor.rgb *= 1.4f + (cColor.a - 0.8);
 	else if (cColor.a >0.6) cColor.rgb *= 1.3f + (cColor.a - 0.6);
 	else if (cColor.a >0.4)cColor.rgb *= 1.1f + (cColor.a - 0.4);
-	else cColor.rgb *= 1.f + (cColor.a);
+	else cColor.rgb *= 1.f + (cColor.a);*/
 	//
 
 	return(cColor);

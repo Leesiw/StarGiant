@@ -261,7 +261,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_ppSprite[i] = new CSpriteObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(0,0,0), XMFLOAT3(0.f,0.f,0.f), static_cast<int>(SpriteType::Ship));
 		m_ppSprite[i]->SetPosition(435.f, 250.f, 640.f);
 		m_ppSprite[i]->CreateShaderVariable(pd3dDevice, pd3dCommandList);
-		AddDieSprite(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(435.f, 250.f, 640.f));
+		//AddDieSprite(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(435.f, 250.f, 640.f));
 	}
 	//=====================================XMFLOAT3(425.0f, 250.0f, 640.0f);
 	BuildBoss(pd3dDevice, pd3dCommandList);

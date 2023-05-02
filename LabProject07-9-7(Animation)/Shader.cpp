@@ -742,7 +742,7 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	//Vertex camera1Position = Vertex(PlayerPosition.x, PlayerPosition.y, PlayerPosition.z); //560 광원위치(-10, 00, 60);
 	Vertex camera1LookAt = Vertex(425, 250, 642); // 처음 젠위치로 합시다 (-1000, 600, -2000);
 	cameraLookVector = Vector3::Normalize(Vector3::Subtract(XMFLOAT3(camera1Position.x, camera1Position.y, camera1Position.z), XMFLOAT3(camera1LookAt.x, camera1LookAt.y, camera1LookAt.z)));
-	pLightCamera =new CFrustrumCamera(renderWidth, renderHeight, camera1Position, camera1LookAt, 10, 1000);//원래 100000
+	pLightCamera =new CFrustrumCamera(renderWidth, renderHeight, camera1Position, camera1LookAt, 10, 4000);//원래 100000
 
 
 	// hlsl 에서 잘 조정해보기... 
@@ -819,6 +819,11 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 		if (pLineObject)
 		{
 			pLineObject->SetPosition(nPosition);
+			/*pRayMaterial->m_xmf4EmissiveColor = XMFLOAT4(1, 1, 1, 1);
+			pRayMaterial->m_xmf4AmbientColor = XMFLOAT4(1, 1, 1, 1);
+			pRayMaterial->m_xmf4SpecularColor = XMFLOAT4(1, 1, 1, 1);*/
+			
+
 			pLineObject->SetMaterial(0, pRayMaterial);
 			m_ppLineObjects[i] = pLineObject;
 		}
@@ -895,13 +900,13 @@ void CGodRayShader::AnimateObjects(CCamera * pCamera)
 		XMFLOAT3 A = (Vector3::ScalarProduct(cameraLookVector, nLen));
 		XMFLOAT3 B = (Vector3::ScalarProduct(newLookVector, nLen));
 		m_ppObjects[i]->SetLookAt(PlayerPosition);
-		m_ppLineObjects[i]->SetLookAt(PlayerPosition);
+		//m_ppLineObjects[i]->SetLookAt(PlayerPosition);
 		m_ppObjects[i]->SetPosition(B);
-		m_ppLineObjects[i]->SetPosition(B);
+		//m_ppLineObjects[i]->SetPosition(B);
 		//if(i==10)std::cout << m_ppObjects[1]->GetPosition().x << endl;
 	}
 	pLightObject->SetLookAt(PlayerPosition);
-	pLightObject->SetPosition(m_ppObjects[GODRAY_SAMPLE-1]->GetPosition());
+	pLightObject->SetPosition(m_ppLineObjects[GODRAY_SAMPLE-1]->GetPosition());
 	cameraLookVector = newLookVector;
 
 }
