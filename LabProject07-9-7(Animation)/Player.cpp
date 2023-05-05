@@ -147,15 +147,20 @@ void CPlayer::Rotate(float x, float y, float z, int mode)
 			if (x != 0.0f)
 			{
 				m_fPitch += x;
+				if (m_fPitch > +90.0f) { x -= (m_fPitch - 90.0f); m_fPitch = +90.0f; }
+				if (m_fPitch < -90.0f) { x -= (m_fPitch + 90.0f); m_fPitch = -90.0f; }
 			}
 			if (y != 0.0f)
 			{
 				m_fYaw += y;
-
+				if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
+				if (m_fYaw < 0.0f) m_fYaw += 360.0f;
 			}
 			if (z != 0.0f)
 			{
 				m_fRoll += z;
+				if (m_fRoll > +90.0f) { z -= (m_fRoll - 90.0f); m_fRoll = +90.0f; }
+				if (m_fRoll < -90.0f) { z -= (m_fRoll + 90.0f); m_fRoll = -90.0f; }
 			}
 
 			m_pCamera->Rotate(x, y, z);
