@@ -147,16 +147,23 @@ void CPlayer::Rotate(float x, float y, float z, int mode)
 			if (x != 0.0f)
 			{
 				m_fPitch += x;
+				if (m_fPitch > +45.0f) { x -= (m_fPitch - 45.0f); m_fPitch = +45.0f; }
+				if (m_fPitch < -45.0f) { x -= (m_fPitch + 45.0f); m_fPitch = -45.0f; }
 			}
 			if (y != 0.0f)
 			{
 				m_fYaw += y;
+				if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
+				if (m_fYaw < 0.0f) m_fYaw += 360.0f;
 
 			}
 			if (z != 0.0f)
 			{
 				m_fRoll += z;
+				if (m_fRoll > +45.0f) { z -= (m_fRoll - 45.0f); m_fRoll = +45.0f; }
+				if (m_fRoll < -45.0f) { z -= (m_fRoll + 45.0f); m_fRoll = -45.0f; }
 			}
+
 
 			m_pCamera->Rotate(x, y, z);
 			if (x != 0.0f)
@@ -269,10 +276,10 @@ CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
 			pNewCamera = new CAttactCamera(m_pCamera);
 			break;
 		case ATTACT_CAMERA_L:
-			pNewCamera = new CAttactCamera(m_pCamera);
+			pNewCamera = new CAttact_lCamera(m_pCamera);
 			break;
 		case ATTACT_CAMERA_R:
-			pNewCamera = new CAttactCamera(m_pCamera);
+			pNewCamera = new CAttact_rCamera(m_pCamera);
 			break;
 	}
 	if (nCurrentCameraMode == SPACESHIP_CAMERA)
@@ -597,7 +604,7 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 			pastcam = DRIVE_CAMERA;
-
+			m_pCamera->SetPastMode(DRIVE_CAMERA);
 			break;
 
 		case ATTACT_CAMERA_C:
@@ -606,14 +613,17 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityXZ(0.0f);
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_C, nCurrentCameraMode);
-			if (pastcam != ATTACT_CAMERA_C)
+			/*if (pastcam != ATTACT_CAMERA_C) {
 				m_pCamera->Rotate(0.0f, -r, 0.0f);
+			}*/
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 			pastcam = ATTACT_CAMERA_C;
+			m_pCamera->SetPastMode(ATTACT_CAMERA_C);
+
 			
 			break;
 		case ATTACT_CAMERA_L:
@@ -622,17 +632,23 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityXZ(0.0f);
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_L, nCurrentCameraMode);
-			if (pastcam == ATTACT_CAMERA_R)
+			/*if (pastcam == ATTACT_CAMERA_R) {
 				m_pCamera->Rotate(0.0f, -r, 0.0f);
+			}
 			r = -90.0f;
-			if (pastcam != ATTACT_CAMERA_L)
+			if (pastcam != ATTACT_CAMERA_L) {
 				m_pCamera->Rotate(0.0f, r, 0.0f);
+			}*/
+			m_pCamera->pRot = -90.0f;
+
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 			pastcam = 6;
+			m_pCamera->SetPastMode(ATTACT_CAMERA_L);
+
 
 			break;
 		case ATTACT_CAMERA_R:
@@ -641,17 +657,22 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			SetMaxVelocityXZ(0.0f);
 			SetMaxVelocityY(0.0f);
 			m_pCamera = OnChangeCamera(ATTACT_CAMERA_R, nCurrentCameraMode);
-			if (pastcam == ATTACT_CAMERA_L)
+			/*if (pastcam == ATTACT_CAMERA_L) {
 				m_pCamera->Rotate(0.0f, -r, 0.0f);
+			}
 			r = 90.0f;
-			if (pastcam != ATTACT_CAMERA_R)
+			if (pastcam != ATTACT_CAMERA_R) {
 				m_pCamera->Rotate(0.0f, r, 0.0f);
+			}*/
+			m_pCamera->pRot = 90.0f;
+
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
 			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 			pastcam = ATTACT_CAMERA_R;
+			m_pCamera->SetPastMode(ATTACT_CAMERA_R);
 
 			break;
 

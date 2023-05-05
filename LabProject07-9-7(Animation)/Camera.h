@@ -36,6 +36,9 @@ protected:
 	float           				m_fYaw;
 
 	DWORD							m_nMode;
+	DWORD							m_nPastMode;
+
+	
 
 	XMFLOAT3						m_xmf3LookAtWorld;
 	XMFLOAT3						m_xmf3Offset;
@@ -62,6 +65,7 @@ public:
 	virtual void ReleaseShaderVariables();
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
 
+	
 	void GenerateViewMatrix();
 	void GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMFLOAT3 xmf3Up);
 	void RegenerateViewMatrix();
@@ -77,7 +81,12 @@ public:
 	CPlayer *GetPlayer() { return(m_pPlayer); }
 
 	void SetMode(DWORD nMode) { m_nMode = nMode; }
+	void SetPastMode(DWORD nMode) { m_nPastMode = nMode; }
+
 	DWORD GetMode() { return(m_nMode); }
+	DWORD GetPastMode() { return(m_nPastMode); }
+	float pRot = 0.0f;
+
 
 	void SetPosition(XMFLOAT3 xmf3Position) { m_xmf3Position = xmf3Position; }
 	XMFLOAT3& GetPosition() { return(m_xmf3Position); }
@@ -149,6 +158,22 @@ public:
 	virtual ~CAttactCamera() { }
 
 	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
+
+};
+
+class CAttact_lCamera : public CAttactCamera
+{
+public:
+	CAttact_lCamera(CCamera* pCamera);
+	virtual ~CAttact_lCamera() { }
+
+};
+
+class CAttact_rCamera : public CAttactCamera
+{
+public:
+	CAttact_rCamera(CCamera* pCamera);
+	virtual ~CAttact_rCamera() { }
 
 };
 
