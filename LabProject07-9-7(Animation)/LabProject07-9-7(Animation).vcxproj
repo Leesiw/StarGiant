@@ -199,6 +199,12 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="fire_ps.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="fire_vs.hlsl">
+      <FileType>Document</FileType>
+    </None>
     <FxCompile Include="Shaders.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

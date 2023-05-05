@@ -952,3 +952,11 @@ void CRayLineMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSe
 
 	pd3dCommandList->DrawInstanced(m_nVertices, 1, m_nOffset, 0);
 }
+
+CFireMesh::CFireMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight, float fDepth) : CMesh(pd3dDevice, pd3dCommandList)
+{
+}
+
+CFireMesh::~CFireMesh()
+{
+}

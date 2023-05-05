@@ -2114,3 +2114,5 @@ CMascotObject::CMascotObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 CMascotObject::~CMascotObject()
 {
 }
+
+

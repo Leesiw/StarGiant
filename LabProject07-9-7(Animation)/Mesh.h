@@ -291,3 +291,49 @@ public:
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSet);
 };
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class CFireMesh : public CMesh
+{
+public:
+	CFireMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth = 20.0f, float fHeight = 20.0f, float fDepth = 20.0f);
+	virtual ~CFireMesh();
+
+
+protected:
+
+	float frameTime;
+	XMFLOAT3 scrollSpeeds; XMFLOAT3 scales; XMFLOAT2 distortion1;
+	XMFLOAT2 distortion2; XMFLOAT2 distortion3; float distortionScale;
+	float distortionBias;
+
+protected:
+
+
+	XMFLOAT4* m_pxmf4Colors = NULL;
+	XMFLOAT2* m_pxmf2TextureCoords0 = NULL;
+	XMFLOAT2* m_pxmf2TextureCoords1 = NULL;
+	XMFLOAT2* m_pxmf2TextureCoords2 = NULL;
+
+
+	ID3D12Resource* m_pd3dColorBuffer = NULL;
+	ID3D12Resource* m_pd3dColorUploadBuffer = NULL;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dColorBufferView;
+
+	ID3D12Resource* m_pd3dTextureCoord0Buffer = NULL;
+	ID3D12Resource* m_pd3dTextureCoord0UploadBuffer = NULL;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord0BufferView;
+
+	ID3D12Resource* m_pd3dTextureCoord1Buffer = NULL;
+	ID3D12Resource* m_pd3dTextureCoord1UploadBuffer = NULL;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord1BufferView;
+
+	ID3D12Resource* m_pd3dTextureCoord2Buffer = NULL;
+	ID3D12Resource* m_pd3dTextureCoord2UploadBuffer = NULL;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord2BufferView;
+
+
+};

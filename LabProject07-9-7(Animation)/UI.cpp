@@ -460,7 +460,7 @@ void UILayer::Render(UINT nFrame, MissionType mty)
 
 
 
-    for (auto& a : m_enemyDot)
+    for (auto& a : m_enemyDot) 
     {
         if(!(a.x == 100.0f && a.z == FRAME_BUFFER_HEIGHT / 2.0f + 100.0f))
             m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(a.x, a.z), 5.0f, 5.0f), Redbrush);

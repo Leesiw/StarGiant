@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="hlsl">
+      <UniqueIdentifier>{90c6c1f9-e59a-4317-916d-cbd75ef5a0ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -69,6 +72,9 @@
     <ClInclude Include="UI.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Boss.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -113,6 +119,9 @@
     <ClCompile Include="UI.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Boss.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LabProject07-9-7(Animation).rc">
@@ -131,5 +140,13 @@
     <FxCompile Include="Shaders.hlsl">
       <Filter>헤더 파일</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fire_ps.hlsl">
+      <Filter>hlsl</Filter>
+    </None>
+    <None Include="fire_vs.hlsl">
+      <Filter>hlsl</Filter>
+    </None>
   </ItemGroup>
 </Project>
