@@ -254,7 +254,16 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_ppEnemyMissiles[i]->SetScale(1.0f, 1.0f, 1.0f);
 		if (pEnemyModel) delete pEnemyModel;
 	}
+	//=====================================
 
+	for (int i = BOSSMETEOS / 2; i < METEOS; ++i) {
+		CLoadedModelInfo* pMeteoModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Rock4.bin", NULL);
+		m_ppBossMeteorObjects[i] = new CMeteorObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMeteoModel, 1);
+		m_ppBossMeteorObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_ppBossMeteorObjects[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
+		m_ppBossMeteorObjects[i]->SetScale(3.0f, 3.0f, 3.0f);
+		if (pMeteoModel) delete pMeteoModel;
+	}
 
 	//=====================================
 	for (int i = 0; i < SPRITE_CNT; ++i) {
@@ -296,7 +305,7 @@ void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	m_ppUI[0] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::CROSSHAIR), 2, 2, 0);
 	m_ppUI[0]->SetPosition(fx, fy, 0.0f);
 
-	m_ppUI[1] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::MINIMAP), 1, 1, 0);
+	m_ppUI[1] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::SCRATCH), 1, 1, 0);
 	m_ppUI[1]->SetPosition(fx + 10.0f, fy, 10.0f);
 
 	for (int i = 2; i < ENEMIES + 2; ++i) { //  UI_CNT
@@ -416,6 +425,11 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	for (int i = 0; i < METEOS; ++i) {
 		m_ppMeteorObjects[i] = NULL;
 	}
+	for (int i = 0; i < METEOS; ++i) {
+		m_ppBossMeteorObjects[i] = NULL;
+	}
+
+	
 
 	BuildUIInside(pd3dDevice, pd3dCommandList);
 
@@ -465,8 +479,14 @@ void CScene::ReleaseObjects()
 	{
 		for (int i = 0; i < METEOS; i++) if (m_ppMeteorObjects[i]) m_ppMeteorObjects[i]->Release();
 		delete[] m_ppMeteorObjects;
+	}	
+	
+	if (m_ppBossMeteorObjects)
+	{
+		for (int i = 0; i < BOSSMETEOS; i++) if (m_ppBossMeteorObjects[i]) m_ppBossMeteorObjects[i]->Release();
+		delete[] m_ppBossMeteorObjects;
 	}
-
+	
 	if (m_ppEnemies)
 	{
 		for (int i = 0; i < ENEMIES; i++) {
@@ -840,6 +860,10 @@ void CScene::RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 		m_ppMeteorObjects[m_info.id]->SetPosition(m_info.pos);
 		m_ppMeteorObjects[m_info.id]->m_xmf3MovingDirection = m_info.direction;
 	}
+}
+
+void CScene::RespawnBossMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info)
+{
 }
 
 void CScene::TransformMeteor(METEO_INFO m_info)
@@ -1274,7 +1298,9 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 	m_ppUI[0]->SetPosition(xmf3Position); //static_cast<int>(UIType::CROSSHAIR)
 	m_ppUI[0]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 
-
+	m_ppUI[1]->SetPosition(xmf3Position); 
+	m_ppUI[1]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+	m_ppUI[1]->SetScale(80.0f, 80.0f, 80.0f);
 
 	for (int i = 2; i < ENEMIES + 2; i++) // hp bar
 	{
@@ -1283,7 +1309,7 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 			m_ppUI[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
 			m_ppUI[i]->HpbarUpdate(m_ppEnemies[i - 2]->GetPosition(), m_ppEnemies[i - 2]->GetMaxHp(), m_ppEnemies[i - 2]->GetcurHp());
 		}
-		else if (m_ppEnemies[i - 2]->isAlive == false)
+		else if (m_ppEnemies[i - 2] && m_ppEnemies[i - 2]->isAlive == false)
 		{
 			m_ppUI[i]->HpbarUpdate(m_ppEnemies[i - 2]->GetPosition(), m_ppEnemies[i - 2]->GetMaxHp(), 0);
 		}
@@ -1308,7 +1334,12 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 
 	}
 
-	for (int i = 1; i < UI_CNT; i++)
+	if (m_ppUI[1] && m_ppBoss->CurMotion == BossAnimation::CLAW_ATTACT)
+	{
+		m_ppUI[1]->Render(pd3dCommandList, pCamera);
+	}
+
+	for (int i = 2; i < UI_CNT; i++)
 	{
 		if (m_ppUI[i])
 		{

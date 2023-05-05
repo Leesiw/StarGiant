@@ -594,9 +594,9 @@ CUI::CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, I
         m_ppUITexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/crosshair.dds", 0);
     }
     
-    if (num == static_cast<int>(UIType::MINIMAP)) {
+    if (num == static_cast<int>(UIType::SCRATCH)) {
         m_ppUITexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-        m_ppUITexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/minimap.dds", 0);
+        m_ppUITexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/scratch.dds", 0);
     }
 
     if (num == static_cast<int>(UIType::HP)) {

@@ -88,6 +88,8 @@ public:
 
 	// ����
 	void RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info);
+	void RespawnBossMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info);
+
 	void TransformMeteor(METEO_INFO m_info);
 	virtual void AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position);
 
@@ -139,6 +141,8 @@ public:
 
 
 	CMeteorObject						*m_ppMeteorObjects[METEOS];
+	CMeteorObject						*m_ppBossMeteorObjects[BOSSMETEOS];
+
 
 	CMeteorObject* landob;
 
