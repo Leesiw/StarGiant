@@ -134,7 +134,7 @@ public:
 	short							max_hp = 100;
 	virtual void OnPrepareAnimate();
 	virtual void Animate(float fTimeElapsed);
-	void SetModelSprite(CGameObject* Loot, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	void SetModelSprite(CGameObject* Loot, CTexture* LootTexture, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	short getHp(){ return hp; }
 
 private:

@@ -350,8 +350,13 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 	CLoadedModelInfo *pModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/CephalonShip.bin", NULL);
 	//CLoadedModelInfo *pModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Doggy_V1.bin", NULL);
+	
+	CTexture* pSpriteTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Laser_sprite_8.dds", 0);//Explode_8x8
 
-	SetModelSprite(pModel->m_pModelRootObject->m_pChild, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 20, false);
+
+	SetModelSprite(pModel->m_pModelRootObject->m_pChild, pSpriteTexture, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	SetChild(pModel->m_pModelRootObject, true);
 
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pModel);
@@ -386,7 +391,7 @@ CAirplanePlayer::~CAirplanePlayer()
 {
 }
 
-void CAirplanePlayer::SetModelSprite(CGameObject* Loot, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
+void CAirplanePlayer::SetModelSprite(CGameObject* Loot,CTexture* LootTexture, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
 	//모델들의 이름을 다 돌아들어가보면서 이름찾고, 그 이름의 메쉬를 가지고 잇는놈의 텍스처와.... 메쉬를 CSpriteObject로 바꾼다. 
 	int num= 0;
@@ -399,17 +404,13 @@ void CAirplanePlayer::SetModelSprite(CGameObject* Loot, ID3D12Device* pd3dDevice
 		//CSpriteObject* Temp = (CSpriteObject*)(Loot->m_pSibling);
 		m_pAirSprites[num] = (CSpriteObject*)(Loot->m_pSibling);
 
-		CTexture* pSpriteTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-		pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Laser_sprite_8.dds", 0);//Explode_8x8
-
+	
 		CSprite2Shader* CSpriteObjectShader = new CSprite2Shader();
 		CSpriteObjectShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 		CSpriteObjectShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-		//m_pAirSprites[num]->SetNewTexture(pd3dDevice, pSpriteTexture);
-		CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 20, false);
 		CMaterial* pStriteMaterial = new CMaterial(1);
-		pStriteMaterial->SetTexture(pSpriteTexture);
+		pStriteMaterial->SetTexture(LootTexture);
 		pStriteMaterial->SetShader(CSpriteObjectShader);
 
 		
@@ -421,10 +422,10 @@ void CAirplanePlayer::SetModelSprite(CGameObject* Loot, ID3D12Device* pd3dDevice
 		m_pAirSprites[num]->SpriteMode = static_cast<int>(SpriteType::Ship);
 		m_pAirSprites[num]->is_Alive = true;
 
-		if(num ==1)SetModelSprite(Loot->m_pSibling, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+		if(num ==1)SetModelSprite(Loot->m_pSibling, LootTexture,pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	}
 	else {
-		SetModelSprite(Loot->m_pSibling, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+		SetModelSprite(Loot->m_pSibling, LootTexture,pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	};
 }
 
@@ -547,7 +548,7 @@ void CAirplanePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 		{
 			m_ppBullets[i]->Render(pd3dCommandList, pCamera); 
 		};
-	for(int i=0; i<2; i++) m_pAirSprites[i]->Render(pd3dCommandList, pCamera);
+	for(int i=0; i<2; i++) m_pAirSprites[i]->CSpriteObject::Render(pd3dCommandList, pCamera);
 	CPlayer::Render(pd3dCommandList, pCamera);
 
 }

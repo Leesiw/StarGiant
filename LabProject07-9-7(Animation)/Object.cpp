@@ -2032,6 +2032,7 @@ void CSpriteObject::Animate(float fElapsedTime)
 void CSpriteObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+	//cout << m_ppMaterials[0]->m_ppTextures[0]->m_pRootArgumentInfos[0].m_nRootParameterIndex<<endl;
 	switch (SpriteMode) {
 		case static_cast<int>(SpriteType::Ship):
 			CGameObject::Render(pd3dCommandList, pCamera);
