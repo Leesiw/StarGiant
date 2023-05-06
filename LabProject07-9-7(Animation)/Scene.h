@@ -137,7 +137,6 @@ public:
 	CGameObject							**m_ppHierarchicalGameObjects = NULL;
 
 
-	CGameObject* m_pBoss = NULL;
 	Boss* m_ppBoss = NULL;
 
 

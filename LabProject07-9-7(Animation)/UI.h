@@ -30,6 +30,8 @@ public:
 
 
     void UpdateHp(short curhp, short maxHp = 100);
+    void UpdateBossHp(short curhp, short maxHp = 100);
+
 
     XMFLOAT4X4 UpdateMat(const XMFLOAT3& ppos);
 
@@ -45,13 +47,27 @@ private:
 
 
 
-    float hpbarLeft = FRAME_BUFFER_WIDTH - 200;
+    float hpbarLeft = FRAME_BUFFER_WIDTH /10 * 8;
+    float hpbarRight = FRAME_BUFFER_WIDTH / 10 * 8.7;
+
+
+
+
+    float bossHpbarLeft = FRAME_BUFFER_WIDTH / 10;
+    float bossHpbarRight = FRAME_BUFFER_WIDTH / 10 * 9;
+    float bossHpbarTop = FRAME_BUFFER_HEIGHT / 10 * 1;
+    float bossHpbarBottom = FRAME_BUFFER_HEIGHT / 10 * 1.5;
+
+
+
 
 
     float m_fWidth;
     float m_fHeight;
 
     float hpBar = 0;
+    float BosshpBar = 0;
+
 
     ID3D11DeviceContext* m_pd3d11DeviceContext = NULL;
     ID3D11On12Device* m_pd3d11On12Device = NULL;

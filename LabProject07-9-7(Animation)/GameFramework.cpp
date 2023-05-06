@@ -941,13 +941,15 @@ void CGameFramework::UpdateUI()
 	uiJew += L"\n\n";
 	uiJew += JEWEL_HP;
 
+
 	m_pUILayer->UpdateLabels(uiText);
 	m_pUILayer->UpdateLabels_Scripts(uiScripts);
 
 	m_pUILayer->UpdateLabels_Jew(uiJew);
 
-
-	m_pUILayer->UpdateHp(m_pPlayer[0]->getHp());
+	m_pUILayer->UpdateHp(m_pPlayer[0]->hp, m_pPlayer[0]->max_hp);
+	/*if(m_pScene->m_ppBoss->GetState()!= BossState::SLEEP)*/
+	m_pUILayer->UpdateBossHp(m_pScene->m_ppBoss->BossHP, m_pScene->m_ppBoss->MAXBossHP);
 	//for (int i = 0; i < ENEMIES; ++i)
 	//{
 	//	m_pUILayer->UpdateDots(i, { 0,0 });
@@ -966,7 +968,8 @@ void CGameFramework::UpdateUI()
 		pDist = m_pUILayer->UpdatePlanetDist(m_pPlayer[0], planetPos);
 	}
 
-	
+	if (m_pScene->m_ppBoss->BossHP < 0)
+		bossdie = 1;
 
 }
 
@@ -976,13 +979,37 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	wstring enemyCountStr;
 	wstring jewelCntStr;
 	wstring planetDist;
+	wstring bossDist;
+	wstring bossDie;
+
+
+
+	short jewelCnt = 0;
+
+	jewelCnt += items[ItemType::JEWEL_ATT];
+	jewelCnt += items[ItemType::JEWEL_DEF];
+	jewelCnt += items[ItemType::JEWEL_HEAL];
+	jewelCnt += items[ItemType::JEWEL_HP];
+
+
+
+	XMVECTOR v1 = XMLoadFloat3(&m_pPlayer[0]->GetPosition());
+	XMVECTOR v2 = XMLoadFloat3(&m_pScene->m_ppBoss->GetPosition());
+	XMVECTOR dist = XMVector3Length(XMVectorSubtract(v2, v1));
+
+	float distance;
+	XMStoreFloat(&distance, dist);
+
 
 
 	enemyCountStr = to_wstring(killCnt);
 	jewelCntStr = to_wstring(jewelCnt);
 	planetDist = to_wstring(pDist);
+	bossDist = to_wstring(distance);
 
-	
+	bossDie = to_wstring(bossdie);
+
+
 
 	wstring uiTextSpace = L" ";
 	wstring uiTextCnt = L" / 20";
@@ -1037,14 +1064,15 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	case MissionType::FIND_BOSS:
 	{
 		uiText = L"미션 - 보스를 추적하라 ( ";
-
+		uiText += bossDist;
+		uiText += L"m 남음";
 		break;
 	}
 	case MissionType::DEFEAT_BOSS:
 	{
 		uiText = L"미션 - 보스를 처치하라 ( ";
-
-		uiText += L"0 / 1 )";
+		uiText += bossDie;
+		uiText += L" / 1 )";
 
 		break;
 	}
@@ -1508,7 +1536,6 @@ void CGameFramework::ProcessPacket(char* p)
 			healAmount = 10 + packet->data.num;
 		}
 
-		jewelCnt += items[packet->data.type];
 
 		break;
 	}
