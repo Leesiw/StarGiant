@@ -452,7 +452,16 @@ void CAttactCamera::Rotate(float x, float y, float z)
 
 CDriveCamera::CDriveCamera(CCamera* pCamera) : CCamera(pCamera)
 {
+
 	m_nMode = DRIVE_CAMERA;
+
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	m_xmf3Right.y = 0.0f;
+	m_xmf3Look.y = 0.0f;
+	m_xmf3Right = Vector3::Normalize(m_xmf3Right);
+	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
+
+
 	if (pCamera)
 	{
 		if (pCamera->GetMode() == SPACESHIP_CAMERA)

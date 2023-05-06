@@ -457,6 +457,9 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 
 				packet.data.pos = m_pCamera->GetPosition();
 				packet.data.direction = m_pCamera->GetLookVector();
+
+				if (std::isnan(m_pCamera->GetPosition().x))cout << "server x nan!!\n";
+
 				send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
 			}
 			else if (player_type == PlayerType::INSIDE && AroundSculpture()) {
@@ -508,10 +511,17 @@ void CGameFramework::CheckSceneChange(bool State, int num)
 		m_pInsideCamera->SceneTimer = 0;
 	}
 
+
+
+
 	if (num == 0)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_L, m_GameTimer.GetTimeElapsed());
 	if (num == 1)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_C, m_GameTimer.GetTimeElapsed());
 	if (num == 2)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
 	if (num == 3)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
+
+
+
+
 //추가할 사항 없으면 F에 몰아넣기로 수정
 }
 
@@ -792,6 +802,11 @@ void CGameFramework::FrameAdvance()
     AnimateObjects();
 
 	UpdateUI();
+
+	if (std::isnan(m_pCamera->GetPosition().x))cout << "x nan!!\n";
+	if (std::isnan(m_pCamera->GetPosition().y))cout << "y nan!!\n";
+	if (std::isnan(m_pCamera->GetPosition().z))cout << "z nan!!\n";
+
 
 	m_pPlayer[0]->curMissionType = curMissionType;
 
