@@ -267,7 +267,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	//=====================================
 	for (int i = 0; i < SPRITE_CNT; ++i) {
-		m_ppSprite[i] = new CSpriteObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(0,0,0), XMFLOAT3(0.f,0.f,0.f), static_cast<int>(SpriteType::Ship));
+		m_ppSprite[i] = new CSpriteObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(0,0,0), XMFLOAT3(0.f,0.f,0.f), static_cast<int>(SpriteType::EnemyBoom));
 		m_ppSprite[i]->SetPosition(435.f, 250.f, 640.f);
 		m_ppSprite[i]->CreateShaderVariable(pd3dDevice, pd3dCommandList);
 		//AddDieSprite(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(435.f, 250.f, 640.f));
@@ -1281,17 +1281,17 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 	//우선 내부일떄 안써서 제한해놓음. 
 	if (!b_Inside) {
-			/*m_ppSprite[0]->Animate(m_fElapsedTime);
-			m_ppSprite[0]->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(30.0f, -60.0f, 0.0f), m_pPlayer[0]->GetLook());
-			m_ppSprite[0]->UpdateShaderVariables(pd3dCommandList, m_ppSprite[0]->GetShaderVariables());
-			m_ppSprite[0]->Render(pd3dCommandList, pCamera);*/
-
-			m_ppSprite[1]->Animate(m_fElapsedTime);
-			m_ppSprite[1]->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(30.0f, -60.0f, 0.0f), m_pPlayer[0]->GetLook());
-			m_ppSprite[1]->UpdateShaderVariables(pd3dCommandList, m_ppSprite[1]->GetShaderVariables());
-			m_ppSprite[1]->Render(pd3dCommandList, pCamera);
+		for (int i = 1; i < SPRITE_CNT; i++) {
+			
+				m_ppSprite[i]->Animate(m_fElapsedTime);
+				//m_ppSprite[1]->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(30.0f, -60.0f, 0.0f), m_pPlayer[0]->GetLook());
+				m_ppSprite[i]->UpdateShaderVariables(pd3dCommandList, m_ppSprite[i]->GetShaderVariables());
+				if (m_ppSprite[i]->is_Alive) {
+					m_ppSprite[i]->Render(pd3dCommandList, pCamera);
+				}
+		}
 	}
-	if (!m_pDieSprite.empty()) {
+	/*if (!m_pDieSprite.empty()) {
 		for (std::list<CSpriteObject*>::iterator i = m_pDieSprite.begin(); i != m_pDieSprite.end();)
 		{
 			if (!(*i)->is_Alive)
@@ -1310,7 +1310,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			i++;
 		}
 		
-	}
+	}*/
 
 }
 
@@ -1441,12 +1441,64 @@ void CScene::RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 }
 
 
-void CScene::AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position)
-{
-	CSpriteObject* m_pSpritdump = new CSpriteObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, XMFLOAT3(0, 0, 0), XMFLOAT3(0.f, 0.f, 0.f), static_cast<int>(SpriteType::EnemyBoom));
+void CScene::AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position, int Target)
+{//m_pDieSprite 의 함수를 발동하면, 그만큼 있다가 알아서 사라지게하기.
+	/*CSpriteObject* m_pSpritdump = new CSpriteObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, XMFLOAT3(0, 0, 0), XMFLOAT3(0.f, 0.f, 0.f), static_cast<int>(SpriteType::EnemyBoom));
 	m_pSpritdump->SetPosition(Position);
 	m_pSpritdump->CreateShaderVariable(pd3dDevice, pd3dCommandList);
-	m_pDieSprite.push_back(m_pSpritdump);
+	m_pSpritdump->TargetNum=Target;
+	m_pDieSprite.push_back(m_pSpritdump);*/
+
+
+}
+
+void CScene::AddDieSprite(XMFLOAT3 Position, int Target)
+{
+	CSpriteObject* pBoomObject = NULL;
+	bool makeSprite = true;
+	for (int i = 0; i < SPRITE_CNT; i++)if (m_ppSprite[i]->TargetNum == Target)makeSprite = false;
+	if (makeSprite) {
+		for (int i = 1; i < SPRITE_CNT; i++)
+		{
+			if (!m_ppSprite[i]->is_Alive)
+			{
+				pBoomObject = m_ppSprite[i];
+				m_ppSprite[i]->is_Alive = true;
+				m_ppSprite[i]->SpriteMode = static_cast<int>(SpriteType::EnemyBoom);
+				m_ppSprite[i]->TargetNum = Target;
+				break;
+			}
+		}
+		if (pBoomObject)
+		{
+			pBoomObject->SetPosition(Position);
+		}
+	}
+
 	
-	//m_pDieSprite 의 함수를 발동하면, 그만큼 있다가 알아서 사라지게하기.
+
+}
+
+void CScene::CheckBoomSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{//렉걸리는데 이렇게 쓰고싶음. 남겨놓음. 
+	//bool needMake = false;
+	//for (int i = 1; i < ENEMIES; i++)
+	//{
+	//	if (m_ppEnemies[i] && !m_ppEnemies[i]->isAlive)
+	//	{
+	//		needMake = true;
+	//		if (!m_pDieSprite.empty()) {
+	//			for (std::list<CSpriteObject*>::iterator t = m_pDieSprite.begin(); t != m_pDieSprite.end();)
+	//			{
+	//				if ((*t)->TargetNum == i)
+	//				{//끝내기
+	//					needMake = false;
+	//				}
+	//				t++;
+	//			}
+	//		}
+	//		if(needMake)
+	//			AddDieSprite(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, m_ppEnemies[i]->GetPosition(), i);
+	//	}
+	//}
 }

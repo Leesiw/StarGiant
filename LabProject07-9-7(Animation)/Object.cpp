@@ -2008,7 +2008,7 @@ CSpriteObject::CSpriteObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	SetMaterial(0, pStriteMaterial);
 	SpriteMode = type;
-	is_Alive = true;
+	is_Alive = false;
 
 }
 
@@ -2057,10 +2057,15 @@ void CSpriteObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 
 void CSpriteObject::CountDiedTime(float dieTime)
 {
-	m_fCntTime += m_fTime;
-	if (m_fCntTime >=dieTime){
-		is_Alive = false; //삭제용 
+	if (is_Alive) {
+		m_fCntTime += m_fTime;
+		if (m_fCntTime >= dieTime) {
+			is_Alive = false; //삭제용 
+			m_fCntTime = 0.0f;
+			TargetNum = -1;
+		}
 	}
+
 	cout << m_fCntTime << endl;
 }
 

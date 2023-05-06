@@ -767,6 +767,7 @@ public:
 	int m_nCols = 1;
 	int SpriteMode = 0;
 	bool is_Alive = false;
+	int TargetNum = -1;
 
 	CB_PLUS_INFO* m_pcbPlusInfo = NULL;
 	ID3D12Resource* m_pcbplusShaderVariable = NULL;

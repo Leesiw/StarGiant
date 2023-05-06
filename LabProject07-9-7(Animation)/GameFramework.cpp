@@ -1442,6 +1442,7 @@ void CGameFramework::ProcessPacket(char* p)
 			if (packet->data.hp <= 0) { // Á×À½
 				m_pScene->m_ppEnemies[packet->data.id]->isAlive = false;
 				//m_pScene->AddDieSprite(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
+				m_pScene->AddDieSprite(m_pScene->m_ppEnemies[packet->data.id]->GetPosition(), packet->data.id);
 
 			}
 			else {
