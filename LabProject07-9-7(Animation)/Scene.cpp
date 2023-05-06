@@ -882,8 +882,15 @@ void CScene::RespawnBossMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 void CScene::TransformMeteor(METEO_INFO m_info)
 {
-	if (m_ppMeteorObjects[m_info.id]) {
-		m_ppMeteorObjects[m_info.id]->SetPosition(m_info.pos);
+	if (m_info.id < METEOS) {
+		if (m_ppMeteorObjects[m_info.id]) {
+			m_ppMeteorObjects[m_info.id]->SetPosition(m_info.pos);
+		}
+	}
+	else {
+		if (m_ppBossMeteorObjects[m_info.id - METEOS]) {
+			m_ppBossMeteorObjects[m_info.id - METEOS]->SetPosition(m_info.pos);
+		}
 	}
 }
 

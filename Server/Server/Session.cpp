@@ -225,6 +225,19 @@ void SESSION::send_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> mete
 	}
 }
 
+void SESSION::send_boss_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> meteo)
+{
+	SC_METEO_PACKET p;
+	p.size = sizeof(SC_METEO_PACKET);
+	p.type = SC_METEO;
+
+	for (int i = 0; i < BOSSMETEOS; ++i) {
+		p.data.id = METEOS + i;
+		p.data.pos = meteo[i]->GetPosition();
+		do_send(&p);
+	}
+}
+
 void SESSION::send_bullet_hit_packet(int c_id, short id, short hp)
 {
 	SC_BULLET_HIT_PACKET p;
