@@ -11,8 +11,32 @@ Boss::Boss()
 	CurMotion = BossAnimation::SLEEP;
 	CurState = BossState::SLEEP;
 
+	CMeteoObject* meteo;
+	for (int i = 0; i < BOSSMETEOS; ++i) {
+		meteo = new CMeteoObject();
+		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
+		meteo->SetMovingDirection(XMFLOAT3(urdPos(dree), urdPos(dree), urdPos(dree)));
+		meteo->SetScale(3.f, 3.f, 3.f);
+		if (i < BOSSMETEOS / 2) {
+			// 바운딩 박스 설정 부탁
+			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+		}
+		else {
+			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256, 0.71804,  -0.0466012 }, XMFLOAT3{ 4.414825, 4.29032, 4.14356 }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+		}
+		m_ppBossMeteoObjects[i] = meteo;
+		m_ppBossMeteoObjects[i]->UpdateTransform(NULL);
+	}
+
 	//boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 34.65389f, -10.1982f), XMFLOAT3(65.5064392f, 35.0004547f, 77.9787476f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	boundingbox = BoundingOrientedBox{ XMFLOAT3(-33.47668f, 41.86574f, 26.52405), XMFLOAT3(774.8785, 299.2372, 584.7963), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+}
+
+Boss::~Boss() {
+	for (int i = 0; i < m_ppBossMeteoObjects.size(); ++i)
+	{
+		if (m_ppBossMeteoObjects[i]) { delete m_ppBossMeteoObjects[i]; }
+	}
 }
 
 
@@ -44,6 +68,33 @@ XMFLOAT4 Boss::GetQuaternion()
 	XMFLOAT4 xmf4;
 	XMStoreFloat4(&xmf4, vec);
 	return xmf4;
+}
+
+void Boss::MeteoAttack(float fTimeElapsed, const XMFLOAT3& TargetPos) // 공격 시작 시 한 번 실행
+{
+	XMFLOAT3 xmf3Pos = GetPosition();
+	XMFLOAT3 player_pos = TargetPos;
+	XMFLOAT3 xmfToPlayer = Vector3::Subtract(player_pos, xmf3Pos);
+	xmfToPlayer = Vector3::TransformCoord(xmfToPlayer, Matrix4x4::RotationAxis(GetUp(), urdAngle(dree)));
+	
+	for (int i = 0; i < BOSSMETEOS; ++i) {
+		m_ppBossMeteoObjects[i]->SetPosition(xmf3Pos);
+		// 현재 한 방향으로만 감 벡터 흔들기 등으로 방향 변경
+		m_ppBossMeteoObjects[i]->SetMovingDirection(xmfToPlayer);
+		m_ppBossMeteoObjects[i]->SetMovingSpeed(5.f);
+	}
+}
+
+void Boss::MoveMeteo(float fTimeElapsed)		// 메테오 움직여야 할때 계속 실행. send까지 포함됨
+{
+	for (int i = 0; i < BOSSMETEOS; ++i) {
+		m_ppBossMeteoObjects[i]->Animate(fTimeElapsed);
+	}
+
+	for (auto& pl : clients) {
+		if (pl.in_use == false) continue;
+		pl.send_boss_meteo_packet(0, m_ppBossMeteoObjects);
+	}
 }
 
 void Boss::MoveBoss(float fTimeElapsed, XMFLOAT3 TargetPos, float dist)

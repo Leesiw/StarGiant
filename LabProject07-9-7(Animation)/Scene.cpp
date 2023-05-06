@@ -256,7 +256,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	}
 	//=====================================
 
-	for (int i = BOSSMETEOS / 2; i < METEOS; ++i) {
+	for (int i = 0; i < BOSSMETEOS; ++i) {
 		CLoadedModelInfo* pMeteoModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Rock4.bin", NULL);
 		m_ppBossMeteorObjects[i] = new CMeteorObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMeteoModel, 1);
 		m_ppBossMeteorObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);

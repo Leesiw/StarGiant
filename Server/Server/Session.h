@@ -102,7 +102,7 @@ public:
 	void send_all_enemy_packet(int c_id, ENEMY_INFO[], bool[]);
 	void send_meteo_direction_packet(int c_id, short id, CMeteoObject* meteo);
 	void send_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> meteo);
-	void send_boss_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> meteo);
+	void send_boss_meteo_packet(int c_id, std::array<CMeteoObject*, BOSSMETEOS> meteo);
 	void send_bullet_hit_packet(int c_id, short id, short hp);
 	void send_item_packet(int c_id, ITEM_INFO& item);
 	void send_animation_packet(char id, char animation);

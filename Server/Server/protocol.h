@@ -15,7 +15,7 @@ const unsigned char option7 = 0x80; // hex for 1000 0000
 
 constexpr char BULLETS = 50;
 constexpr char METEOS = 20;
-constexpr char BOSSMETEOS = 20;
+constexpr char BOSSMETEOS = 5;
 
 constexpr char LASER_ENEMY = 13;
 constexpr char MISSILE_ENEMY = 4;

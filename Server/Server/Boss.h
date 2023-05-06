@@ -9,7 +9,7 @@ class Boss : public CGameObject
 {
 public:
 	Boss();
-	virtual ~Boss() {};
+	virtual ~Boss();
 
 public:
 	BossState CurState = BossState::SLEEP;
@@ -29,6 +29,8 @@ public:
 
 	chrono::steady_clock::time_point stateStartTime;
 	chrono::steady_clock::time_point lastAttackTime;
+
+	std::array<CMeteoObject*, BOSSMETEOS>		m_ppBossMeteoObjects;
 
 	BossState GetState() { return CurState; };
 	BossState SetState(BossState BState) { return CurState = BState; };
@@ -53,6 +55,9 @@ protected:
 	float           			m_fMaxVelocityY = 0.0f;
 
 public:
+	void MeteoAttack(float fTimeElapsed, const XMFLOAT3& TargetPos); // 공격 시작 시 한 번 실행
+	void MoveMeteo(float fTimeElapsed); // 메테오 움직여야 할때 계속 실행. send까지 포함됨
+
 	void MoveBoss(float fTimeElapsed, XMFLOAT3 TargetPos, float dist);
 	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
 	void Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHp);

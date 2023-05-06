@@ -225,7 +225,7 @@ void SESSION::send_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> mete
 	}
 }
 
-void SESSION::send_boss_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> meteo)
+void SESSION::send_boss_meteo_packet(int c_id, std::array<CMeteoObject*, BOSSMETEOS> meteo)
 {
 	SC_METEO_PACKET p;
 	p.size = sizeof(SC_METEO_PACKET);
