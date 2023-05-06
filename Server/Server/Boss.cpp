@@ -11,7 +11,8 @@ Boss::Boss()
 	CurMotion = BossAnimation::SLEEP;
 	CurState = BossState::SLEEP;
 
-	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 34.65389f, -10.1982f), XMFLOAT3(65.5064392f, 35.0004547f, 77.9787476f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+	//boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 34.65389f, -10.1982f), XMFLOAT3(65.5064392f, 35.0004547f, 77.9787476f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(-33.47668f, 41.86574f, 26.52405), XMFLOAT3(774.8785, 299.2372, 584.7963), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 }
 
 
@@ -93,6 +94,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 	XMFLOAT3 SubTarget = Vector3::Subtract(TargetPos, BossPos);
 	float Dist = Vector3::Length(SubTarget);
 
+	static int a=0;
 
 	switch (CurState) {
 	case  BossState::APPEAR:
@@ -155,17 +157,19 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 
 
 		//10퍼 남으면 스크림 함 해주기
-		else if (float(MAXBossHP / bossHP) <= 0.1)
+		else if (float(MAXBossHP / bossHP) <= 0.1 && a == 1)
 		{
 			SetState(BossState::SCREAM);
 			stateStartTime = steady_clock::now();
+			a = 2;
 		}
 
 		//반피되면 피격모션 한번해주기
-		else if (float(bossHP / MAXBossHP) <= 0.5)
+		else if (float(bossHP / MAXBossHP) <= 0.5&& a == 0)
 		{
 			SetState(BossState::GET_HIT);
 			stateStartTime = steady_clock::now();
+			a = 1;
 		}
 
 
@@ -181,6 +185,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			CurMotion = BossAnimation::BASIC_ATTACT;
 			if (CurMotion != PastMotion)
 				SendAnimation();
+
 			PastState = (BossState)(BossAnimation::BASIC_ATTACT);
 			if (player->GetHP() > 0) {
 				player->GetAttack(2);
@@ -268,7 +273,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 		CurMotion = BossAnimation::GET_HIT;
 		if (CurMotion != PastMotion)
 			SendAnimation();
-		cout << "GET_HIT" << endl;
+		//cout << "GET_HIT" << endl;
 
 		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= 3) {
 			SetState(BossState::IDLE);
