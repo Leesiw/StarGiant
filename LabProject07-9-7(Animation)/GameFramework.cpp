@@ -807,6 +807,31 @@ void CGameFramework::FrameAdvance()
 	if (std::isnan(m_pCamera->GetPosition().y))cout << "y nan!!\n";
 	if (std::isnan(m_pCamera->GetPosition().z))cout << "z nan!!\n";
 
+	//static int b = 0;
+
+
+	//XMFLOAT3 a;
+
+	//
+	//	a = m_pCamera->GetPosition();
+	//	a.x = a.x / 0;
+
+	//	if (std::isnan(a.x)) {
+	//		cout << "a가 난이 됐음s\n";
+	//	}
+
+	//	m_pCamera->SetPosition(a);
+	//	b = 1;
+	//	cout << "s난으로 한번감\n";
+	
+
+	if (std::isnan(m_pCamera->GetPosition().x)) {
+		m_pCamera->SetPosition(m_pPlayer[0]->GetPosition());
+		cout << "돌아와\n";
+	}
+	
+
+
 
 	m_pPlayer[0]->curMissionType = curMissionType;
 
