@@ -214,6 +214,55 @@ void CPlayer::Rotate(float x, float y, float z, int mode)
 	}
 }
 
+void CPlayer::Rotate2(float x, float y, float z, int mode)
+{
+	DWORD nCurrentCameraMode = m_pCamera->GetMode();
+
+	if (nCurrentCameraMode == ATTACT_CAMERA_C || nCurrentCameraMode == ATTACT_CAMERA_L || nCurrentCameraMode == ATTACT_CAMERA_R)
+	{
+		if (x != 0.0f)
+		{
+			m_fPitch += x;
+			if (m_fPitch > +90.0f) { x -= (m_fPitch - 90.0f); m_fPitch = +90.0f; }
+			if (m_fPitch < -90.0f) { x -= (m_fPitch + 90.0f); m_fPitch = -90.0f; }
+		}
+		if (y != 0.0f)
+		{
+			m_fYaw += y;
+			if (m_fYaw > 360.0f) m_fYaw -= 360.0f;
+			if (m_fYaw < 0.0f) m_fYaw += 360.0f;
+		}
+		if (z != 0.0f)
+		{
+			m_fRoll += z;
+			if (m_fRoll > +90.0f) { z -= (m_fRoll - 90.0f); m_fRoll = +90.0f; }
+			if (m_fRoll < -90.0f) { z -= (m_fRoll + 90.0f); m_fRoll = -90.0f; }
+		}
+
+		m_pCamera->Rotate(x, y, z);
+
+		if (x != 0.0f)
+		{
+			XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(x));
+			m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+			m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
+		}
+		if (y != 0.0f)
+		{
+			XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
+			m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, xmmtxRotate);
+			m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+		}
+		if (z != 0.0f)
+		{
+			XMMATRIX xmmtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Look), XMConvertToRadians(z));
+			m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
+			m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
+		}
+
+	}
+}
+
 void CPlayer::Update(float fTimeElapsed)
 {
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, m_xmf3Gravity);
@@ -236,12 +285,19 @@ void CPlayer::Update(float fTimeElapsed)
 	DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (nCurrentCameraMode == DRIVE_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
-	//if (nCurrentCameraMode == ATTACT_CAMERA_L) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	/*if (nCurrentCameraMode == ATTACT_CAMERA_L) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	if (nCurrentCameraMode == ATTACT_CAMERA_C) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	if (nCurrentCameraMode == ATTACT_CAMERA_R) m_pCamera->Update(m_xmf3Position, fTimeElapsed);*/
+
 
 
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
 	if (nCurrentCameraMode == DRIVE_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
+	/*if (nCurrentCameraMode == ATTACT_CAMERA_L) m_pCamera->SetLookAt(m_xmf3Position);
+	if (nCurrentCameraMode == ATTACT_CAMERA_C) m_pCamera->SetLookAt(m_xmf3Position);
+	if (nCurrentCameraMode == ATTACT_CAMERA_R) m_pCamera->SetLookAt(m_xmf3Position);*/
+
 	//if (nCurrentCameraMode == ATTACT_CAMERA_L) m_pCamera->SetLookAt(m_xmf3Position);
 
 

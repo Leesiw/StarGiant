@@ -688,7 +688,10 @@ void CGameFramework::ProcessInput()
 					m_pInsidePlayer[g_myid]->Rotate(0.0f, cxDelta, 0.0f);
 				}
 				else {
-					m_pPlayer[0]->Rotate(cyDelta, cxDelta, 0.0f);
+					if(m_pPlayer[0]->GetCamera()->GetMode() == ATTACT_CAMERA_C|| m_pPlayer[0]->GetCamera()->GetMode() == ATTACT_CAMERA_L|| m_pPlayer[0]->GetCamera()->GetMode() == ATTACT_CAMERA_R)
+						m_pPlayer[0]->Rotate2(cyDelta, cxDelta, 0.0f);
+					else
+						m_pPlayer[0]->Rotate(cyDelta, cxDelta, 0.0f);
 				}
 			}
 

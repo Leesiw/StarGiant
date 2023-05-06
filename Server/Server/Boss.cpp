@@ -86,8 +86,9 @@ void  Boss::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 }
 
 
-void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, XMFLOAT3 TargetPos, int bossHP)
+void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHP)
 {
+	XMFLOAT3 TargetPos = player->GetPosition();
 	XMFLOAT3 BossPos = GetPosition();
 	XMFLOAT3 SubTarget = Vector3::Subtract(TargetPos, BossPos);
 	float Dist = Vector3::Length(SubTarget);
@@ -181,6 +182,15 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, XMFLOAT3 TargetPos, i
 			if (CurMotion != PastMotion)
 				SendAnimation();
 			PastState = (BossState)(BossAnimation::BASIC_ATTACT);
+			if (player->GetHP() > 0) {
+				player->GetAttack(2);
+			}
+
+			for (auto& pl : clients)
+			{
+				if (pl.in_use == false) continue;
+				pl.send_bullet_hit_packet(0, -1, player->GetHP());
+			}
 
 			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 2) {
 				lastAttackTime = steady_clock::now();
@@ -195,6 +205,17 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, XMFLOAT3 TargetPos, i
 			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 4) {
 				lastAttackTime = steady_clock::now();
 				SetState(BossState::IDLE);
+				
+				if (player->GetHP() > 0) {
+					player->GetAttack(10);
+				}
+
+				for (auto& pl : clients)
+				{
+					if (pl.in_use == false) continue;
+					pl.send_bullet_hit_packet(0, -1, player->GetHP());
+				}
+
 			}
 		}
 		else
@@ -203,6 +224,17 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, XMFLOAT3 TargetPos, i
 			if (CurMotion != PastMotion)
 				SendAnimation();
 			PastState = (BossState)(BossAnimation::CLAW_ATTACT);
+
+			if (player->GetHP() > 0) {
+				player->GetAttack(5);
+			}
+
+			for (auto& pl : clients)
+			{
+				if (pl.in_use == false) continue;
+				pl.send_bullet_hit_packet(0, -1, player->GetHP());
+			}
+
 
 			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 3) {
 				lastAttackTime = steady_clock::now();
