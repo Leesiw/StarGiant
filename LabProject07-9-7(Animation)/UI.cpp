@@ -359,9 +359,17 @@ float UILayer::UpdatePlanetDist(CAirplanePlayer* player, XMFLOAT3& lpos)
 
 
 
-void UILayer::UpdateHp(short Hp, short maxHp)
+void UILayer::UpdateHp(short curhp, short maxHp)
 {
-    hpBar = float (maxHp - Hp) * 1.5;
+    hpBar =(hpbarRight - hpbarLeft) - (float(curhp) / float(maxHp)) * (hpbarRight - hpbarLeft);
+}
+
+void UILayer::UpdateBossHp(short curhp, short maxHp)
+{
+
+   // BosshpBar = float(maxHp - curhp) * 1.5;
+
+    BosshpBar = (bossHpbarRight - bossHpbarLeft) - (float(curhp) / float(maxHp)) * (bossHpbarRight - bossHpbarLeft);
 
 
 }
@@ -472,11 +480,18 @@ void UILayer::Render(UINT nFrame, MissionType mty)
 
 
 
-    m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarLeft + 150, FRAME_BUFFER_HEIGHT - 50), Whitebrush); //배경
-    m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarLeft + 150 - hpBar, FRAME_BUFFER_HEIGHT - 50), Redbrush); // hp
+    m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarRight, FRAME_BUFFER_HEIGHT - 50), Whitebrush); //배경
+    if(hpbarRight - hpBar> hpbarLeft)
+        m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarRight - hpBar, FRAME_BUFFER_HEIGHT - 50), Redbrush); // hp
 
 
-   
+    if (mty == MissionType::DEFEAT_BOSS) {
+        m_pd2dDeviceContext->FillRectangle(D2D1::RectF(bossHpbarLeft, bossHpbarTop, bossHpbarRight, bossHpbarBottom), Whitebrush); //배경
+        if (bossHpbarRight - BosshpBar > bossHpbarLeft)
+            m_pd2dDeviceContext->FillRectangle(D2D1::RectF(bossHpbarLeft, bossHpbarTop, bossHpbarRight - BosshpBar, bossHpbarBottom), Redbrush); // hp
+    }
+
+
 
     m_pd2dDeviceContext->EndDraw();
 
