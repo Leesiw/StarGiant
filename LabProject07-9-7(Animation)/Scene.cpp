@@ -270,7 +270,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_ppSprite[i] = new CSpriteObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(0,0,0), XMFLOAT3(0.f,0.f,0.f), static_cast<int>(SpriteType::Ship));
 		m_ppSprite[i]->SetPosition(435.f, 250.f, 640.f);
 		m_ppSprite[i]->CreateShaderVariable(pd3dDevice, pd3dCommandList);
-		//AddDieSprite(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(435.f, 250.f, 640.f));
+		AddDieSprite(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(435.f, 250.f, 640.f));
 	}
 	//=====================================XMFLOAT3(425.0f, 250.0f, 640.0f);
 	BuildBoss(pd3dDevice, pd3dCommandList);
@@ -312,7 +312,8 @@ void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 		m_ppUI[i] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::HP), 15, 2, 0);
 		m_ppUI[i]->SetPosition(fx + 10.0f + 20.0f * i, fy, 10.0f);
 	}
-
+	m_ppUI[ENEMIES + 2] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::HP), 30, 4, 0);
+	m_ppUI[ENEMIES + 2]->SetPosition(0.0f, 0.0f, 0.0f);
 
 }
 
@@ -864,6 +865,7 @@ void CScene::RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 void CScene::RespawnBossMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info)
 {
+
 }
 
 void CScene::TransformMeteor(METEO_INFO m_info)
@@ -1201,6 +1203,18 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 	}
 
+	for (int i = 0; i < METEOS; i++)
+	{
+		if (m_ppBossMeteorObjects[i])
+		{
+			m_ppBossMeteorObjects[i]->Animate(m_fElapsedTime);
+			if (!m_ppBossMeteorObjects[i]->m_pSkinnedAnimationController) m_ppBossMeteorObjects[i]->UpdateTransform(NULL);
+			m_ppBossMeteorObjects[i]->Render(pd3dCommandList, pCamera);
+		}
+	}
+
+	
+
 	for (int i = 0; i < ENEMIES; i++)
 	{
 		if (m_ppEnemies[i] && m_ppEnemies[i]->isAlive)
@@ -1315,6 +1329,9 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 		}
 	}
 
+	m_ppUI[ENEMIES + 2]->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y + 10.0f, m_ppBoss->GetPosition().z);
+	m_ppUI[ENEMIES + 2]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
+	m_ppUI[ENEMIES + 2]->HpbarUpdate(m_ppBoss->GetPosition(), m_ppBoss->GetMaxHp(), m_ppBoss->GetcurHp());
 
 	////hp테스트
 	//m_ppUI[3]->SetPosition(m_ppEnemies[0]->GetPosition());

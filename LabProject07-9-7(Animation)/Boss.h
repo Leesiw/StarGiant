@@ -29,6 +29,9 @@ public:
 	int MAXBossHP = 100.0f;
 	int BossHP = 100.0f;
 
+	int GetcurHp() { return BossHP; }
+	int GetMaxHp() { return MAXBossHP; }
+
 	int attactCoolTime = 3;
 
 	BossState GetState() { return CurState; };
