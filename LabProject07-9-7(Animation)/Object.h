@@ -776,6 +776,7 @@ public:
 	void SetCntTime(float Time) { m_fCntTime = Time; }
 	void SetSpeed(float Speed) { m_fSpeed = Speed; }
 	void SetfollowPosition(XMFLOAT3 Target, XMFLOAT3 Distance, XMFLOAT3 LookAt);
+	void SetNewTexture(ID3D12Device* pd3dDevice,CTexture* pSpriteTexture);
 
 	float GetCntTime() {return m_fCntTime;};
 	virtual ID3D12Resource* GetShaderVariables() { return m_pcbplusShaderVariable; }
@@ -785,6 +786,11 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 	void CountDiedTime(float dieTime);
+};
+class CSprite2Object : public CSpriteObject
+{
+	CSprite2Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Center, XMFLOAT3 Size, int type = 0);
+	virtual ~CSprite2Object() {};
 };
 
 //====================================================================================================

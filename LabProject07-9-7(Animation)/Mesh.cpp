@@ -903,16 +903,18 @@ CRayLineMesh::CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	float fz = Vector3::ScalarProduct(XMFLOAT3(fxPosition, fyPosition, fzPosition), fDepth).z; //끝점 //fzPosition +Vector3::ScalarProduct(Vector, fDepth).z;
 	*/
 
-	float fx = -(fWidth * 0.5f) + fxPosition, fy = -(fHeight * 0.5f) + fyPosition; //시작점
-	float fz = fzPosition + Vector3::ScalarProduct(Vector, fDepth).z;//Vector3::ScalarProduct(XMFLOAT3(fxPosition, fyPosition, fzPosition), fDepth).z; //끝점 //
+	float fx = -(fWidth * 0.5f) + fxPosition, fz = -(fHeight * 0.5f) + fzPosition; //시작점
+	float fy = fyPosition + Vector3::ScalarProduct(XMFLOAT3(fxPosition, fyPosition, fzPosition), fDepth).y; //끝점 //
 	float dx = fWidth / m_nNumber, dy = fHeight / m_nNumber;
 
 	//시작점인듯 
 	int num = 0;
 	for (int i = 0; i < m_nNumber; i++) {
 		for (int z = 0; z < m_nNumber; z++) {
-			m_pxmf3Positions[num] = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x, Vector3::ScalarProduct(Vector, fy + (dy * z)).y, Vector3::ScalarProduct(Vector,fzPosition).z); m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3();
-			m_pxmf3Positions[num] = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x, Vector3::ScalarProduct(Vector, fy + (dy * z)).y, Vector3::ScalarProduct(Vector, fz).z); m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3(); ;
+			m_pxmf3Positions[num] = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x,  Vector3::ScalarProduct(Vector,fzPosition).y,Vector3::ScalarProduct(Vector, fz + (dy * z)).z);
+								m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3();
+			m_pxmf3Positions[num] = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x, Vector3::ScalarProduct(Vector, fy).y, Vector3::ScalarProduct(Vector, fz + (dy * z)).z);
+								m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3(); ;
 		}
 	}
 
