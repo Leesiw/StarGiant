@@ -2066,7 +2066,7 @@ void CSpriteObject::CountDiedTime(float dieTime)
 		}
 	}
 
-	cout << m_fCntTime << endl;
+	//cout << m_fCntTime << endl;
 }
 
 
