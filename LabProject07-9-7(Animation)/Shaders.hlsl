@@ -318,6 +318,7 @@ VS_SPRITE_OUTPUT VS_SPRITE(VS_SPRITE_INPUT input)
 	return(output);
 }
 Texture2D gtxtSPRITETexture : register(t17);
+//Texture2D gtxtSPRITETexture2 : register(t18);
 
 float4 PS_SPRITE(VS_SPRITE_OUTPUT input) : SV_TARGET
 {
@@ -325,6 +326,13 @@ float4 PS_SPRITE(VS_SPRITE_OUTPUT input) : SV_TARGET
 	//cColor = float4(1.0,1.0,1.0,1.0);
 	return (cColor);
 }
+
+//float4 PS_SPRITE2(VS_SPRITE_OUTPUT input) : SV_TARGET
+//{
+//	float4 cColor = gtxtSPRITETexture2.Sample(gssWrap, input.uv);
+//	//cColor = float4(1.0,1.0,1.0,1.0);
+//	return (cColor);
+//}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct VS_GOD_INPUT

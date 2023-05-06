@@ -2032,7 +2032,6 @@ void CSpriteObject::Animate(float fElapsedTime)
 void CSpriteObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
-
 	switch (SpriteMode) {
 		case static_cast<int>(SpriteType::Ship):
 			CGameObject::Render(pd3dCommandList, pCamera);
@@ -2073,6 +2072,12 @@ void CSpriteObject::SetfollowPosition(XMFLOAT3 Target, XMFLOAT3 Distance,XMFLOAT
 	SetPosition(spaceshipPosition);
 	//왜이러냐 진짜 
 }
+
+void CSpriteObject::SetNewTexture(ID3D12Device* pd3dDevice,CTexture* pSpriteTexture)
+{
+	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 18, false); //PS를 UI  18
+}
+
 
 void CSpriteObject::CreateShaderVariable(ID3D12Device* pd3dDevice,ID3D12GraphicsCommandList* pd3dCommandList)
 { 

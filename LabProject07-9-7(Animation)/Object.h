@@ -776,6 +776,7 @@ public:
 	void SetCntTime(float Time) { m_fCntTime = Time; }
 	void SetSpeed(float Speed) { m_fSpeed = Speed; }
 	void SetfollowPosition(XMFLOAT3 Target, XMFLOAT3 Distance, XMFLOAT3 LookAt);
+	void SetNewTexture(ID3D12Device* pd3dDevice,CTexture* pSpriteTexture);
 
 	float GetCntTime() {return m_fCntTime;};
 	virtual ID3D12Resource* GetShaderVariables() { return m_pcbplusShaderVariable; }

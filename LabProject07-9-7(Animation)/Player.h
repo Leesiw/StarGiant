@@ -119,7 +119,8 @@ public:
 
 	CGameObject					*m_pMainRotorFrame = NULL;
 	CGameObject					*m_pTailRotorFrame = NULL;
-
+	
+	CSpriteObject* m_pAirSprites[2];
 	CGameObject** m_BulletObjects = NULL;
 	CBulletObject* m_ppBullets[BULLETS];
 	void FireBullet(CGameObject* pLockedObject);
@@ -133,6 +134,7 @@ public:
 	short							max_hp = 100;
 	virtual void OnPrepareAnimate();
 	virtual void Animate(float fTimeElapsed);
+	void SetModelSprite(CGameObject* Loot, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	short getHp(){ return hp; }
 
 private:

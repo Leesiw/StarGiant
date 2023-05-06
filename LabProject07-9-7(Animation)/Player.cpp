@@ -40,6 +40,8 @@ CPlayer::~CPlayer()
 	if (m_pCamera) delete m_pCamera;
 }
 
+
+
 void CPlayer::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
 	if (m_pCamera) m_pCamera->CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -348,6 +350,7 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	CLoadedModelInfo *pModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/CephalonShip.bin", NULL);
 	//CLoadedModelInfo *pModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Doggy_V1.bin", NULL);
 
+	SetModelSprite(pModel->m_pModelRootObject->m_pChild, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	SetChild(pModel->m_pModelRootObject, true);
 
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pModel);
@@ -380,6 +383,48 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 CAirplanePlayer::~CAirplanePlayer()
 {
+}
+
+void CAirplanePlayer::SetModelSprite(CGameObject* Loot, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+	//모델들의 이름을 다 돌아들어가보면서 이름찾고, 그 이름의 메쉬를 가지고 잇는놈의 텍스처와.... 메쉬를 CSpriteObject로 바꾼다. 
+	int num= 0;
+	if ((0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_L"))||(0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_R"))) 
+	{ 
+		if(0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_L")) num =0;
+		else if (0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_R")) num=1;
+
+		cout << "find Test " << endl;
+		//CSpriteObject* Temp = (CSpriteObject*)(Loot->m_pSibling);
+		m_pAirSprites[num] = (CSpriteObject*)(Loot->m_pSibling);
+		//delete(Loot->m_pSibling->m_pMesh);
+
+		CTexture* pSpriteTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+		pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Laser_sprite_8.dds", 0);//Explode_8x8
+
+		CSpriteShader* CSpriteObjectShader = new CSpriteShader();
+		CSpriteObjectShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+		CSpriteObjectShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+		//CSpriteObjectShader->ChangePS();
+
+		CMaterial* pStriteMaterial = new CMaterial(1);
+		pStriteMaterial->SetTexture(pSpriteTexture);
+		pStriteMaterial->SetShader(CSpriteObjectShader);
+
+		m_pAirSprites[num]->SetNewTexture(pd3dDevice, pSpriteTexture);
+		m_pAirSprites[num]->SetMaterial(0, pStriteMaterial);
+		m_pAirSprites[num]->SetRowColumn(1, 8);
+		//m_pAirSprites[num]->SetSpeed(3.0f / 8);			//why Error? 
+		m_pAirSprites[num]->Animate(0.0f);
+
+		m_pAirSprites[num]->SpriteMode = static_cast<int>(SpriteType::Ship);
+		m_pAirSprites[num]->is_Alive = true;
+
+		if(num ==1)SetModelSprite(Loot->m_pSibling, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	}
+	else {
+		SetModelSprite(Loot->m_pSibling, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	};
 }
 
 void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
@@ -501,7 +546,7 @@ void CAirplanePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 		{
 			m_ppBullets[i]->Render(pd3dCommandList, pCamera); 
 		};
-
+	for(int i=0; i<2; i++) m_pAirSprites[i]->Render(pd3dCommandList, pCamera);
 	CPlayer::Render(pd3dCommandList, pCamera);
 
 }
