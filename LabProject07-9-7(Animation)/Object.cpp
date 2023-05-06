@@ -2075,7 +2075,7 @@ void CSpriteObject::SetfollowPosition(XMFLOAT3 Target, XMFLOAT3 Distance,XMFLOAT
 
 void CSpriteObject::SetNewTexture(ID3D12Device* pd3dDevice,CTexture* pSpriteTexture)
 {
-	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 18, false); //PS¸¦ UI  18
+	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 20, false); //PS¸¦ UI  18
 }
 
 

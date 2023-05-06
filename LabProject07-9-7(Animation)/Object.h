@@ -787,6 +787,11 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 	void CountDiedTime(float dieTime);
 };
+class CSprite2Object : public CSpriteObject
+{
+	CSprite2Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Center, XMFLOAT3 Size, int type = 0);
+	virtual ~CSprite2Object() {};
+};
 
 //====================================================================================================
 class CMascotObject : public CGameObject

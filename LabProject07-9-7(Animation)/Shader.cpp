@@ -1125,5 +1125,15 @@ D3D12_INPUT_LAYOUT_DESC CSpriteShader::CreateInputLayout()
 
 void CSpriteShader::ChangePS()
 {
-	m_d3dPipelineStateDesc.PS = CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_SPRITE2", "ps_5_1", &m_pd3dPixelShaderBlob);
+	//m_d3dPipelineStateDesc.PS = CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_SPRITE2", "ps_5_1", &m_pd3dPixelShaderBlob);
+}
+
+D3D12_SHADER_BYTECODE CSprite2Shader::CreateVertexShader()
+{
+	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VS_SPRITE2", "vs_5_1", &m_pd3dPixelShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE CSprite2Shader::CreatePixelShader()
+{
+	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_SPRITE2", "ps_5_1", &m_pd3dPixelShaderBlob));
 }

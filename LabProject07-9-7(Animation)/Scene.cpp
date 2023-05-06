@@ -573,11 +573,12 @@ void CScene::ReleaseObjects()
 	if (m_pLights) delete[] m_pLights;
 }
 
+
 ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
 
-	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[14];
+	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[15];
 
 	pd3dDescriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	pd3dDescriptorRanges[0].NumDescriptors = 1;
@@ -663,7 +664,13 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	pd3dDescriptorRanges[13].RegisterSpace = 0;
 	pd3dDescriptorRanges[13].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER pd3dRootParameters[20];
+	pd3dDescriptorRanges[14].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	pd3dDescriptorRanges[14].NumDescriptors = 1;
+	pd3dDescriptorRanges[14].BaseShaderRegister = 18; //t18: gtxtSprite2Texture2
+	pd3dDescriptorRanges[14].RegisterSpace = 0;
+	pd3dDescriptorRanges[14].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_ROOT_PARAMETER pd3dRootParameters[21];
 
 	pd3dRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	pd3dRootParameters[0].Descriptor.ShaderRegister = 1; //Camera
@@ -766,6 +773,11 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	pd3dRootParameters[19].Constants.ShaderRegister = 9; //plus SpriteTransform
 	pd3dRootParameters[19].Constants.RegisterSpace = 0;
 	pd3dRootParameters[19].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	pd3dRootParameters[20].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	pd3dRootParameters[20].DescriptorTable.NumDescriptorRanges = 1;
+	pd3dRootParameters[20].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[14]); //Sprite2 texture
+	pd3dRootParameters[20].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	D3D12_STATIC_SAMPLER_DESC pd3dSamplerDescs[2];
 
@@ -1262,14 +1274,15 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 	//우선 내부일떄 안써서 제한해놓음. 
 	if (!b_Inside) {
-		for (int i = 0; i < SPRITE_CNT; i++) {
-
-			m_ppSprite[i]->Animate(m_fElapsedTime);
+			/*m_ppSprite[0]->Animate(m_fElapsedTime);
 			m_ppSprite[0]->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(30.0f, -60.0f, 0.0f), m_pPlayer[0]->GetLook());
-			m_ppSprite[i]->UpdateShaderVariables(pd3dCommandList, m_ppSprite[i]->GetShaderVariables());
-			//m_ppSprite[i]->Render(pd3dCommandList, pCamera);
-		}
-		m_ppSprite[1]->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(-30.0f, -80.0f, 0.0f), m_pPlayer[0]->GetLook());
+			m_ppSprite[0]->UpdateShaderVariables(pd3dCommandList, m_ppSprite[0]->GetShaderVariables());
+			m_ppSprite[0]->Render(pd3dCommandList, pCamera);*/
+
+			m_ppSprite[1]->Animate(m_fElapsedTime);
+			m_ppSprite[1]->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(30.0f, -60.0f, 0.0f), m_pPlayer[0]->GetLook());
+			m_ppSprite[1]->UpdateShaderVariables(pd3dCommandList, m_ppSprite[1]->GetShaderVariables());
+			m_ppSprite[1]->Render(pd3dCommandList, pCamera);
 	}
 	if (!m_pDieSprite.empty()) {
 		for (std::list<CSpriteObject*>::iterator i = m_pDieSprite.begin(); i != m_pDieSprite.end();)

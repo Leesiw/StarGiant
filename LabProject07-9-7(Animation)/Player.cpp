@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "Shader.h"
+#include "Scene.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CPlayer
@@ -397,21 +398,21 @@ void CAirplanePlayer::SetModelSprite(CGameObject* Loot, ID3D12Device* pd3dDevice
 		cout << "find Test " << endl;
 		//CSpriteObject* Temp = (CSpriteObject*)(Loot->m_pSibling);
 		m_pAirSprites[num] = (CSpriteObject*)(Loot->m_pSibling);
-		//delete(Loot->m_pSibling->m_pMesh);
 
 		CTexture* pSpriteTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 		pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Laser_sprite_8.dds", 0);//Explode_8x8
 
-		CSpriteShader* CSpriteObjectShader = new CSpriteShader();
+		CSprite2Shader* CSpriteObjectShader = new CSprite2Shader();
 		CSpriteObjectShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 		CSpriteObjectShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
-		//CSpriteObjectShader->ChangePS();
 
+		//m_pAirSprites[num]->SetNewTexture(pd3dDevice, pSpriteTexture);
+		CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 20, false);
 		CMaterial* pStriteMaterial = new CMaterial(1);
 		pStriteMaterial->SetTexture(pSpriteTexture);
 		pStriteMaterial->SetShader(CSpriteObjectShader);
 
-		m_pAirSprites[num]->SetNewTexture(pd3dDevice, pSpriteTexture);
+		
 		m_pAirSprites[num]->SetMaterial(0, pStriteMaterial);
 		m_pAirSprites[num]->SetRowColumn(1, 8);
 		//m_pAirSprites[num]->SetSpeed(3.0f / 8);			//why Error? 
