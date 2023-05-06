@@ -660,7 +660,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	if (m_pBoss) {
 		m_pBoss->Animate(fTimeElapsed);
-		m_pBoss->Boss_Ai(fTimeElapsed, m_pBoss->GetState(), m_pSpaceship->GetPosition(), m_pBoss->GetHP());;
+		m_pBoss->Boss_Ai(fTimeElapsed, m_pBoss->GetState(), m_pSpaceship, m_pBoss->GetHP());;
 	}
 
 	m_pSpaceship->Animate(fTimeElapsed);

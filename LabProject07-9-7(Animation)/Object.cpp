@@ -1984,6 +1984,7 @@ void CUIObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCam
 
 CSpriteObject::CSpriteObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Center, XMFLOAT3 Size, int type) : CGameObject(1)
 {
+
 	CTexturedRectMesh* SpriteMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 50.0f, 50.0f, 0.0f);//Size.x, Size.y, 0.0f);
 	SetMesh(SpriteMesh);
 
@@ -1991,6 +1992,7 @@ CSpriteObject::CSpriteObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Explode_8x8.dds", 0);//Explode_8x8
 
 	CSpriteShader* CSpriteObjectShader = new CSpriteShader();
+	
 	CSpriteObjectShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	CSpriteObjectShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
@@ -2003,6 +2005,7 @@ CSpriteObject::CSpriteObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	SetRowColumn(8, 8);
 	SetSpeed(3.0f / (8 * 8));
 	Animate(0.0f);
+
 	SetMaterial(0, pStriteMaterial);
 	SpriteMode = type;
 	is_Alive = true;

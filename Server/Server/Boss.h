@@ -55,7 +55,7 @@ protected:
 public:
 	void MoveBoss(float fTimeElapsed, XMFLOAT3 TargetPos, float dist);
 	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
-	void Boss_Ai(float fTimeElapsed, BossState CurState, XMFLOAT3 TargetPos, int bossHp);
+	void Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHp);
 
 
 };
