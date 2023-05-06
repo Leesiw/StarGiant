@@ -407,8 +407,8 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	CLoadedModelInfo *pModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/CephalonShip.bin", NULL);
 	//CLoadedModelInfo *pModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Doggy_V1.bin", NULL);
 	
-	CTexture* pSpriteTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Laser_sprite_8.dds", 0);//Explode_8x8
+	CTexture* pSpriteTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);//Laser_sprite_8
+	pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Explode_8x8.dds", 0);//Explode_8x8
 
 	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 20, false);
 
