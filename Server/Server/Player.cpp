@@ -123,7 +123,7 @@ void CPlayer::Update(float fTimeElapsed)
 	}
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
-	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 50.f, false);
+	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 10.f, false);
 	xmf3Velocity = Vector3::Add(xmf3Velocity, LookVelocity);
 	Move(xmf3Velocity, false);
 
@@ -263,7 +263,7 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 	m_xmf3Look.x = xmf4x4._31; m_xmf3Look.y = xmf4x4._32; m_xmf3Look.z = xmf4x4._33;
 
 	if (input_info.dwDirection) {
-		Move(input_info.dwDirection, 350.0f * fTimeElapsed, true);
+		Move(input_info.dwDirection, 700.0f * fTimeElapsed, true);
 		input_info.dwDirection = NULL;
 	}
 	is_update = true;
