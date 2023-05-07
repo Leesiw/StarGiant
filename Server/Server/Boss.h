@@ -22,7 +22,7 @@ public:
 	int MAXBossHP = 100.0f;
 	int BossHP = 100.0f;
 	bool condition = false;
-	int attactCoolTime = 3;
+	int attactCoolTime = 7;
 	float speed = 100.0f;
 
 	float randAttact = urdAttack(dree);

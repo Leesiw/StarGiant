@@ -815,8 +815,13 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	m_pSkinnedAnimationController->SetTrackEnable(2, false);
 	m_pSkinnedAnimationController->SetTrackEnable(3, false);
 
+	
+
 
 	m_pSkinnedAnimationController->SetCallbackKeys(1, 2);
+
+
+
 #ifdef _WITH_SOUND_RESOURCE
 	m_pSkinnedAnimationController->SetCallbackKey(0, 0.1f, _T("Footstep01"));
 	m_pSkinnedAnimationController->SetCallbackKey(1, 0.5f, _T("Footstep02"));
@@ -969,6 +974,7 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 	}
 
 	CPlayer::Move(dwDirection, fDistance, bUpdateVelocity);
+
 }
 
 void CTerrainPlayer::Update(float fTimeElapsed)
@@ -995,6 +1001,8 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 				m_pSkinnedAnimationController->SetTrackEnable(3, false);
 				m_pSkinnedAnimationController->SetTrackPosition(1, 0.0f);
 				m_pSkinnedAnimationController->SetTrackPosition(2, 0.0f);
+
+
 			}
 			else {
 				m_pSkinnedAnimationController->SetTrackEnable(0, false);

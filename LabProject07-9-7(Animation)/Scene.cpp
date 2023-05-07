@@ -261,7 +261,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_ppBossMeteorObjects[i] = new CMeteorObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMeteoModel, 1);
 		m_ppBossMeteorObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_ppBossMeteorObjects[i]->SetPosition(330.0f + i * 10, m_pTerrain->GetHeight(330.0f, 590.0f) + 20.0f, 590.0f);
-		m_ppBossMeteorObjects[i]->SetScale(3.0f, 3.0f, 3.0f);
+		m_ppBossMeteorObjects[i]->SetScale(100.0f, 100.0f, 100.0f);
 		if (pMeteoModel) delete pMeteoModel;
 	}
 
@@ -425,9 +425,6 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 
 	for (int i = 0; i < METEOS; ++i) {
 		m_ppMeteorObjects[i] = NULL;
-	}
-	for (int i = 0; i < METEOS; ++i) {
-		m_ppBossMeteorObjects[i] = NULL;
 	}
 
 	
@@ -858,6 +855,8 @@ void CScene::ReleaseUploadBuffers()
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nHierarchicalGameObjects; i++) m_ppHierarchicalGameObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < METEOS; i++)if (m_ppMeteorObjects[i] != NULL) m_ppMeteorObjects[i]->ReleaseUploadBuffers();
+	for (int i = 0; i < BOSSMETEOS; i++)if (m_ppBossMeteorObjects[i] != NULL) m_ppBossMeteorObjects[i]->ReleaseUploadBuffers();
+
 	for (int i = 0; i < ENEMIES; i++)if (m_ppEnemies[i])	m_ppEnemies[i]->ReleaseUploadBuffers();
 	if (m_pPlayer[g_myid])m_pPlayer[g_myid]->ReleaseUploadBuffers();
 
@@ -877,7 +876,11 @@ void CScene::RespawnMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 void CScene::RespawnBossMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info)
 {
-
+	if (m_ppBossMeteorObjects[m_info.id - METEOS])
+	{
+		m_ppBossMeteorObjects[m_info.id - METEOS]->ResetScale();
+		m_ppBossMeteorObjects[m_info.id - METEOS]->SetPosition(m_info.pos);
+	}
 }
 
 void CScene::TransformMeteor(METEO_INFO m_info)
@@ -1222,7 +1225,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 	}
 
-	for (int i = 0; i < METEOS; i++)
+	for (int i = 0; i < BOSSMETEOS; i++)
 	{
 		if (m_ppBossMeteorObjects[i])
 		{
@@ -1271,6 +1274,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
 		//m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
 		m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
+
 		m_ppBoss->Render(pd3dCommandList, pCamera); 
 	}
 

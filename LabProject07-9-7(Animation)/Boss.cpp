@@ -326,15 +326,35 @@ void Boss::ChangeAnimation(BossAnimation CurMotion)
 	//다르면 먼저 모션 바꿔주고, c를 p에 저장
 	if (CurMotion != PastMotion) {
 		m_pSkinnedAnimationController->SetTrackEnable(static_cast<int>(PastMotion), false);
+		m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(CurMotion), 0.0f);
+		m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(PastMotion), 0.0f);
+		SetTrackAnimationPosition(static_cast<int>(PastMotion), 0.0f);
+		SetTrackAnimationPosition(static_cast<int>(CurMotion), 0.0f);
 		m_pSkinnedAnimationController->SetTrackEnable(static_cast<int>(CurMotion), true);
-
 		PastMotion = CurMotion;
 
 	}
 
-	//if (CurMotion != PastMotion)
-	//	PastMotion = CurMotion;
 
 
-	//cout << "cur" << static_cast<int>(CurState) << endl;
+	if (CurMotion == BossAnimation::DIE)
+	{
+		static std::chrono::time_point<std::chrono::steady_clock> target_time;
+		// 처음에 target_time 초기화
+		if (target_time.time_since_epoch().count() == 0) {
+			target_time = std::chrono::steady_clock::now() + std::chrono::milliseconds(1700);
+		}
+
+
+
+		auto now = std::chrono::steady_clock::now();
+
+		if (std::chrono::steady_clock::now() > target_time) {
+			cout << "d";
+			m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(CurMotion), 1.0f);
+			SetTrackAnimationPosition(static_cast<int>(CurMotion), 1.0f);
+			m_pSkinnedAnimationController->SetTrackSpeed(static_cast<int>(CurMotion), 0.0f);
+		}
+	}
+
 }

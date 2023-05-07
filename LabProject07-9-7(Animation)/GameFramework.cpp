@@ -1383,6 +1383,7 @@ void CGameFramework::ProcessPacket(char* p)
 	{
 		SC_SPAWN_METEO_PACKET* packet = reinterpret_cast<SC_SPAWN_METEO_PACKET*>(p);
 		m_pScene->RespawnMeteor(m_pd3dDevice, m_pd3dCommandList, packet->data);
+		m_pScene->RespawnBossMeteor(m_pd3dDevice, m_pd3dCommandList, packet->data);
 		break;
 	}
 	case SC_METEO:

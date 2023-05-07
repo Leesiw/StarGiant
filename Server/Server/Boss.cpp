@@ -16,10 +16,11 @@ Boss::Boss()
 		meteo = new CMeteoObject();
 		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
 		meteo->SetMovingDirection(XMFLOAT3(urdPos(dree), urdPos(dree), urdPos(dree)));
-		meteo->SetScale(3.f, 3.f, 3.f);
+		meteo->SetScale(100.0f, 100.0f, 100.0f);
 		if (i < BOSSMETEOS / 2) {
 			// 바운딩 박스 설정 부탁
-			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256, 0.71804,  -0.0466012 }, XMFLOAT3{ 4.414825, 4.29032, 4.14356 }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		}
 		else {
 			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256, 0.71804,  -0.0466012 }, XMFLOAT3{ 4.414825, 4.29032, 4.14356 }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
@@ -30,6 +31,9 @@ Boss::Boss()
 
 	//boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 34.65389f, -10.1982f), XMFLOAT3(65.5064392f, 35.0004547f, 77.9787476f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	boundingbox = BoundingOrientedBox{ XMFLOAT3(-33.47668f, 41.86574f, 26.52405), XMFLOAT3(774.8785, 299.2372, 584.7963), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+
+
+	
 }
 
 Boss::~Boss() {
@@ -73,28 +77,42 @@ XMFLOAT4 Boss::GetQuaternion()
 void Boss::MeteoAttack(float fTimeElapsed, const XMFLOAT3& TargetPos) // 공격 시작 시 한 번 실행
 {
 	XMFLOAT3 xmf3Pos = GetPosition();
+	xmf3Pos.y + 1000.f;
 	XMFLOAT3 player_pos = TargetPos;
 	XMFLOAT3 xmfToPlayer = Vector3::Subtract(player_pos, xmf3Pos);
 	xmfToPlayer = Vector3::TransformCoord(xmfToPlayer, Matrix4x4::RotationAxis(GetUp(), urdAngle(dree)));
 	
+	XMFLOAT3 directions[5] = {
+	   xmfToPlayer, // 중심 방향
+	   Vector3::TransformNormal(XMFLOAT3(0.f, 0.f, 1.f), XMMatrixRotationY(XMConvertToRadians(45.f))), // 위쪽 방향
+	   Vector3::TransformNormal(XMFLOAT3(0.f, 0.f, 1.f), XMMatrixRotationY(XMConvertToRadians(-45.f))), // 아래쪽 방향
+	   Vector3::TransformNormal(XMFLOAT3(1.f, 0.f, 0.f), XMMatrixRotationY(XMConvertToRadians(45.f))), // 왼쪽 방향
+	   Vector3::TransformNormal(XMFLOAT3(1.f, 0.f, 0.f), XMMatrixRotationY(XMConvertToRadians(-45.f))) // 오른쪽 방향
+	};
+
 	for (int i = 0; i < BOSSMETEOS; ++i) {
 		m_ppBossMeteoObjects[i]->SetPosition(xmf3Pos);
-		// 현재 한 방향으로만 감 벡터 흔들기 등으로 방향 변경
-		m_ppBossMeteoObjects[i]->SetMovingDirection(xmfToPlayer);
-		m_ppBossMeteoObjects[i]->SetMovingSpeed(5.f);
+		m_ppBossMeteoObjects[i]->SetMovingDirection(directions[i]);
+		m_ppBossMeteoObjects[i]->SetMovingSpeed(10000.f);
 	}
+
 }
 
 void Boss::MoveMeteo(float fTimeElapsed)		// 메테오 움직여야 할때 계속 실행. send까지 포함됨
 {
 	for (int i = 0; i < BOSSMETEOS; ++i) {
 		m_ppBossMeteoObjects[i]->Animate(fTimeElapsed);
+	
+		/*printf("pos : %f, %f, %f\n", 
+			m_ppBossMeteoObjects[0]->GetPosition().x, m_ppBossMeteoObjects[0]->GetPosition().y, m_ppBossMeteoObjects[0]->GetPosition().z);*/
 	}
 
 	for (auto& pl : clients) {
 		if (pl.in_use == false) continue;
 		pl.send_boss_meteo_packet(0, m_ppBossMeteoObjects);
 	}
+	/*cout << "send meteo\n";*/
+
 }
 
 void Boss::MoveBoss(float fTimeElapsed, XMFLOAT3 TargetPos, float dist)
@@ -114,7 +132,7 @@ void Boss::MoveBoss(float fTimeElapsed, XMFLOAT3 TargetPos, float dist)
 }
 
 
-void  Boss::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
+void Boss::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 {
 	XMFLOAT3 new_pos = pos;
 	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World)); // 역행렬
@@ -171,7 +189,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			SendAnimation();
 		SendPosition();
 		//만약에 플레이어가 가까이 오면 idle로 가기 
-		if (Dist < 200.0f) {
+		if (Dist < 500.0f) {
 			SetState(BossState::IDLE);
 			stateStartTime = steady_clock::now();
 		}
@@ -192,7 +210,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 
 
 		//플레이어와 거리가 멀어지면 플레이어 추적
-		if (Dist > 400.0f) {
+		if (Dist > 3000.0f) {
 			SetState(BossState::CHASE);
 			stateStartTime = steady_clock::now();
 		}
@@ -223,24 +241,33 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			a = 1;
 		}
 
+		else if (float(bossHP <= 0)){
+			SetState(BossState::DIE);
+			stateStartTime = steady_clock::now();
+		}
 
 		break;
 	}
 
 	case BossState::ATTACT: {
+		static int aa = 0;
 
 		LookAtPosition(fTimeElapsed, TargetPos);
 		SendPosition();
 
 		if (randAttact > 0.5f) {
 			CurMotion = BossAnimation::BASIC_ATTACT;
-			if (CurMotion != PastMotion)
+			if (CurState != PastState) {
 				SendAnimation();
+				//cout << "send attack!!\n";
+				if (player->GetHP() > 0) {
+					player->GetAttack(2);
+				}
 
-			PastState = (BossState)(BossAnimation::BASIC_ATTACT);
-			if (player->GetHP() > 0) {
-				player->GetAttack(2);
 			}
+
+			//PastState = (BossState)(BossAnimation::BASIC_ATTACT);
+			PastState = BossState::ATTACT;
 
 			for (auto& pl : clients)
 			{
@@ -248,24 +275,33 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 				pl.send_bullet_hit_packet(0, -1, player->GetHP());
 			}
 
-			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 2) {
+			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 1.8) {
 				lastAttackTime = steady_clock::now();
+			
 				SetState(BossState::IDLE);
 			}
+
+
 		}
-		else if (randAttact < 0.2f) {
+		else if (randAttact < 0.2f && a == 0) {
 			CurMotion = BossAnimation::FLAME_ATTACK;
-			if (CurMotion != PastMotion)
-				SendAnimation();;
-			PastState = (BossState)(BossAnimation::FLAME_ATTACK);
-			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 4) {
-				lastAttackTime = steady_clock::now();
-				SetState(BossState::IDLE);
-				
+			if (CurState != PastState) {
+				SendAnimation();
 				if (player->GetHP() > 0) {
 					player->GetAttack(10);
 				}
+				MeteoAttack(fTimeElapsed, TargetPos);
+				a = 1;
+			}
+			//PastState = (BossState)(BossAnimation::FLAME_ATTACK);
+			PastState = BossState::ATTACT;
 
+			
+
+			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 3.5) {
+				lastAttackTime = steady_clock::now();
+				SetState(BossState::IDLE);
+				
 				for (auto& pl : clients)
 				{
 					if (pl.in_use == false) continue;
@@ -277,14 +313,15 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 		else
 		{
 			CurMotion = BossAnimation::CLAW_ATTACT;
-			if (CurMotion != PastMotion)
+			if (CurState != PastState) {
 				SendAnimation();
-			PastState = (BossState)(BossAnimation::CLAW_ATTACT);
-
-			if (player->GetHP() > 0) {
-				player->GetAttack(5);
+				if (player->GetHP() > 0) {
+					player->GetAttack(5);
+				}
 			}
-
+			//PastState = (BossState)(BossAnimation::CLAW_ATTACT);
+			PastState = BossState::ATTACT;
+			
 			for (auto& pl : clients)
 			{
 				if (pl.in_use == false) continue;
@@ -292,13 +329,12 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			}
 
 
-			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 3) {
+			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 2.2) {
 				lastAttackTime = steady_clock::now();
 				SetState(BossState::IDLE);
 
 			}
 		}
-
 		break;
 	}
 
@@ -316,7 +352,13 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 	case BossState::SCREAM: {
 		CurMotion = BossAnimation::SCREAM;
 		if (CurMotion != PastMotion)
-			SendAnimation();;
+			SendAnimation();
+
+		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= 3) {
+			SetState(BossState::IDLE);
+			stateStartTime = steady_clock::now();
+		}
+
 		break;
 	}
 
@@ -326,7 +368,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			SendAnimation();
 		//cout << "GET_HIT" << endl;
 
-		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= 3) {
+		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= 1) {
 			SetState(BossState::IDLE);
 			stateStartTime = steady_clock::now();
 		}
@@ -357,7 +399,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 		MoveBoss(fTimeElapsed, TargetPos ,Dist);
 		SendPosition();
 
-		if (Dist <= 400.0f) {
+		if (Dist <= 2000.0f) {
 			SetState(BossState::IDLE);
 			stateStartTime = steady_clock::now();
 		}
@@ -456,7 +498,10 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 	}
 
 	case BossState::DIE: {
-		cout << "DIE" << endl;
+		//cout << "DIE" << endl;
+		CurMotion = BossAnimation::DIE;
+		if (CurMotion != PastMotion)
+			SendAnimation();
 
 		break;
 	}
@@ -464,8 +509,15 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 		break;
 	}
 
-	if ((CurState != BossState::ATTACT) || (CurState != BossState::CHASE))
+	if ((CurState != BossState::ATTACT) && (CurState != BossState::CHASE)) {
 		PastState = CurState;
+	}
+	if(a==1)
+		MoveMeteo(fTimeElapsed);
+
+	/*cout << "curstate - " << int(CurState) <<endl;
+	cout << "paststate - " << int(PastState) << endl;*/
+
 }
 
 
