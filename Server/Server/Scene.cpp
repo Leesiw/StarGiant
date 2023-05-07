@@ -606,7 +606,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));
-	if (dist < 900.f) // boss 막기
+	if (dist < 1000.f) // boss 막기
 	{
 		XMFLOAT3 ToGo = Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition());
 		ToGo = Vector3::ScalarProduct(ToGo, 800.f);

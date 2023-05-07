@@ -277,18 +277,13 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	BuildUI(pd3dDevice, pd3dCommandList);
 
 
-	m_nShaders = 2;
-	m_ppShaders = new CShader * [2];
-
-	CEthanObjectsShader* pEthanObjectsShader = new CEthanObjectsShader();
-	pEthanObjectsShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEthanModel, m_pTerrain);
-
-	m_ppShaders[0] = pEthanObjectsShader;
+	m_nShaders = 1;
+	m_ppShaders = new CShader * [1];
 
 	CGodRayShader* pGodRayShader = new CGodRayShader();
 	pGodRayShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEthanModel, m_pTerrain);
 
-	m_ppShaders[1] = pGodRayShader;
+	m_ppShaders[0] = pGodRayShader;
 
 	if (pEthanModel) delete pEthanModel;
 
@@ -311,6 +306,7 @@ void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	for (int i = 2; i < ENEMIES + 2; ++i) { //  UI_CNT
 		m_ppUI[i] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::HP), 15, 2, 0);
 		m_ppUI[i]->SetPosition(fx + 10.0f + 20.0f * i, fy, 10.0f);
+		m_ppUI[i]->SetScale(0, 0, 0);
 	}
 	m_ppUI[ENEMIES + 2] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::HP), 30, 4, 0);
 	m_ppUI[ENEMIES + 2]->SetPosition(0.0f, 0.0f, 0.0f);
@@ -1175,11 +1171,12 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	pd3dCommandList->SetGraphicsRootConstantBufferView(2, d3dcbLightsGpuVirtualAddress); //Lights
 
 	if (m_pSkyBox) m_pSkyBox->Render(pd3dCommandList, pCamera);
-	if (m_pTerrain && !b_Inside) m_pTerrain->Render(pd3dCommandList, pCamera);
+	//if (m_pTerrain && !b_Inside) m_pTerrain->Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->Render(pd3dCommandList, pCamera);
 	for (int i = 0; i < m_nShaders; i++) if (m_ppShaders[i]) m_ppShaders[i]->Render(pd3dCommandList, pCamera);
-	if (m_nShaders>1) m_ppShaders[1]->SetPlayerPosition(m_pPlayer[0]->GetPosition());
+	if (m_nShaders>0) m_ppShaders[0]->SetPlayerPosition(m_pPlayer[0]->GetPosition());
+
 
 
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
@@ -1194,6 +1191,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_ppHierarchicalGameObjects[9]->SetLookAt(tar, XMFLOAT3(0.0f, 1.0f, 0.0f));
 		m_ppHierarchicalGameObjects[9]->Rotate(90, 0, 0);
 		m_ppHierarchicalGameObjects[9]->SetScale(10, 5, 10);
+		m_ppHierarchicalGameObjects[9]->Render(pd3dCommandList, pCamera);
 	}
 
 	if (m_pPlayer[0]->curMissionType == MissionType::FIND_BOSS) {
@@ -1201,19 +1199,33 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_ppHierarchicalGameObjects[9]->SetLookAt(m_ppBoss->GetPosition(), XMFLOAT3(0.0f, 0.5f, 0.0f));
 		m_ppHierarchicalGameObjects[9]->Rotate(90, 0, 0);
 		m_ppHierarchicalGameObjects[9]->SetScale(10, 5, 10);
+		m_ppHierarchicalGameObjects[9]->Render(pd3dCommandList, pCamera);
+
+	}
+	if (b_Inside) {
+		m_ppHierarchicalGameObjects[0]->Render(pd3dCommandList, pCamera);
+		m_ppHierarchicalGameObjects[1]->Render(pd3dCommandList, pCamera);
+
 	}
 
 
 
+	//for (int i = 0; i < m_nHierarchicalGameObjects; i++)
+	//{
+	//	if (m_ppHierarchicalGameObjects[i])
+	//	{
+	//		m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
+	//		if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
+	//		m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
+	//	}
+	//}
 
-	for (int i = 0; i < m_nHierarchicalGameObjects; i++)
+
+	if (m_ppHierarchicalGameObjects[0])
 	{
-		if (m_ppHierarchicalGameObjects[i])
-		{
-			m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
-			if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
-			m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
-		}
+		m_ppHierarchicalGameObjects[0]->Animate(m_fElapsedTime);
+		if (!m_ppHierarchicalGameObjects[0]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[0]->UpdateTransform(NULL);
+		m_ppHierarchicalGameObjects[0]->Render(pd3dCommandList, pCamera);
 	}
 
 	for (int i = 0; i < METEOS; i++)
@@ -1274,7 +1286,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_ppBoss->Animate(m_fElapsedTime);
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
 		//m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
-		//m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
+		m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
 
 		if(!(m_ppBoss->BossHP<=0))
 			m_ppBoss->Render(pd3dCommandList, pCamera); 
@@ -1346,6 +1358,7 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 	{
 		if (m_ppEnemies[i- 2]&& m_ppEnemies[i - 2]->isAlive == true) {
 			m_ppUI[i]->SetPosition(m_ppEnemies[i - 2]->GetPosition().x, m_ppEnemies[i - 2]->GetPosition().y + 10.0f, m_ppEnemies[i - 2]->GetPosition().z);
+			m_ppUI[i]->SetScale(1, 1, 1);
 			m_ppUI[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
 			m_ppUI[i]->HpbarUpdate(m_ppEnemies[i - 2]->GetPosition(), m_ppEnemies[i - 2]->GetMaxHp(), m_ppEnemies[i - 2]->GetcurHp());
 		}
