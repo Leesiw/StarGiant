@@ -102,7 +102,7 @@ void CScene::BuildObjects()
 
 	// boss
 	m_pBoss = new Boss();
-	m_pBoss->SetPosition(10.f, 250.f, 640.f);
+	m_pBoss->SetPosition(3000.f, 3000.f, 3000.f);
 }
 
 void CScene::ReleaseObjects()
@@ -448,9 +448,10 @@ void CScene::CheckMissionComplete()
 	}*/
 	case MissionType::FIND_BOSS: {
 		float dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));		// 임시 좌표
-		if (dist < 500.f) {
+		if (dist < 1500.0f) {
 			MissionClear();
 		}
+
 		break;
 	}
 	}
@@ -462,6 +463,8 @@ void CScene::MissionClear()
 	if (cur_mission != levels[cur_mission].NextMission) 
 	{
 		cur_mission = levels[cur_mission].NextMission;
+		if (cur_mission == MissionType::FIND_BOSS)
+			m_pBoss->SetPosition(Vector3::Add(m_pSpaceship->GetPosition(), XMFLOAT3(2400.0f, 0.f, 0.f)));
 		for (auto& pl : clients) {
 			pl.send_mission_start_packet(cur_mission);
 		}
@@ -600,6 +603,17 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		SpawnEnemy();// 적 스폰
 		m_fEnemySpawnTimeRemaining = m_fEnemySpawnTime;
 	}
+
+	float dist;
+	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));
+	if (dist < 900.f) // boss 막기
+	{
+		XMFLOAT3 ToGo = Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition());
+		ToGo = Vector3::ScalarProduct(ToGo, 800.f);
+		ToGo = Vector3::Add(m_pBoss->GetPosition(), ToGo);
+		m_pSpaceship->SetPosition(ToGo);
+	}
+
 
 	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
 	for (int i = 0; i < METEOS; ++i) 

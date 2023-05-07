@@ -183,13 +183,12 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 
 	case  BossState::SLEEP:
 	{
-
 		CurMotion = BossAnimation::SLEEP;
 		if(CurMotion !=PastMotion)
 			SendAnimation();
 		SendPosition();
 		//만약에 플레이어가 가까이 오면 idle로 가기 
-		if (Dist < 500.0f) {
+		if (Dist < 1500.0f) {
 			SetState(BossState::IDLE);
 			stateStartTime = steady_clock::now();
 		}
@@ -210,7 +209,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 
 
 		//플레이어와 거리가 멀어지면 플레이어 추적
-		if (Dist > 3000.0f) {
+		if (Dist > 2500.0f) {
 			SetState(BossState::CHASE);
 			stateStartTime = steady_clock::now();
 		}

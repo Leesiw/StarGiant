@@ -338,6 +338,7 @@ void CScene::BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_ppBoss = new Boss();
 	m_ppBoss->BossObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBossModel);
 	m_ppBoss->SetPosition(0.0f + 10, 250.0f, 640.0f);
+	m_ppBoss->Rotate(0, 0, 0);
 	m_ppBoss->SetScale(100.0f, 100.0f, 100.0f);
 	if (pBossModel) delete pBossModel;
 

@@ -367,6 +367,7 @@ void CSitEventCamera::SetLookAt(XMFLOAT3& vLookAt)
 CAttactCamera::CAttactCamera(CCamera* pCamera) : CCamera(pCamera)
 {
 	m_nMode = ATTACT_CAMERA_C;
+
 	if (pCamera)
 	{
 		if (pCamera->GetMode() == SPACESHIP_CAMERA)
