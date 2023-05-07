@@ -1274,9 +1274,10 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_ppBoss->Animate(m_fElapsedTime);
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
 		//m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
-		m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
+		//m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
 
-		m_ppBoss->Render(pd3dCommandList, pCamera); 
+		if(!(m_ppBoss->BossHP<=0))
+			m_ppBoss->Render(pd3dCommandList, pCamera); 
 	}
 
 	if (m_ppMascot) {

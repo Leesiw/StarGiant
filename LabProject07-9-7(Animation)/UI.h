@@ -35,7 +35,7 @@ public:
 
     XMFLOAT4X4 UpdateMat(const XMFLOAT3& ppos);
 
-    void Render(UINT nFrame, MissionType mty = MissionType::TU_SIT);
+    void Render(UINT nFrame, MissionType mty = MissionType::TU_SIT, BossState bst = BossState::SLEEP);
     void ReleaseResources();
     void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height);
 
@@ -92,6 +92,8 @@ private:
     IWICImagingFactory* m_pwicImagingFactory = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource_jew = NULL;
+    ID2D1Effect* m_pd2dfxBitmapSource_logo = NULL;
+
     ID2D1Effect* m_pd2dfxBitmapSource_nevi = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource_nevi2 = NULL;
 
@@ -100,6 +102,8 @@ private:
 
     ID2D1Effect* m_pd2dfxGaussianBlur = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_jew = NULL;
+    ID2D1Effect* m_pd2dfxGaussianBlur_logo = NULL;
+
     ID2D1Effect* m_pd2dfxGaussianBlur_nevi = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_nevi2 = NULL;
 
@@ -108,6 +112,8 @@ private:
 
     ID2D1Effect* m_pd2dfxSize = NULL;
     ID2D1Effect* m_pd2dfxSize_jew = NULL;
+    ID2D1Effect* m_pd2dfxSize_logo = NULL;
+
     ID2D1Effect* m_pd2dfxSize_nevi = NULL;
     ID2D1Effect* m_pd2dfxSize_nevi2 = NULL;
 

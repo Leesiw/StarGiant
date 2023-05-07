@@ -89,6 +89,7 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_pd2dFactory->CreateDrawingStateBlock(&m_pd2dsbDrawingState);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_jew);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_logo);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_nevi);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_nevi2);
 
@@ -96,6 +97,8 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
 
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_jew);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_logo);
+
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_nevi);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_nevi2);
 
@@ -103,6 +106,8 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
 
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_jew);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_logo);
+
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_nevi);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_nevi2);
 
@@ -153,6 +158,30 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
    
     if (pwicBitmapDecoder_jewel) pwicBitmapDecoder_jewel->Release();
     if (pwicFrameDecode_j) pwicFrameDecode_j->Release();
+
+    //==
+
+    IWICBitmapDecoder* pwicBitmapDecoder_logo;
+    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/clear.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_logo);
+
+    IWICBitmapFrameDecode* pwicFrameDecode_lo;
+    pwicBitmapDecoder_logo->GetFrame(0, &pwicFrameDecode_lo);
+
+    m_pwicImagingFactory->CreateFormatConverter(&m_pwicFormatConverter[1]);
+    m_pwicFormatConverter[1]->Initialize(pwicFrameDecode_lo, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
+
+    m_pd2dfxBitmapSource_logo->SetValue(D2D1_BITMAPSOURCE_PROP_WIC_BITMAP_SOURCE, m_pwicFormatConverter[1]);
+
+    m_pd2dfxGaussianBlur_logo->SetInputEffect(0, m_pd2dfxBitmapSource_logo);
+    m_pd2dfxGaussianBlur_logo->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 0.0f);
+
+
+    m_pd2dfxSize_logo->SetInputEffect(0, m_pd2dfxBitmapSource_logo);
+    m_pd2dfxSize_logo->SetValue(D2D1_BITMAPSOURCE_PROP_SCALE, D2D1::Vector2F(0.1f, 0.1f));
+
+
+    if (pwicBitmapDecoder_logo) pwicBitmapDecoder_logo->Release();
+    if (pwicFrameDecode_lo) pwicFrameDecode_lo->Release();
 
     //==
 
@@ -399,7 +428,7 @@ XMFLOAT4X4 UILayer::UpdateMat(const XMFLOAT3& pos)
     return matrix;
 }
 
-void UILayer::Render(UINT nFrame, MissionType mty)
+void UILayer::Render(UINT nFrame, MissionType mty, BossState bst)
 {
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
@@ -429,6 +458,9 @@ void UILayer::Render(UINT nFrame, MissionType mty)
 
     D2D_POINT_2F d2dPoint_nevi = { -25, -75 };
 
+    D2D_POINT_2F d2dPoint_logo = { FRAME_BUFFER_WIDTH/2 - 512, FRAME_BUFFER_HEIGHT /2 - 128};
+
+
 
 
     D2D_RECT_F d2dRect = { 0.0f, 0.0f, 100.0f, 200.0f };
@@ -450,6 +482,10 @@ void UILayer::Render(UINT nFrame, MissionType mty)
     m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
     m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur, &d2dPoint);
     m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_jew, &d2dPoint_jew);
+
+    if(bst ==BossState::DIE)
+        m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_logo, &d2dPoint_logo);
+
     m_pd2dDeviceContext->SetTransform(matTM);
 
    // m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Rotation(angle, a));

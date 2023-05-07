@@ -891,7 +891,7 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
-	m_pUILayer->Render(m_nSwapChainBufferIndex, curMissionType);
+	m_pUILayer->Render(m_nSwapChainBufferIndex, curMissionType, m_pScene->m_ppBoss->CurState);
 
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
