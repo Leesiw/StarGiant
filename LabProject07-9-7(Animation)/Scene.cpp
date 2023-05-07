@@ -1404,7 +1404,7 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 	}
 
 
-	if (landob)landob->Render(pd3dCommandList, pCamera);
+	//if (landob)landob->Render(pd3dCommandList, pCamera);
 }
 
 void CScene::RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
