@@ -1239,7 +1239,7 @@ bool CGameFramework::ConnectServer()
 		SOCKADDR_IN server_address{};
 		server_address.sin_family = AF_INET;
 		server_address.sin_port = htons(PORT_NUM);
-		inet_pton(AF_INET, "127.0.0.1", &(server_address.sin_addr.s_addr));
+		inet_pton(AF_INET, "192.168.30.92", &(server_address.sin_addr.s_addr));
 
 		if(connect(sock, reinterpret_cast<sockaddr*>(&server_address), sizeof(server_address)) == SOCKET_ERROR)
 		{
