@@ -740,7 +740,7 @@ void CGameFramework::ProcessInput()
 	}
 
 	if (isConnect) {
-		m_pPlayer[0]->UpdateOnServer(player_type != PlayerType::MOVE);
+		m_pPlayer[0]->UpdateOnServer(player_type == PlayerType::INSIDE);
 		for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->UpdateOnServer(i != g_myid);
 	}
 	if(!b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Update(m_GameTimer.GetTimeElapsed());
