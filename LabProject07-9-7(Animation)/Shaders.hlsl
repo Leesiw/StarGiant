@@ -362,7 +362,19 @@ struct VS_GOD_OUTPUT
 	float2 uv : TEXCOORD0;
 	//float4 ChannelMask :COLOR0;
 };
-
+float4x4 rotationMatrixAxisAngle(float3 axis, float angle)
+{
+	axis = normalize(axis);
+	float s = sin(angle);
+	float c = cos(angle);
+	float oc = 1.0f - c;
+	return float4x4(
+		oc * axis.x * axis.x + c, oc * axis.x * axis.y - axis.z * s, oc * axis.z * axis.x + axis.y * s, 0.0f,
+		oc * axis.x * axis.y + axis.z * s, oc * axis.y * axis.y + c, oc * axis.y * axis.z - axis.x * s, 0.0f,
+		oc * axis.z * axis.x - axis.y * s, oc * axis.y * axis.z + axis.x * s, oc * axis.z * axis.z + c, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+		);
+}
 VS_GOD_OUTPUT VS_GODMain(VS_GOD_INPUT input)
 {
 	/*VS_UI_OUTPUT output;
@@ -377,11 +389,21 @@ float4					m_cEmissive;
 	return(output);*/
 	VS_GOD_OUTPUT output;
 
-	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
-	output.positionL = input.position;
+
+	// 입력 좌표값을 변화시켜 흔들린 선형 형태를 만듭니다.
+	float3 newPos = input.position;
+	newPos.x += 20.0f * sin(input.position.y * 40.0f * 3.1415f);
+	newPos.z += 20.0f * cos(input.position.x * 40.0f * 3.1415f);
+
+	// 변화된 좌표값을 모델-뷰-프로젝션 행렬로 변환하여 출력합니다.
+	output.position = mul(mul(mul(float4(newPos, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.positionL = newPos;
 	output.uv = input.uv;
 
-	return(output);
+
+	
+
+	return output;
 
 }
 
@@ -454,7 +476,8 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 	else cColor.rgb *= 1.f + (cColor.a);*/
 	//
 
-	return(cColor);
+	//return(cColor);
+	return(float4(1,1,1,0.6));
 
 }
 

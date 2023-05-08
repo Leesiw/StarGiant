@@ -777,6 +777,7 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	XMFLOAT3 nPosition=XMFLOAT3(0,0,0);
 	CGameObject* pRayObject = new CGameObject(1);
 	CGameObject* pLineObject = new CGameObject(1);
+	CGameObject* pLine2Object = new CGameObject(1);
 	
 	CGodRayShader* pSkyBoxShader = new CGodRayShader();
 	pSkyBoxShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
@@ -851,7 +852,32 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 		pRayObject->SetMaterial(0, pRayMaterial);
 		pLightObject = pRayObject;
 	}
+	//////////////////////////////////////////////////////////////////////////// 테스트
 	
+	
+	pLine2Object = new CGameObject(1);
+
+	CRayLineMesh* LineMesh = new CRayLineMesh(pd3dDevice, pd3dCommandList, cameraLookVector, 10, 4000, renderDepth, XMFLOAT3(camera1Position.x, camera1Position.y, camera1Position.z));
+	pLine2Object->SetMesh(LineMesh);
+
+	CMaterial* pLineMaterial = new CMaterial(1);
+
+	//Noise Texture 섞기 
+	if (1 % 2)pLineMaterial->SetTexture(pNoiseTexture[0]);
+	else pLineMaterial->SetTexture(pNoiseTexture[1]);
+
+	pLineMaterial->SetShader(pSkyBoxShader);
+	if (pLine2Object)
+	{
+		pLine2Object->SetPosition(nPosition);
+		/*pRayMaterial->m_xmf4EmissiveColor = XMFLOAT4(1, 1, 1, 1);
+		pRayMaterial->m_xmf4AmbientColor = XMFLOAT4(1, 1, 1, 1);
+		pRayMaterial->m_xmf4SpecularColor = XMFLOAT4(1, 1, 1, 1);*/
+
+
+		pLine2Object->SetMaterial(0, pLineMaterial);
+		p_TestObjects = pLine2Object;
+	}
 			//엔진만듬------------------------------------------------------ -
 			//	light 생성
 			//	FBO생성
@@ -899,14 +925,15 @@ void CGodRayShader::AnimateObjects(CCamera * pCamera)
 		//MoveVector =Vector3::Add((Vector3::ScalarProduct(newLookVector, nLen)), (Vector3::ScalarProduct((Vector3::ScalarProduct(cameraLookVector, -1)), nLen)));
 		XMFLOAT3 A = (Vector3::ScalarProduct(cameraLookVector, nLen));
 		XMFLOAT3 B = (Vector3::ScalarProduct(newLookVector, nLen));
-		m_ppObjects[i]->SetLookAt(PlayerPosition);
+		//m_ppObjects[i]->SetLookAt(PlayerPosition);
 		//m_ppLineObjects[i]->SetLookAt(PlayerPosition);
-		m_ppObjects[i]->SetPosition(B);
+		//m_ppObjects[i]->SetPosition(B);
 		//m_ppLineObjects[i]->SetPosition(B);
 		//if(i==10)std::cout << m_ppObjects[1]->GetPosition().x << endl;
 	}
 	pLightObject->SetLookAt(PlayerPosition);
-	pLightObject->SetPosition(m_ppLineObjects[GODRAY_SAMPLE-1]->GetPosition());
+	//pLightObject->SetPosition(m_ppLineObjects[GODRAY_SAMPLE-1]->GetPosition());
+	pLightObject->SetPosition(XMFLOAT3(460, 1260, 640));
 	cameraLookVector = newLookVector;
 
 }
@@ -927,10 +954,12 @@ void CGodRayShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 			AnimateObjects(pCamera);
 			//m_ppObjects[i]->Render(pd3dCommandList, pCamera);
 
-			pLightObject->Render(pd3dCommandList, pCamera);
-			m_ppLineObjects[i]->Render(pd3dCommandList, pCamera);
+			
+			//m_ppLineObjects[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
+	pLightObject->Render(pd3dCommandList, pCamera);
+	p_TestObjects->Render(pd3dCommandList, pCamera);
 }
 
 D3D12_SHADER_BYTECODE CGodRayShader::CreateVertexShader()

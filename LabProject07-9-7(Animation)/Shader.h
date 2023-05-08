@@ -201,6 +201,7 @@ public:
 
 	CGameObject*					pLightObject =new CGameObject(1);
 	CGameObject*					pGameObject =new CGameObject(1);
+	CGameObject*					p_TestObjects = new CGameObject(1);
 
 	CTexturedRectMesh*				pRayRectMesh[GODRAY_SAMPLE];
 	CRayLineMesh*					pRayLineMesh[GODRAY_SAMPLE];
@@ -229,6 +230,7 @@ public:
 protected:
 	CGameObject**					m_ppObjects = 0;
 	CGameObject**					m_ppLineObjects = 0;
+	
 	int								m_nObjects = 0;
 };
 

@@ -277,7 +277,8 @@ class CRayLineMesh : public CMesh
 {
 public:
 	CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 Vector, float fWidth = 20.0f, float fHeight = 20.0f, float fDepth = 20.0f, float fxPosition = 0.0f, float fyPosition = 0.0f, float fzPosition = 0.0f);
-	virtual ~CRayLineMesh();
+	CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 Vector, float fWidth, float fHeight, float fDepth, XMFLOAT3 Position);
+		virtual ~CRayLineMesh();
 
 protected:
 	XMFLOAT2* m_pxmf2TextureCoords0 = NULL;

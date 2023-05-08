@@ -930,7 +930,52 @@ CRayLineMesh::CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	m_d3dTextureCoord0BufferView.StrideInBytes = sizeof(XMFLOAT2);
 	m_d3dTextureCoord0BufferView.SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
 }
+CRayLineMesh::CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 Vector, float fWidth, float fHeight, float fDepth, XMFLOAT3 Position) : CMesh(pd3dDevice, pd3dCommandList)
+{
+	int m_nNumber = 30;//사각형 각 변을 이만큼 쪼개겟다. 
+	m_nVertices = 2 * m_nNumber * m_nNumber; //사각형에서 라인을 100개씩 그리려고한다. (10x10 인듯? 그럼) 
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+	//중심의 좌표가 float fxPosition, float fyPosition, float fzPosition
+	//사각형의 너비가 float fWidth, float fHeight, float fDepth
+	//float fDepth가 그려야할 길이라고 설정한다. 
 
+	m_pxmf3Positions = new XMFLOAT3[m_nVertices];
+	m_pxmf2TextureCoords0 = new XMFLOAT2[m_nVertices];
+	m_pxmf2Vector = new XMFLOAT3[m_nVertices];
+
+
+	float fx = -(fWidth * 0.5f) + Position.x, fz = -(fWidth * 0.5f) + Position.z; //시작점
+	float fy = Position.y;
+	float dx = fWidth / m_nNumber, dz = fWidth / m_nNumber;
+
+	XMFLOAT3 nPosition =Vector3::Add(Position, Vector3::ScalarProduct(Vector, fDepth));
+	float nfx = -(fHeight * 0.5) + nPosition.x, nfz = -(fHeight * 0.5) + nPosition.z;
+	float nfy = nPosition.y;
+	float ndx = fHeight / m_nNumber, ndz = fHeight / m_nNumber;
+
+	//시작점인듯 
+	int num = 0;
+	for (int i = 0; i < m_nNumber; i++) {
+		for (int z = 0; z < m_nNumber; z++) {
+			m_pxmf3Positions[num] = XMFLOAT3(fx + dx * i, fy, fz + dz * z);
+			m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3();
+			m_pxmf3Positions[num] = XMFLOAT3(nfx + ndx * i, nfy, nfz + ndz * z);
+			m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3(); ;
+		}
+	}
+
+	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
+
+	m_d3dPositionBufferView.BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
+	m_d3dPositionBufferView.StrideInBytes = sizeof(XMFLOAT3);
+	m_d3dPositionBufferView.SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
+
+	m_pd3dTextureCoord0Buffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf2TextureCoords0, sizeof(XMFLOAT2) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dTextureCoord0UploadBuffer);
+
+	m_d3dTextureCoord0BufferView.BufferLocation = m_pd3dTextureCoord0Buffer->GetGPUVirtualAddress();
+	m_d3dTextureCoord0BufferView.StrideInBytes = sizeof(XMFLOAT2);
+	m_d3dTextureCoord0BufferView.SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
+}
 CRayLineMesh::~CRayLineMesh()
 {
 	if (m_pd3dTextureCoord0Buffer) m_pd3dTextureCoord0Buffer->Release();
