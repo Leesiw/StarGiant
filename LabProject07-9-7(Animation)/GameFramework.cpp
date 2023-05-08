@@ -41,7 +41,7 @@ CGameFramework::CGameFramework()
 	items[ItemType::JEWEL_HEAL] = 0;
 	items[ItemType::JEWEL_HP] = 0;
 	
-	planetPos = { 1000.0f,1000.0f,1000.0f };
+	planetPos = { 10000.0f,10000.0f,10000.0f };
 
 	scriptsStartTime = steady_clock::now();
 	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
