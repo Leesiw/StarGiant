@@ -435,7 +435,7 @@ void CScene::CheckMissionComplete()
 	}*/
 	case MissionType::GO_PLANET: {
 		XMFLOAT3 player_pos = m_pSpaceship->GetPosition();
-		XMFLOAT3 planet_pos{ 1000.f, 1000.f, 1000.f }; // юс╫ц абг╔
+		XMFLOAT3 planet_pos{ 10000.f, 10000.f, 10000.f }; // юс╫ц абг╔
 
 		float dist = Vector3::Length(Vector3::Subtract(player_pos, planet_pos));
 		if (dist < 1000.f) {

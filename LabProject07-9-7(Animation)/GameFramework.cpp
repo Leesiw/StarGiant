@@ -986,9 +986,9 @@ void CGameFramework::UpdateUI()
 
 
 	for (int i = 0; i < ENEMIES; ++i) {
-		m_pUILayer->UpdateDots(i, m_pPlayer[0], m_pScene->m_ppEnemies[i]->GetPosition());
+		m_pUILayer->UpdateDots(i, m_pPlayer[0], m_pScene->m_ppEnemies[i]->GetPosition(), m_pScene->m_ppEnemies[i]->isAlive);
 	}
-
+	
 	if(curMissionType ==MissionType::FIND_BOSS)
 		m_pUILayer->UpdateBossNevi(BOSS_ID, m_pPlayer[0], m_pScene->m_ppBoss->GetPosition());
 
@@ -1029,7 +1029,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	float distance;
 	XMStoreFloat(&distance, dist);
 
-
+	distance = distance - 1500.0f;
 
 	enemyCountStr = to_wstring(killCnt);
 	jewelCntStr = to_wstring(jewelCnt);
@@ -1079,7 +1079,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	{
 		uiText = L"미션 - 목표 지점으로 도달하라 ( ";
 		uiText += planetDist;
-		uiText += L"m 남음";
+		uiText += L"m 남음 )";
 
 		break;
 	}
@@ -1094,7 +1094,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	{
 		uiText = L"미션 - 보스를 추적하라 ( ";
 		uiText += bossDist;
-		uiText += L"m 남음";
+		uiText += L"m 남음 )";
 		break;
 	}
 	case MissionType::DEFEAT_BOSS:

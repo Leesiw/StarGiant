@@ -102,13 +102,13 @@ void CPlayer::Update(float fTimeElapsed)
 {
 	XMFLOAT3 pos = GetPosition();
 	float dist;
-	dist = Vector3::Length(Vector3::Subtract(pos, XMFLOAT3(1000.f, 1000.f, 1000.f)));
+	dist = Vector3::Length(Vector3::Subtract(pos, XMFLOAT3(10000.f, 10000.f, 10000.f)));
 
 	if (dist < 800.f)
 	{
-		XMFLOAT3 ToGo = Vector3::Subtract(pos, XMFLOAT3(1000.f, 1000.f, 1000.f));
+		XMFLOAT3 ToGo = Vector3::Subtract(pos, XMFLOAT3(10000.f, 10000.f, 10000.f));
 		ToGo = Vector3::ScalarProduct(ToGo, 800.f);
-		ToGo = Vector3::Add(XMFLOAT3(1000.f, 1000.f, 1000.f), ToGo);
+		ToGo = Vector3::Add(XMFLOAT3(10000.f, 10000.f, 10000.f), ToGo);
 		SetPosition(ToGo);
 	}
 
