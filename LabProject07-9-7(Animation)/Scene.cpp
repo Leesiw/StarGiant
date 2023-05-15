@@ -1185,19 +1185,20 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 	XMFLOAT3 xmf3Position2 = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 10.0f, false));
+
 	XMFLOAT3 tar = { 10000.0f,10000.0f,10000.0f };
 	if (m_pPlayer[0]->curMissionType == MissionType::GO_PLANET) {
 		m_ppHierarchicalGameObjects[9]->SetPosition(xmf3Position2);
 		m_ppHierarchicalGameObjects[9]->SetLookAt(tar, XMFLOAT3(0.0f, 1.0f, 0.0f));
-		m_ppHierarchicalGameObjects[9]->Rotate(90, 0, 0);
+		m_ppHierarchicalGameObjects[9]->Rotate(180, 0, 0);
 		m_ppHierarchicalGameObjects[9]->SetScale(10, 5, 10);
 		m_ppHierarchicalGameObjects[9]->Render(pd3dCommandList, pCamera);
 	}
 
 	if (m_pPlayer[0]->curMissionType == MissionType::FIND_BOSS) {
 		m_ppHierarchicalGameObjects[9]->SetPosition(xmf3Position2);
-		m_ppHierarchicalGameObjects[9]->SetLookAt(m_ppBoss->GetPosition(), XMFLOAT3(0.0f, 0.5f, 0.0f));
-		m_ppHierarchicalGameObjects[9]->Rotate(90, 0, 0);
+		m_ppHierarchicalGameObjects[9]->SetLookAt(m_ppBoss->GetPosition(), XMFLOAT3(0.0f, 1.0f, 0.0f));
+		m_ppHierarchicalGameObjects[9]->Rotate(180, 0, 0);
 		m_ppHierarchicalGameObjects[9]->SetScale(10, 5, 10);
 		m_ppHierarchicalGameObjects[9]->Render(pd3dCommandList, pCamera);
 
