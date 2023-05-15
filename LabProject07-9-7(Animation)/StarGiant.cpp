@@ -1,8 +1,8 @@
-﻿// LabProject07-9-7.cpp : 응용 프로그램에 대한 진입점을 정의합니다.
+﻿// StarGiant.cpp : 응용 프로그램에 대한 진입점을 정의합니다.
 //
 
 #include "stdafx.h"
-#include "LabProject07-9-7(Animation).h"
+#include "StarGiant.h"
 #include "GameFramework.h"
 
 #define MAX_LOADSTRING 100
@@ -27,12 +27,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	HACCEL hAccelTable;
 
 	::LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-	::LoadString(hInstance, IDC_LABPROJECT0797ANIMATION, szWindowClass, MAX_LOADSTRING);
+	::LoadString(hInstance, IDC_STARGIANT, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 
 	if (!InitInstance(hInstance, nCmdShow)) return(FALSE);
 
-	hAccelTable = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LABPROJECT0797ANIMATION));
+	hAccelTable = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_STARGIANT));
 
 	while (1)
 	{
@@ -66,10 +66,10 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
 	wcex.hInstance = hInstance;
-	wcex.hIcon = ::LoadIcon(hInstance, MAKEINTRESOURCE(IDI_LABPROJECT0797ANIMATION));
+	wcex.hIcon = ::LoadIcon(hInstance, MAKEINTRESOURCE(IDI_STARGIANT));
 	wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszMenuName = NULL;//MAKEINTRESOURCE(IDC_LABPROJECT0797ANIMATION);
+	wcex.lpszMenuName = NULL;//MAKEINTRESOURCE(IDC_STARGIANT);
 	wcex.lpszClassName = szWindowClass;
 	wcex.hIconSm = ::LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 

@@ -44,7 +44,7 @@ CGameFramework::CGameFramework()
 	planetPos = { 10000.0f,10000.0f,10000.0f };
 
 	scriptsStartTime = steady_clock::now();
-	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
+	_tcscpy_s(m_pszFrameRate, _T("StarGiant ("));
 }
 
 CGameFramework::~CGameFramework()

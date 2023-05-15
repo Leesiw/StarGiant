@@ -22,8 +22,9 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{1EB15378-08E5-4968-8822-783E90677599}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>LabProject0797Animation</RootNamespace>
+    <RootNamespace>StarGiant</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>StarGiant</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -156,7 +157,7 @@
     <ClInclude Include="DDSTextureLoader12.h" />
     <ClInclude Include="Frustrum.h" />
     <ClInclude Include="GameFramework.h" />
-    <ClInclude Include="LabProject07-9-7(Animation).h" />
+    <ClInclude Include="StarGiant.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />
@@ -175,7 +176,7 @@
     <ClCompile Include="DDSTextureLoader12.cpp" />
     <ClCompile Include="Frustrum.cpp" />
     <ClCompile Include="GameFramework.cpp" />
-    <ClCompile Include="LabProject07-9-7(Animation).cpp" />
+    <ClCompile Include="StarGiant.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -192,10 +193,10 @@
     <ClCompile Include="WICTextureLoader12.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="LabProject07-9-7(Animation).rc" />
+    <ResourceCompile Include="StarGiant.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="LabProject07-9-7(Animation).ico" />
+    <Image Include="StarGiant.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
