@@ -831,6 +831,12 @@ CTerrainPlayer::~CTerrainPlayer()
 void CTerrainPlayer::UpdateOnServer(bool rotate_update)
 {
 	if (!is_update) {
+		if (Vector3::IsZero(Vector3::Add(player_info.pos, m_xmf3Position, -1.f))) {
+			motion = AnimationState::IDLE;
+		}
+		else {
+			motion = AnimationState::WALK;
+		}
 		SetPosition(player_info.pos);
 		if (rotate_update) {
 			Rotate(0.0f, player_info.m_fYaw - m_fYaw, 0.0f);

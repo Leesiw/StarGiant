@@ -1419,9 +1419,9 @@ void CGameFramework::ProcessPacket(char* p)
 	{
 		SC_MOVE_INSIDE_PACKET* packet = reinterpret_cast<SC_MOVE_INSIDE_PACKET*>(p);
 		m_pInsidePlayer[packet->data.id]->SetPlayerInfo(packet->data);
-		if (int(m_pInsidePlayer[packet->data.id]->motion) != (int)packet->data.animation) {
-			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = (AnimationState)packet->data.animation;
-		}
+		//if (int(m_pInsidePlayer[packet->data.id]->motion) != (int)packet->data.animation) {
+		//	((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = (AnimationState)packet->data.animation;
+		//}
 		//m_pInsidePlayer[playerInfo.id]->SetPosition(playerInfo.pos);
 		//m_pInsidePlayer[playerInfo.id]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[playerInfo.id]->GetYaw(), 0.0f);
 		break;
