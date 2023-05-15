@@ -196,6 +196,7 @@
     <ResourceCompile Include="StarGiant.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="star.ico" />
     <Image Include="StarGiant.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
