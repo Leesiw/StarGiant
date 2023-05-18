@@ -360,7 +360,7 @@ bool CTerrainPlayer::CheckCollision(const XMFLOAT3 pos[])
 	}
 	float x, z;
 
-	for (int i = 0; i < MAX_USER; ++i) {
+	for (int i = 0; i < 3; ++i) {
 		x = pos[i].x - m_xmf3Position.x;
 		z = pos[i].z - m_xmf3Position.z;
 		if (fabs(x) < 5.f && fabs(z) < 5.f) { return true; }

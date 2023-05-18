@@ -53,7 +53,7 @@ void CScene::BuildObjects()
 
 	_plist.fill(-1);
 
-	for (int i = 0; i < MAX_USER; ++i) {
+	for (int i = 0; i < 3; ++i) {
 		CTerrainPlayer* pPlayer = new CTerrainPlayer();
 		pPlayer->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 10.0f, 740.0f));
 		m_ppPlayers[i] = pPlayer;
@@ -764,11 +764,11 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	m_pSpaceship->Animate(fTimeElapsed);
 	m_pSpaceship->Update(fTimeElapsed);
 
-	for (int i = 0; i < MAX_USER; ++i)
+	for (int i = 0; i < 3; ++i)
 	{
-		XMFLOAT3 pos[MAX_USER - 1]{};
+		XMFLOAT3 pos[2]{};
 		int num = 0;
-		for (int j = 0; j < MAX_USER; ++j) {
+		for (int j = 0; j < 3; ++j) {
 			if (j == i) { continue; }
 			if (clients[_plist[j]]._state == ST_INGAME) {
 				pos[num] = m_ppPlayers[j]->GetPosition();
@@ -813,7 +813,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			if (pl_id == -1) continue;
 			if (clients[pl_id]._state != ST_INGAME) continue;
 			clients[pl_id].send_meteo_packet(0, m_ppMeteoObjects);
-			for (int i = 0; i < MAX_USER; ++i) {
+			for (int i = 0; i < 3; ++i) {
 				if (_plist[i] == -1) continue;
 				if (clients[_plist[i]]._state == !ST_INGAME) { continue; }
 				clients[pl_id].send_change_packet(i, clients[_plist[i]].type);
