@@ -73,7 +73,7 @@ public:
 };
 
 //===================================
-
+/*
 
 class CBulletObject : public CGameObject
 {
@@ -113,4 +113,4 @@ public:
 
 	void SetFirePosition(XMFLOAT3 xmf3FirePosition);
 	void Reset();
-};
+};*/

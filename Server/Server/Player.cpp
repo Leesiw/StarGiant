@@ -168,7 +168,7 @@ CAirplanePlayer::CAirplanePlayer()
 CAirplanePlayer::~CAirplanePlayer()
 {
 }
-
+/*
 bool CAirplanePlayer::FireBullet(short attack_num)
 {
 	return false;
@@ -206,8 +206,8 @@ bool CAirplanePlayer::FireBullet(short attack_num)
 		m_fFireWaitingTime[attack_num] = m_fFireDelayTime * 1.0f;
 
 		return true;
-	}*/
-}
+	}
+}*/
 
 void CAirplanePlayer::GetAttack(char damage)
 {
@@ -235,11 +235,14 @@ bool CAirplanePlayer::GetHeal(double sec)
 
 }
 
-bool CAirplanePlayer::CanAttack(short num)
+void CAirplanePlayer::Reset()
 {
-	if (m_fFireWaitingTime[num] > 0.0f) { return false; }
-	m_fFireWaitingTime[num] = m_fFireDelayTime * 1.0f;
-	return true;
+	max_hp = 100;
+	hp = 100;
+
+	damage = 3;
+	heal = 10;
+	def = 0;
 }
 
 void CAirplanePlayer::Animate(float fTimeElapsed)
@@ -249,10 +252,6 @@ void CAirplanePlayer::Animate(float fTimeElapsed)
 void CAirplanePlayer::Update(float fTimeElapsed)
 {
 	CPlayer::Update(fTimeElapsed);
-	for (int i = 0; i < MAX_USER; ++i) {
-		if (m_fFireWaitingTime[i] > 0.0f)
-			m_fFireWaitingTime[i] -= fTimeElapsed;
-	}
 
 	if (is_update) { return; }
 	XMVECTOR a = XMLoadFloat4(&input_info.Quaternion);

@@ -13,11 +13,16 @@ public:
 	CGameFramework();
 	~CGameFramework();
 
+	void worker_thread(HANDLE h_iocp);
+
+	short GetSceneID();
+
 	void Init();
 	void SetMission();
 
 	void BuildObjects();
 	void ReleaseObjects();
+	void ReleaseObjects(short room_id);
 
 	void AnimateObjects(float fTimeElapsed);
 
@@ -28,7 +33,8 @@ public:
 	int get_new_client_id();
 	void disconnect(int c_id);
 private:
-	CScene* m_pScene = NULL;
+	SOCKET g_s_socket, g_c_socket;
+	OVER_EXP g_a_over;
 
 	std::chrono::duration<double> fps;
 

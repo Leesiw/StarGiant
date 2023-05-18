@@ -27,6 +27,8 @@ public:
 
 	float randAttact = urdAttack(dree);
 
+	short scene_num;
+
 	chrono::steady_clock::time_point stateStartTime;
 	chrono::steady_clock::time_point lastAttackTime;
 

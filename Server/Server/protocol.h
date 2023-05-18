@@ -31,7 +31,8 @@ constexpr char SPRITE_CNT = 6;
 
 constexpr char MAX_ITEM = 15;	// 보석 최대 레벨?
 
-constexpr int MAX_USER = 3;
+constexpr int MAX_ROOM = 1000;
+constexpr int MAX_USER = MAX_ROOM * 3;
 
 constexpr int PORT_NUM = 4000;
 constexpr int RECV_BUF_SIZE = 10000;
@@ -42,36 +43,38 @@ constexpr int NAME_SIZE = 20;
 constexpr char BOSS_ID = ENEMIES + 1;
 
 // Packet ID
-constexpr char CS_CHANGE = 0;
-constexpr char CS_INSIDE_MOVE = 1;
-constexpr char CS_SPACESHIP_MOVE = 2;
-constexpr char CS_ATTACK = 3;
-constexpr char CS_HEAL = 4;
+constexpr char CS_LOGIN = 0;
+constexpr char CS_CHANGE = 1;
+constexpr char CS_INSIDE_MOVE = 2;
+constexpr char CS_SPACESHIP_MOVE = 3;
+constexpr char CS_ATTACK = 4;
+constexpr char CS_HEAL = 5;
 
-constexpr char SC_LOGIN_INFO = 5;
-constexpr char SC_CHANGE = 6;
-constexpr char SC_ADD_PLAYER = 7;
-constexpr char SC_REMOVE_PLAYER = 8;
+constexpr char SC_LOGIN_INFO = 6;
+constexpr char SC_CHANGE = 7;
+constexpr char SC_ADD_PLAYER = 8;
+constexpr char SC_REMOVE_PLAYER = 9;
 
-constexpr char SC_SPAWN_METEO = 9;
-constexpr char SC_METEO_DIRECTION = 10;
-constexpr char SC_METEO = 11;
+constexpr char SC_SPAWN_METEO = 10;
+constexpr char SC_METEO_DIRECTION = 11;
+constexpr char SC_METEO = 12;
 
-constexpr char SC_MOVE_SPACESHIP = 12;
-constexpr char SC_MOVE_INSIDEPLAYER = 13;
-constexpr char SC_SPAWN_ENEMY = 14;
-constexpr char SC_MOVE_ENEMY = 15;
-constexpr char SC_BULLET = 16;
-constexpr char SC_BULLET_HIT = 17;
-constexpr char SC_MISSILE = 18;
-constexpr char SC_REMOVE_MISSILE = 19;
-constexpr char SC_ITEM = 20;
-constexpr char SC_ANIMATION_CHANGE = 21;
-constexpr char SC_HEAL = 22;
-constexpr char SC_MISSION_START = 23;
-constexpr char SC_KILL_NUM = 24;
+constexpr char SC_MOVE_SPACESHIP = 13;
+constexpr char SC_MOVE_INSIDEPLAYER = 14;
+constexpr char SC_SPAWN_ENEMY = 15;
+constexpr char SC_MOVE_ENEMY = 16;
+constexpr char SC_BULLET = 17;
+constexpr char SC_BULLET_HIT = 18;
+constexpr char SC_MISSILE = 19;
+constexpr char SC_REMOVE_MISSILE = 20;
+constexpr char SC_ITEM = 21;
+constexpr char SC_ANIMATION_CHANGE = 22;
+constexpr char SC_HEAL = 23;
+constexpr char SC_MISSION_START = 24;
+constexpr char SC_KILL_NUM = 25;
 
-constexpr char CS_NEXT_MISSION = 25;
+// cheat
+constexpr char CS_NEXT_MISSION = 26;
 
 enum class PlayerType : char
 {
@@ -253,6 +256,13 @@ struct CS_NEXT_MISSION_PACKET {
 
 
 // login
+struct CS_LOGIN_PACKET {
+	unsigned char size;
+	char	type;
+
+	short room_id;
+};
+
 struct SC_LOGIN_INFO_PACKET {
 	unsigned char size;
 	char	type;

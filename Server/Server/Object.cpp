@@ -160,6 +160,7 @@ void CMeteoObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 
 //============================================
 
+/*
 
 CBulletObject::CBulletObject(float fEffectiveRange)
 {
@@ -238,3 +239,4 @@ void CBulletObject::Animate(float fElapsedTime)
 	if ((m_fMovingDistance > m_fBulletEffectiveRange) || (m_fElapsedTimeAfterFire > m_fLockingTime)) Reset();
 }
 
+*/

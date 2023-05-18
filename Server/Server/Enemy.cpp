@@ -1,5 +1,8 @@
 #include "Enemy.h"
+#include "SceneManager.h"
 #include <limits>
+
+extern SceneManager scene_manager;
 
 CEnemy::CEnemy()
 {
@@ -121,16 +124,27 @@ void CEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 	if (urdEnemyAI(dree) < h_probability) {	// 플레이어에게 공격 명중
 		if (player->GetHP() <= 0) { return; }
 		player->GetAttack(damage);
-		for (auto& pl : clients)
+
 		{
-			if (false == pl.in_use) continue;
-			pl.send_bullet_packet(0, xmf3Pos, xmfToPlayer);
+			SC_BULLET_PACKET p;
+
+			p.size = sizeof(SC_BULLET_PACKET);
+			p.type = SC_BULLET;
+
+			p.data.direction = xmfToPlayer;
+			p.data.pos = xmf3Pos;
+
+			scene_manager.Send(scene_num, (char*)&p);
 		}
 
-		for (auto& pl : clients)
 		{
-			if (false == pl.in_use) continue;
-			pl.send_bullet_hit_packet(0, -1, player->GetHP());
+			SC_BULLET_HIT_PACKET p;
+			p.size = sizeof(SC_BULLET_HIT_PACKET);
+			p.type = SC_BULLET_HIT;
+			p.data.id = -1;
+			p.data.hp = player->GetHP();
+
+			scene_manager.Send(scene_num, (char*)&p);
 		}
 	}
 
@@ -290,9 +304,10 @@ void CEnemy::SendPos()
 		info.Quaternion = GetQuaternion();
 		info.pos = GetPosition();
 		info.velocity = GetVelocity();
+
 		for (auto& pl : clients)
 		{
-			if (false == pl.in_use) continue;
+			//if (false == pl.in_use) continue;
 			pl.send_enemy_packet(0, info);
 		}
 	}

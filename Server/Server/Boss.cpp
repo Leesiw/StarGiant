@@ -1,5 +1,10 @@
+#pragma once
+
 #include "stdafx.h"
+#include "SceneManager.h"
 #include "Boss.h"
+
+extern SceneManager scene_manager;
 
 Boss::Boss()
 {
@@ -46,23 +51,27 @@ Boss::~Boss() {
 
 void Boss::SendPosition()	// 위치/각도 변화할 때 사용. 
 {
-	ENEMY_INFO info;
-	info.id = BOSS_ID;
-	info.pos = GetPosition();
-	info.Quaternion = GetQuaternion();
+	SC_MOVE_ENEMY_PACKET p;
 
-	for (auto& pl : clients) {
-		if (false == pl.in_use) continue;
-		pl.send_enemy_packet(0, info);
-	}
+	p.size = sizeof(SC_MOVE_ENEMY_PACKET);
+	p.type = SC_MOVE_ENEMY;
+
+	p.data.id = BOSS_ID;
+	p.data.Quaternion = GetQuaternion();
+	p.data.pos = GetPosition();
+
+	scene_manager.Send(scene_num, (char*)&p);
 }
 
 void Boss::SendAnimation() // 애니메이션 변화했을 때 사용
 {
-	for (auto& pl : clients) {
-		if (false == pl.in_use) continue;
-		pl.send_animation_packet(BOSS_ID, (char)CurMotion);
-	}
+	SC_ANIMATION_CHANGE_PACKET p;
+	p.size = sizeof(SC_ANIMATION_CHANGE_PACKET);
+	p.type = SC_ANIMATION_CHANGE;
+	p.data.id = BOSS_ID;
+	p.data.animation = (char)CurMotion;
+
+	scene_manager.Send(scene_num, (char*)&p);
 }
 
 XMFLOAT4 Boss::GetQuaternion()
@@ -107,12 +116,16 @@ void Boss::MoveMeteo(float fTimeElapsed)		// 메테오 움직여야 할때 계속 실행. sen
 			m_ppBossMeteoObjects[0]->GetPosition().x, m_ppBossMeteoObjects[0]->GetPosition().y, m_ppBossMeteoObjects[0]->GetPosition().z);*/
 	}
 
-	for (auto& pl : clients) {
-		if (pl.in_use == false) continue;
-		pl.send_boss_meteo_packet(0, m_ppBossMeteoObjects);
-	}
-	/*cout << "send meteo\n";*/
 
+	SC_METEO_PACKET p;
+	p.size = sizeof(SC_METEO_PACKET);
+	p.type = SC_METEO;
+
+	for (int i = 0; i < BOSSMETEOS; ++i) {
+		p.data.id = METEOS + i;
+		p.data.pos = m_ppBossMeteoObjects[i]->GetPosition();
+		scene_manager.Send(scene_num, (char*)&p);
+	}
 }
 
 void Boss::MoveBoss(float fTimeElapsed, XMFLOAT3 TargetPos, float dist)
@@ -268,11 +281,12 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			//PastState = (BossState)(BossAnimation::BASIC_ATTACT);
 			PastState = BossState::ATTACT;
 
-			for (auto& pl : clients)
-			{
-				if (pl.in_use == false) continue;
-				pl.send_bullet_hit_packet(0, -1, player->GetHP());
-			}
+			SC_BULLET_HIT_PACKET p;
+			p.size = sizeof(SC_BULLET_HIT_PACKET);
+			p.type = SC_BULLET_HIT;
+			p.data.id = -1;
+			p.data.hp = player->GetHP();
+			scene_manager.Send(scene_num, (char*)&p);
 
 			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 1.8) {
 				lastAttackTime = steady_clock::now();
@@ -301,12 +315,13 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 				lastAttackTime = steady_clock::now();
 				SetState(BossState::IDLE);
 				
-				for (auto& pl : clients)
-				{
-					if (pl.in_use == false) continue;
-					pl.send_bullet_hit_packet(0, -1, player->GetHP());
-				}
 
+				SC_BULLET_HIT_PACKET p;
+				p.size = sizeof(SC_BULLET_HIT_PACKET);
+				p.type = SC_BULLET_HIT;
+				p.data.id = -1;
+				p.data.hp = player->GetHP();
+				scene_manager.Send(scene_num, (char*)&p);
 			}
 		}
 		else
@@ -321,11 +336,12 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			//PastState = (BossState)(BossAnimation::CLAW_ATTACT);
 			PastState = BossState::ATTACT;
 			
-			for (auto& pl : clients)
-			{
-				if (pl.in_use == false) continue;
-				pl.send_bullet_hit_packet(0, -1, player->GetHP());
-			}
+			SC_BULLET_HIT_PACKET p;
+			p.size = sizeof(SC_BULLET_HIT_PACKET);
+			p.type = SC_BULLET_HIT;
+			p.data.id = -1;
+			p.data.hp = player->GetHP();
+			scene_manager.Send(scene_num, (char*)&p);
 
 
 			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 2.2) {

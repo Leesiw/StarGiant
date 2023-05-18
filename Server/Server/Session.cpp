@@ -200,7 +200,7 @@ void SESSION::send_all_enemy_packet(int c_id, ENEMY_INFO e_info[], bool alive[])
 	}
 }
 
-void SESSION::send_meteo_direction_packet(int c_id, short id, CMeteoObject* meteo)
+void SESSION::send_meteo_direction_packet(int c_id, char id, CMeteoObject* meteo)
 {
 	SC_METEO_DIRECTION_PACKET p;
 	p.size = sizeof(SC_METEO_DIRECTION_PACKET);
@@ -238,7 +238,7 @@ void SESSION::send_boss_meteo_packet(int c_id, std::array<CMeteoObject*, BOSSMET
 	}
 }
 
-void SESSION::send_bullet_hit_packet(int c_id, short id, short hp)
+void SESSION::send_bullet_hit_packet(int c_id, char id, short hp)
 {
 	SC_BULLET_HIT_PACKET p;
 	p.size = sizeof(SC_BULLET_HIT_PACKET);
@@ -290,3 +290,5 @@ void SESSION::send_kill_num_packet(char num)
 
 	do_send(&p);
 }
+
+

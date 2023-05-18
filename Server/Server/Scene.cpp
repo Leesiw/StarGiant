@@ -26,6 +26,10 @@ CScene::CScene()
 	items[ItemType::JEWEL_DEF] = 0;
 	items[ItemType::JEWEL_HEAL] = 0;
 	items[ItemType::JEWEL_HP] = 0;
+
+	_id = -1;
+
+	_state = ST_FREE;
 }
 
 CScene::~CScene()
@@ -46,6 +50,8 @@ void CScene::BuildObjects()
 	pAirplanePlayer->mesh = true;
 	pAirplanePlayer->boundingbox = BoundingOrientedBox{ XMFLOAT3(-0.000000f, -0.000000f, -0.000096f), XMFLOAT3(15.5f, 15.5f, 3.90426f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	m_pSpaceship = pAirplanePlayer;
+
+	_plist.fill(-1);
 
 	for (int i = 0; i < MAX_USER; ++i) {
 		CTerrainPlayer* pPlayer = new CTerrainPlayer();
@@ -85,14 +91,17 @@ void CScene::BuildObjects()
 	for (int i = 0; i < PLASMACANNON_ENEMY; ++i) {
 		m_ppEnemies[i] = new CPlasmaCannonEnemy;
 		m_ppEnemies[i]->id = i;
+		m_ppEnemies[i]->scene_num = num;
 	}
 	for (int i = PLASMACANNON_ENEMY; i < PLASMACANNON_ENEMY + LASER_ENEMY; ++i) {
 		m_ppEnemies[i] = new CLaserEnemy;
 		m_ppEnemies[i]->id = i;
+		m_ppEnemies[i]->scene_num = num;
 	}
 	for (int i = PLASMACANNON_ENEMY + LASER_ENEMY; i < ENEMIES; ++i) {
 		m_ppEnemies[i] = new CMissileEnemy;
 		m_ppEnemies[i]->id = i;
+		m_ppEnemies[i]->scene_num = num;
 	}
 
 	// misile
@@ -102,6 +111,7 @@ void CScene::BuildObjects()
 
 	// boss
 	m_pBoss = new Boss();
+	m_pBoss->scene_num = num;
 	m_pBoss->SetPosition(3000.f, 3000.f, 3000.f);
 }
 
@@ -124,6 +134,55 @@ void CScene::ReleaseObjects()
 		if (m_ppMissiles[i]) { delete m_ppMissiles[i]; }
 	}
 	if (m_pBoss) { delete m_pBoss; }
+}
+
+void CScene::Reset()
+{
+
+	m_pSpaceship->SetPosition(XMFLOAT3(0.f, 0.f, 0.f));
+	m_pSpaceship->Reset();
+
+	items[ItemType::JEWEL_ATT] = 0;
+	items[ItemType::JEWEL_DEF] = 0;
+	items[ItemType::JEWEL_HEAL] = 0;
+	items[ItemType::JEWEL_HP] = 0;
+
+	//_plist_lock.lock();
+	_plist.fill(-1);
+	//_plist_lock.unlock();
+
+	cur_mission = MissionType::TU_SIT;
+	for (char i = 0; i < 3; ++i) {
+		m_ppPlayers[i]->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 10.0f, 740.0f));
+	}
+
+	for (int i = 0; i < METEOS; ++i) {
+		m_ppMeteoObjects[i]->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
+		m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(urdPos(dree), urdPos(dree), urdPos(dree)));
+		m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+		if (i < METEOS / 2) {
+			m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+		}
+		else {
+			m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
+		}
+		m_ppMeteoObjects[i]->UpdateTransform(NULL);
+	}
+
+	for (int i = 0; i < ENEMIES; ++i) {
+		m_ppEnemies[i]->SetisAlive(false);
+	}
+
+	for (int i = 0; i < ENEMY_BULLETS; ++i) {
+		m_ppMissiles[i]->SetisActive(false);
+	}
+
+	m_fEnemySpawnTimeRemaining = 0.0f;
+	kill_monster_num = 0;
+	cur_monster_num = 0;
+	heal_player = -1;
+
+	m_pBoss->SetPosition(3000.f, 3000.f, 3000.f);
 }
 
 void CScene::CheckMeteoByPlayerCollisions()
@@ -157,11 +216,12 @@ void CScene::CheckMeteoByPlayerCollisions()
 					m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 2);
 				}
 
-				for (auto& pl : clients)
-				{
-					if (pl.in_use == false) continue;
-					pl.send_meteo_direction_packet(0, i, m_ppMeteoObjects[i]);
-					pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_meteo_direction_packet(0, i, m_ppMeteoObjects[i]);
+					clients[pl_id].send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
+
 				}
 			}
 		}
@@ -182,11 +242,13 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		{
 			printf("hit");
 			m_ppEnemies[i]->hp -= m_pSpaceship->damage;
-			for (auto& pl : clients)
-			{
-				if (pl.in_use == false) continue;
-				pl.send_bullet_hit_packet(0, m_ppEnemies[i]->GetID(), m_ppEnemies[i]->hp);
+
+			for (short pl_id : _plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_bullet_hit_packet(0, m_ppEnemies[i]->GetID(), m_ppEnemies[i]->hp);
 			}
+
 
 			if (m_ppEnemies[i]->hp <= 0) { 
 				m_ppEnemies[i]->SetisAlive(false);
@@ -202,10 +264,12 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 				else if (cur_mission == MissionType::Kill_MONSTER)
 				{
 					++kill_monster_num;
-					for (auto& pl : clients) {
-						if (false == pl.in_use) continue;
-						pl.send_kill_num_packet(kill_monster_num);
+					for (short pl_id : _plist) {
+						if (pl_id == -1) continue;
+						if (clients[pl_id]._state != ST_INGAME) continue;
+						clients[pl_id].send_kill_num_packet(kill_monster_num);
 					}
+
 					if (kill_monster_num == 15) {
 						kill_monster_num = 0;
 						MissionClear();
@@ -216,10 +280,12 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 				else if (cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME)
 				{
 					++kill_monster_num;
-					for (auto& pl : clients) {
-						if (false == pl.in_use) continue;
-						pl.send_kill_num_packet(kill_monster_num);
+					for (short pl_id : _plist) {
+						if (pl_id == -1) continue;
+						if (clients[pl_id]._state != ST_INGAME) continue;
+						clients[pl_id].send_kill_num_packet(kill_monster_num);;
 					}
+
 					if (kill_monster_num == 20) {
 						kill_monster_num = 0;
 						MissionClear();
@@ -236,10 +302,10 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 	if (m_pBoss->m_xmOOBB.Intersects(pos, dir, dist)) // 보스 충돌처리
 	{
 		m_pBoss->BossHP -= m_pSpaceship->damage;
-		for (auto& pl : clients)
-		{
-			if (pl.in_use == false) continue;
-			pl.send_bullet_hit_packet(0, BOSS_ID, m_pBoss->BossHP);
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_bullet_hit_packet(0, BOSS_ID, m_pBoss->BossHP);
 		}
 		return;
 	}
@@ -328,10 +394,10 @@ void CScene::CheckEnemyCollisions()
 					m_ppEnemies[j]->SetVelocity(XMFLOAT3(finalVelX1, finalVelY1, finalVelZ1));
 					m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(finalVelX2, finalVelY2, finalVelZ2));
 
-					for (auto& pl : clients)
-					{
-						if (pl.in_use == false) continue;
-						pl.send_meteo_direction_packet(0, i, m_ppMeteoObjects[i]);
+					for (short pl_id : _plist) {
+						if (pl_id == -1) continue;
+						if (clients[pl_id]._state != ST_INGAME) continue;
+						clients[pl_id].send_meteo_direction_packet(0, i, m_ppMeteoObjects[i]);
 					}
 				}
 			}
@@ -393,11 +459,11 @@ void CScene::CheckMissileCollisions()
 					m_pSpaceship->GetAttack(m_ppMissiles[i]->GetDamage());
 				}
 
-				for (auto& pl : clients)
-				{
-					if (pl.in_use == false) continue;
-					pl.send_remove_missile_packet(0, i);
-					pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_remove_missile_packet(0, i);
+					clients[pl_id].send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
 				}
 			}
 		}
@@ -465,8 +531,10 @@ void CScene::MissionClear()
 		cur_mission = levels[cur_mission].NextMission;
 		if (cur_mission == MissionType::FIND_BOSS)
 			m_pBoss->SetPosition(Vector3::Add(m_pSpaceship->GetPosition(), XMFLOAT3(2400.0f, 0.f, 0.f)));
-		for (auto& pl : clients) {
-			pl.send_mission_start_packet(cur_mission);
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_mission_start_packet(cur_mission);
 		}
 	}
 	else {
@@ -515,10 +583,11 @@ void CScene::GetJewels()
 	ITEM_INFO info;
 	info.type = item_type;
 	info.num = items[item_type];
-	for (auto& pl : clients)
-	{
-		if (pl.in_use == false) continue;
-		pl.send_item_packet(0, info);
+
+	for (short pl_id : _plist) {
+		if (pl_id == -1) continue;
+		if (clients[pl_id]._state != ST_INGAME) continue;
+		clients[pl_id].send_item_packet(0, info);
 	}
 
 	// 미션
@@ -560,9 +629,11 @@ void CScene::SpawnEnemy()
 				e_info.destination = m_ppEnemies[j]->GetDestination();
 				e_info.max_hp = m_ppEnemies[j]->GetHP();
 				e_info.state = EnemyState::IDLE;
-				for (auto& pl : clients) {
-					if (false == pl.in_use) continue;
-					pl.send_spawn_enemy_packet(0, e_info);
+
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_spawn_enemy_packet(0, e_info);
 				}
 				++cur_monster_num;
 				break;
@@ -589,9 +660,18 @@ void CScene::SpawnMeteo(char i)
 	}
 	m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(urdPos3(dree), urdPos3(dree), urdPos3(dree)));
 
-	for (auto& pl : clients) {
-		if (false == pl.in_use) continue;
-		pl.send_spawn_meteo_packet(0, i, m_ppMeteoObjects[i]);
+	for (short pl_id : _plist) {
+		if (pl_id == -1) continue;
+		if (clients[pl_id]._state != ST_INGAME) continue;
+		clients[pl_id].send_spawn_meteo_packet(0, i, m_ppMeteoObjects[i]);
+	}
+}
+
+void CScene::Send(char* p)
+{
+	for (auto pl_id : _plist)
+	{
+		clients[pl_id].do_send(p);
 	}
 }
 
@@ -641,9 +721,11 @@ void CScene::AnimateObjects(float fTimeElapsed)
 						m_info.id = j;
 						m_info.pos = info.StartPos;
 						m_info.Quaternion = info.Quaternion;
-						for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
-							if (false == pl.in_use) continue;
-							pl.send_missile_packet(0, m_info);
+						
+						for (short pl_id : _plist) {
+							if (pl_id == -1) continue;
+							if (clients[pl_id]._state != ST_INGAME) continue;
+							clients[pl_id].send_missile_packet(0, m_info);
 						}
 						break;
 					}
@@ -660,13 +742,15 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			m_info.pos = m_ppMissiles[i]->GetPosition();
 			//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
 			m_info.Quaternion = m_ppMissiles[i]->GetQuaternion();
-			for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
-				if (false == pl.in_use) continue;
+
+			for (short pl_id : _plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
 				if (m_ppMissiles[i]->GetisActive()) {
-					pl.send_missile_packet(0, m_info);
+					clients[pl_id].send_missile_packet(0, m_info);
 				}
 				else {
-					pl.send_remove_missile_packet(0, i);
+					clients[pl_id].send_remove_missile_packet(0, i);
 				}
 			}
 		}
@@ -686,38 +770,53 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		int num = 0;
 		for (int j = 0; j < MAX_USER; ++j) {
 			if (j == i) { continue; }
-			if (clients[j].in_use) {
+			if (clients[_plist[j]]._state == ST_INGAME) {
 				pos[num] = m_ppPlayers[j]->GetPosition();
 			}
 			else { pos[num] = { 0.f, 0.f, 0.f }; }
 			++num;
 		}
 		m_ppPlayers[i]->Update(fTimeElapsed, pos);
-		if (clients[i].in_use && clients[i].type == PlayerType::INSIDE) {
-			for (auto& pl : clients) {
-				if (pl.in_use == false) continue;
-				pl.send_inside_packet(i, m_ppPlayers[i]);
+		if (clients[_plist[i]]._state == ST_INGAME && clients[i].type == PlayerType::INSIDE) {
+			for (short pl_id : _plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_inside_packet(i, m_ppPlayers[i]);
 			}
 		}
 	}
 
-	for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
-		if (false == pl.in_use) continue;
-		pl.send_spaceship_packet(3, m_pSpaceship);
-		// 적 위치?
+	for (short pl_id : _plist) {
+		if (pl_id == -1) continue;
+		if (clients[pl_id]._state != ST_INGAME) continue;
+		clients[pl_id].send_spaceship_packet(3, m_pSpaceship);
 	}
 
 //	if (send_time % 30 == 0) {
 		for (int i = 0; i < ENEMIES; ++i) {
-			m_ppEnemies[i]->SendPos();
+			if (m_ppEnemies[i]->GetisAlive()) {
+				ENEMY_INFO info;
+				info.id = m_ppEnemies[i]->GetID();
+				info.Quaternion = m_ppEnemies[i]->GetQuaternion();
+				info.pos = m_ppEnemies[i]->GetPosition();
+				info.velocity = m_ppEnemies[i]->GetVelocity();
+
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_enemy_packet(0, info);
+				}
+			}
 		}
 
-		for (auto& pl : clients) {	// 주기적으로 보내줘야 하는 것
-			if (false == pl.in_use) continue;
-			pl.send_meteo_packet(0, m_ppMeteoObjects);
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_meteo_packet(0, m_ppMeteoObjects);
 			for (int i = 0; i < MAX_USER; ++i) {
-				if (clients[i].in_use == false) { continue; }
-				pl.send_change_packet(i, clients[i].type);
+				if (_plist[i] == -1) continue;
+				if (clients[_plist[i]]._state == !ST_INGAME) { continue; }
+				clients[pl_id].send_change_packet(i, clients[_plist[i]].type);
 			}
 		}
 		send_time = 0;
@@ -727,10 +826,10 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		std::chrono::duration<double>sec = std::chrono::system_clock::now() - heal_start;
 		heal_start = std::chrono::system_clock::now();
 		if (m_pSpaceship->GetHeal(sec.count())) {
-			for (auto& pl : clients)
-			{
-				if (false == pl.in_use) continue;
-				pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
+			for (short pl_id : _plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
 			}
 		}
 	}
@@ -744,4 +843,47 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	//CheckEnemyByBulletCollisions();
 
 	++send_time;
+}
+
+
+
+//--------------------------------------------------------------------------------------------------------
+
+void CScene::Start()
+{
+	_s_lock.lock();
+	if (_state == ST_FREE) {
+		_state = ST_INGAME;
+		_s_lock.unlock();
+
+		for (short pl_id:_plist) {
+			if (pl_id == -1) continue;
+			clients[pl_id]._s_lock.lock();
+			clients[pl_id]._state = ST_INGAME;
+			clients[pl_id]._s_lock.unlock();
+			// 게임 스타트 패킷 send
+		}
+
+		
+		return;
+	}
+	_s_lock.unlock();
+
+}
+
+void CScene::InsertPlayer(short pl_id)
+{
+	_plist_lock.lock();
+	for (int i = 0; i < _plist.size(); ++i)
+	{
+		if (_plist[i] != -1) {
+			_plist[i] = pl_id;
+			clients[pl_id].room_id = num;
+			clients[pl_id].room_pid = i;
+			_plist_lock.unlock();
+			if (i == 2) { Start(); }
+			return;
+		}
+	}
+	_plist_lock.unlock();
 }

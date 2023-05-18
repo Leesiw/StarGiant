@@ -91,12 +91,6 @@ public:
 
 	float						m_fBulletEffectiveRange = 150.0f;
 
-	//불렛
-	float						m_fFireDelayTime = 0.1f;
-	float						m_fFireWaitingTime[3];
-
-	bool FireBullet(short attack_num);
-
 	float heal_amount = 0.f;
 
 	SPACESHIP_INPUT_INFO input_info;
@@ -107,8 +101,9 @@ public:
 	void GetAttack(char damage);
 	bool GetHeal(double sec);
 
+	void Reset();
+
 	void SetInputInfo(SPACESHIP_INPUT_INFO i_info) { input_info = i_info; is_update = false; }
-	bool CanAttack(short num);
 	virtual void Animate(float fTimeElapsed);
 	virtual void Update(float fTimeElapsed);
 	virtual void OnPrepareRender();
@@ -121,9 +116,6 @@ public:
 	CTerrainPlayer();
 	virtual ~CTerrainPlayer();
 
-
-
-	bool walk;	//애니메이션
 	INSIDE_INPUT_INFO input_info;
 public:
 	void SetInputInfo(INSIDE_INPUT_INFO i_info) { input_info = i_info; is_update = false; }

@@ -18,6 +18,8 @@ public:
 	void BuildObjects();
 	void ReleaseObjects();
 
+	void Reset();
+
 	void AnimateObjects(float fTimeElapsed);
 
 	void CheckMeteoByPlayerCollisions();
@@ -35,6 +37,11 @@ public:
 	void SpawnEnemy();
 	void SpawnMeteo(char i);
 
+	void Send(char* p);
+
+	void Start();
+	void InsertPlayer(short pl_id);
+
 	CAirplanePlayer* m_pSpaceship = NULL;
 	CTerrainPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
 
@@ -47,10 +54,13 @@ public:
 
 	Boss* m_pBoss;
 
+	short _id;
+	short num;
+
 	std::chrono::system_clock::time_point heal_start;
 	char heal_player = -1;
 
-	bool						m_bIsRunning = true;
+//	bool						m_bIsRunning = true;
 
 	char						kill_monster_num = 0;
 	char						cur_monster_num = 0;
@@ -60,7 +70,12 @@ public:
 	float m_fEnemySpawnTime = 20.0f;
 	float m_fEnemySpawnTimeRemaining = 0.0f;
 
+	S_STATE _state;
+	mutex _s_lock;
+
+	array<short, 3> _plist;
+	mutex _plist_lock;
+
 	// юс╫ц
 	int send_time = 0;
 };
-

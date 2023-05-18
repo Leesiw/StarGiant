@@ -37,16 +37,21 @@ public:
 	}
 };
 
-
+enum S_STATE { ST_FREE, ST_ALLOC, ST_INGAME };
 class SESSION {
 	OVER_EXP _recv_over;
 
 public:
-	bool in_use;
+	mutex _s_lock;
+
+	S_STATE _state;
 	int _id;
 	PlayerType type;	// ����/����
 	SOCKET _socket;
-	char	_name[NAME_SIZE];
+	//char	_name[NAME_SIZE]; // 일단 사용x
+
+	short room_id;
+	char room_pid;
 
 	int		_prev_remain;
 public:
@@ -54,8 +59,8 @@ public:
 	{
 		_id = -1;
 		_socket = 0;
-		_name[0] = 0;
-		in_use = false;
+		//_name[0] = 0;
+		_state = ST_FREE;
 		_prev_remain = 0;
 	}
 
@@ -80,10 +85,9 @@ public:
 	{
 		SC_LOGIN_INFO_PACKET p;
 		p.data.id = _id;
-		p.data.player_type = type;
-
 		p.size = sizeof(SC_LOGIN_INFO_PACKET);
 		p.type = SC_LOGIN_INFO;
+		p.data.player_type = type;
 		do_send(&p);
 	}
 	void send_add_player_packet(LOGIN_INFO& info);
@@ -100,12 +104,13 @@ public:
 	void send_spawn_meteo_packet(int c_id, short id, CMeteoObject* meteo);
 	void send_spawn_all_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> meteo);
 	void send_all_enemy_packet(int c_id, ENEMY_INFO[], bool[]);
-	void send_meteo_direction_packet(int c_id, short id, CMeteoObject* meteo);
+	void send_meteo_direction_packet(int c_id, char id, CMeteoObject* meteo);
 	void send_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> meteo);
 	void send_boss_meteo_packet(int c_id, std::array<CMeteoObject*, BOSSMETEOS> meteo);
-	void send_bullet_hit_packet(int c_id, short id, short hp);
+	void send_bullet_hit_packet(int c_id, char id, short hp);
 	void send_item_packet(int c_id, ITEM_INFO& item);
 	void send_animation_packet(char id, char animation);
 	void send_mission_start_packet(MissionType mission);
 	void send_kill_num_packet(char num);
 };
+
