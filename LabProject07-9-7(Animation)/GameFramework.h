@@ -9,6 +9,10 @@
 
 extern int g_myid;
 
+enum SCENE_STATE {
+	SCENE_LOBBY, SCENE_INGAME
+};
+
 class CGameFramework
 {
 public:
@@ -149,6 +153,8 @@ private:
 
 	// 현재 회복량
 	char healAmount = 10;
+
+	SCENE_STATE _state;
 
 };
 

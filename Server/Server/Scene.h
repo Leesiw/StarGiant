@@ -7,6 +7,8 @@
 extern array<SESSION, MAX_USER> clients;
 extern std::unordered_map<MissionType, Level> levels;
 
+enum SCENE_STATE { SCENE_FREE, SCENE_ALLOC, SCENE_INGAME, SCENE_RESET };
+					// 아무도x, 누군가 기다림, 게임 중, 리셋 중
 class CScene
 {
 public:
@@ -40,7 +42,7 @@ public:
 	void Send(char* p);
 
 	void Start();
-	void InsertPlayer(short pl_id);
+	char InsertPlayer(short pl_id);
 
 	CAirplanePlayer* m_pSpaceship = NULL;
 	CTerrainPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
@@ -70,7 +72,7 @@ public:
 	float m_fEnemySpawnTime = 20.0f;
 	float m_fEnemySpawnTimeRemaining = 0.0f;
 
-	S_STATE _state;
+	SCENE_STATE _state;
 	mutex _s_lock;
 
 	array<short, 3> _plist;

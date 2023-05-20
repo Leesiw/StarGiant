@@ -29,7 +29,7 @@ CScene::CScene()
 
 	_id = -1;
 
-	_state = ST_FREE;
+	_state = SCENE_FREE;
 }
 
 CScene::~CScene()
@@ -671,7 +671,9 @@ void CScene::Send(char* p)
 {
 	for (auto pl_id : _plist)
 	{
-		clients[pl_id].do_send(p);
+		if (pl_id != -1) {
+			clients[pl_id].do_send(p);
+		}
 	}
 }
 
@@ -764,12 +766,15 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	m_pSpaceship->Animate(fTimeElapsed);
 	m_pSpaceship->Update(fTimeElapsed);
 
+	
 	for (int i = 0; i < 3; ++i)
 	{
+		if (_plist[i] == -1) { continue; }
 		XMFLOAT3 pos[2]{};
 		int num = 0;
 		for (int j = 0; j < 3; ++j) {
 			if (j == i) { continue; }
+			if (_plist[j] == -1) { continue; }
 			if (clients[_plist[j]]._state == ST_INGAME) {
 				pos[num] = m_ppPlayers[j]->GetPosition();
 			}
@@ -777,7 +782,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			++num;
 		}
 		m_ppPlayers[i]->Update(fTimeElapsed, pos);
-		if (clients[_plist[i]]._state == ST_INGAME && clients[i].type == PlayerType::INSIDE) {
+
+		if (clients[_plist[i]]._state == ST_INGAME && clients[_plist[i]].type == PlayerType::INSIDE) {
 			for (short pl_id : _plist) {
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
@@ -785,6 +791,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			}
 		}
 	}
+
+
 
 	for (short pl_id : _plist) {
 		if (pl_id == -1) continue;
@@ -852,8 +860,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 void CScene::Start()
 {
 	_s_lock.lock();
-	if (_state == ST_FREE) {
-		_state = ST_INGAME;
+	if (_state == SCENE_ALLOC) {
+		_state = SCENE_INGAME;
 		_s_lock.unlock();
 
 		for (short pl_id:_plist) {
@@ -863,27 +871,26 @@ void CScene::Start()
 			clients[pl_id]._s_lock.unlock();
 			// 게임 스타트 패킷 send
 		}
-
-		
 		return;
 	}
 	_s_lock.unlock();
 
 }
 
-void CScene::InsertPlayer(short pl_id)
+char CScene::InsertPlayer(short pl_id)
 {
 	_plist_lock.lock();
 	for (int i = 0; i < _plist.size(); ++i)
 	{
-		if (_plist[i] != -1) {
+		if (_plist[i] == -1) {
 			_plist[i] = pl_id;
 			clients[pl_id].room_id = num;
 			clients[pl_id].room_pid = i;
 			_plist_lock.unlock();
-			if (i == 2) { Start(); }
-			return;
+			//if (i == 2) { Start(); }
+			return i;
 		}
 	}
 	_plist_lock.unlock();
+	return -1;
 }

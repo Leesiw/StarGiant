@@ -10,7 +10,7 @@ public:
 	CScene* GetScene(short id);
 	void SceneStart(short num);	// 게임 state INGAME으로 변경
 	void ResetScene(short num);
-	void InsertPlayer(short num, short pl_id);
+	char InsertPlayer(short num, short pl_id);
 	void SceneAnimate(float fTimeElapsed);	// 이후 타이머로 변경
 	void Send(short num, char* p);
 

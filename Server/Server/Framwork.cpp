@@ -100,23 +100,22 @@ void CGameFramework::Init() {
 
 	WSADATA WSAData;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
-	SOCKET server = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	g_s_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 	SOCKADDR_IN server_addr;
 	memset(&server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(PORT_NUM);
 	server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
-	bind(server, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
-	listen(server, SOMAXCONN);
+	bind(g_s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
+	listen(g_s_socket, SOMAXCONN);
 	SOCKADDR_IN cl_addr;
 	int addr_size = sizeof(cl_addr);
 
 	h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
-	CreateIoCompletionPort(reinterpret_cast<HANDLE>(server), h_iocp, 9999, 0);
-	SOCKET c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-	OVER_EXP a_over;
-	a_over._comp_type = OP_ACCEPT;
-	AcceptEx(server, c_socket, a_over._send_buf, 0, addr_size + 16, addr_size + 16, 0, &a_over._over);
+	CreateIoCompletionPort(reinterpret_cast<HANDLE>(g_s_socket), h_iocp, 9999, 0);
+	g_c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	g_a_over._comp_type = OP_ACCEPT;
+	AcceptEx(g_s_socket, g_c_socket, g_a_over._send_buf, 0, addr_size + 16, addr_size + 16, 0, &g_a_over._over);
 
 	vector <thread> worker_threads;
 	int num_threads = std::thread::hardware_concurrency();
@@ -237,6 +236,48 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 
 	switch (packet[1]) {
 	case CS_LOGIN: {
+		CS_LOGIN_PACKET* p = reinterpret_cast<CS_LOGIN_PACKET*>(packet);
+		if (p->room_id != -1) {
+			scene_manager._scene_lock.lock();
+			short scene_num = scene_manager.FindScene(p->room_id, c_id);
+			scene_manager._scene_lock.unlock();
+
+			if (scene_num >= 0) {
+				char num = scene_manager.InsertPlayer(scene_num, c_id);
+				printf("num : %d\n", num);
+				if (num == 2) { scene_manager.SceneStart(scene_num); }
+				else if (num == -1) { disconnect(c_id); return; }  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
+				else {
+					CScene* scene = scene_manager.GetScene(scene_num);
+					scene->_s_lock.lock();
+					if (scene->_state == SCENE_FREE) {
+						scene_manager.GetScene(scene_num)->_state = SCENE_ALLOC;
+					}
+					scene->_s_lock.unlock();
+				}
+			}
+			else {
+				disconnect(c_id);	return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
+			}
+		}
+		else {
+			// 자동 배정 (비어있는 Scene 혹은 비어있는 자리)
+		}
+
+		printf("send login packet\n");
+		clients[c_id].send_login_info_packet();
+
+		SC_LOGIN_INFO_PACKET packet;
+		packet.type = SC_ADD_PLAYER;
+		packet.size = sizeof(packet);
+		packet.data.id = clients[c_id].room_pid;
+		CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+		packet.data.yaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
+		packet.data.player_type = clients[c_id].type;
+		packet.data.x = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition().x;
+		packet.data.z = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition().z;
+		
+		scene_manager.Send(clients[c_id].room_id, (char*)& packet);
 		break;
 	}
 	case CS_CHANGE: {
@@ -253,11 +294,11 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 
 			scene_manager.Send(clients[c_id].room_id, (char*)&packet);	// 수정	
 		}
-		else 
+		else
 		{
 			bool exists = scene_manager.GetCanSit(clients[c_id].room_id, p->player_type);
 
-			if (!exists) {
+			if (exists) {
 				clients[c_id].type = p->player_type;
 
 				// 미션
@@ -288,7 +329,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_INSIDE_MOVE: {
 		CS_INSIDE_PACKET* p = reinterpret_cast<CS_INSIDE_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::INSIDE) {
-			scene_manager.GetScene(clients[c_id].room_id)->m_ppPlayers[c_id]->SetInputInfo(p->data);
+			scene_manager.GetScene(clients[c_id].room_id)->m_ppPlayers[clients[c_id].room_pid]->SetInputInfo(p->data);
 		}
 		break;
 	}
@@ -299,15 +340,15 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (isnan(p->data.direction.x) || isnan(p->data.direction.y) || isnan(p->data.direction.z)) { break; }
 		if (clients[c_id].type >= PlayerType::ATTACK1 && clients[c_id].type <= PlayerType::ATTACK3) {
 			//if (m_pScene->m_pSpaceship->CanAttack((short)clients[c_id].type - (short)PlayerType::ATTACK1)) {
-				m_pScene->CheckEnemyByBulletCollisions(p->data);
-				m_pScene->CheckMeteoByBulletCollisions(p->data);
+			m_pScene->CheckEnemyByBulletCollisions(p->data);
+			m_pScene->CheckMeteoByBulletCollisions(p->data);
 
-				for (short pl_id : m_pScene->_plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_bullet_packet(0, p->data.pos, p->data.direction);
+			for (short pl_id : m_pScene->_plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_bullet_packet(0, p->data.pos, p->data.direction);
 
-				}
+			}
 			//}
 		}
 		break;
@@ -336,8 +377,21 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		break;
 	}
 	case CS_NEXT_MISSION: {
-		CS_NEXT_MISSION_PACKET* p = reinterpret_cast<CS_NEXT_MISSION_PACKET*>(packet);
 		scene_manager.GetScene(clients[c_id].room_id)->MissionClear();
+		break;
+	}
+	case CS_START: {
+		if (clients[c_id].room_id != -1) {
+			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+			scene->Start();
+
+			SC_START_PACKET packet;
+			packet.size = sizeof(SC_START_PACKET);
+			packet.type = SC_START;
+
+			printf("start %d\n", clients[c_id].room_id);
+			scene_manager.Send(clients[c_id].room_id, (char*)&packet);
+		}
 		break;
 	}
 	}
@@ -377,20 +431,22 @@ void CGameFramework::disconnect(int c_id)
 	p.size = sizeof(p);
 	p.type = SC_REMOVE_PLAYER;
 
-	scene_manager.Send(clients[c_id].room_id, (char*)&p);
-
-	CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
-
-	scene->_plist_lock.lock();
-	scene->_plist[clients[c_id].room_pid] = -1;
-	
-
-	if (std::all_of(scene->_plist.begin(), scene->_plist.end(), [](short i){return i == -1;})) {
-		scene_manager.ResetScene(clients[c_id].room_id);
-	}
-	scene->_plist_lock.unlock();
-
 	lock_guard<mutex> ll(clients[c_id]._s_lock);
+	if (clients[c_id].room_id != -1) {
+		scene_manager.Send(clients[c_id].room_id, (char*)&p);
+
+		CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+
+		scene->_plist_lock.lock();
+		scene->_plist[clients[c_id].room_pid] = -1;
+
+
+		if (std::all_of(scene->_plist.begin(), scene->_plist.end(), [](short i) {return i == -1; })) {
+			scene_manager.ResetScene(clients[c_id].room_id);
+		}
+		scene->_plist_lock.unlock();
+	}
+
 	clients[c_id]._state = ST_FREE;
 	closesocket(clients[c_id]._socket);
 }

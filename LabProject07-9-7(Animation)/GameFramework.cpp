@@ -43,6 +43,8 @@ CGameFramework::CGameFramework()
 	
 	planetPos = { 10000.0f,10000.0f,10000.0f };
 
+	_state = SCENE_LOBBY;
+
 	scriptsStartTime = steady_clock::now();
 	_tcscpy_s(m_pszFrameRate, _T("StarGiant ("));
 }
@@ -382,11 +384,35 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				b_Inside = !b_Inside;
 				std::cout << "씬 전환";
 				break;
+			case 'M':
+			{
+				CS_LOGIN_PACKET packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_LOGIN;
+				packet.room_id = 1;
+				if (_state == SCENE_LOBBY) {
+					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+				}
+				break;
+			}
+			case 'P':
+			{
+				CS_NEXT_MISSION_PACKET packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_START;
+				if (_state == SCENE_LOBBY) {
+					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+				}
+				break;
+			}
 			case 'N':
-				CS_NEXT_MISSION_PACKET my_packet;
-				my_packet.size = sizeof(CS_NEXT_MISSION_PACKET);
-				my_packet.type = CS_NEXT_MISSION;
-				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+				if (_state == SCENE_INGAME) {
+					CS_NEXT_MISSION_PACKET my_packet;
+					my_packet.size = sizeof(CS_NEXT_MISSION_PACKET);
+					my_packet.type = CS_NEXT_MISSION;
+					
+					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+				}
 				break;
 
 			case 'F': //F키 상호작용 앉기
@@ -397,18 +423,22 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 						CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState(), State);
 					}
 					if (State == 3) {
-						CS_CHANGE_PACKET my_packet;
-						my_packet.size = sizeof(CS_CHANGE_PACKET);
-						my_packet.type = CS_CHANGE;
-						my_packet.player_type = PlayerType::MOVE;
-						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+						if (_state == SCENE_INGAME) {
+							CS_CHANGE_PACKET my_packet;
+							my_packet.size = sizeof(CS_CHANGE_PACKET);
+							my_packet.type = CS_CHANGE;
+							my_packet.player_type = PlayerType::MOVE;
+							send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+						}
 					}
 					else if(State >= 0) {
-						CS_CHANGE_PACKET my_packet;
-						my_packet.size = sizeof(CS_CHANGE_PACKET);
-						my_packet.type = CS_CHANGE;
-						my_packet.player_type = (PlayerType)(State + 2);
-						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+						if (_state == SCENE_INGAME) {
+							CS_CHANGE_PACKET my_packet;
+							my_packet.size = sizeof(CS_CHANGE_PACKET);
+							my_packet.type = CS_CHANGE;
+							my_packet.player_type = (PlayerType)(State + 2);
+							send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+						}
 					}
 				}
 				//m_pScene->m_ppEnemies[0]->DieSprite(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
@@ -420,11 +450,13 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 
 				if (player_type != PlayerType::INSIDE) {
-					CS_CHANGE_PACKET my_packet;
-					my_packet.size = sizeof(CS_CHANGE_PACKET);
-					my_packet.type = CS_CHANGE;
-					my_packet.player_type = PlayerType::INSIDE;
-					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+					if (_state == SCENE_INGAME) {
+						CS_CHANGE_PACKET my_packet;
+						my_packet.size = sizeof(CS_CHANGE_PACKET);
+						my_packet.type = CS_CHANGE;
+						my_packet.player_type = PlayerType::INSIDE;
+						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+					}
 				}
 				break;
 			}
@@ -459,15 +491,18 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 				packet.data.direction = m_pCamera->GetLookVector();
 
 				if (std::isnan(m_pCamera->GetPosition().x))cout << "server x nan!!\n";
-
-				send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+				if (_state == SCENE_INGAME) {
+					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+				}
 			}
 			else if (player_type == PlayerType::INSIDE && AroundSculpture()) {
 				CS_HEAL_PACKET my_packet;
 				my_packet.size = sizeof(CS_HEAL_PACKET);
 				my_packet.type = CS_HEAL;
 				my_packet.start = true;
-				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+				if (_state == SCENE_INGAME) {
+					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+				}
 			}
 			break;
         case WM_RBUTTONDOWN:
@@ -478,7 +513,9 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 				my_packet.size = sizeof(CS_HEAL_PACKET);
 				my_packet.type = CS_HEAL;
 				my_packet.start = false;
-				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+				if (_state == SCENE_INGAME) {
+					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+				}
 				isHealing = false;
 			}
 			break;
@@ -532,6 +569,23 @@ bool CGameFramework::AroundSculpture()
 		return true;
 	}
 	return false;
+}
+
+void error_display(const char* msg, int err_no)
+{
+	WCHAR* lpMsgBuf;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, err_no,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR)&lpMsgBuf, 0, NULL);
+	std::cout << msg;
+	std::wcout << L"에러" << lpMsgBuf << std::endl;
+
+//	MessageBox(hWnd, lpMsgBuf, L"ERROR", 0);
+	LocalFree(lpMsgBuf);
+	// while (true);
 }
 
 void CGameFramework::OnDestroy()
@@ -716,7 +770,9 @@ void CGameFramework::ProcessInput()
 					my_packet.type = CS_INSIDE_MOVE;
 					my_packet.data.dwDirection = dwDirection;
 					my_packet.data.yaw = m_pInsidePlayer[g_myid]->GetYaw();
-					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+					if (_state == SCENE_INGAME) {
+						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+					}
 				}
 				else if(player_type == PlayerType::MOVE) {
 					CS_SPACESHIP_PACKET my_packet;
@@ -726,8 +782,9 @@ void CGameFramework::ProcessInput()
 					XMFLOAT4 a;
 					XMStoreFloat4(&a, m_pPlayer[0]->GetQuaternion());
 					my_packet.data.Quaternion = a;
-						
-					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+					if (_state == SCENE_INGAME) {
+						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+					}
 				}
 			}
 			else {
@@ -751,7 +808,9 @@ void CGameFramework::ProcessInput()
 		my_packet.size = sizeof(CS_HEAL_PACKET);
 		my_packet.type = CS_HEAL;
 		my_packet.start = false;
-		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+		if (_state == SCENE_INGAME) {
+			send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+		}
 		isHealing = false;
 	}
 }
@@ -1588,6 +1647,11 @@ void CGameFramework::ProcessPacket(char* p)
 	{
 		SC_KILL_NUM_PACKET* packet = reinterpret_cast<SC_KILL_NUM_PACKET*>(p);
 		killCnt = packet->num;
+		break;
+	}
+	case SC_START:
+	{
+		_state = SCENE_INGAME;
 		break;
 	}
 	default:
