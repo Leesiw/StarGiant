@@ -237,6 +237,16 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	switch (packet[1]) {
 	case CS_LOGIN: {
 		CS_LOGIN_PACKET* p = reinterpret_cast<CS_LOGIN_PACKET*>(packet);
+		if (clients[c_id].room_id != -1) {	// 이미 배정된 방이 있을 때
+			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+			scene->_plist_lock.lock();
+			scene->_plist[clients[c_id].room_pid] = -1;
+			clients[c_id].room_id = -1;
+			clients[c_id].room_pid = -1;
+			scene->_plist_lock.unlock();
+		}
+
+
 		if (p->room_id != -1) {
 			scene_manager._scene_lock.lock();
 			short scene_num = scene_manager.FindScene(p->room_id, c_id);
