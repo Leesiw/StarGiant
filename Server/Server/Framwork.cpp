@@ -278,6 +278,44 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		packet.data.z = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition().z;
 		
 		scene_manager.Send(clients[c_id].room_id, (char*)& packet);
+		
+		for (auto pl_id : scene->_plist) {
+			if (pl_id == -1) { continue; }
+			SC_LOGIN_INFO_PACKET my_packet;
+			my_packet.type = SC_ADD_PLAYER;
+			my_packet.size = sizeof(my_packet);
+			my_packet.data.id = clients[pl_id].room_pid;
+			CScene* scene = scene_manager.GetScene(clients[pl_id].room_id);
+			my_packet.data.yaw = scene->m_ppPlayers[clients[pl_id].room_pid]->GetYaw();
+			my_packet.data.player_type = clients[pl_id].type;
+			my_packet.data.x = scene->m_ppPlayers[clients[pl_id].room_pid]->GetPosition().x;
+			my_packet.data.z = scene->m_ppPlayers[clients[pl_id].room_pid]->GetPosition().z;
+
+			clients[c_id].do_send(&my_packet);
+			
+		}
+
+		SC_MISSION_START_PACKET miss_packet;
+		miss_packet.size = sizeof(miss_packet);
+		miss_packet.type = SC_MISSION_START;
+		miss_packet.next_mission = scene->cur_mission;
+		clients[c_id].do_send(&miss_packet);
+
+		if (scene->cur_mission == MissionType::Kill_MONSTER || scene->cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME)
+		{
+			SC_KILL_NUM_PACKET pack;
+			pack.size = sizeof(pack);
+			pack.type = SC_KILL_NUM;
+			pack.num = scene->kill_monster_num;
+			clients[c_id].do_send(&pack);
+		}
+
+		for (int i = 0; i < 4; ++i) {
+			ITEM_INFO info;
+			info.type = (ItemType)i;
+			info.num = scene->items[info.type];
+			clients[c_id].send_item_packet(0, info);
+		}
 		break;
 	}
 	case CS_CHANGE: {
