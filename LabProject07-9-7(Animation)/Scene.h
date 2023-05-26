@@ -55,6 +55,8 @@ public:
 
 	void BuildDefaultLightsAndMaterials();
 	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
+	void BuildLobbyObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+
 	void BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void BuildUIInside(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
@@ -159,6 +161,9 @@ public:
 
 
 	CUI								*m_ppUI[UI_CNT];
+
+	CUI								*m_ppLobbyUI[1];
+
 
 	CUI								*m_ppUIInside[UI_INSIDE_CNT];
 

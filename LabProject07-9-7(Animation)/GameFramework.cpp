@@ -334,135 +334,198 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
 	if (m_pScene) m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
+
 	switch (nMessageID)
 	{
-		case WM_KEYUP:
-			switch (wParam)
-			{
-			case VK_ESCAPE:
-				::PostQuitMessage(0);
+	case WM_KEYUP:
+		switch (wParam)
+		{
+		case VK_ESCAPE:
+			::PostQuitMessage(0);
+			break;
+		case VK_RETURN:
+			break;
+
+			case '0':
+			case VK_NUMPAD0:
+				cout << "0";
+				roomNum += L"0";
 				break;
-			case VK_RETURN:
-				break;
-			case VK_F1:
-			case VK_F2:
-			case VK_F3:
-				m_pCamera = m_pPlayer[0]->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
-				break;
-			case VK_F4:
-					m_pCamera = m_pPlayer[0]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
-				break;
-			case VK_F5:
-					m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_L, m_GameTimer.GetTimeElapsed());
-				break;
-			case VK_F6:
-				m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_C, m_GameTimer.GetTimeElapsed());
-				break;
-			case VK_F7:
-				m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
-				break;
-			case VK_F9:
-				ChangeSwapChainState();
-				break;
-			case VK_CONTROL:
-				((CAirplanePlayer*)m_pPlayer[0])->FireBullet(NULL);
-				std::cout << "ÃÑ¾Ë";
-				break;
-			case VK_SPACE:
-				if (((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion != AnimationState::SIT) {
-					((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = AnimationState::SIT;
-					std::cout << "¾É±â";
-				}
-				else
-				{
-					std::cout << "¼­±â";
-					((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = AnimationState::IDLE;
-				}
+
+			case '1':
+			case VK_NUMPAD1:
+				cout << "1";
+				roomNum += L"1";
 
 				break;
-			case VK_TAB:
-				b_Inside = !b_Inside;
-				std::cout << "¾À ÀüÈ¯";
+
+			case '2':
+			case VK_NUMPAD2:
+				cout << "2";
+				roomNum += L"2";
 				break;
-			case 'M':
-			{
-				CS_LOGIN_PACKET packet;
-				packet.size = sizeof(packet);
-				packet.type = CS_LOGIN;
-				packet.room_id = 1;
-				if (_state == SCENE_LOBBY) {
-					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
-				}
+
+			case '3':
+			case VK_NUMPAD3:
+				cout << "3";
+				roomNum += L"3";
 				break;
+
+			case '4':
+			case VK_NUMPAD4:
+				cout << "4";
+				roomNum += L"4";
+				break;
+
+			case '5':
+			case VK_NUMPAD5:
+				cout << "5";
+				roomNum += L"5";
+				break;
+
+			case '6':
+			case VK_NUMPAD6:
+				cout << "6";
+				roomNum += L"6";
+				break;
+			case '7':
+			case VK_NUMPAD7:
+				cout << "7";
+				roomNum += L"7";
+				break;
+			case '8':
+			case VK_NUMPAD8:
+				cout << "8";
+				roomNum += L"8";
+				break;
+			case '9':
+			case VK_NUMPAD9:
+				cout << "9";
+				roomNum += L"9";
+				break;
+
+		case VK_F1:
+		case VK_F2:
+		case VK_F3:
+			m_pCamera = m_pPlayer[0]->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
+			break;
+		case VK_F4:
+			m_pCamera = m_pPlayer[0]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
+			break;
+		case VK_F5:
+			m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_L, m_GameTimer.GetTimeElapsed());
+			break;
+		case VK_F6:
+			m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_C, m_GameTimer.GetTimeElapsed());
+			break;
+		case VK_F7:
+			m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
+			break;
+		case VK_F9:
+			ChangeSwapChainState();
+			break;
+		case VK_CONTROL:
+			((CAirplanePlayer*)m_pPlayer[0])->FireBullet(NULL);
+			std::cout << "ÃÑ¾Ë";
+			break;
+		case VK_SPACE:
+			if (((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion != AnimationState::SIT) {
+				((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = AnimationState::SIT;
+				std::cout << "¾É±â";
 			}
-			case 'P':
+			else
 			{
-				CS_NEXT_MISSION_PACKET packet;
-				packet.size = sizeof(packet);
-				packet.type = CS_START;
-				if (_state == SCENE_LOBBY) {
-					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
-				}
-				break;
+				std::cout << "¼­±â";
+				((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = AnimationState::IDLE;
 			}
-			case 'N':
-				if (_state == SCENE_INGAME) {
-					CS_NEXT_MISSION_PACKET my_packet;
-					my_packet.size = sizeof(CS_NEXT_MISSION_PACKET);
-					my_packet.type = CS_NEXT_MISSION;
-					
-					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+
+			break;
+		case VK_TAB:
+			b_Inside = !b_Inside;
+			std::cout << "¾À ÀüÈ¯";
+			break;
+		case 'M':
+		{
+			room_num = static_cast<short>(std::stoi(roomNum));
+			CS_LOGIN_PACKET packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_LOGIN;
+			packet.room_id = room_num;
+			if (_state == SCENE_LOBBY) {
+				send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+			}
+			break;
+		}
+		case 'P':
+		{
+			CS_NEXT_MISSION_PACKET packet;
+			packet.size = sizeof(packet);
+			packet.type = CS_START;
+			if (_state == SCENE_LOBBY) {
+				send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+			}
+
+			break;
+		}
+		case 'N':
+			if (_state == SCENE_INGAME) {
+				CS_NEXT_MISSION_PACKET my_packet;
+				my_packet.size = sizeof(CS_NEXT_MISSION_PACKET);
+				my_packet.type = CS_NEXT_MISSION;
+
+				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+			}
+			break;
+
+		case 'F': //FÅ° »óÈ£ÀÛ¿ë ¾É±â
+			if (b_Inside || m_pInsidePlayer[g_myid]->GetSitState())
+			{
+				int State = m_pInsideScene->CheckSitCollisions();
+				if (!isConnect) {
+					CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState(), State);
 				}
-				break;
-
-			case 'F': //FÅ° »óÈ£ÀÛ¿ë ¾É±â
-				if (b_Inside || m_pInsidePlayer[g_myid]->GetSitState())
-				{
-					int State = m_pInsideScene->CheckSitCollisions();
-					if (!isConnect) {
-						CheckSceneChange(m_pInsidePlayer[g_myid]->GetSitState(), State);
-					}
-					if (State == 3) {
-						if (_state == SCENE_INGAME) {
-							CS_CHANGE_PACKET my_packet;
-							my_packet.size = sizeof(CS_CHANGE_PACKET);
-							my_packet.type = CS_CHANGE;
-							my_packet.player_type = PlayerType::MOVE;
-							send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
-						}
-					}
-					else if(State >= 0) {
-						if (_state == SCENE_INGAME) {
-							CS_CHANGE_PACKET my_packet;
-							my_packet.size = sizeof(CS_CHANGE_PACKET);
-							my_packet.type = CS_CHANGE;
-							my_packet.player_type = (PlayerType)(State + 2);
-							send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
-						}
-					}
-				}
-				//m_pScene->m_ppEnemies[0]->DieSprite(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
-				//m_pScene->m_ppSprite[0]->CountDiedTime(3.0f);
-
-				if (b_Inside) {
-					scriptsOn = true;
-				}
-
-
-				if (player_type != PlayerType::INSIDE) {
+				if (State == 3) {
 					if (_state == SCENE_INGAME) {
 						CS_CHANGE_PACKET my_packet;
 						my_packet.size = sizeof(CS_CHANGE_PACKET);
 						my_packet.type = CS_CHANGE;
-						my_packet.player_type = PlayerType::INSIDE;
+						my_packet.player_type = PlayerType::MOVE;
 						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 					}
 				}
-				break;
+				else if (State >= 0) {
+					if (_state == SCENE_INGAME) {
+						CS_CHANGE_PACKET my_packet;
+						my_packet.size = sizeof(CS_CHANGE_PACKET);
+						my_packet.type = CS_CHANGE;
+						my_packet.player_type = (PlayerType)(State + 2);
+						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+					}
+				}
+			}
+			//m_pScene->m_ppEnemies[0]->DieSprite(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+			//m_pScene->m_ppSprite[0]->CountDiedTime(3.0f);
+
+			if (b_Inside) {
+				scriptsOn = true;
+			}
+
+
+			if (player_type != PlayerType::INSIDE) {
+				if (_state == SCENE_INGAME) {
+					CS_CHANGE_PACKET my_packet;
+					my_packet.size = sizeof(CS_CHANGE_PACKET);
+					my_packet.type = CS_CHANGE;
+					my_packet.player_type = PlayerType::INSIDE;
+					send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+				}
 			}
 			break;
-		default:
-			break;
+
+		}
+		break;
+	default:
+		break;
 	}
 }
 
@@ -950,7 +1013,7 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
-	m_pUILayer->Render(m_nSwapChainBufferIndex, curMissionType, m_pScene->m_ppBoss->CurState);
+	m_pUILayer->Render(m_nSwapChainBufferIndex, curMissionType, m_pScene->m_ppBoss->CurState, _state);
 
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
@@ -1034,6 +1097,8 @@ void CGameFramework::UpdateUI()
 	m_pUILayer->UpdateLabels_Scripts(uiScripts);
 
 	m_pUILayer->UpdateLabels_Jew(uiJew);
+
+	m_pUILayer->UpdateLabels_Lobby(roomNum);
 
 	m_pUILayer->UpdateHp(m_pPlayer[0]->hp, m_pPlayer[0]->max_hp);
 	/*if(m_pScene->m_ppBoss->GetState()!= BossState::SLEEP)*/

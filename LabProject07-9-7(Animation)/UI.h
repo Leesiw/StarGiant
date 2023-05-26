@@ -18,6 +18,10 @@ public:
     void UpdateLabels_Jew(const std::wstring& strUIText);
 
 
+    void UpdateLabels_Lobby(const std::wstring& strUIText);
+
+
+
     void UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool live = true);
     void UpdateBossNevi(int id, CAirplanePlayer* player, XMFLOAT3& bpos);
     void UpdatePlanetNevi(CAirplanePlayer* player, XMFLOAT3& lpos);
@@ -35,7 +39,7 @@ public:
 
     XMFLOAT4X4 UpdateMat(const XMFLOAT3& ppos);
 
-    void Render(UINT nFrame, MissionType mty = MissionType::TU_SIT, BossState bst = BossState::SLEEP);
+    void Render(UINT nFrame, MissionType mty = MissionType::TU_SIT, BossState bst = BossState::SLEEP, int sst = 0);
     void ReleaseResources();
     void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height);
 
@@ -76,6 +80,8 @@ private:
     ID2D1Device2* m_pd2dDevice = NULL;
     ID2D1DeviceContext2* m_pd2dDeviceContext = NULL;
     ID2D1SolidColorBrush* m_pd2dTextBrush = NULL;
+    ID2D1SolidColorBrush* m_pd2dTextBlackBrush = NULL;
+
 
     ID2D1SolidColorBrush* Redbrush = NULL;
     ID2D1SolidColorBrush* Whitebrush = NULL;
@@ -85,6 +91,9 @@ private:
     IDWriteTextFormat* m_pdwTextFormat = NULL;
     IDWriteTextFormat* m_pdwScriptsFormat = NULL;
     IDWriteTextFormat* m_pdwJewFormat = NULL;
+
+    IDWriteTextFormat* m_pdwLobbyFormat = NULL;
+
 
 
 
@@ -97,6 +106,9 @@ private:
     ID2D1Effect* m_pd2dfxBitmapSource_nevi = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource_nevi2 = NULL;
 
+    ID2D1Effect* m_pd2dfxBitmapSource_Lobby = NULL;
+
+
 
 
 
@@ -106,6 +118,9 @@ private:
 
     ID2D1Effect* m_pd2dfxGaussianBlur_nevi = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_nevi2 = NULL;
+
+    ID2D1Effect* m_pd2dfxGaussianBlur_Lobby = NULL;
+
 
 
 
@@ -118,11 +133,15 @@ private:
     ID2D1Effect* m_pd2dfxSize_nevi2 = NULL;
 
 
+    ID2D1Effect* m_pd2dfxSize_Lobby = NULL;
+
+
+
 
 
 
     ID2D1DrawingStateBlock1* m_pd2dsbDrawingState = NULL;
-    IWICFormatConverter* m_pwicFormatConverter[4] = {};
+    IWICFormatConverter* m_pwicFormatConverter[5] = {};
 
     int							m_nDrawEffectImage = 0;
 
@@ -132,6 +151,8 @@ private:
     std::vector<TextBlock>          m_vTextBlocks;
     std::vector<TextBlock>          m_vScriptsBlocks;
     std::vector<TextBlock>          m_vJewBlocks;
+    std::vector<TextBlock>          m_vLobbyBlocks;
+
 
 
 

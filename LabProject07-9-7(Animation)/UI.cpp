@@ -14,6 +14,7 @@ UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_vTextBlocks.resize(1);
     m_vScriptsBlocks.resize(1);
     m_vJewBlocks.resize(1);
+    m_vLobbyBlocks.resize(1);
 
     Initialize(pd3dDevice, pd3dCommandQueue);
     InitializeImage(pd3dDevice, pd3dCommandQueue);
@@ -92,6 +93,8 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_logo);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_nevi);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_nevi2);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_Lobby);
+
 
 
 
@@ -102,6 +105,9 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_nevi);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_nevi2);
 
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_Lobby);
+
+
 
 
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize);
@@ -110,6 +116,9 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
 
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_nevi);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_nevi2);
+
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_Lobby);
+
 
 
 
@@ -233,6 +242,33 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     if (pwicFrameDecode_n2) pwicFrameDecode_n2->Release();
 
 
+    //==
+    IWICBitmapDecoder* pwicBitmapDecoder_Lobby;
+    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/lobby.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_Lobby);
+
+    IWICBitmapFrameDecode* pwicFrameDecode_Lobby;
+    pwicBitmapDecoder_Lobby->GetFrame(0, &pwicFrameDecode_Lobby);
+
+    m_pwicImagingFactory->CreateFormatConverter(&m_pwicFormatConverter[4]);
+    m_pwicFormatConverter[4]->Initialize(pwicFrameDecode_Lobby, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
+
+    m_pd2dfxBitmapSource_Lobby->SetValue(D2D1_BITMAPSOURCE_PROP_WIC_BITMAP_SOURCE, m_pwicFormatConverter[4]);
+
+    m_pd2dfxGaussianBlur_Lobby->SetInputEffect(0, m_pd2dfxBitmapSource_Lobby);
+    m_pd2dfxGaussianBlur_Lobby->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 0.0f);
+
+
+    m_pd2dfxSize_Lobby->SetInputEffect(0, m_pd2dfxBitmapSource_Lobby);
+    m_pd2dfxSize_Lobby->SetValue(D2D1_BITMAPSOURCE_PROP_SCALE, D2D1::Vector2F(0.1f, 0.1f));
+
+
+
+    if (pwicBitmapDecoder_Lobby) pwicBitmapDecoder_Lobby->Release();
+    if (pwicFrameDecode_Lobby) pwicFrameDecode_Lobby->Release();
+
+
+
+
 }
 
 void UILayer::DrawDot(int dotCnt, XMFLOAT3[])
@@ -256,6 +292,12 @@ void UILayer::UpdateLabels_Jew(const std::wstring& strUIText)
 {
     m_vJewBlocks[0] = { strUIText, D2D1::RectF(15.0f, FRAME_BUFFER_HEIGHT / 9, FRAME_BUFFER_WIDTH / 16, FRAME_BUFFER_HEIGHT), m_pdwJewFormat };
 }
+
+void UILayer::UpdateLabels_Lobby(const std::wstring& strUIText)
+{
+    m_vLobbyBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT / 7 * 4.15, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwLobbyFormat };
+}
+
 
 void UILayer::UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool live)
 {
@@ -428,7 +470,7 @@ XMFLOAT4X4 UILayer::UpdateMat(const XMFLOAT3& pos)
     return matrix;
 }
 
-void UILayer::Render(UINT nFrame, MissionType mty, BossState bst)
+void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst)
 {
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
@@ -452,6 +494,8 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst)
         m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBrush);
     }
 
+
+
     D2D_POINT_2F d2dPoint = { 0.0f, FRAME_BUFFER_HEIGHT/2 * 1.5f };
 
     D2D_POINT_2F d2dPoint_jew = { 0.0f, 55.0f };
@@ -459,6 +503,10 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst)
     D2D_POINT_2F d2dPoint_nevi = { -25, -75 };
 
     D2D_POINT_2F d2dPoint_logo = { FRAME_BUFFER_WIDTH/2 - 512, FRAME_BUFFER_HEIGHT /2 - 128};
+
+
+    D2D_POINT_2F d2dPoint_Lobby = { FRAME_BUFFER_WIDTH / 2 - 800, FRAME_BUFFER_HEIGHT / 2 - 450 };
+
 
 
 
@@ -501,6 +549,15 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst)
     m_pd2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
 
 
+    if (sst == 0) {
+        m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_Lobby, &d2dPoint_Lobby);
+        for (auto textBlock : m_vLobbyBlocks)
+        {
+            m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBlackBrush);
+        }
+    }
+
+
 
 
 
@@ -529,6 +586,8 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst)
 
 
 
+
+
     m_pd2dDeviceContext->EndDraw();
 
     m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
@@ -552,6 +611,8 @@ void UILayer::ReleaseResources()
         m_vWrappedRenderTargets[i]->Release();
     }
     m_pd2dTextBrush->Release();
+    m_pd2dTextBlackBrush->Release();
+
     Redbrush->Release();
     Whitebrush->Release();
 
@@ -560,6 +621,8 @@ void UILayer::ReleaseResources()
     m_pd2dDeviceContext->Release();
     m_pdwTextFormat->Release();
     m_pdwScriptsFormat->Release();
+    m_pdwLobbyFormat->Release();
+
     m_pdwJewFormat->Release();
 
 
@@ -593,8 +656,14 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
     if (m_pd2dTextBrush) m_pd2dTextBrush->Release();
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &m_pd2dTextBrush);
 
+
+    if (m_pd2dTextBlackBrush) m_pd2dTextBlackBrush->Release();
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pd2dTextBlackBrush);
+
     const float fFontSize = m_fHeight / 25.0f;
     const float fFontSize_Scripts = m_fHeight / 25.0f;
+    const float fFontSize_Lobby = m_fHeight / 10.0f;
+
 
     const float fSmallFontSize = m_fHeight / 40.0f;
 
@@ -613,6 +682,12 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
 
     m_pdwJewFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     m_pdwJewFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
+
+    m_pd2dWriteFactory->CreateTextFormat(L"±¼¸²Ã¼", nullptr, DWRITE_FONT_WEIGHT_MEDIUM, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize_Lobby, L"en-us", &m_pdwLobbyFormat);
+
+    m_pdwLobbyFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+    m_pdwLobbyFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
 
     //    m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);

@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Scene.h"
 
+
 extern int g_myid;
 
 enum SCENE_STATE {
@@ -114,6 +115,8 @@ private:
 
 
 	//
+	wstring roomNum;
+	short room_num = 0;
 	short killCnt = 0; 
 	
 	float pDist = 0;
