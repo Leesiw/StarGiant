@@ -862,7 +862,6 @@ void CScene::Start()
 	_s_lock.lock();
 	if (_state == SCENE_ALLOC) {
 		_state = SCENE_INGAME;
-		_s_lock.unlock();
 
 		for (short pl_id:_plist) {
 			if (pl_id == -1) continue;
@@ -871,6 +870,8 @@ void CScene::Start()
 			clients[pl_id]._s_lock.unlock();
 			// 게임 스타트 패킷 send
 		}
+		_s_lock.unlock();
+
 		return;
 	}
 	_s_lock.unlock();
@@ -892,5 +893,14 @@ char CScene::InsertPlayer(short pl_id)
 		}
 	}
 	_plist_lock.unlock();
+
+	_s_lock.lock();
+	if (_state == SCENE_INGAME) {
+		clients[pl_id]._s_lock.lock();
+		clients[pl_id]._state = ST_INGAME;
+		clients[pl_id]._s_lock.unlock();
+	}
+	_s_lock.unlock();
+
 	return -1;
 }
