@@ -97,7 +97,7 @@ public:
 	void send_inside_packet(int c_id, CTerrainPlayer* m_pPlayer);
 	void send_enemy_packet(int c_id, ENEMY_INFO& enemy_info);
 	void send_spawn_enemy_packet(int c_id, SPAWN_ENEMY_INFO& enemy_info);
-	void send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction);
+	void send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction, unsigned int time);
 	void send_missile_packet(int c_id, MISSILE_INFO& info);
 	void send_remove_missile_packet(int c_id, short id);
 	void send_heal_packet();

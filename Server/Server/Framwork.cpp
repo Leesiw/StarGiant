@@ -376,7 +376,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_SPACESHIP_MOVE: {
 		CS_SPACESHIP_PACKET* p = reinterpret_cast<CS_SPACESHIP_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::MOVE) {
-			scene_manager.GetScene(clients[c_id].room_id)->m_pSpaceship->SetInputInfo(p->data);
+			scene_manager.GetScene(clients[c_id].room_id)->m_pSpaceship->SetInputInfo(p->data, p->move_time);
 		}
 		break;
 	}
@@ -400,7 +400,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			for (short pl_id : m_pScene->_plist) {
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].send_bullet_packet(0, p->data.pos, p->data.direction);
+				clients[pl_id].send_bullet_packet(0, p->data.pos, p->data.direction, p->attack_time);
 
 			}
 			//}

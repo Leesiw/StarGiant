@@ -31,6 +31,8 @@ void SESSION::send_spaceship_packet(int c_id, CAirplanePlayer* m_pPlayer)	// วรท
 	p.data.pos = m_pPlayer->GetPosition();
 	XMFLOAT4 a;
 	p.data.Quaternion = m_pPlayer->input_info.Quaternion;
+	p.move_time = m_pPlayer->move_time;
+	m_pPlayer->move_time = 0;
 
 	//p.data.velocity = m_pPlayer->GetVelocity();
 	//p.data.shift = m_pPlayer->GetShift();
@@ -80,7 +82,7 @@ void SESSION::send_spawn_enemy_packet(int c_id, SPAWN_ENEMY_INFO& enemy_info)
 	do_send(&p);
 }
 
-void SESSION::send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction)
+void SESSION::send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction, unsigned int time)
 {
 	SC_BULLET_PACKET p;
 
@@ -89,6 +91,7 @@ void SESSION::send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction)
 
 	p.data.direction = direction;
 	p.data.pos = pos;
+	p.attack_time = time;
 
 	do_send(&p);
 }

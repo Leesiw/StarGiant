@@ -89,6 +89,8 @@ public:
 	char heal = 10;
 	char def = 0;
 
+	unsigned int move_time = 0;
+
 	float						m_fBulletEffectiveRange = 150.0f;
 
 	float heal_amount = 0.f;
@@ -103,7 +105,7 @@ public:
 
 	void Reset();
 
-	void SetInputInfo(SPACESHIP_INPUT_INFO i_info) { input_info = i_info; is_update = false; }
+	void SetInputInfo(SPACESHIP_INPUT_INFO i_info, unsigned int time) { input_info = i_info; is_update = false;  move_time = time; }
 	virtual void Animate(float fTimeElapsed);
 	virtual void Update(float fTimeElapsed);
 	virtual void OnPrepareRender();
