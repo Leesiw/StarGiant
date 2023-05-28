@@ -125,8 +125,11 @@ void ProcessPacket(int ci, unsigned char packet[])
 		//로그인 처리 : 아이디 0이면 move로 change 패킷 전송
 		//	1, 2면 일단 attack1, 2로 change 패킷 전송
 		SC_LOGIN_INFO_PACKET* login_packet = reinterpret_cast<SC_LOGIN_INFO_PACKET*>(packet);
+		active_clients++;
+		g_clients[ci].connected = true;
 
 		CS_NEXT_MISSION_PACKET start_packet;
+		
 		start_packet.size = sizeof(start_packet);
 		start_packet.type = CS_START;
 		SendPacket(ci, &start_packet);
