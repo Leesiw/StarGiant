@@ -81,7 +81,9 @@ short SceneManager::FindScene(short pl_id)
 				(*iter) = pl_id;
 				clients[pl_id].room_id = scene->num;
 				clients[pl_id].room_pid = (char)(iter - scene->_plist.begin());
-
+				clients[pl_id]._s_lock.lock();
+				clients[pl_id]._state = ST_INGAME;
+				clients[pl_id]._s_lock.unlock();
 				scene->_plist_lock.unlock();
 				return scene->num;
 			}
