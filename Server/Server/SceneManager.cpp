@@ -64,6 +64,35 @@ short SceneManager::FindScene(short id, short pl_id)		// 수정 필요 lock / unlock
 	return -2;
 }
 
+short SceneManager::FindScene(short pl_id)
+{
+	for (auto& scene : m_pScenes) {
+		if (scene->_id == -1) {
+			scene->_plist_lock.lock();
+			array<short, 3>::iterator iter = std::find(scene->_plist.begin(), scene->_plist.end(), -1);
+
+			if (iter != scene->_plist.end()) {
+				scene->_s_lock.lock();
+				if (scene->_state == SCENE_FREE) {
+					scene->_state = SCENE_ALLOC;
+				}
+				scene->_s_lock.unlock();
+				
+				(*iter) = pl_id;
+				clients[pl_id].room_id = scene->num;
+				clients[pl_id].room_pid = (char)(iter - scene->_plist.begin());
+
+				scene->_plist_lock.unlock();
+				return scene->num;
+			}
+			else {
+				scene->_plist_lock.unlock();
+			}
+		}
+	}
+	return -1;
+}
+
 CScene* SceneManager::GetScene(short id)
 {
 	return m_pScenes[id];

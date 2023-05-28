@@ -339,6 +339,7 @@ struct CS_SPACESHIP_PACKET {
 	char	type;
 
 	SPACESHIP_INPUT_INFO	data;
+	unsigned int move_time;
 };
 
 struct SC_MOVE_SPACESHIP_PACKET {
@@ -346,6 +347,7 @@ struct SC_MOVE_SPACESHIP_PACKET {
 	char	type;
 
 	SPACESHIP_INFO data;
+	unsigned int move_time;
 };
 
 // inside
@@ -369,6 +371,7 @@ struct CS_ATTACK_PACKET {
 	char	type;
 
 	BULLET_INFO data;
+	unsigned int attack_time;
 };
 
 struct SC_BULLET_PACKET {
@@ -376,6 +379,7 @@ struct SC_BULLET_PACKET {
 	char	type;
 
 	BULLET_INFO data;
+	unsigned int attack_time;
 };
 
 struct SC_BULLET_HIT_PACKET {

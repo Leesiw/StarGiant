@@ -254,7 +254,6 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 
 			if (scene_num >= 0) {
 				char num = scene_manager.InsertPlayer(scene_num, c_id);
-				printf("num : %d\n", num);
 				if (num == 2) { scene_manager.SceneStart(scene_num); }
 				else if (num == -1) { disconnect(c_id); return; }  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
 				else {
@@ -271,10 +270,17 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			}
 		}
 		else {
+			scene_manager._scene_lock.lock();
+			short scene_num = scene_manager.FindScene(c_id);
+			scene_manager._scene_lock.unlock();
+
+			if(scene_num == -1) {
+				disconnect(c_id);	return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
+			}
+
 			// 자동 배정 (비어있는 Scene 혹은 비어있는 자리)
 		}
 
-		printf("send login packet\n");
 		clients[c_id].send_login_info_packet();
 
 		SC_LOGIN_INFO_PACKET packet;
