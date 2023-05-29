@@ -355,11 +355,11 @@ void CScene::BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_ppBoss->SetScale(100.0f, 100.0f, 100.0f);
 	if (pBossModel) delete pBossModel;
 
-	CLoadedModelInfo* pLandModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Slime.bin", NULL);
+	CLoadedModelInfo* pLandModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/PA_RockSet2_Pile5.bin", NULL);
 	landob = new CMeteorObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pLandModel, 1);
 	landob->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	landob->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y - 10.0f, m_ppBoss->GetPosition().z);
-	landob->SetScale(50.0f, 50.0f, 50.0f);
+	landob->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y-827.0f, m_ppBoss->GetPosition().z);
+	landob->SetScale(10.0f, 10.0f, 10.0f);
 	if (pLandModel) delete pLandModel;
 
 
@@ -1300,6 +1300,10 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 	}
 
+
+
+
+
 	if (m_ppBoss) {
 		m_ppBoss->Animate(m_fElapsedTime);
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
@@ -1313,6 +1317,14 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if(!(m_ppBoss->BossHP<=0))
 			m_ppBoss->Render(pd3dCommandList, pCamera); 
 	}
+
+	if (landob) {
+		landob->Render(pd3dCommandList, pCamera);
+		if (m_ppBoss) {
+			landob->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y - 827.0f, m_ppBoss->GetPosition().z);
+		}
+	}
+
 
 	if (m_ppMascot) {
 		m_ppMascot->Animate(m_fElapsedTime);
@@ -1426,7 +1438,7 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 	}
 
 
-	//if (landob)landob->Render(pd3dCommandList, pCamera);
+
 }
 
 void CScene::RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
