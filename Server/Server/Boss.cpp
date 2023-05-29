@@ -1,8 +1,11 @@
 #pragma once
+#include "include/lua.hpp"
+#pragma comment (lib, "lua54.lib")
 
 #include "stdafx.h"
 #include "SceneManager.h"
 #include "Boss.h"
+
 
 extern SceneManager scene_manager;
 
@@ -230,7 +233,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 
 		//attactCoolTime 초마다 공격
 		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= attactCoolTime) {
-			SetState(BossState::ATTACT);
+			SetState(BossState::ATTACK);
 			randAttact = urdAttack(dree);
 			stateStartTime = steady_clock::now();
 			lastAttackTime = steady_clock::now();
@@ -261,7 +264,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 		break;
 	}
 
-	case BossState::ATTACT: {
+	case BossState::ATTACK: {
 		static int aa = 0;
 
 		LookAtPosition(fTimeElapsed, TargetPos);
@@ -279,7 +282,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			}
 
 			//PastState = (BossState)(BossAnimation::BASIC_ATTACT);
-			PastState = BossState::ATTACT;
+			PastState = BossState::ATTACK;
 
 			SC_BULLET_HIT_PACKET p;
 			p.size = sizeof(SC_BULLET_HIT_PACKET);
@@ -307,7 +310,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 				a = 1;
 			}
 			//PastState = (BossState)(BossAnimation::FLAME_ATTACK);
-			PastState = BossState::ATTACT;
+			PastState = BossState::ATTACK;
 
 			
 
@@ -334,7 +337,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 				}
 			}
 			//PastState = (BossState)(BossAnimation::CLAW_ATTACT);
-			PastState = BossState::ATTACT;
+			PastState = BossState::ATTACK;
 			
 			SC_BULLET_HIT_PACKET p;
 			p.size = sizeof(SC_BULLET_HIT_PACKET);
@@ -524,7 +527,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 		break;
 	}
 
-	if ((CurState != BossState::ATTACT) && (CurState != BossState::CHASE)) {
+	if ((CurState != BossState::ATTACK) && (CurState != BossState::CHASE)) {
 		PastState = CurState;
 	}
 	if(a==1)
@@ -536,4 +539,41 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 }
 
 
+void Boss::Boss_Ai_lua(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHP)
+{
+	// Lua 상태 객체 생성
+	lua_State* L = luaL_newstate();
 
+	// 루아 표준 라이브러리 로드
+	luaL_openlibs(L);
+
+	// 루아 파일 불러오기
+	if (luaL_loadfile(L, "boss_ai.lua") != LUA_OK) {
+		// 불러오기 실패 처리
+		const char* errorMsg = lua_tostring(L, -1);
+		std::cout << "Failed to load Lua file: " << errorMsg << std::endl;
+
+		// Lua 상태 정리
+		lua_close(L);
+		return;
+	}
+
+	// 루아 파일 실행
+	if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+		// 실행 실패 처리
+		const char* errorMsg = lua_tostring(L, -1);
+		std::cout << "Failed to run Lua file: " << errorMsg << std::endl;
+
+		// Lua 상태 정리
+		lua_close(L);
+		return;
+	}
+
+	// 보스 AI Lua 함수 호출
+	lua_getglobal(L, "Boss_Ai_lua");
+	lua_pushnumber(L, fTimeElapsed);
+	lua_pushinteger(L, static_cast<int>(CurState));
+
+
+	
+}

@@ -92,7 +92,7 @@ void Boss::Boss_Ai(BossState CurState, XMFLOAT3 TargetPos, int bossHP)
 
 		//attactCoolTime 초마다 공격
 		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= attactCoolTime) {
-			SetState(BossState::ATTACT);
+			SetState(BossState::ATTACK);
 			randomValue = distribution(generator);
 			stateStartTime = steady_clock::now();
 			lastAttackTime = steady_clock::now();
@@ -117,7 +117,7 @@ void Boss::Boss_Ai(BossState CurState, XMFLOAT3 TargetPos, int bossHP)
 		break;
 	}
 
-	case BossState::ATTACT: {
+	case BossState::ATTACK: {
 			if (randomValue > 0.5f) {
 				m_pSkinnedAnimationController->SetTrackEnable(static_cast<int>(PastState), false);
 				m_pSkinnedAnimationController->SetTrackEnable(static_cast<int>(BossAnimation::BASIC_ATTACT), true);
@@ -309,7 +309,7 @@ void Boss::Boss_Ai(BossState CurState, XMFLOAT3 TargetPos, int bossHP)
 		break;
 	}
 
-	if(CurState != BossState::ATTACT)
+	if(CurState != BossState::ATTACK)
 		PastState = CurState;
 }
 

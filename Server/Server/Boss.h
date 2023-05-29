@@ -63,6 +63,8 @@ public:
 	void MoveBoss(float fTimeElapsed, XMFLOAT3 TargetPos, float dist);
 	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
 	void Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHp);
+	void Boss_Ai_lua(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHp);
+
 
 
 };
