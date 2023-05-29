@@ -390,10 +390,9 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 	SetModelSprite(pModel->m_pModelRootObject->m_pChild, pSpriteTexture, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	SetChild(pModel->m_pModelRootObject, true);
-
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pModel);
-	m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_pSkinnedAnimationController->SetCallbackKeys(0, 1);
+	/*m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	m_pSkinnedAnimationController->SetCallbackKeys(0, 1);*/
 
 	for (int i = 0; i < BULLETS; i++)
 	{
@@ -427,38 +426,40 @@ void CAirplanePlayer::SetModelSprite(CGameObject* Loot,CTexture* LootTexture, ID
 {
 	//모델들의 이름을 다 돌아들어가보면서 이름찾고, 그 이름의 메쉬를 가지고 잇는놈의 텍스처와.... 메쉬를 CSpriteObject로 바꾼다. 
 	int num= 0;
-	if ((0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_L"))||(0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_R"))) 
-	{ 
-		if(0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_L")) num =0;
-		else if (0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_R")) num=1;
+	if (Loot->m_pSibling != NULL) {
+		if ((0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_L")) || (0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_R")))
+		{
+			if (0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_L")) num = 0;
+			else if (0 == strcmp(Loot->m_pSibling->m_pstrFrameName, "Feather_R")) num = 1;
 
-		cout << "find Test " << endl;
-		//CSpriteObject* Temp = (CSpriteObject*)(Loot->m_pSibling);
-		m_pAirSprites[num] = (CSpriteObject*)(Loot->m_pSibling);
+			cout << "find Test " << endl;
+			//CSpriteObject* Temp = (CSpriteObject*)(Loot->m_pSibling);
+			m_pAirSprites[num] = (CSpriteObject*)(Loot->m_pSibling);
 
-	
-		CSprite2Shader* CSpriteObjectShader = new CSprite2Shader();
-		CSpriteObjectShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
-		CSpriteObjectShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-		CMaterial* pStriteMaterial = new CMaterial(1);
-		pStriteMaterial->SetTexture(LootTexture);
-		pStriteMaterial->SetShader(CSpriteObjectShader);
+			CSprite2Shader* CSpriteObjectShader = new CSprite2Shader();
+			CSpriteObjectShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+			CSpriteObjectShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-		
-		m_pAirSprites[num]->SetMaterial(0, pStriteMaterial);
-		m_pAirSprites[num]->SetRowColumn(1, 8);
-		//m_pAirSprites[num]->SetSpeed(3.0f / 8);			//why Error? 
-		m_pAirSprites[num]->Animate(0.0f);
+			CMaterial* pStriteMaterial = new CMaterial(1);
+			pStriteMaterial->SetTexture(LootTexture);
+			pStriteMaterial->SetShader(CSpriteObjectShader);
 
-		m_pAirSprites[num]->SpriteMode = static_cast<int>(SpriteType::Ship);
-		m_pAirSprites[num]->is_Alive = true;
 
-		if(num ==1)SetModelSprite(Loot->m_pSibling, LootTexture,pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+			m_pAirSprites[num]->SetMaterial(0, pStriteMaterial);
+			m_pAirSprites[num]->SetRowColumn(1, 8);
+			//m_pAirSprites[num]->SetSpeed(3.0f / 8);			//why Error? 
+			m_pAirSprites[num]->Animate(0.0f);
+
+			m_pAirSprites[num]->SpriteMode = static_cast<int>(SpriteType::Ship);
+			m_pAirSprites[num]->is_Alive = true;
+
+			if (num == 1)SetModelSprite(Loot->m_pSibling, LootTexture, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+		}
+		else {
+			SetModelSprite(Loot->m_pSibling, LootTexture, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+		};
 	}
-	else {
-		SetModelSprite(Loot->m_pSibling, LootTexture,pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
-	};
 }
 
 void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)

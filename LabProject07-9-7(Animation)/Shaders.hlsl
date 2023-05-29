@@ -480,56 +480,36 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 	return(float4(1,1,1,0.6));
 
 }
-
-
-//// 두 번째 버텍스 쉐이더
-//struct VS_Line_OUTPUT {
-//	float4 position : SV_POSITION; // 정점 좌표
-//	float2 uv : TEXCOORD0; // 텍스처 좌표
-//};
 //
-//VS_Line_OUTPUT VS_Line(float4 input) {
-//	VS_Line_OUTPUT output;
-//	output.position = input.position;
-//	output.uv = output.position.xy;
-//	return output;
-//}
+//Texture2D<float4> noiseTexture1; // 첫 번째 noise 텍스처
+//Texture2D<float4> noiseTexture2; // 두 번째 noise 텍스처
+//Texture2D<float> depthBufferTexture; // 깊이 버퍼 텍스처
 //
-//// 두 번째 픽셀 쉐이더
-//struct PS_Line_INPUT {
-//	float4 position : SV_POSITION; // 정점 좌표
-//	float2 uv : TEXCOORD0; // 텍스처 좌표
-//};
-//
-//float4 PS_Line(PS_Line_INPUT input) : SV_TARGET1{
-//	if (input.uv.y >= 0.5) { // 픽셀 좌표가 윗쪽 반절에 위치한 경우
-//		return float4(1.0, 0.0, 0.0, 1.0); // 빨간색으로 설정
-//	}
-//	else { // 픽셀 좌표가 아랫쪽 반절에 위치한 경우
-//		return float4(0.0, 1.0, 0.0, 1.0); // 초록색으로 설정
-//	}
-//}
-//
-//
-//float4 Combine(float4 color1 : SV_TARGET, float4 color2 : SV_TARGET1) : SV_TARGET
+//SamplerState samplerLinear
 //{
-//	// 두 개의 픽셀 색상 값을 합쳐서 출력
-//	return color1 + color2;
+//	Filter = MIN_MAG_LINEAR_MIP_POINT;
+//	AddressU = Wrap;
+//	AddressV = Wrap;
+//};
+//
+//float4 PSMain(float4 position : SV_POSITION) : SV_TARGET
+//{
+//	float2 texCoord = position.xy / float2(800, 600); // 화면 크기에 맞게 나눔
+//
+//	// 텍스처에서 위치 정보 읽어오기
+//	float4 location = noiseTexture1.SampleLevel(samplerLinear, texCoord, 0);
+//	float4 location2 = noiseTexture2.SampleLevel(samplerLinear, texCoord, 0);
+//
+//	// 텍스처 좌표를 기준으로 광선의 색 계산
+//	float intensity = sin(location.x) + sin(location.y); // Sin 곡선에 따른 강도 계산
+//	float3 color = float3(intensity, intensity, intensity); // 흑백으로 표현할 경우
+//
+//	// 깊이 버퍼에서 해당 픽셀의 깊이 값을 읽어옴
+//	float depth = depthBufferTexture.SampleLevel(samplerLinear, texCoord, 0);
+//
+//	// 그림자 효과 계산
+//	float shadowIntensity = 1.0f - depth; // 깊이에 비례한 그림자 강도 계산
+//	color *= shadowIntensity; // 색상에 그림자 강도를 곱하여 그림자 효과 적용
+//
+//	return float4(color, 1.0f);
 //}
-/*
-float3 LINE(float2 screenPos, float2 screenSize, float4x4 invProjMatrix, float4x4 invViewMatrix)
-{
-	// Compute clip space coordinates
-	float2 clipPos = (screenPos / screenSize) * 2.0f - 1.0f;
-	clipPos.y = -clipPos.y;
-
-	// Compute view space position
-	float4 viewPos = mul(invProjMatrix, float4(clipPos, 0.0f, 1.0f));
-	viewPos.xyz /= viewPos.w;
-
-	// Compute world space position
-	float4 worldPos = mul(invViewMatrix, viewPos);
-
-	return worldPos.xyz;
-}*/
-

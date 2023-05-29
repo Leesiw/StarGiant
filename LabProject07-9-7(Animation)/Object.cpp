@@ -771,8 +771,10 @@ void CGameObject::ReleaseUploadBuffers()
 		if (m_ppMaterials[i]) m_ppMaterials[i]->ReleaseUploadBuffers();
 	}
 
-	if (m_pSibling) m_pSibling->ReleaseUploadBuffers();
-	if (m_pChild) m_pChild->ReleaseUploadBuffers();
+	if (m_pSibling) 
+		m_pSibling->ReleaseUploadBuffers();
+	if (m_pChild) 
+		m_pChild->ReleaseUploadBuffers();
 }
 
 void CGameObject::SetPosition(float x, float y, float z)
