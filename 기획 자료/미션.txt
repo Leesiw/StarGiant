@@ -1,0 +1,30 @@
+TU 
+<CS - 외부 우주선 중심으로 한바퀴 돌기>
+1. TU_SIT
+2. TU_KILL
+3. TU_HILL
+4. TU_END
+1R
+1. GET_JEWELS
+2. Kill_MONSTER
+<CS - 행성 보여주기>
+3. GO_PLANET
+4. KILL_MONSTER_ONE_MORE_TIME
+5. FIND_BOSS
+<CS - 보스 스크림 보여주기>
+6. DEFEAT_BOSS
+<CS - 스타 자이언트 보여주기>
+2R
+1. GO_CENTER
+2. Kill_MONSTER3
+3. KILL_METEOR
+<CS - 블랙홀 보여주기>
+4. ESCAPE_BALCK_HOLE
+5. GO_CENTER_REAL
+3R
+<CS - 보스 보여주기>
+1. KILL_GOD
+2. THE_END
+<CS - 보스 죽는거 보여주기>
+<CS - 우주 중심에 스타 자이언트 들어가는거 보여주기>
+
