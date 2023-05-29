@@ -13,13 +13,18 @@
 #include <queue>
 #include <array>
 #include <memory>
+#include <random>
 
 using namespace std;
 using namespace chrono;
 
 extern HWND		hWnd;
 
-const static int MAX_TEST = 10000;
+static std::random_device rdd;
+static std::default_random_engine dree(rdd());
+static std::uniform_real_distribution<float> urdRandom(-1000, 1000);
+
+const static int MAX_TEST = 3000;
 const static int MAX_CLIENTS = MAX_TEST * 2;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
@@ -389,8 +394,8 @@ void Test_Thread()
 				CS_ATTACK_PACKET my_packet;
 				my_packet.size = sizeof(my_packet);
 				my_packet.type = CS_ATTACK;
-				my_packet.data.pos = { 0.0, 0.0, 0.0 };
-				my_packet.data.direction = { 1.0, 0.0, 0.0 };
+				my_packet.data.pos = { urdRandom(dree),  urdRandom(dree),  urdRandom(dree) };
+				my_packet.data.direction = { urdRandom(dree),  urdRandom(dree),  urdRandom(dree) };
 				my_packet.attack_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
 				SendPacket(i, &my_packet);
 			}
