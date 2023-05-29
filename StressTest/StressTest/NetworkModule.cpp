@@ -373,7 +373,8 @@ void Test_Thread()
 
 		for (int i = 0; i < num_connections; ++i) {
 			if (false == g_clients[i].connected) continue;
-			if (g_clients[i].last_move_time + 1s > high_resolution_clock::now()) continue;
+			if (g_clients[i].id != 0 && g_clients[i].last_move_time + 1s > high_resolution_clock::now()) continue;
+			if (g_clients[i].id == 0 && g_clients[i].last_move_time + 33ms > high_resolution_clock::now()) continue;
 			g_clients[i].last_move_time = high_resolution_clock::now();
 			if (g_clients[i].id == 0) {
 				CS_SPACESHIP_PACKET my_packet;

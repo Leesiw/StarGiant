@@ -800,6 +800,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		clients[pl_id].send_spaceship_packet(3, m_pSpaceship);
 	}
 
+	m_pSpaceship->move_time = 0;
+
 //	if (send_time % 30 == 0) {
 		for (int i = 0; i < ENEMIES; ++i) {
 			if (m_ppEnemies[i]->GetisAlive()) {
