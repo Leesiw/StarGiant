@@ -32,7 +32,6 @@ void SESSION::send_spaceship_packet(int c_id, CAirplanePlayer* m_pPlayer)	// วรท
 	XMFLOAT4 a;
 	p.data.Quaternion = m_pPlayer->input_info.Quaternion;
 	p.move_time = m_pPlayer->move_time;
-	m_pPlayer->move_time = 0;
 
 	//p.data.velocity = m_pPlayer->GetVelocity();
 	//p.data.shift = m_pPlayer->GetShift();
