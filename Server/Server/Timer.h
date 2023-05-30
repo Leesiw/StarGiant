@@ -17,4 +17,4 @@ struct TIMER_EVENT {
 	}
 };
 
-concurrency::concurrent_priority_queue<TIMER_EVENT> timer_queue;
+static concurrency::concurrent_priority_queue<TIMER_EVENT> timer_queue;
