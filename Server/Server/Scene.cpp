@@ -763,7 +763,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		m_pBoss->Boss_Ai(fTimeElapsed, m_pBoss->GetState(), m_pSpaceship, m_pBoss->GetHP());;
 	}
 
-	m_pSpaceship->Animate(fTimeElapsed);
 	m_pSpaceship->Update(fTimeElapsed);
 
 	
@@ -823,11 +822,11 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			if (pl_id == -1) continue;
 			if (clients[pl_id]._state != ST_INGAME) continue;
 			clients[pl_id].send_meteo_packet(0, m_ppMeteoObjects);
-			for (int i = 0; i < 3; ++i) {
-				if (_plist[i] == -1) continue;
-				if (clients[_plist[i]]._state == !ST_INGAME) { continue; }
-				clients[pl_id].send_change_packet(i, clients[_plist[i]].type);
-			}
+			//for (int i = 0; i < 3; ++i) {
+			//	if (_plist[i] == -1) continue;
+			//	if (clients[_plist[i]]._state == !ST_INGAME) { continue; }
+			//	clients[pl_id].send_change_packet(i, clients[_plist[i]].type);
+			//}
 		}
 		send_time = 0;
 //	}

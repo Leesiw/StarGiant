@@ -452,6 +452,50 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	//prev_process_time = chrono::system_clock::now();
 }
 
+void CGameFramework::TimerThread()
+{
+	while (true) {
+		TIMER_EVENT ev;
+		auto current_time = chrono::system_clock::now();
+		if (true == timer_queue.try_pop(ev)) {
+			if (ev.wakeup_time > current_time) {
+				timer_queue.push(ev);		// 최적화 필요
+				// timer_queue에 다시 넣지 않고 처리해야 한다.
+				this_thread::sleep_for(1ms);  // 실행시간이 아직 안되었으므로 잠시 대기
+				continue;
+			}
+			switch (ev.event_id) {
+			case EV_SPAWN_ENEMY: {
+				break;
+			}
+			case EV_UPDATE_ENEMY: {
+				break;
+			}
+			case EV_UPDATE_METEO: {
+				break;
+			}
+			case EV_UPDATE_MISSILE: {
+				break;
+			}
+			case EV_UPDATE_BOSS: {
+				break;
+			}
+			case EV_UPDATE_SPACESHIP: {
+				break;
+			}
+			case EV_UPDATE_PLAYER: {
+				break;
+			}
+			case EV_HEAL: {
+				break;
+			}
+			}
+			continue;		// 즉시 다음 작업 꺼내기
+		}
+		this_thread::sleep_for(1ms);   // timer_queue가 비어 있으니 잠시 기다렸다가 다시 시작
+	}
+}
+
 void CGameFramework::ClientProcess()
 {
 	auto StartTime = chrono::system_clock::now();
@@ -463,6 +507,8 @@ void CGameFramework::ClientProcess()
 		if (fps.count() > 0.0333333) {
 			StartTime = chrono::system_clock::now();
 			AnimateObjects(fps.count());
+
+			
 		}
 	}
 }

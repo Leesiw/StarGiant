@@ -2,7 +2,8 @@
 #include <chrono>
 #include <concurrent_priority_queue.h>
 
-enum EVENT_TYPE { EV_RANDOM_MOVE };
+enum EVENT_TYPE { EV_SPAWN_ENEMY, EV_UPDATE_ENEMY, EV_UPDATE_METEO, 
+	EV_UPDATE_MISSILE, EV_UPDATE_BOSS, EV_UPDATE_SPACESHIP, EV_UPDATE_PLAYER, EV_HEAL };
 
 struct TIMER_EVENT {
 	char obj_id;

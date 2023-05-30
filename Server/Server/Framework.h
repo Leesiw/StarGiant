@@ -2,6 +2,7 @@
 
 #include "Session.h"
 #include "Scene.h"
+#include "Timer.h"
 
 extern array<SESSION, MAX_USER> clients;
 extern std::unordered_map<MissionType, Level> levels;
@@ -27,6 +28,7 @@ public:
 	void AnimateObjects(float fTimeElapsed);
 
 	void ProcessPacket(int c_id, char* packet);
+	void TimerThread();
 	void send_packet(void* packet);
 	void ClientProcess();
 
