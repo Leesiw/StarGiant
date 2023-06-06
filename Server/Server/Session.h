@@ -11,7 +11,9 @@
 #pragma comment(lib, "MSWSock.lib")
 using namespace std;
 
-enum COMP_TYPE { OP_ACCEPT, OP_RECV, OP_SEND };
+enum COMP_TYPE { OP_ACCEPT, OP_RECV, OP_SEND, 
+	OP_SPAWN_ENEMY, OP_UPDATE_ENEMY, OP_UPDATE_METEO, OP_UPDATE_MISSILE, OP_UPDATE_BOSS, 
+	OP_UPDATE_SPACESHIP, OP_UPDATE_PLAYER, OP_HEAL };
 
 
 class OVER_EXP {
@@ -20,6 +22,7 @@ public:
 	WSABUF _wsabuf;
 	char _send_buf[SEND_BUF_SIZE];
 	COMP_TYPE _comp_type;
+	char obj_id;
 	OVER_EXP()
 	{
 		_wsabuf.len = SEND_BUF_SIZE;

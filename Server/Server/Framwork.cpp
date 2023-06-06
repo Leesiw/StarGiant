@@ -84,9 +84,43 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			clients[key].do_recv();
 			break;
 		}
-		case OP_SEND:
+		case OP_SEND: {
 			delete ex_over;
 			break;
+		}
+		case OP_SPAWN_ENEMY: {
+			//SpawnEnemy();
+			delete ex_over;
+			break;
+		}
+		case OP_UPDATE_ENEMY: {
+			delete ex_over;
+			break;
+		}
+		case OP_UPDATE_METEO: {
+			delete ex_over;
+			break;
+		}
+		case OP_UPDATE_MISSILE: {
+			delete ex_over;
+			break;
+		}
+		case OP_UPDATE_BOSS: {
+			delete ex_over;
+			break;
+		}
+		case OP_UPDATE_SPACESHIP: {
+			delete ex_over;
+			break;
+		}
+		case OP_UPDATE_PLAYER: {
+			delete ex_over;
+			break;
+		}
+		case OP_HEAL: {
+			delete ex_over;
+			break;
+		}
 		}
 	}
 }
@@ -452,7 +486,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	//prev_process_time = chrono::system_clock::now();
 }
 
-void CGameFramework::TimerThread()
+void CGameFramework::TimerThread(HANDLE h_iocp)
 {
 	while (true) {
 		TIMER_EVENT ev;
@@ -466,27 +500,58 @@ void CGameFramework::TimerThread()
 			}
 			switch (ev.event_id) {
 			case EV_SPAWN_ENEMY: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_SPAWN_ENEMY;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
 			case EV_UPDATE_ENEMY: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_UPDATE_ENEMY;
+				ov->obj_id = ev.obj_id;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
 			case EV_UPDATE_METEO: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_UPDATE_METEO;
+				ov->obj_id = ev.obj_id;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
 			case EV_UPDATE_MISSILE: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_UPDATE_MISSILE;
+				ov->obj_id = ev.obj_id;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
 			case EV_UPDATE_BOSS: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_UPDATE_BOSS;
+				ov->obj_id = ev.obj_id;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
 			case EV_UPDATE_SPACESHIP: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_UPDATE_SPACESHIP;
+				ov->obj_id = ev.obj_id;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
 			case EV_UPDATE_PLAYER: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_UPDATE_PLAYER;
+				ov->obj_id = ev.obj_id;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
 			case EV_HEAL: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_HEAL;
+				ov->obj_id = ev.obj_id;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
 			}
@@ -507,7 +572,7 @@ void CGameFramework::ClientProcess()
 		if (fps.count() > 0.0333333) {
 			StartTime = chrono::system_clock::now();
 			AnimateObjects(fps.count());
-
+		//	printf("fps.count = %f\n", fps.count());
 			
 		}
 	}

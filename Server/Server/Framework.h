@@ -28,7 +28,7 @@ public:
 	void AnimateObjects(float fTimeElapsed);
 
 	void ProcessPacket(int c_id, char* packet);
-	void TimerThread();
+	void TimerThread(HANDLE h_iocp);
 	void send_packet(void* packet);
 	void ClientProcess();
 

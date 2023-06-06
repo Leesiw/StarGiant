@@ -9,7 +9,7 @@ struct TIMER_EVENT {
 	char obj_id;
 	std::chrono::system_clock::time_point wakeup_time;
 	EVENT_TYPE event_id;
-	int room_id;
+	short room_id;
 
 	constexpr bool operator < (const TIMER_EVENT& L) const
 	{
