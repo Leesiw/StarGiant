@@ -380,8 +380,16 @@ float4					m_cEmissive;
 
 	// 입력 좌표값을 변화시켜 흔들린 선형 형태를 만듭니다.
 	float3 newPos = input.position;
+
 	newPos.x += 20.0f * sin(input.position.y * 40.0f * 3.1415f);
 	newPos.z += 20.0f * cos(input.position.x * 40.0f * 3.1415f);
+
+	float Distance = distance(newPos, float3(gmtxTexture._11, gmtxTexture._12, gmtxTexture._13));
+	float DepthLayer = saturate(Distance / gmtxTexture._23);
+
+	float depthScale = 1.0f + DepthLayer *0.3;
+
+	newPos *= depthScale;
 
 	// 변화된 좌표값을 모델-뷰-프로젝션 행렬로 변환하여 출력합니다.
 	output.position = mul(mul(mul(float4(newPos, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
