@@ -905,6 +905,11 @@ void CGodRayShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 			//	3.광 산란이 없는 장면 렌더링
 			//	4.라이트 산란 효과를 위에 덧그린다.
 	//delete pRayObject;
+
+	CreateShaderVariable(pd3dDevice, pd3dCommandList);
+	XMFLOAT3 Center = pRayObject->GetPosition();
+	m_xmf4x4Texture._11 = Center.x, m_xmf4x4Texture._12 = Center.y, m_xmf4x4Texture._13 = Center.z;
+	m_xmf4x4Texture._21 = renderWidth, m_xmf4x4Texture._22 = renderHeight, m_xmf4x4Texture._23 = renderDepth;
 }
 
 void CGodRayShader::AnimateObjects(CCamera * pCamera)
@@ -950,6 +955,7 @@ void CGodRayShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 	for (int i = 0; i < m_nObjects; i++)//m_nObjects
 	{
 		if (m_ppObjects[i]) {
+			UpdateShaderVariables(pd3dCommandList, m_pcbplusShaderVariable); 
 			//m_ppObjects[i]->UpdateTransform(NULL);
 			AnimateObjects(pCamera);
 			//m_ppObjects[i]->Render(pd3dCommandList, pCamera);
@@ -960,6 +966,26 @@ void CGodRayShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 	}
 	pLightObject->Render(pd3dCommandList, pCamera);
 	p_TestObjects->Render(pd3dCommandList, pCamera);
+}
+
+void CGodRayShader::CreateShaderVariable(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	//only do once time
+	m_pcbplusShaderVariable = NULL;
+	UINT ncbElementBytes = ((sizeof(CB_PLUS_INFO) + 255) & ~255); //256의 배수
+	m_pcbplusShaderVariable = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER | D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
+
+	m_pcbplusShaderVariable->Map(0, NULL, (void**)&m_pcbPlusInfo);
+}
+
+void CGodRayShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo)
+{
+	// 중앙좌표 변경할시 여기에. 
+	XMStoreFloat4x4(&m_pcbPlusInfo->gmtxTexture, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Texture)));
+
+	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbPlusInfo->GetGPUVirtualAddress();
+	pd3dCommandList->SetGraphicsRootConstantBufferView(19, d3dGpuVirtualAddress);
+
 }
 
 D3D12_SHADER_BYTECODE CGodRayShader::CreateVertexShader()

@@ -362,19 +362,7 @@ struct VS_GOD_OUTPUT
 	float2 uv : TEXCOORD0;
 	//float4 ChannelMask :COLOR0;
 };
-float4x4 rotationMatrixAxisAngle(float3 axis, float angle)
-{
-	axis = normalize(axis);
-	float s = sin(angle);
-	float c = cos(angle);
-	float oc = 1.0f - c;
-	return float4x4(
-		oc * axis.x * axis.x + c, oc * axis.x * axis.y - axis.z * s, oc * axis.z * axis.x + axis.y * s, 0.0f,
-		oc * axis.x * axis.y + axis.z * s, oc * axis.y * axis.y + c, oc * axis.y * axis.z - axis.x * s, 0.0f,
-		oc * axis.z * axis.x - axis.y * s, oc * axis.y * axis.z + axis.x * s, oc * axis.z * axis.z + c, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f
-		);
-}
+
 VS_GOD_OUTPUT VS_GODMain(VS_GOD_INPUT input)
 {
 	/*VS_UI_OUTPUT output;
@@ -400,30 +388,12 @@ float4					m_cEmissive;
 	output.positionL = newPos;
 	output.uv = input.uv;
 
-
-	
-
 	return output;
 
 }
 
 Texture2D gtxtGODTexture1 : register(t15);
 Texture2D gtxtGODTexture2 : register(t16);
-
-float4 CalculateLineColor(float3 pixelPos)
-{
-	// 픽셀 위치를 노이즈 텍스처 좌표계로 변환합니다.
-	float2 noiseCoord = pixelPos.xy / 10.0;
-
-	// 노이즈 텍스처에서 샘플링한 값을 노이즈 값으로 사용합니다.
-	float noiseValue = gtxtGODTexture1.Sample(gssWrap, noiseCoord).r * 0.5;
-
-	// 직선의 색상값을 계산합니다.
-	float4 lineColor = float4(noiseValue, noiseValue, noiseValue, 1.0);
-	//float4 lineColor = float4(0,0,0, 1.0);
-
-	return lineColor;
-}
 
 float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 {
@@ -470,16 +440,25 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 	float4 cColor = compositeNoise * float4(cookie.r, cookie.g, cookie.b, 0.0f) * lightColor;
 
 	cColor.a = saturate(dot(float3(cColor.a, cColor.g, cColor.b), float3(1.0f, 1.0f, 1.0f)));
-	/*if (cColor.a > 0.8) cColor.rgb *= 1.4f + (cColor.a - 0.8);
-	else if (cColor.a >0.6) cColor.rgb *= 1.3f + (cColor.a - 0.6);
-	else if (cColor.a >0.4)cColor.rgb *= 1.1f + (cColor.a - 0.4);
-	else cColor.rgb *= 1.f + (cColor.a);*/
-	//
 
-	//return(cColor);
-	return(float4(1,1,1,0.6));
+	//임시 거리값 
+	float3 Center = float3(gmtxTexture._11, gmtxTexture._12, gmtxTexture._13);
+	float3 Length = float3(gmtxTexture._21, gmtxTexture._22, gmtxTexture._23); // Weight, Height, Depth
 
+	float Distance = distance(input.positionL, Center);
+	float DepthLayer = saturate(Distance / Length.z);
+
+	Distance = distance(input.positionL, float3(Center.x, 0.0f, Center.z));
+	float normalizedWidth = saturate(Distance / Length.x);
+	float normalizedHeight = saturate(Distance / Length.y);
+	float2 LengthLayer = float2(normalizedWidth, normalizedHeight);
+
+	float alphaChannel = 1.0f - saturate(DepthLayer * LengthLayer.x * LengthLayer.y);
+
+	//return float4(1.0f, 1.0f, 1.0f, 1.0* DepthLayer);
+	return float4(1.0f* DepthLayer, 1.0f* LengthLayer.x, 1.0f* LengthLayer.y, alphaChannel);
 }
+
 //
 //Texture2D<float4> noiseTexture1; // 첫 번째 noise 텍스처
 //Texture2D<float4> noiseTexture2; // 두 번째 noise 텍스처
