@@ -7,6 +7,8 @@
 #include "Object.h"
 #include "Camera.h"
 
+
+
 class CShader
 {
 public:
@@ -213,6 +215,10 @@ public:
 	XMFLOAT3						cameraLookVector;
 	XMFLOAT3						PlayerPosition =XMFLOAT3(0.f,0.f,0.f);
 
+	CB_PLUS_INFO					* m_pcbPlusInfo = NULL; 
+	ID3D12Resource					* m_pcbplusShaderVariable = NULL;
+	XMFLOAT4X4						m_xmf4x4Texture;
+
 	int		renderDepth = 1000;
 
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
@@ -224,6 +230,8 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual void SetPlayerPosition(XMFLOAT3 in) { PlayerPosition = in; };
 
+	void CreateShaderVariable(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
 	//virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, int nPipelineState);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
