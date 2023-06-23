@@ -36,6 +36,8 @@ public:
 
 	void GetJewels();
 
+	void SpawnEnemy(char id);
+
 	void SpawnEnemy();
 	void SpawnMeteo(char i);
 
@@ -68,9 +70,6 @@ public:
 	char						cur_monster_num = 0;
 
 	MissionType cur_mission;
-
-	float m_fEnemySpawnTime = 20.0f;
-	float m_fEnemySpawnTimeRemaining = 0.0f;
 
 	SCENE_STATE _state;
 	mutex _s_lock;

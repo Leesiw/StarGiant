@@ -101,7 +101,7 @@ public:
 	short GetHP() { return hp; }
 
 	void GetAttack(char damage);
-	bool GetHeal(double sec);
+	bool GetHeal();
 
 	void Reset();
 

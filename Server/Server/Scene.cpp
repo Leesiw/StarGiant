@@ -177,7 +177,6 @@ void CScene::Reset()
 		m_ppMissiles[i]->SetisActive(false);
 	}
 
-	m_fEnemySpawnTimeRemaining = 0.0f;
 	kill_monster_num = 0;
 	cur_monster_num = 0;
 	heal_player = -1;
@@ -329,44 +328,6 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 
 void CScene::CheckEnemyCollisions()
 {
-	//플레이어와
-	/*
-	for (int i = 0; i < ENEMIES; ++i)
-	{
-		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
-		m_ppEnemies[i]->UpdateBoundingBox();
-
-		if (m_pSpaceship->HierarchyIntersects(m_ppEnemies[i]))
-		{
-			XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
-			xmf3Sub = Vector3::Subtract(m_ppEnemies[i]->GetPosition(), xmf3Sub);
-			xmf3Sub = Vector3::Normalize(xmf3Sub);
-			XMFLOAT3 vel = m_ppEnemies[i]->GetVelocity();
-			float fLen = Vector3::Length(vel);
-			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, true);
-			
-			XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
-
-			m_ppEnemies[i]->hp = -1;
-			m_ppEnemies[i]->SetisAlive(false);
-			
-			m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
-
-			short real_damage = m_ppEnemies[i]->GetDamage() - m_pSpaceship->def;
-			if (real_damage <= 0) { real_damage = 1; }
-			short new_hp = m_pSpaceship->GetHP() - real_damage;
-			m_pSpaceship->SetHP(new_hp);
-
-			for (auto& pl : clients)
-			{
-				if (pl.in_use == false) continue;
-				pl.send_bullet_hit_packet(0, i, m_ppEnemies[i]->hp);
-				if (m_pSpaceship->GetHP() <= 0) { continue; }
-				pl.send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
-			}
-		}
-	}
-	*/
 
 	for (int i = 0; i < ENEMIES; ++i) {
 		m_ppEnemies[i]->UpdateBoundingBox();
@@ -602,44 +563,32 @@ void CScene::GetJewels()
 	}
 }
 
-void CScene::SpawnEnemy()
+void CScene::SpawnEnemy(char id)
 {
 	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
-	for (int i = 0; i < levels[cur_mission].SpawnMonsterNum; ++i)
-	{
-		if (cur_monster_num >= levels[cur_mission].MaxMonsterNum) { return; }
-		
-		std::random_shuffle(m_ppEnemies.begin(), m_ppEnemies.end());
+	XMFLOAT3 random_pos{ urdPos(dree), urdPos(dree), urdPos(dree) / 5.f };
+	if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x; }
+	if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; }
+	if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; }
+	m_ppEnemies[id]->SetisAlive(true);
+	m_ppEnemies[id]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
+	m_ppEnemies[id]->state = EnemyState::IDLE;
+	m_ppEnemies[id]->SetDestination();
 
-		for (int j = 0; j < ENEMIES; ++j) {
-			if (!m_ppEnemies[j]->GetisAlive()) {
-				XMFLOAT3 random_pos{ urdPos(dree), urdPos(dree), urdPos(dree) / 5.f };
-				if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x; }
-				if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; }
-				if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; }
-				m_ppEnemies[j]->SetisAlive(true);
-				m_ppEnemies[j]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
-				m_ppEnemies[j]->state = EnemyState::IDLE;
-				m_ppEnemies[j]->SetDestination();
-				m_ppEnemies[j]->SetStatus(cur_mission);
-				SPAWN_ENEMY_INFO e_info;
-				e_info.id = m_ppEnemies[j]->GetID();
-				e_info.Quaternion = m_ppEnemies[j]->GetQuaternion();
-				e_info.pos = m_ppEnemies[j]->GetPosition();
-				e_info.destination = m_ppEnemies[j]->GetDestination();
-				e_info.max_hp = m_ppEnemies[j]->GetHP();
-				e_info.state = EnemyState::IDLE;
+	SPAWN_ENEMY_INFO e_info;
+	e_info.id = m_ppEnemies[id]->GetID();
+	e_info.Quaternion = m_ppEnemies[id]->GetQuaternion();
+	e_info.pos = m_ppEnemies[id]->GetPosition();
+	e_info.destination = m_ppEnemies[id]->GetDestination();
+	e_info.max_hp = m_ppEnemies[id]->GetHP();
+	e_info.state = EnemyState::IDLE;
 
-				for (short pl_id : _plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_spawn_enemy_packet(0, e_info);
-				}
-				++cur_monster_num;
-				break;
-			}
-		}
+	for (short pl_id : _plist) {
+		if (pl_id == -1) continue;
+		if (clients[pl_id]._state != ST_INGAME) continue;
+		clients[pl_id].send_spawn_enemy_packet(0, e_info);
 	}
+	++cur_monster_num;
 }
 
 void CScene::SpawnMeteo(char i)
@@ -671,20 +620,14 @@ void CScene::Send(char* p)
 {
 	for (auto pl_id : _plist)
 	{
-		if (pl_id != -1) {
-			clients[pl_id].do_send(p);
-		}
+		if (pl_id == -1) continue;
+		if (clients[pl_id]._state != ST_INGAME) continue;
+		clients[pl_id].do_send(p);
 	}
 }
 
 void CScene::AnimateObjects(float fTimeElapsed)
 {
-	m_fEnemySpawnTimeRemaining -= fTimeElapsed;
-	if (m_fEnemySpawnTimeRemaining < 0.0f)
-	{
-		SpawnEnemy();// 적 스폰
-		m_fEnemySpawnTimeRemaining = m_fEnemySpawnTime;
-	}
 
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));
@@ -831,6 +774,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		send_time = 0;
 //	}
 
+		/*
 	if (heal_player != -1) {
 		std::chrono::duration<double>sec = std::chrono::system_clock::now() - heal_start;
 		heal_start = std::chrono::system_clock::now();
@@ -841,7 +785,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				clients[pl_id].send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
 			}
 		}
-	}
+	}*/
 
 	CheckMeteoByPlayerCollisions();
 	CheckEnemyCollisions();

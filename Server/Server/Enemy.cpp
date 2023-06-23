@@ -227,6 +227,12 @@ void CEnemy::SetisAlive(bool i_a)
 	}
 }
 
+void CEnemy::SetAttackTimerFalse()
+{
+	enemy_flags &= ~option2;
+
+}
+
 void CEnemy::SetStatus(MissionType cur_mission)
 {
 }

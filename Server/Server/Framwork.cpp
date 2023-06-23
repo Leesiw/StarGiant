@@ -89,35 +89,237 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			break;
 		}
 		case OP_SPAWN_ENEMY: {
-			//SpawnEnemy();
+			CScene* scene = scene_manager.GetScene(key);
+			if (scene->_state != ST_INGAME) { break; }
+			std::array<CEnemy*, ENEMIES> ppEnemies{ scene->m_ppEnemies };
+			std::random_shuffle(ppEnemies.begin(), ppEnemies.end());
+
+			char spawn_num = levels[scene->cur_mission].SpawnMonsterNum;
+
+			for (int i = 0; i < ENEMIES; ++i)
+			{
+				if (spawn_num <= 0) { break; }
+				if (!ppEnemies[i]->GetisAlive()) {
+					scene->SpawnEnemy(ppEnemies[i]->GetID());
+					TIMER_EVENT ev_u{ ppEnemies[i]->GetID(), chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, key};
+					timer_queue.push(ev_u);
+					--spawn_num;
+				}
+			}
+			TIMER_EVENT ev{0, chrono::system_clock::now() + 20s, EV_SPAWN_ENEMY, key };
+			timer_queue.push(ev);
+
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_ENEMY: {
+			CScene* scene = scene_manager.GetScene(key);
+			if (scene->_state != ST_INGAME) { break; }
+			if (scene->m_ppEnemies[ex_over->obj_id]->hp <= 0) { 
+				scene->m_ppEnemies[ex_over->obj_id]->SetisAlive(false);
+				--scene->cur_monster_num;
+				break; 
+			}
+
+			scene->m_ppEnemies[ex_over->obj_id]->AI(0.033, scene->m_pSpaceship);
+			scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
+
+			// 운석과 충돌처리
+
+			for (int i = 0; i < ENEMIES; ++i)
+			{
+				if (!scene->m_ppEnemies[i]->GetisAlive()) { continue; }
+				if (scene->m_ppEnemies[ex_over->obj_id]->HierarchyIntersects(scene->m_ppEnemies[i]))
+				{
+					XMFLOAT3 xmf3Sub = scene->m_ppEnemies[i]->GetPosition();
+					xmf3Sub = Vector3::Subtract(scene->m_ppEnemies[ex_over->obj_id]->GetPosition(), xmf3Sub);
+					if (Vector3::Length(xmf3Sub) > 0.0001f) {
+						xmf3Sub = Vector3::Normalize(xmf3Sub);
+					}
+					XMFLOAT3 vel = scene->m_ppEnemies[ex_over->obj_id]->GetVelocity();
+					float fLen = Vector3::Length(vel) / 10.f;
+					xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+					XMFLOAT3 vel2 = scene->m_ppEnemies[i]->GetVelocity();
+
+					scene->m_ppEnemies[ex_over->obj_id]->SetVelocity(Vector3::Add(vel, xmf3Sub));
+					scene->m_ppEnemies[i]->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+				}
+			}
+
+			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, key };
+			timer_queue.push(ev);
+
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_METEO: {
+			CScene* scene = scene_manager.GetScene(key);
+			if (scene->_state != ST_INGAME) { break; }
+			scene->m_ppMeteoObjects[ex_over->obj_id]->Animate(0.033);
+			
+			XMFLOAT3 p_pos = scene->m_pSpaceship->GetPosition();
+			XMFLOAT3 m_pos = scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition();
+			float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
+			if (dist > 1500.0f) {
+				scene->SpawnMeteo(ex_over->obj_id);
+			}
+			scene->m_ppMeteoObjects[ex_over->obj_id]->UpdateBoundingBox();
+			if (scene->m_pSpaceship->HierarchyIntersects(scene->m_ppMeteoObjects[ex_over->obj_id]))
+			{
+				XMFLOAT3 vel1 = scene->m_pSpaceship->GetVelocity();
+				XMFLOAT3 vel2 = scene->m_ppMeteoObjects[ex_over->obj_id]->GetMovingDirection();
+				float m1 = 1.0f; float m2 = 5.0f;
+				float finalVelX1 = ((m1 - m2) / (m1 + m2)) * vel1.x + ((2.f * m2) / (m1 + m2)) * vel2.x;
+				float finalVelY1 = ((m1 - m2) / (m1 + m2)) * vel1.y + ((2.f * m2) / (m1 + m2)) * vel2.y;
+				float finalVelZ1 = ((m1 - m2) / (m1 + m2)) * vel1.z + ((2.f * m2) / (m1 + m2)) * vel2.z;
+				float finalVelX2 = ((2.f * m1) / (m1 + m2)) * vel1.x + ((m2 - m1) / (m1 + m2)) * vel2.x;
+				float finalVelY2 = ((2.f * m1) / (m1 + m2)) * vel1.y + ((m2 - m1) / (m1 + m2)) * vel2.y;
+				float finalVelZ2 = ((2.f * m1) / (m1 + m2)) * vel1.z + ((m2 - m1) / (m1 + m2)) * vel2.z;
+
+				scene->m_pSpaceship->SetVelocity(XMFLOAT3(finalVelX1, finalVelY1, finalVelZ1));
+				scene->m_ppMeteoObjects[ex_over->obj_id]->SetMovingDirection(XMFLOAT3(finalVelX2, finalVelY2, finalVelZ2));
+
+				//scnee->m_pSpaceship->Move(scene->m_pSpaceship->GetVelocity(), true);
+				scene->m_pSpaceship->SetHP(scene->m_pSpaceship->GetHP() - 2);
+
+				
+				for (short pl_id : scene->_plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_meteo_direction_packet(0, ex_over->obj_id, scene->m_ppMeteoObjects[ex_over->obj_id]);
+					clients[pl_id].send_bullet_hit_packet(0, -1, scene->m_pSpaceship->GetHP());
+
+				}
+			}
+			
+			SC_METEO_PACKET p;
+			p.size = sizeof(SC_METEO_PACKET);
+			p.type = SC_METEO;
+			p.data.id = ex_over->obj_id;
+			p.data.pos = scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition();
+			
+			scene->Send((char*)& p);
+
+			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_SPAWN_MISSILE, key };
+			timer_queue.push(ev);
+
 			delete ex_over;
 			break;
 		}
+		case OP_SPAWN_MISSILE: {
+			CScene* scene = scene_manager.GetScene(key);
+			if (scene->_state != ST_INGAME) { break; }
+			if (!scene->m_ppEnemies[ex_over->obj_id]->GetisAlive() || scene->m_ppEnemies[ex_over->obj_id]->state != EnemyState::AIMING) {
+				scene->m_ppEnemies[ex_over->obj_id]->SetAttackTimerFalse();
+				break; 
+			}
+
+			MissileInfo info;
+			info.StartPos = scene->m_ppEnemies[ex_over->obj_id]->GetPosition();
+			info.Quaternion = scene->m_ppEnemies[ex_over->obj_id]->GetQuaternion();
+			info.damage = levels[scene->cur_mission].Missile.ATK;
+
+			// 미사일 생성, 미사일 타이머 push
+			for (int i = 0; i < ENEMY_BULLETS; ++i) {
+				if (!scene->m_ppMissiles[i]->GetisActive()) {
+					scene->m_ppMissiles[i]->SetNewMissile(info);
+
+					MISSILE_INFO m_info;
+					m_info.id = i;
+					m_info.pos = info.StartPos;
+					m_info.Quaternion = info.Quaternion;
+
+					for (short pl_id : scene->_plist) {
+						if (pl_id == -1) continue;
+						if (clients[pl_id]._state != ST_INGAME) continue;
+						clients[pl_id].send_missile_packet(0, m_info);
+					}
+					TIMER_EVENT ev{ i, chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, key };
+					timer_queue.push(ev);
+
+					break;
+				}
+			}
+
+			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, key };
+			timer_queue.push(ev);
+			delete ex_over;
+			break;
+		}
+
 		case OP_UPDATE_MISSILE: {
+			CScene* scene = scene_manager.GetScene(key);
+			if (scene->_state != ST_INGAME) { break; }
+			if (!scene->m_ppMissiles[ex_over->obj_id]->GetisActive()) { break; }
+
+			scene->m_ppMissiles[ex_over->obj_id]->Animate(0.033, scene->m_pSpaceship);
+			
+			MISSILE_INFO m_info;
+			m_info.id = ex_over->obj_id;
+			m_info.pos = scene->m_ppMissiles[ex_over->obj_id]->GetPosition();
+			//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
+			m_info.Quaternion = scene->m_ppMissiles[ex_over->obj_id]->GetQuaternion();
+
+			for (short pl_id : scene->_plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				if (scene->m_ppMissiles[ex_over->obj_id]->GetisActive()) {
+					clients[pl_id].send_missile_packet(0, m_info);
+					TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, key };
+					timer_queue.push(ev);
+				}
+				else {
+					clients[pl_id].send_remove_missile_packet(0, ex_over->obj_id);
+				}
+			}
+
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_BOSS: {
+			CScene* scene = scene_manager.GetScene(key);
+			if (scene->_state != ST_INGAME) { break; }
+			if (scene->m_pBoss->BossHP <= 0) { break; }
+
+			scene->m_pBoss->Boss_Ai(0.033, scene->m_pBoss->GetState(), scene->m_pSpaceship, scene->m_pBoss->GetHP());
+
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, key };
+			timer_queue.push(ev);
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_SPACESHIP: {
+			CScene* scene = scene_manager.GetScene(key);
+			if (scene->_state != ST_INGAME) { break; }
+			scene->m_pSpaceship->Update(0.033);
+
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, key };
+			timer_queue.push(ev);
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_PLAYER: {
+			CScene* scene = scene_manager.GetScene(key);
+			if (scene->_state != ST_INGAME) { break; }
 			delete ex_over;
 			break;
 		}
 		case OP_HEAL: {
+			CScene* scene = scene_manager.GetScene(key);
+			if (scene->_state != ST_INGAME) { break; }
+
+			if (scene->heal_player != -1) {
+				if (scene->m_pSpaceship->GetHeal()) {
+					for (short pl_id : scene->_plist) {
+						if (pl_id == -1) continue;
+						if (clients[pl_id]._state != ST_INGAME) continue;
+						clients[pl_id].send_bullet_hit_packet(0, -1, scene->m_pSpaceship->GetHP());
+					}
+				}
+
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, key };
+				timer_queue.push(ev);
+			}
 			delete ex_over;
 			break;
 		}
@@ -155,7 +357,7 @@ void CGameFramework::Init() {
 	int num_threads = std::thread::hardware_concurrency();
 	for (int i = 0; i < num_threads; ++i)
 		worker_threads.emplace_back(&CGameFramework::worker_thread, this, h_iocp);
-	thread timer_thread{ &CGameFramework::ClientProcess, this };
+	thread timer_thread{ &CGameFramework::TimerThread, this, h_iocp };
 	for (auto& th : worker_threads)
 		th.join();
 	timer_thread.join();
@@ -519,6 +721,13 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
+			case EV_SPAWN_MISSILE: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_SPAWN_MISSILE;
+				ov->obj_id = ev.obj_id;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
+				break;
+			}
 			case EV_UPDATE_MISSILE: {
 				OVER_EXP* ov = new OVER_EXP;
 				ov->_comp_type = OP_UPDATE_MISSILE;
@@ -563,6 +772,7 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 
 void CGameFramework::ClientProcess()
 {
+	/*
 	auto StartTime = chrono::system_clock::now();
 	auto EndTime = chrono::system_clock::now();
 
@@ -575,7 +785,9 @@ void CGameFramework::ClientProcess()
 		//	printf("fps.count = %f\n", fps.count());
 			
 		}
-	}
+	}*/
+
+
 }
 
 int CGameFramework::get_new_client_id()
