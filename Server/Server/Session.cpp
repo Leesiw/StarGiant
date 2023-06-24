@@ -29,7 +29,6 @@ void SESSION::send_spaceship_packet(int c_id, CAirplanePlayer* m_pPlayer)	// วรท
 	p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
 	p.type = SC_MOVE_SPACESHIP;
 	p.data.pos = m_pPlayer->GetPosition();
-	XMFLOAT4 a;
 	p.data.Quaternion = m_pPlayer->input_info.Quaternion;
 	p.move_time = m_pPlayer->move_time;
 
@@ -108,7 +107,7 @@ void SESSION::send_missile_packet(int c_id, MISSILE_INFO& info)
 	do_send(&p);
 }
 
-void SESSION::send_remove_missile_packet(int c_id, short id)
+void SESSION::send_remove_missile_packet(int c_id, char id)
 {
 	SC_REMOVE_MISSILE_PACKET p;
 	p.size = sizeof(SC_REMOVE_MISSILE_PACKET);
@@ -172,7 +171,7 @@ void SESSION::send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 play
 }
 */
 
-void SESSION::send_spawn_meteo_packet(int c_id, short id, CMeteoObject* meteo)
+void SESSION::send_spawn_meteo_packet(int c_id, char id, CMeteoObject* meteo)
 {
 	SC_SPAWN_METEO_PACKET p;
 	p.size = sizeof(SC_SPAWN_METEO_PACKET);

@@ -118,7 +118,11 @@ void CScene::BuildObjects()
 void CScene::ReleaseObjects()
 {
 	if (m_pSpaceship) { delete m_pSpaceship; }
-	if (m_ppPlayers) { delete[] m_ppPlayers; }
+	for (int i = 0; i < 3; ++i)
+	{
+		if (m_ppPlayers[i]) { delete m_ppPlayers[i]; }
+	}
+
 	for (int i = 0; i < m_ppEnemies.size(); ++i)
 	{
 		if (m_ppEnemies[i]) { delete m_ppEnemies[i]; }
@@ -191,12 +195,12 @@ void CScene::CheckMeteoByPlayerCollisions()
 	m_pSpaceship->UpdateBoundingBox();
 
 	for (int i = 0; i < METEOS; ++i) {
-		if (time(NULL) - m_ppMeteoObjects[i]->coll_time >= 1) {
+	//	if (time(NULL) - m_ppMeteoObjects[i]->coll_time >= 1) {
 			m_ppMeteoObjects[i]->UpdateBoundingBox();
 
 			if (m_pSpaceship->HierarchyIntersects(m_ppMeteoObjects[i]))
 			{
-				m_ppMeteoObjects[i]->coll_time = time(NULL);
+		//		m_ppMeteoObjects[i]->coll_time = time(NULL);
 				XMFLOAT3 vel1 = m_pSpaceship->GetVelocity();
 				XMFLOAT3 vel2 = m_ppMeteoObjects[i]->GetMovingDirection();
 				float m1 = 1.0f; float m2 = 5.0f;
@@ -223,7 +227,7 @@ void CScene::CheckMeteoByPlayerCollisions()
 
 				}
 			}
-		}
+		//}
 	}
 }
 
@@ -341,7 +345,7 @@ void CScene::CheckEnemyCollisions()
 				
 				if (m_ppEnemies[j]->HierarchyIntersects(m_ppMeteoObjects[i]))
 				{
-					m_ppMeteoObjects[i]->coll_time = time(NULL);
+					//m_ppMeteoObjects[i]->coll_time = time(NULL);
 					XMFLOAT3 vel1 = m_ppEnemies[j]->GetVelocity();
 					XMFLOAT3 vel2 = m_ppMeteoObjects[i]->GetMovingDirection();
 					float m1 = 1.0f; float m2 = 5.0f;

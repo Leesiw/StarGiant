@@ -11,7 +11,7 @@ Boss::Boss()
 	m_xmf4x4ToParent = Matrix4x4::Identity();
 	m_xmf4x4World = Matrix4x4::Identity();
 
-	MAXBossHP = 100.0f;
+	MAXBossHP = 100;
 	BossHP = MAXBossHP;
 	CurMotion = BossAnimation::SLEEP;
 	CurState = BossState::SLEEP;
@@ -24,18 +24,18 @@ Boss::Boss()
 		meteo->SetScale(100.0f, 100.0f, 100.0f);
 		if (i < BOSSMETEOS / 2) {
 			// 바운딩 박스 설정 부탁
-			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256, 0.71804,  -0.0466012 }, XMFLOAT3{ 4.414825, 4.29032, 4.14356 }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256f, 0.71804f,  -0.0466012f }, XMFLOAT3{ 4.414825f, 4.29032f, 4.14356f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		}
 		else {
-			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256, 0.71804,  -0.0466012 }, XMFLOAT3{ 4.414825, 4.29032, 4.14356 }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256f, 0.71804f,  -0.0466012f }, XMFLOAT3{ 4.414825f, 4.29032f, 4.14356f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		}
 		m_ppBossMeteoObjects[i] = meteo;
 		m_ppBossMeteoObjects[i]->UpdateTransform(NULL);
 	}
 
 	//boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 34.65389f, -10.1982f), XMFLOAT3(65.5064392f, 35.0004547f, 77.9787476f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
-	boundingbox = BoundingOrientedBox{ XMFLOAT3(-33.47668f, 41.86574f, 26.52405), XMFLOAT3(774.8785, 299.2372, 584.7963), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(-33.47668f, 41.86574f, 26.52405f), XMFLOAT3(774.8785f, 299.2372f, 584.7963f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 
 
 	
