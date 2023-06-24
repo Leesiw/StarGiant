@@ -900,7 +900,9 @@ void CGameFramework::disconnect(int c_id)
 		scene_manager.Send(clients[c_id].room_id, (char*)&p);
 
 		CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
-
+		if (scene->heal_player == clients[c_id].room_pid) {
+			scene->heal_player = -1;
+		}
 		scene->_plist_lock.lock();
 		scene->_plist[clients[c_id].room_pid] = -1;
 
