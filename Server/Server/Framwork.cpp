@@ -772,7 +772,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			packet.size = sizeof(SC_START_PACKET);
 			packet.type = SC_START;
 
-			printf("start %d\n", clients[c_id].room_id);
+			//printf("start %d\n", clients[c_id].room_id);
 			scene_manager.Send(clients[c_id].room_id, (char*)&packet);
 		}
 		break;

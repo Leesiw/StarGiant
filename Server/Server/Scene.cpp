@@ -243,7 +243,6 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
 		if (m_ppEnemies[i]->m_xmOOBB.Intersects(pos, dir, dist)) //총알/적 충돌시
 		{
-			printf("hit");
 			m_ppEnemies[i]->hp -= m_pSpaceship->damage;
 
 			for (short pl_id : _plist) {
