@@ -112,14 +112,11 @@ void SceneManager::ResetScene(short num)
 		m_pScenes[num]->_state = SCENE_RESET;
 		m_pScenes[num]->_s_lock.unlock();
 		m_pScenes[num]->Reset();
-
-		m_pScenes[num]->_s_lock.lock();
-		m_pScenes[num]->_state = SCENE_FREE;
-
-
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 60s, EV_RESET_SCENE, num };
+		timer_queue.push(ev);
+		return;
 	}
 	m_pScenes[num]->_s_lock.unlock();
-
 }
 
 char SceneManager::InsertPlayer(short num, short pl_id)

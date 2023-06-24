@@ -17,5 +17,3 @@ struct TIMER_EVENT {
 		return (wakeup_time > L.wakeup_time);
 	}
 };
-
-static concurrency::concurrent_priority_queue<TIMER_EVENT> timer_queue;

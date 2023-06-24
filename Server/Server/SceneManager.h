@@ -1,5 +1,8 @@
 #pragma once
 #include "Scene.h"
+#include "Timer.h"
+
+extern concurrency::concurrent_priority_queue<TIMER_EVENT> timer_queue;
 
 class SceneManager {
 public:

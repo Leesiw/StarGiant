@@ -142,7 +142,7 @@ void CScene::ReleaseObjects()
 
 void CScene::Reset()
 {
-
+	_id = -1;
 	m_pSpaceship->SetPosition(XMFLOAT3(0.f, 0.f, 0.f));
 	m_pSpaceship->Reset();
 

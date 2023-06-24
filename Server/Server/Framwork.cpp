@@ -323,6 +323,17 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			delete ex_over;
 			break;
 		}
+		case OP_RESET_SCENE: {
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
+			scene->_s_lock.lock();
+
+			if (scene->_state == SCENE_RESET) {
+				scene->_state = SCENE_FREE;
+			}
+			scene->_s_lock.unlock();
+			delete ex_over;
+			break;
+		}
 		}
 	}
 }
@@ -730,6 +741,7 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 	while (true) {
 		TIMER_EVENT ev;
 		auto current_time = chrono::system_clock::now();
+
 		if (true == timer_queue.try_pop(ev)) {
 			if (ev.wakeup_time > current_time) {
 				timer_queue.push(ev);		// 최적화 필요
@@ -797,6 +809,12 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 				OVER_EXP* ov = new OVER_EXP;
 				ov->_comp_type = OP_HEAL;
 				ov->obj_id = ev.obj_id;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
+				break;
+			}
+			case EV_RESET_SCENE: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_RESET_SCENE;
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}

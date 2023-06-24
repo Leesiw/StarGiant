@@ -7,6 +7,7 @@
 extern array<SESSION, MAX_USER> clients;
 extern std::unordered_map<MissionType, Level> levels;
 extern mutex m;
+extern concurrency::concurrent_priority_queue<TIMER_EVENT> timer_queue;
 
 class CGameFramework
 {
