@@ -647,7 +647,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 				++num;
 			}
 
-			scene->m_ppPlayers[clients[c_id].room_pid]->Move(p->data.dwDirection, 2.64, pos);
+			scene->m_ppPlayers[clients[c_id].room_pid]->Move(p->data.dwDirection, 2.64f, pos);
 
 			SC_MOVE_INSIDE_PACKET pack{};
 			pack.size = sizeof(pack);
