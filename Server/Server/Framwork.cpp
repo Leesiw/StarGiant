@@ -619,7 +619,33 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_INSIDE_MOVE: {
 		CS_INSIDE_PACKET* p = reinterpret_cast<CS_INSIDE_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::INSIDE) {
-			scene_manager.GetScene(clients[c_id].room_id)->m_ppPlayers[clients[c_id].room_pid]->SetInputInfo(p->data);
+			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+			float yaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
+			if (yaw != p->data.yaw)
+			{
+				scene->m_ppPlayers[clients[c_id].room_pid]->Rotate(0, p->data.yaw - yaw, 0);
+			}
+
+			XMFLOAT3 pos[2]{};
+			char num = 0;
+			for (char i = 0; i < 3; ++i)
+			{
+				if (i == clients[c_id].room_pid) { continue; }
+				if (scene->_plist[i] == -1) { continue; }
+				pos[num] = scene->m_ppPlayers[i]->GetPosition();
+				++num;
+			}
+
+			scene->m_ppPlayers[clients[c_id].room_pid]->Move(p->data.dwDirection, 2.64, pos);
+
+			SC_MOVE_INSIDE_PACKET pack{};
+			pack.size = sizeof(pack);
+			pack.type = SC_MOVE_INSIDEPLAYER;
+			pack.data.id = clients[c_id].room_pid;
+			pack.data.m_fYaw = yaw;
+			pack.data.pos = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition();
+
+			scene->Send((char*)&pack);
 		}
 		break;
 	}

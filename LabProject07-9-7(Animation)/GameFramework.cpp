@@ -835,7 +835,7 @@ void CGameFramework::ProcessInput()
 					my_packet.type = CS_INSIDE_MOVE;
 					my_packet.data.dwDirection = dwDirection;
 					my_packet.data.yaw = m_pInsidePlayer[g_myid]->GetYaw();
-					if (_state == SCENE_INGAME) {
+					if (_state == SCENE_INGAME && (dwDirection != 0 || cxDelta != 0.0f)) {
 						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 					}
 				}
