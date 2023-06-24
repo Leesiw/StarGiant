@@ -77,7 +77,7 @@ void CScene::BuildObjects()
 			meteo->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
 			// 크기 정확히 모르겠음 임시
 			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256, 0.71804,  -0.0466012 }, XMFLOAT3{ 0.882965, 0.858064, 0.828712 }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
-			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256, 0.71804,  -0.0466012 }, XMFLOAT3{ 4.414825, 4.29032, 4.14356 }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256f, 0.71804f,  -0.0466012f }, XMFLOAT3{ 4.414825f, 4.29032f, 4.14356f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 			
 			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.0f, 0.0f, -0.066881f }, XMFLOAT3{ 10.0928127f, 10.0928127f, 10.218262f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
@@ -541,7 +541,7 @@ void CScene::GetJewels()
 	}
 
 	++items[item_type];
-	ITEM_INFO info;
+	ITEM_INFO info{};
 	info.type = item_type;
 	info.num = items[item_type];
 
@@ -575,7 +575,7 @@ void CScene::SpawnEnemy(char id)
 	m_ppEnemies[id]->state = EnemyState::IDLE;
 	m_ppEnemies[id]->SetDestination();
 
-	SPAWN_ENEMY_INFO e_info;
+	SPAWN_ENEMY_INFO e_info{};
 	e_info.id = m_ppEnemies[id]->GetID();
 	e_info.Quaternion = m_ppEnemies[id]->GetQuaternion();
 	e_info.pos = m_ppEnemies[id]->GetPosition();
@@ -662,7 +662,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				for (int j = 0; j < ENEMY_BULLETS; ++j) {
 					if (!m_ppMissiles[j]->GetisActive()) {
 						m_ppMissiles[j]->SetNewMissile(info);
-						MISSILE_INFO m_info;
+						MISSILE_INFO m_info{};
 						m_info.id = j;
 						m_info.pos = info.StartPos;
 						m_info.Quaternion = info.Quaternion;
@@ -682,7 +682,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (int i = 0; i < ENEMY_BULLETS; ++i) {
 		if (m_ppMissiles[i]->GetisActive()) {
 			m_ppMissiles[i]->Animate(fTimeElapsed, m_pSpaceship);
-			MISSILE_INFO m_info;
+			MISSILE_INFO m_info{};
 			m_info.id = i;
 			m_info.pos = m_ppMissiles[i]->GetPosition();
 			//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
@@ -747,7 +747,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 //	if (send_time % 30 == 0) {
 		for (int i = 0; i < ENEMIES; ++i) {
 			if (m_ppEnemies[i]->GetisAlive()) {
-				ENEMY_INFO info;
+				ENEMY_INFO info{};
 				info.id = m_ppEnemies[i]->GetID();
 				info.Quaternion = m_ppEnemies[i]->GetQuaternion();
 				info.pos = m_ppEnemies[i]->GetPosition();

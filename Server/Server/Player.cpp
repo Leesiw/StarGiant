@@ -218,21 +218,13 @@ void CAirplanePlayer::GetAttack(char damage)
 
 bool CAirplanePlayer::GetHeal()
 {
-	heal_amount += heal;
-	if (heal_amount > 1.f) {
-		if (heal_amount + hp < max_hp) {
-			hp += heal_amount;
-
-			heal_amount -= floor(heal_amount);
-		}
-		else {
-			hp = max_hp;
-		}
-		return true;
+	if (heal + hp < max_hp) {
+		hp += heal;
 	}
-
-	return false;
-
+	else {
+		hp = max_hp;
+	}
+	return true;
 }
 
 void CAirplanePlayer::Reset()

@@ -86,7 +86,7 @@ public:
 	}
 	void send_login_info_packet()
 	{
-		SC_LOGIN_INFO_PACKET p;
+		SC_LOGIN_INFO_PACKET p{};
 		p.data.id = room_pid;
 		p.size = sizeof(SC_LOGIN_INFO_PACKET);
 		p.type = SC_LOGIN_INFO;

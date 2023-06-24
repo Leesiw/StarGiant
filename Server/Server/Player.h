@@ -93,8 +93,6 @@ public:
 
 	float						m_fBulletEffectiveRange = 150.0f;
 
-	float heal_amount = 0.f;
-
 	SPACESHIP_INPUT_INFO input_info;
 public:
 	void SetHP(short s) { hp = s; }

@@ -126,7 +126,7 @@ void CEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 		player->GetAttack(damage);
 
 		{
-			SC_BULLET_PACKET p;
+			SC_BULLET_PACKET p{};
 
 			p.size = sizeof(SC_BULLET_PACKET);
 			p.type = SC_BULLET;
@@ -138,7 +138,7 @@ void CEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 		}
 
 		{
-			SC_BULLET_HIT_PACKET p;
+			SC_BULLET_HIT_PACKET p{};
 			p.size = sizeof(SC_BULLET_HIT_PACKET);
 			p.type = SC_BULLET_HIT;
 			p.data.id = -1;
@@ -305,7 +305,7 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 void CEnemy::SendPos()
 {
 	if (enemy_flags & option0) {
-		ENEMY_INFO info;
+		ENEMY_INFO info{};
 		info.id = id;
 		info.Quaternion = GetQuaternion();
 		info.pos = GetPosition();
@@ -383,7 +383,7 @@ CLaserEnemy::CLaserEnemy()
 
 	enemy_flags &= ~option2;
 
-	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.037703, -0.673452, -0.197806), XMFLOAT3(3.478002f, 3.023166f, 3.342354f), XMFLOAT4(0.0, 0.0, 0.0, 1.0f) };
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.037703f, -0.673452f, -0.197806f), XMFLOAT3(3.478002f, 3.023166f, 3.342354f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 }
 
 CLaserEnemy::~CLaserEnemy()

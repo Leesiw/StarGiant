@@ -19,8 +19,8 @@ public:
 	BossAnimation CurMotion = BossAnimation::SLEEP;
 	BossAnimation PastMotion = CurMotion;
 
-	int MAXBossHP = 100.0f;
-	int BossHP = 100.0f;
+	int MAXBossHP = 100;
+	int BossHP = 100;
 	bool condition = false;
 	int attactCoolTime = 7;
 	float speed = 100.0f;

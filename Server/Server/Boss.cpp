@@ -51,7 +51,7 @@ Boss::~Boss() {
 
 void Boss::SendPosition()	// 위치/각도 변화할 때 사용. 
 {
-	SC_MOVE_ENEMY_PACKET p;
+	SC_MOVE_ENEMY_PACKET p{};
 
 	p.size = sizeof(SC_MOVE_ENEMY_PACKET);
 	p.type = SC_MOVE_ENEMY;
@@ -65,7 +65,7 @@ void Boss::SendPosition()	// 위치/각도 변화할 때 사용.
 
 void Boss::SendAnimation() // 애니메이션 변화했을 때 사용
 {
-	SC_ANIMATION_CHANGE_PACKET p;
+	SC_ANIMATION_CHANGE_PACKET p{};
 	p.size = sizeof(SC_ANIMATION_CHANGE_PACKET);
 	p.type = SC_ANIMATION_CHANGE;
 	p.data.id = BOSS_ID;
@@ -117,7 +117,7 @@ void Boss::MoveMeteo(float fTimeElapsed)		// 메테오 움직여야 할때 계속 실행. sen
 	}
 
 
-	SC_METEO_PACKET p;
+	SC_METEO_PACKET p{};
 	p.size = sizeof(SC_METEO_PACKET);
 	p.type = SC_METEO;
 
@@ -281,7 +281,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			//PastState = (BossState)(BossAnimation::BASIC_ATTACT);
 			PastState = BossState::ATTACT;
 
-			SC_BULLET_HIT_PACKET p;
+			SC_BULLET_HIT_PACKET p{};
 			p.size = sizeof(SC_BULLET_HIT_PACKET);
 			p.type = SC_BULLET_HIT;
 			p.data.id = -1;
@@ -316,7 +316,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 				SetState(BossState::IDLE);
 				
 
-				SC_BULLET_HIT_PACKET p;
+				SC_BULLET_HIT_PACKET p{};
 				p.size = sizeof(SC_BULLET_HIT_PACKET);
 				p.type = SC_BULLET_HIT;
 				p.data.id = -1;
@@ -336,7 +336,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			//PastState = (BossState)(BossAnimation::CLAW_ATTACT);
 			PastState = BossState::ATTACT;
 			
-			SC_BULLET_HIT_PACKET p;
+			SC_BULLET_HIT_PACKET p{};
 			p.size = sizeof(SC_BULLET_HIT_PACKET);
 			p.type = SC_BULLET_HIT;
 			p.data.id = -1;

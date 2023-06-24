@@ -24,9 +24,9 @@ protected:
 	XMFLOAT3					m_xmf3Velocity;
 	XMFLOAT3					m_xmf3Destination;
 
-	short						damage = 3;
-	short						hit_probability = 50;
-	short						m_fAvoidReductionRate = 20;
+	char						damage = 3;
+	char						hit_probability = 50;
+	char						m_fAvoidReductionRate = 20;
 
 	unsigned char enemy_flags = 0;	// 0 : 살아있는지 1 : 플레이어를 보고 있는지
 	// 2 : 공격 타이머가 켜져 있는지

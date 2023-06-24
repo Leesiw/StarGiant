@@ -89,7 +89,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			break;
 		}
 		case OP_SPAWN_ENEMY: {
-			CScene* scene = scene_manager.GetScene(key);
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
 			std::array<CEnemy*, ENEMIES> ppEnemies{ scene->m_ppEnemies };
 			std::random_shuffle(ppEnemies.begin(), ppEnemies.end());
@@ -101,19 +101,19 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				if (spawn_num <= 0) { break; }
 				if (!ppEnemies[i]->GetisAlive()) {
 					scene->SpawnEnemy(ppEnemies[i]->GetID());
-					TIMER_EVENT ev_u{ ppEnemies[i]->GetID(), chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, key};
+					TIMER_EVENT ev_u{ ppEnemies[i]->GetID(), chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(key) };
 					timer_queue.push(ev_u);
 					--spawn_num;
 				}
 			}
-			TIMER_EVENT ev{0, chrono::system_clock::now() + 20s, EV_SPAWN_ENEMY, key };
+			TIMER_EVENT ev{0, chrono::system_clock::now() + 20s, EV_SPAWN_ENEMY, static_cast<short>(key) };
 			timer_queue.push(ev);
 
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_ENEMY: {
-			CScene* scene = scene_manager.GetScene(key);
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
 			if (scene->m_ppEnemies[ex_over->obj_id]->hp <= 0) { 
 				scene->m_ppEnemies[ex_over->obj_id]->SetisAlive(false);
@@ -121,7 +121,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				break; 
 			}
 
-			scene->m_ppEnemies[ex_over->obj_id]->AI(0.033, scene->m_pSpaceship);
+			scene->m_ppEnemies[ex_over->obj_id]->AI(0.033f, scene->m_pSpaceship);
 			scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
 
 			// 款籍苞 面倒贸府
@@ -146,16 +146,16 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				}
 			}
 
-			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, key };
+			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(key) };
 			timer_queue.push(ev);
 
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_METEO: {
-			CScene* scene = scene_manager.GetScene(key);
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
-			scene->m_ppMeteoObjects[ex_over->obj_id]->Animate(0.033);
+			scene->m_ppMeteoObjects[ex_over->obj_id]->Animate(0.033f);
 			
 			XMFLOAT3 p_pos = scene->m_pSpaceship->GetPosition();
 			XMFLOAT3 m_pos = scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition();
@@ -192,7 +192,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				}
 			}
 			
-			SC_METEO_PACKET p;
+			SC_METEO_PACKET p{};
 			p.size = sizeof(SC_METEO_PACKET);
 			p.type = SC_METEO;
 			p.data.id = ex_over->obj_id;
@@ -200,21 +200,21 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			
 			scene->Send((char*)& p);
 
-			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_SPAWN_MISSILE, key };
+			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_SPAWN_MISSILE, static_cast<short>(key) };
 			timer_queue.push(ev);
 
 			delete ex_over;
 			break;
 		}
 		case OP_SPAWN_MISSILE: {
-			CScene* scene = scene_manager.GetScene(key);
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
 			if (!scene->m_ppEnemies[ex_over->obj_id]->GetisAlive() || scene->m_ppEnemies[ex_over->obj_id]->state != EnemyState::AIMING) {
 				scene->m_ppEnemies[ex_over->obj_id]->SetAttackTimerFalse();
 				break; 
 			}
 
-			MissileInfo info;
+			MissileInfo info{};
 			info.StartPos = scene->m_ppEnemies[ex_over->obj_id]->GetPosition();
 			info.Quaternion = scene->m_ppEnemies[ex_over->obj_id]->GetQuaternion();
 			info.damage = levels[scene->cur_mission].Missile.ATK;
@@ -224,7 +224,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				if (!scene->m_ppMissiles[i]->GetisActive()) {
 					scene->m_ppMissiles[i]->SetNewMissile(info);
 
-					MISSILE_INFO m_info;
+					MISSILE_INFO m_info{};
 					m_info.id = i;
 					m_info.pos = info.StartPos;
 					m_info.Quaternion = info.Quaternion;
@@ -234,27 +234,27 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 						if (clients[pl_id]._state != ST_INGAME) continue;
 						clients[pl_id].send_missile_packet(0, m_info);
 					}
-					TIMER_EVENT ev{ i, chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, key };
+					TIMER_EVENT ev{ static_cast<char>(i), chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
 					timer_queue.push(ev);
 
 					break;
 				}
 			}
 
-			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, key };
+			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(key) };
 			timer_queue.push(ev);
 			delete ex_over;
 			break;
 		}
 
 		case OP_UPDATE_MISSILE: {
-			CScene* scene = scene_manager.GetScene(key);
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
 			if (!scene->m_ppMissiles[ex_over->obj_id]->GetisActive()) { break; }
 
-			scene->m_ppMissiles[ex_over->obj_id]->Animate(0.033, scene->m_pSpaceship);
+			scene->m_ppMissiles[ex_over->obj_id]->Animate(0.033f, scene->m_pSpaceship);
 			
-			MISSILE_INFO m_info;
+			MISSILE_INFO m_info{};
 			m_info.id = ex_over->obj_id;
 			m_info.pos = scene->m_ppMissiles[ex_over->obj_id]->GetPosition();
 			//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
@@ -265,7 +265,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				if (clients[pl_id]._state != ST_INGAME) continue;
 				if (scene->m_ppMissiles[ex_over->obj_id]->GetisActive()) {
 					clients[pl_id].send_missile_packet(0, m_info);
-					TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, key };
+					TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
 					timer_queue.push(ev);
 				}
 				else {
@@ -277,35 +277,35 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			break;
 		}
 		case OP_UPDATE_BOSS: {
-			CScene* scene = scene_manager.GetScene(key);
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
 			if (scene->m_pBoss->BossHP <= 0) { break; }
 
-			scene->m_pBoss->Boss_Ai(0.033, scene->m_pBoss->GetState(), scene->m_pSpaceship, scene->m_pBoss->GetHP());
+			scene->m_pBoss->Boss_Ai(0.033f, scene->m_pBoss->GetState(), scene->m_pSpaceship, scene->m_pBoss->GetHP());
 
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, key };
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(key) };
 			timer_queue.push(ev);
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_SPACESHIP: {
-			CScene* scene = scene_manager.GetScene(key);
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
-			scene->m_pSpaceship->Update(0.033);
+			scene->m_pSpaceship->Update(0.033f);
 
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, key };
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, static_cast<short>(key) };
 			timer_queue.push(ev);
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_PLAYER: {
-			CScene* scene = scene_manager.GetScene(key);
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
 			delete ex_over;
 			break;
 		}
 		case OP_HEAL: {
-			CScene* scene = scene_manager.GetScene(key);
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
 
 			if (scene->heal_player != -1) {
@@ -317,7 +317,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 					}
 				}
 
-				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, key };
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, static_cast<short>(key) };
 				timer_queue.push(ev);
 			}
 			delete ex_over;
@@ -344,7 +344,7 @@ void CGameFramework::Init() {
 	server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
 	bind(g_s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 	listen(g_s_socket, SOMAXCONN);
-	SOCKADDR_IN cl_addr;
+	SOCKADDR_IN cl_addr{};
 	int addr_size = sizeof(cl_addr);
 
 	h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
@@ -519,7 +519,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 
 		clients[c_id].send_login_info_packet();
 
-		SC_LOGIN_INFO_PACKET packet;
+		SC_LOGIN_INFO_PACKET packet{};
 		packet.type = SC_ADD_PLAYER;
 		packet.size = sizeof(packet);
 		packet.data.id = clients[c_id].room_pid;
@@ -533,7 +533,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		
 		for (auto pl_id : scene->_plist) {
 			if (pl_id == -1) { continue; }
-			SC_LOGIN_INFO_PACKET my_packet;
+			SC_LOGIN_INFO_PACKET my_packet{};
 			my_packet.type = SC_ADD_PLAYER;
 			my_packet.size = sizeof(my_packet);
 			my_packet.data.id = clients[pl_id].room_pid;
@@ -547,7 +547,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			
 		}
 
-		SC_MISSION_START_PACKET miss_packet;
+		SC_MISSION_START_PACKET miss_packet{};
 		miss_packet.size = sizeof(miss_packet);
 		miss_packet.type = SC_MISSION_START;
 		miss_packet.next_mission = scene->cur_mission;
@@ -555,7 +555,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 
 		if (scene->cur_mission == MissionType::Kill_MONSTER || scene->cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME)
 		{
-			SC_KILL_NUM_PACKET pack;
+			SC_KILL_NUM_PACKET pack{};
 			pack.size = sizeof(pack);
 			pack.type = SC_KILL_NUM;
 			pack.num = scene->kill_monster_num;
@@ -563,7 +563,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 
 		for (int i = 0; i < 4; ++i) {
-			ITEM_INFO info;
+			ITEM_INFO info{};
 			info.type = (ItemType)i;
 			info.num = scene->items[info.type];
 			clients[c_id].send_item_packet(0, info);
@@ -576,7 +576,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		{
 			clients[c_id].type = PlayerType::INSIDE;
 
-			SC_LOGIN_INFO_PACKET packet;
+			SC_LOGIN_INFO_PACKET packet{};
 			packet.data.id = c_id;
 			packet.data.player_type = p->player_type;
 			packet.size = sizeof(SC_LOGIN_INFO_PACKET);
@@ -598,7 +598,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 				}
 
 
-				SC_LOGIN_INFO_PACKET packet;
+				SC_LOGIN_INFO_PACKET packet{};
 				packet.data.id = c_id;
 				packet.data.player_type = p->player_type;
 				packet.size = sizeof(SC_LOGIN_INFO_PACKET);
@@ -675,7 +675,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
 			scene->Start();
 
-			SC_START_PACKET packet;
+			SC_START_PACKET packet{};
 			packet.size = sizeof(SC_START_PACKET);
 			packet.type = SC_START;
 
@@ -803,7 +803,7 @@ int CGameFramework::get_new_client_id()
 
 void CGameFramework::disconnect(int c_id)
 {	
-	SC_REMOVE_PLAYER_PACKET p;
+	SC_REMOVE_PLAYER_PACKET p{};
 	p.id = c_id;
 	p.size = sizeof(p);
 	p.type = SC_REMOVE_PLAYER;
