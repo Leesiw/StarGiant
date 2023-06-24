@@ -2,6 +2,9 @@
 
 #include "Object.h"
 #include "Session.h"
+#include "include/lua.hpp"
+#pragma comment (lib, "lua54.lib")
+
 
 extern array<SESSION, MAX_USER> clients;
 
@@ -43,6 +46,9 @@ public:
 	void SendAnimation();
 
 	XMFLOAT4 GetQuaternion();
+
+
+
 protected:
 	/*XMFLOAT3					m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3					m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
@@ -63,6 +69,11 @@ public:
 	void MoveBoss(float fTimeElapsed, XMFLOAT3 TargetPos, float dist);
 	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
 	void Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHp);
+
+
+	// Lua ป๓ลย
+	lua_State* m_L;
+
 
 
 };
