@@ -3,31 +3,7 @@
 #include "stdafx.h"
 #include "SceneManager.h"
 #include "Boss.h"
-
-
-
 extern SceneManager scene_manager;
-
-static int LuaLookAtPosition(lua_State* L)
-{
-	cout << "LuaLookAtPosition";
-	// 전달된 인자 개수 확인
-	int nArgs = lua_gettop(L);
-
-
-	Boss* boss = reinterpret_cast<Boss*>(lua_touserdata(L, lua_upvalueindex(1)));
-
-	// 인자 처리
-	float fTimeElapsed = static_cast<float>(lua_tonumber(L, 1));
-	const XMFLOAT3& pos = *reinterpret_cast<const XMFLOAT3*>(lua_touserdata(L, 2));
-
-	// LookAtPosition 함수 호출
-
-	boss->LookAtPosition(fTimeElapsed, pos);
-
-	// 반환 값이 없으므로 0을 반환
-	return 0;
-}
 
 
 Boss::Boss()
@@ -72,10 +48,17 @@ Boss::Boss()
 		printf("Error loading boss_ai.lua: %s\n", error);
 	}
 
-	// Lua 함수 등록
-	lua_pushlightuserdata(m_L, this);
-	lua_pushcclosure(m_L, LuaLookAtPosition, 1);
-	lua_setglobal(m_L, "LookAtPosition");
+	lua_getglobal(m_L, "updateBossAI");
+	if (lua_pcall(m_L, 0, 0, 0) != LUA_OK)
+	{
+		const char* error = lua_tostring(m_L, -1);
+		printf("Error calling updateBossAI: %s\n", error);
+	}
+	lua_getglobal(m_L, "state");
+	CurState = BossState(lua_tonumber(m_L, -1));
+	lua_pop(m_L, 1);
+
+	cout << int(CurState) << "\n";
 
 }
 Boss::~Boss() {
@@ -212,19 +195,14 @@ void Boss::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 
 void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHP)
 {
-	// Lua 함수 호출
-	lua_getglobal(m_L, "BossAi");
-	lua_pushnumber(m_L, fTimeElapsed);
-	lua_pushinteger(m_L, static_cast<int>(CurState));
-	lua_pushlightuserdata(m_L, player);
-	lua_pushinteger(m_L, bossHP);
-
-	if (lua_pcall(m_L, 4, 0, 0) != LUA_OK)
+	lua_getglobal(m_L, "updateBossAI");
+	if (lua_pcall(m_L, 0, 0, 0) != LUA_OK)
 	{
 		const char* error = lua_tostring(m_L, -1);
-		printf("Error calling Boss_Ai: %s\n", error);
+		printf("Error calling updateBossAI: %s\n", error);
 	}
-
+	lua_getglobal(m_L, "state");
+	SendAnimation();
 }
 
 
