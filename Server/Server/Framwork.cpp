@@ -260,19 +260,51 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
 			m_info.Quaternion = scene->m_ppMissiles[ex_over->obj_id]->GetQuaternion();
 
-			for (short pl_id : scene->_plist) {
-				if (pl_id == -1) continue;
-				if (clients[pl_id]._state != ST_INGAME) continue;
-				if (scene->m_ppMissiles[ex_over->obj_id]->GetisActive()) {
-					clients[pl_id].send_missile_packet(0, m_info);
-					TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
-					timer_queue.push(ev);
+			scene->m_ppMissiles[ex_over->obj_id]->UpdateBoundingBox();
+			if (scene->m_ppMissiles[ex_over->obj_id]->HierarchyIntersects(scene->m_pSpaceship))
+			{
+				scene->m_ppMissiles[ex_over->obj_id]->SetisActive(false);
+				// 충돌처리
+
+				XMFLOAT3 xmf3Sub = scene->m_pSpaceship->GetPosition();
+				xmf3Sub = Vector3::Subtract(scene->m_ppMissiles[ex_over->obj_id]->GetPosition(), xmf3Sub);
+				if (Vector3::Length(xmf3Sub) > 0.0001f) {
+					xmf3Sub = Vector3::Normalize(xmf3Sub);
 				}
-				else {
-					clients[pl_id].send_remove_missile_packet(0, ex_over->obj_id);
+				float fLen = 100.f;
+				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+
+				XMFLOAT3 vel2 = scene->m_pSpaceship->GetVelocity();
+
+				scene->m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+
+				if (scene->m_pSpaceship->GetHP() > 0) {
+					scene->m_pSpaceship->GetAttack(scene->m_ppMissiles[ex_over->obj_id]->GetDamage());
+				}
+
+				for (short pl_id : scene->_plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_bullet_hit_packet(0, -1, scene->m_pSpaceship->GetHP());
 				}
 			}
 
+			if (scene->m_ppMissiles[ex_over->obj_id]->GetisActive()) {
+				for (short pl_id : scene->_plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_missile_packet(0, m_info);
+				}
+				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
+				timer_queue.push(ev);
+			}
+			else {
+				for (short pl_id : scene->_plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_remove_missile_packet(0, ex_over->obj_id);
+				}
+			}
 			delete ex_over;
 			break;
 		}
