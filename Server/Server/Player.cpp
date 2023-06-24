@@ -258,6 +258,8 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 		input_info.dwDirection = NULL;
 	}
 	is_update = true;
+
+	UpdateBoundingBox();
 }
 
 void CAirplanePlayer::OnPrepareRender()

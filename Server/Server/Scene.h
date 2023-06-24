@@ -3,6 +3,9 @@
 #include "Enemy.h"
 #include "Boss.h"
 #include "Missile.h"
+#include "Timer.h"
+
+extern concurrency::concurrent_priority_queue<TIMER_EVENT> timer_queue;
 
 extern array<SESSION, MAX_USER> clients;
 extern std::unordered_map<MissionType, Level> levels;

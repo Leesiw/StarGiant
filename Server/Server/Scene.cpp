@@ -811,6 +811,7 @@ void CScene::Start()
 	_s_lock.lock();
 	if (_state == SCENE_ALLOC) {
 		_state = SCENE_INGAME;
+		_s_lock.unlock();
 
 		for (short pl_id:_plist) {
 			if (pl_id == -1) continue;
@@ -819,7 +820,17 @@ void CScene::Start()
 			clients[pl_id]._s_lock.unlock();
 			// 게임 스타트 패킷 send
 		}
-		_s_lock.unlock();
+
+		for (int i = 0; i < METEOS; ++i) {
+			TIMER_EVENT ev{ i, chrono::system_clock::now() + 33ms, EV_UPDATE_METEO, num };
+			timer_queue.push(ev);
+		}
+
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_SPAWN_ENEMY, num };
+		timer_queue.push(ev);
+
+		TIMER_EVENT ev1{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, num };
+		timer_queue.push(ev1);
 
 		return;
 	}

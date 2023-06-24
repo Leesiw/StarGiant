@@ -145,6 +145,16 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 					scene->m_ppEnemies[i]->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
 				}
 			}
+			ENEMY_INFO info{};
+			info.id = ex_over->obj_id;
+			info.pos = scene->m_ppEnemies[ex_over->obj_id]->GetPosition();
+			info.Quaternion = scene->m_ppEnemies[ex_over->obj_id]->GetQuaternion();
+			info.velocity = scene->m_ppEnemies[ex_over->obj_id]->GetVelocity();
+			for (short pl_id : scene->_plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_enemy_packet(ex_over->obj_id, info);
+			}
 
 			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(key) };
 			timer_queue.push(ev);
@@ -321,18 +331,19 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			break;
 		}
 		case OP_UPDATE_SPACESHIP: {
+			
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
 			scene->m_pSpaceship->Update(0.033f);
 
+			for (short pl_id : scene->_plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_spaceship_packet(0, scene->m_pSpaceship);
+			}
+
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, static_cast<short>(key) };
 			timer_queue.push(ev);
-			delete ex_over;
-			break;
-		}
-		case OP_UPDATE_PLAYER: {
-			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
 			delete ex_over;
 			break;
 		}
@@ -533,9 +544,9 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 
 			if (scene_num >= 0) {
 				char num = scene_manager.InsertPlayer(scene_num, c_id);
-				if (num == 2) { scene_manager.SceneStart(scene_num); }
-				else if (num == -1) { disconnect(c_id); return; }  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
-				else {
+				//if (num == 2) { scene_manager.SceneStart(scene_num); }
+				if (num == -1) { disconnect(c_id); return; }  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
+				else if(num == 0) {
 					CScene* scene = scene_manager.GetScene(scene_num);
 					scene->_s_lock.lock();
 					if (scene->_state == SCENE_FREE) {
@@ -731,6 +742,8 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			m_pScene->heal_start = std::chrono::system_clock::now();
 			m_pScene->heal_player = c_id;
 			clients[c_id].send_heal_packet();
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, clients[c_id].room_id};
+			timer_queue.push(ev);
 		}
 		else {
 			if (m_pScene->heal_player == c_id) {
@@ -826,13 +839,6 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 			case EV_UPDATE_SPACESHIP: {
 				OVER_EXP* ov = new OVER_EXP;
 				ov->_comp_type = OP_UPDATE_SPACESHIP;
-				ov->obj_id = ev.obj_id;
-				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
-				break;
-			}
-			case EV_UPDATE_PLAYER: {
-				OVER_EXP* ov = new OVER_EXP;
-				ov->_comp_type = OP_UPDATE_PLAYER;
 				ov->obj_id = ev.obj_id;
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
