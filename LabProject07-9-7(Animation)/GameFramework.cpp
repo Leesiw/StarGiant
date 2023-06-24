@@ -1436,6 +1436,13 @@ void CGameFramework::ProcessPacket(char* p)
 		}
 		m_pInsidePlayer[g_myid]->type = player_type;
 		m_pInsidePlayer[g_myid]->isAlive = true;
+		INSIDE_PLAYER_INFO info{};
+		info.pos.x = packet->data.x;
+		info.pos.z = packet->data.z;
+		info.m_fYaw = packet->data.yaw;
+
+		m_pInsidePlayer[g_myid]->SetPlayerInfo(info);
+
 	//	float y = m_pInsidePlayer[g_myid]->GetPosition().y;
 	//	m_pInsidePlayer[g_myid]->SetPosition({ packet->data.x, y, packet->data.z });
 		break;
@@ -1501,6 +1508,14 @@ void CGameFramework::ProcessPacket(char* p)
 		float y = m_pInsidePlayer[packet->data.id]->GetPosition().y;
 		m_pInsidePlayer[packet->data.id]->SetPosition({ packet->data.x, y, packet->data.z });
 		m_pInsidePlayer[packet->data.id]->Rotate(0.f, packet->data.yaw - m_pInsidePlayer[packet->data.id]->GetYaw(), 0.f);
+
+		INSIDE_PLAYER_INFO info{};
+		info.pos.x = packet->data.x;
+		info.pos.z = packet->data.z;
+		info.m_fYaw = packet->data.yaw;
+		m_pInsidePlayer[packet->data.id]->SetPlayerInfo(info);
+
+
 		break;
 	}
 	case SC_REMOVE_PLAYER:

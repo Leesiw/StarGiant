@@ -583,6 +583,17 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			packet.type = SC_CHANGE;
 
 			scene_manager.Send(clients[c_id].room_id, (char*)&packet);	// ¼öÁ¤	
+
+			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+
+			SC_MOVE_INSIDE_PACKET pack{};
+			pack.size = sizeof(pack);
+			pack.type = SC_MOVE_INSIDEPLAYER;
+			pack.data.id = clients[c_id].room_pid;
+			pack.data.m_fYaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
+			pack.data.pos = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition();
+
+			scene->Send((char*)&pack);
 		}
 		else
 		{
