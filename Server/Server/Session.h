@@ -38,6 +38,14 @@ public:
 		_comp_type = OP_SEND;
 		memcpy(_send_buf, packet, packet[0]);
 	}
+	OVER_EXP(char* packet, int size)
+	{
+		_wsabuf.len = size;
+		_wsabuf.buf = _send_buf;
+		ZeroMemory(&_over, sizeof(_over));
+		_comp_type = OP_SEND;
+		memcpy(_send_buf, packet, size);
+	}
 };
 
 enum S_STATE { ST_FREE, ST_ALLOC, ST_INGAME };
@@ -84,6 +92,13 @@ public:
 		OVER_EXP* sdata = new OVER_EXP{ reinterpret_cast<char*>(packet) };
 		WSASend(_socket, &sdata->_wsabuf, 1, 0, 0, &sdata->_over, 0);
 	}
+
+	void do_send(void* packet, int size)
+	{
+		OVER_EXP* sdata = new OVER_EXP{ reinterpret_cast<char*>(packet), size };
+		WSASend(_socket, &sdata->_wsabuf, 1, 0, 0, &sdata->_over, 0);
+	}
+
 	void send_login_info_packet()
 	{
 		SC_LOGIN_INFO_PACKET p{};

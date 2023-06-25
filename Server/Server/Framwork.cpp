@@ -146,7 +146,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				}
 			}
 
-			if (scene->m_ppEnemies[ex_over->obj_id]->send_num == 0) {
+		//	if (scene->m_ppEnemies[ex_over->obj_id]->send_num == 0) {
 				ENEMY_INFO info{};
 				info.id = ex_over->obj_id;
 				info.pos = scene->m_ppEnemies[ex_over->obj_id]->GetPosition();
@@ -160,11 +160,11 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				scene->m_ppEnemies[ex_over->obj_id]->send_num = 5;
 
 
-			}
-			else {
-				--scene->m_ppEnemies[ex_over->obj_id]->send_num;
+		//	}
+		//	else {
+		//		--scene->m_ppEnemies[ex_over->obj_id]->send_num;
 
-			}
+///			}
 
 		
 			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(key) };
@@ -213,7 +213,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				}
 			}
 
-			if (scene->m_ppMeteoObjects[ex_over->obj_id]->send_num == 0) {
+		//	if (scene->m_ppMeteoObjects[ex_over->obj_id]->send_num == 0) {
 
 				SC_METEO_PACKET p{};
 				p.size = sizeof(SC_METEO_PACKET);
@@ -223,10 +223,10 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 
 				scene->Send((char*)&p);
 				scene->m_ppMeteoObjects[ex_over->obj_id]->send_num == 5;
-			}
-			else {
+		//	}
+		//	else {
 				--scene->m_ppMeteoObjects[ex_over->obj_id]->send_num;
-			}
+		//	}
 			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_METEO, static_cast<short>(key) };
 			timer_queue.push(ev);
 
