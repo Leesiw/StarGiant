@@ -241,21 +241,43 @@ void Boss::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 
 void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHP)
 {
+	//test
+	float x, y, z;
+	x = float(GetPosition().x);
+	y = float(GetPosition().y);
+	z = float(GetPosition().z);
+
 	lua_getglobal(m_L, "updateBossAI");
+	lua_pushnumber(m_L, MAXBossHP);
+
+	lua_pushnumber(m_L, x);
+	lua_pushnumber(m_L, y);
+	lua_pushnumber(m_L, z);
+
+
+	lua_pcall(m_L, 4, 0, 0);	// 파라미터 개수, 리턴값 개수, 핸들러
+	//int result = lua_tonumber(m_L, -1);	// 리턴값 맨 꼭대기 값
+	//lua_pop(m_L, 1);
+
 	if (lua_pcall(m_L, 0, 0, 0) != LUA_OK)
 	{
 		const char* error = lua_tostring(m_L, -1);
-		printf("eeError calling updateBossAI: %s\n", error);
+		printf("Error calling updateBossAI: %s\n", error);
 	}
-	lua_getglobal(m_L, "state");
-	CurState = BossState(lua_tonumber(m_L, -1));
-	lua_pop(m_L, 1);
+
+	lua_getglobal(m_L, "boss_x"); lua_getglobal(m_L, "boss_y"); lua_getglobal(m_L, "boss_z");
+	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+	lua_pop(m_L, 3);
+	cout << "getpos - " << GetPosition().x << "\n";
 
 	SendPosition();
 	SendAnimation();
+	
 
-
-
+	if (CurState != BossState::SLEEP)
+	{
+		LookAtPosition(fTimeElapsed, player->GetPosition());
+	}
 
 
 }

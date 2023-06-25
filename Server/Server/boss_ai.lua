@@ -43,6 +43,10 @@ boss_z = 1000
 
 curHp = MaxHp
 
+
+local idleElapsedTime = 0  -- idle 경과 시간 (초)
+local idleDelay = 5  -- idle 상태 지속 시간 (초)
+
 function getPlayerPos(px, py, pz)
     local position = { px, py, pz }
 	return position;
@@ -65,7 +69,7 @@ function updateBossAI(hp, bpx, bpy, bpz)
 
     elseif state == BossState.IDLE then
         -- 보스가 IDLE 때의 동작을 수행합니다.
-        idle(bpx, bpy, bpz)
+        idle()
 
     elseif state == BossState.ATTACK then
         -- 보스가 ATTACK 때의 동작을 수행합니다.
@@ -84,7 +88,7 @@ function sleep()
 end
 
 -- 보스의 유휴 상태 동작
-function idle(bpx, bpy, bpz)
+function idle()
     -- 보스의 유휴 상태 동작을 정의합니다.
     print("보스가 idle 상태입니다.")
     -- TODO: 보스의 유휴 상태 동작을 구현합니다.
