@@ -69,13 +69,13 @@ Boss::Boss()
 	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
 
 
-	cout << "getpos - " << GetPosition().x << "\n";
-	cout << "getpos - " << GetPosition().y << "\n";
-	cout << "getpos - " << GetPosition().z << "\n";
-	cout << "CurState - " << int(CurState) <<"\n";
-	cout << "CurMotion - " << int(CurMotion) << "\n";
-	cout << "MAXBossHP - "<< MAXBossHP << "\n";
-	cout << "getpos - " << GetPosition().y << "\n";
+	//cout << "getpos - " << GetPosition().x << "\n";
+	//cout << "getpos - " << GetPosition().y << "\n";
+	//cout << "getpos - " << GetPosition().z << "\n";
+	//cout << "CurState - " << int(CurState) <<"\n";
+	//cout << "CurMotion - " << int(CurMotion) << "\n";
+	//cout << "MAXBossHP - "<< MAXBossHP << "\n";
+	//cout << "getpos - " << GetPosition().y << "\n";
 	lua_pop(m_L, 6);
 
 	////test
@@ -269,9 +269,9 @@ void Boss::Boss_Ai(float fTimeElapsed, CAirplanePlayer* player, int bossHP)
 	lua_getglobal(m_L, "boss_x"); lua_getglobal(m_L, "boss_y"); lua_getglobal(m_L, "boss_z");
 	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
 	lua_pop(m_L, 3);
-	cout << "getpos - " << GetPosition().x << "\n";
+	/*cout << "getpos - " << GetPosition().x << "\n";
 	cout << "getpos - " << GetPosition().y << "\n";
-	cout << "getpos - " << GetPosition().z << "\n";
+	cout << "getpos - " << GetPosition().z << "\n";*/
 
 	lua_getglobal(m_L, "boss_z");
 	lua_getglobal(m_L, "state");

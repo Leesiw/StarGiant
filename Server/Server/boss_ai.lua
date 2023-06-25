@@ -94,7 +94,7 @@ end
 -- 보스의 잠자는 동작
 function sleep()
     -- 보스가 잠자는 동안의 동작을 정의합니다.
-    print("보스가 sleep 중입니다.")
+    --print("보스가 sleep 중입니다.")
     -- TODO: 보스의 잠자는 동작을 구현합니다.
 
 end
@@ -113,7 +113,7 @@ function idle(frameTime)
             attackType = math.random(7, 8)
         end
 
-        print("attackType - ", attackType)
+        --print("attackType - ", attackType)
         if attackType == tonumber(BossState.BASIC_ATTACK) then
             basicAttack()
             attackCooldown = frameTime + 4
@@ -142,7 +142,7 @@ end
 -- 보스의 appear 상태 동작
 function appear(bpx, bpy, bpz)
     -- 보스의 appear 상태 동작을 정의합니다.
-    print("보스가 appear 상태입니다.")
+   -- print("보스가 appear 상태입니다.")
     -- TODO: 보스의 appear 상태 동작을 구현합니다.
     -- 플레이어의 위치로 세팅
     boss_x = bpx + 2300
@@ -158,104 +158,104 @@ function attack(frameTime)
     if attackType == tonumber(BossState.BASIC_ATTACK) then
         --state = BossState.BASIC_ATTACK
         motion = BossState.BASIC_ATTACK
-        print(motion)
-        print("BASIC_ATTACK")
+   --     print(motion)
+    --    print("BASIC_ATTACK")
     
     elseif attackType == tonumber(BossState.CLAW_ATTACK) then
         --state = BossState.BASIC_ATTACK
         motion = BossState.BASIC_ATTACK
-        print(motion)
-        print("CLAW_ATTACK")
+   --     print(motion)
+     --   print("CLAW_ATTACK")
 
     elseif attackType == tonumber(BossState.FLAME_ATTACK) then
         --state = BossState.FLAME_ATTACK
         motion = BossState.FLAME_ATTACK
-        print(motion)
-        print("FLAME_ATTACK")
+       -- print(motion)
+      --  print("FLAME_ATTACK")
     end
 
     --print(frameTime)
     attackCooldown = 4
     if frameTime >= attackCooldown then
-        print("IDLE로 갈 준비")
+    --    print("IDLE로 갈 준비")
         attackState = false
     end
 end
 
 -- BASIC_ATTACK 실행 함수
 function basicAttack()
-    print("보스가 BASIC_ATTACK을 실행합니다.")
+  --  print("보스가 BASIC_ATTACK을 실행합니다.")
     -- TODO: BASIC_ATTACK 실행 코드 작성
     motion = BossState.BASIC_ATTACK
-    print(motion)
+--    print(motion)
     frameTime = 0
 end
 
 -- FLAME_ATTACK 실행 함수
 function flameAttack()
-    print("보스가 FLAME_ATTACK을 실행합니다.")
+ --   print("보스가 FLAME_ATTACK을 실행합니다.")
     -- TODO: FLAME_ATTACK 실행 코드 작성
     motion = BossState.FLAME_ATTACK
-    print(motion)
+ --   print(motion)
     frameTime = 0
 end
 
 -- CLAW_ATTACK 실행 함수
 function clawAttack()
-    print("보스가 CLAW_ATTACK을 실행합니다.")
+  --  print("보스가 CLAW_ATTACK을 실행합니다.")
     -- TODO: CLAW_ATTACK 실행 코드 작성
     motion = BossState.CLAW_ATTACK
-    print(motion)
+  --  print(motion)
     frameTime = 0
 end
 
 -- 죽음 상태 처리 함수
 function die()
-    print("보스가 die 상태입")
+   -- print("보스가 die 상태입")
     -- TODO: 죽음 상태 처리 코드 작성
 end
 
 
 function nextState(bpx, bpy, bpz)
-    print("다음으로")
+   -- print("다음으로")
     local distance = CalculateDistance(boss_x, boss_y, boss_z, bpx, bpy, bpz)
 
     if state == BossState.IDLE then
         if curHp <= 0 then
             state = BossState.DIE
             motion = BossState.DIE
-            print("다이")
+     --       print("다이")
         elseif attackState and state ~= BossState.ATTACK then
             state = BossState.ATTACK
             frameTime = 0
             attackCooldown = 4
-            print("공격, 프레임타임 0으로 초기화")
+    --        print("공격, 프레임타임 0으로 초기화")
         end
-        -- 다른 조건에 따른 상태 변경 로직을 추가하세요
+        
 
 
     elseif state == BossState.SLEEP then
-        print("SLEEP로 바꿉니다")
+  --      print("SLEEP로 바꿉니다")
         state = BossState.SLEEP
         motion = BossState.SLEEP
 
         -- appear로
         if onappear == true then
             state = BossState.APPEAR
-            print("APPEAR로 바꿉니다")
+   --         print("APPEAR로 바꿉니다")
             onappear = false
         end
 
         if distance <= 1500 then
-            print(onIdle)
+    --        print(onIdle)
             onIdle = true
         else
-            print(onIdle)
+   --         print(onIdle)
             onIdle = false
         end   
 
         if onIdle == true then
-            print("onIdle")
+    --        print("onIdle")
             state = BossState.IDLE
             motion = BossState.IDLE
         end
@@ -271,10 +271,10 @@ function nextState(bpx, bpy, bpz)
         if attackState == false then
             state = BossState.IDLE
             motion = BossState.IDLE
-            print("IDLE로 변경한다")
+     --       print("IDLE로 변경한다")
             frameTime = 0
         end
-        -- 다른 조건에 따른 상태 변경 로직을 추가하세요
+     
     end
 end
 
