@@ -73,7 +73,4 @@ public:
 
 	// Lua ป๓ลย
 	lua_State* m_L;
-
-
-
 };
