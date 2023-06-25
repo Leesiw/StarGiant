@@ -26,8 +26,8 @@ BossState = {
     COUNT = 22
 }
 
-CLAW_COOL_TIME = 4
-FLAME_COOL_TIME = 4
+CLAW_COOL_TIME = 5
+FLAME_COOL_TIME = 10
 
 -- 보스의 초기 상태
 
@@ -56,8 +56,11 @@ frameInterval = 0
 
 -- 보스의 AI 업데이트 함수
 function updateBossAI(hp, bpx, bpy, bpz, elapsedTime)
-    curHp = hp + 10
+    curHp = hp
     frameTime = frameTime + elapsedTime
+    clawCooldown = clawCooldown - elapsedTime
+    flameCooldown = flameCooldown - elapsedTime
+
     --print(bpx, bpy, bpz)
 
     if state == BossState.SLEEP then
@@ -84,32 +87,40 @@ end
 -- 보스의 잠자는 동작
 function sleep()
     -- 보스가 잠자는 동안의 동작을 정의합니다.
-    print("보스가 잠자는 중입니다.")
+    print("보스가 sleep 중입니다.")
     -- TODO: 보스의 잠자는 동작을 구현합니다.
 end
 
 
 -- 보스의 idle 상태 동작
 function idle(frameTime)
-    print("idle 상태")
-    print(frameTime)
+    --print("idle 상태")
+   -- print(frameTime)
     if not attackState and frameTime >= attackCooldown then
-        local attackType = math.random(7, 9)
+        local attackType
+        
+        if curHp <= (MaxHp / 2) then
+            attackType = math.random(7, 9)
+        else
+            attackType = math.random(7, 8)
+        end
+
+        print("attackType - ", attackType)
         if attackType == tonumber(BossState.BASIC_ATTACK) then
             basicAttack()
             attackCooldown = frameTime + 4
             attackState = true
-        elseif attackType == tonumber(BossState.FLAME_ATTACK) then
-            if curHp <= MaxHp / 2 and frameTime >= flameCooldown then
-                flameAttack()
-                flameCooldown = frameTime + FLAME_COOL_TIME
+        elseif attackType == tonumber(BossState.CLAW_ATTACK) then
+            if clawCooldown <= 0 then
+                clawAttack()
+                clawCooldown = frameTime + CLAW_COOL_TIME
                 attackCooldown = frameTime + 4
                 attackState = true
             end
-        elseif attackType == tonumber(BossState.CLAW_ATTACK) then
-            if frameTime >= clawCooldown then
-                clawAttack()
-                clawCooldown = frameTime + CLAW_COOL_TIME
+        elseif attackType == tonumber(BossState.FLAME_ATTACK) then
+            if flameCooldown <= 0 then
+                flameAttack()
+                flameCooldown = frameTime + FLAME_COOL_TIME
                 attackCooldown = frameTime + 4
                 attackState = true
             end
@@ -131,22 +142,28 @@ end
 
 -- 보스의 공격 동작
 function attack(frameTime)
-    print("보스가 공격합니다.")
+    --print("보스가 공격합니다.")
     -- TODO: 보스의 공격 동작을 구현합니다.
     if attackType == tonumber(BossState.BASIC_ATTACK) then
         --state = BossState.BASIC_ATTACK
+        motion = BossState.BASIC_ATTACK
+        print(motion)
         print("BASIC_ATTACK")
     
     elseif attackType == tonumber(BossState.CLAW_ATTACK) then
         --state = BossState.BASIC_ATTACK
+        motion = BossState.BASIC_ATTACK
+        print(motion)
         print("CLAW_ATTACK")
 
     elseif attackType == tonumber(BossState.FLAME_ATTACK) then
         --state = BossState.FLAME_ATTACK
+        motion = BossState.FLAME_ATTACK
+        print(motion)
         print("FLAME_ATTACK")
     end
 
-    print(frameTime)
+    --print(frameTime)
     attackCooldown = 4
     if frameTime >= attackCooldown then
         print("IDLE로 갈 준비")
@@ -158,6 +175,8 @@ end
 function basicAttack()
     print("보스가 BASIC_ATTACK을 실행합니다.")
     -- TODO: BASIC_ATTACK 실행 코드 작성
+    motion = BossState.BASIC_ATTACK
+    print(motion)
     frameTime = 0
 end
 
@@ -165,6 +184,8 @@ end
 function flameAttack()
     print("보스가 FLAME_ATTACK을 실행합니다.")
     -- TODO: FLAME_ATTACK 실행 코드 작성
+    motion = BossState.FLAME_ATTACK
+    print(motion)
     frameTime = 0
 end
 
@@ -172,22 +193,25 @@ end
 function clawAttack()
     print("보스가 CLAW_ATTACK을 실행합니다.")
     -- TODO: CLAW_ATTACK 실행 코드 작성
+    motion = BossState.CLAW_ATTACK
+    print(motion)
     frameTime = 0
 end
 
 -- 죽음 상태 처리 함수
 function die()
-    print("보스가 죽었습니다.")
+    print("보스가 die 상태입")
     -- TODO: 죽음 상태 처리 코드 작성
 end
 
 
 function nextState()
-    print("다음으로")
+    --print("다음으로")
 
     if state == BossState.IDLE then
         if curHp <= 0 then
             state = BossState.DIE
+            motion = BossState.DIE
             print("다이")
         elseif attackState and state ~= BossState.ATTACK then
             state = BossState.ATTACK
@@ -199,6 +223,7 @@ function nextState()
     elseif state == BossState.ATTACK then
         if attackState == false then
             state = BossState.IDLE
+            motion = BossState.IDLE
             print("IDLE로 변경한다")
             frameTime = 0
         end

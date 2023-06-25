@@ -54,7 +54,7 @@ Boss::Boss()
 
 
 	lua_getglobal(m_L, "state");
-	lua_getglobal(m_L, "state");
+	lua_getglobal(m_L, "motion");
 	lua_getglobal(m_L, "MaxHp");
 
 	lua_getglobal(m_L, "boss_x");
@@ -240,7 +240,7 @@ void Boss::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 }
 
 
-void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHP)
+void Boss::Boss_Ai(float fTimeElapsed, CAirplanePlayer* player, int bossHP)
 {
 	//test
 	float x, y, z;
@@ -249,12 +249,10 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 	z = float(GetPosition().z);
 
 	lua_getglobal(m_L, "updateBossAI");
-	lua_pushnumber(m_L, MAXBossHP);
-
+	lua_pushnumber(m_L, bossHP);
 	lua_pushnumber(m_L, x);
 	lua_pushnumber(m_L, y);
 	lua_pushnumber(m_L, z);
-
 	lua_pushnumber(m_L, fTimeElapsed);
 
 	lua_pcall(m_L, 5, 0, 0);	// 파라미터 개수, 리턴값 개수, 핸들러
@@ -271,6 +269,17 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
 	lua_pop(m_L, 3);
 	//cout << "getpos - " << GetPosition().x << "\n";
+
+	lua_getglobal(m_L, "boss_z");
+	lua_getglobal(m_L, "state");
+	lua_getglobal(m_L, "motion");
+
+
+	CurState = BossState(lua_tonumber(m_L, -2));
+	CurMotion = BossAnimation(lua_tonumber(m_L, -1));
+	lua_pop(m_L, 2);
+	//cout << " CurState -" << int(CurState) << endl;
+	//cout << " CurMotion -" << int(CurMotion) << endl;
 
 	SendPosition();
 	SendAnimation();
