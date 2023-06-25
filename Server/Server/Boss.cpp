@@ -48,17 +48,63 @@ Boss::Boss()
 		printf("Error loading boss_ai.lua: %s\n", error);
 	}
 
+	XMFLOAT3 position;
+
+	position = { position.x = 0.0, position.y = 0.0, position.z = 0.0 };
+
+
+	lua_getglobal(m_L, "state");
+	lua_getglobal(m_L, "state");
+	lua_getglobal(m_L, "MaxHp");
+
+	lua_getglobal(m_L, "boss_x");
+	lua_getglobal(m_L, "boss_y");
+	lua_getglobal(m_L, "boss_z");
+
+
+	CurState = BossState(lua_tonumber(m_L, -6));
+	CurMotion = BossAnimation(lua_tonumber(m_L, -5));
+
+	MAXBossHP = lua_tonumber(m_L, -4);
+	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+	cout << "CurState - " << int(CurState) <<"\n";
+	cout << "CurMotion - " << int(CurMotion) << "\n";
+	cout << "MAXBossHP - "<< MAXBossHP << "\n";
+	cout << "getpos - " << GetPosition().y << "\n";
+	lua_pop(m_L, 6);
+
+
+
+
+
+	//test
+	float x, y, z;
+	x = float(GetPosition().x);
+	y = float(GetPosition().y);
+	z = float(GetPosition().z);
+
 	lua_getglobal(m_L, "updateBossAI");
+	lua_pushnumber(m_L, MAXBossHP);
+
+	lua_pushnumber(m_L, x);
+	lua_pushnumber(m_L, y);
+	lua_pushnumber(m_L, z);
+
+
+	lua_pcall(m_L, 4, 0, 0);	// 파라미터 개수, 리턴값 개수, 핸들러
+	//int result = lua_tonumber(m_L, -1);	// 리턴값 맨 꼭대기 값
+	//lua_pop(m_L, 1);
+
 	if (lua_pcall(m_L, 0, 0, 0) != LUA_OK)
 	{
 		const char* error = lua_tostring(m_L, -1);
 		printf("Error calling updateBossAI: %s\n", error);
 	}
-	lua_getglobal(m_L, "state");
-	CurState = BossState(lua_tonumber(m_L, -1));
-	lua_pop(m_L, 1);
 
-	cout << int(CurState) << "\n";
+	lua_getglobal(m_L, "boss_x"); lua_getglobal(m_L, "boss_y"); lua_getglobal(m_L, "boss_z");
+	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+	lua_pop(m_L, 3);
+	cout << "getpos - " << GetPosition().x << "\n";
 
 }
 Boss::~Boss() {
@@ -199,10 +245,19 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 	if (lua_pcall(m_L, 0, 0, 0) != LUA_OK)
 	{
 		const char* error = lua_tostring(m_L, -1);
-		printf("Error calling updateBossAI: %s\n", error);
+		printf("eeError calling updateBossAI: %s\n", error);
 	}
 	lua_getglobal(m_L, "state");
+	CurState = BossState(lua_tonumber(m_L, -1));
+	lua_pop(m_L, 1);
+
+	SendPosition();
 	SendAnimation();
+
+
+
+
+
 }
 
 
