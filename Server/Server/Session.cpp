@@ -23,7 +23,7 @@ void SESSION::send_change_packet(int c_id, PlayerType p_type)
 	do_send(&p);
 }
 
-void SESSION::send_spaceship_packet(int c_id, CAirplanePlayer* m_pPlayer)	// 플레이어 좌표 각도 전송
+void SESSION::send_spaceship_packet(CAirplanePlayer* m_pPlayer)	// 플레이어 좌표 각도 전송
 {
 	SC_MOVE_SPACESHIP_PACKET p;
 	p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
@@ -50,21 +50,19 @@ void SESSION::send_inside_packet(int c_id, CTerrainPlayer* m_pPlayer)
 	do_send(&p);
 }
 
-void SESSION::send_enemy_packet(int c_id, ENEMY_INFO& enemy_info)
+void SESSION::send_enemy_packet(ENEMY_INFO& enemy_info)
 {
 	SC_MOVE_ENEMY_PACKET p;
 
 	p.size = sizeof(SC_MOVE_ENEMY_PACKET);
 	p.type = SC_MOVE_ENEMY;
 
-	p.data.id = enemy_info.id;
-	p.data.Quaternion = enemy_info.Quaternion;
-	p.data.pos = enemy_info.pos;
+	p.data = enemy_info;
 
 	do_send(&p);
 }
 
-void SESSION::send_spawn_enemy_packet(int c_id, SPAWN_ENEMY_INFO& enemy_info)
+void SESSION::send_spawn_enemy_packet(SPAWN_ENEMY_INFO& enemy_info)
 {
 	SC_SPAWN_ENEMY_PACKET p;
 
@@ -80,7 +78,7 @@ void SESSION::send_spawn_enemy_packet(int c_id, SPAWN_ENEMY_INFO& enemy_info)
 	do_send(&p);
 }
 
-void SESSION::send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction, unsigned int time)
+void SESSION::send_bullet_packet(XMFLOAT3& pos, XMFLOAT3& direction, unsigned int time)
 {
 	SC_BULLET_PACKET p;
 
@@ -94,7 +92,7 @@ void SESSION::send_bullet_packet(int c_id, XMFLOAT3& pos, XMFLOAT3& direction, u
 	do_send(&p);
 }
 
-void SESSION::send_missile_packet(int c_id, MISSILE_INFO& info)
+void SESSION::send_missile_packet(MISSILE_INFO& info)
 {
 	SC_MISSILE_PACKET p;
 	p.size = sizeof(SC_MISSILE_PACKET);
@@ -107,7 +105,7 @@ void SESSION::send_missile_packet(int c_id, MISSILE_INFO& info)
 	do_send(&p);
 }
 
-void SESSION::send_remove_missile_packet(int c_id, char id)
+void SESSION::send_remove_missile_packet(char id)
 {
 	SC_REMOVE_MISSILE_PACKET p;
 	p.size = sizeof(SC_REMOVE_MISSILE_PACKET);
@@ -171,7 +169,7 @@ void SESSION::send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 play
 }
 */
 
-void SESSION::send_spawn_meteo_packet(int c_id, char id, CMeteoObject* meteo)
+void SESSION::send_spawn_meteo_packet(char id, CMeteoObject* meteo)
 {
 	SC_SPAWN_METEO_PACKET p;
 	p.size = sizeof(SC_SPAWN_METEO_PACKET);
@@ -185,23 +183,23 @@ void SESSION::send_spawn_meteo_packet(int c_id, char id, CMeteoObject* meteo)
 	do_send(&p);
 }
 
-void SESSION::send_spawn_all_meteo_packet(int c_id, std::array<CMeteoObject*,METEOS> meteo) 
+void SESSION::send_spawn_all_meteo_packet(std::array<CMeteoObject*,METEOS> meteo) 
 {
 	for (int i = 0; i < METEOS; ++i) {
-		send_spawn_meteo_packet(0, i, meteo[i]);
+		send_spawn_meteo_packet(i, meteo[i]);
 	}
 }
 
-void SESSION::send_all_enemy_packet(int c_id, ENEMY_INFO e_info[], bool alive[])
+void SESSION::send_all_enemy_packet(ENEMY_INFO e_info[], bool alive[])
 {
 	for (int i = 0; i < ENEMIES; ++i) {
 		if (alive[i]) {
-			send_enemy_packet(i, e_info[i]);
+			send_enemy_packet(e_info[i]);
 		}
 	}
 }
 
-void SESSION::send_meteo_direction_packet(int c_id, char id, CMeteoObject* meteo)
+void SESSION::send_meteo_direction_packet(char id, CMeteoObject* meteo)
 {
 	SC_METEO_DIRECTION_PACKET p;
 	p.size = sizeof(SC_METEO_DIRECTION_PACKET);
@@ -213,7 +211,7 @@ void SESSION::send_meteo_direction_packet(int c_id, char id, CMeteoObject* meteo
 	do_send(&p);
 }
 
-void SESSION::send_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> meteo)
+void SESSION::send_meteo_packet(std::array<CMeteoObject*, METEOS> meteo)
 {
 	SC_METEO_PACKET p;
 	p.size = sizeof(SC_METEO_PACKET);
@@ -226,7 +224,7 @@ void SESSION::send_meteo_packet(int c_id, std::array<CMeteoObject*, METEOS> mete
 	}
 }
 
-void SESSION::send_boss_meteo_packet(int c_id, std::array<CMeteoObject*, BOSSMETEOS> meteo)
+void SESSION::send_boss_meteo_packet(std::array<CMeteoObject*, BOSSMETEOS> meteo)
 {
 	SC_METEO_PACKET p;
 	p.size = sizeof(SC_METEO_PACKET);
@@ -239,7 +237,7 @@ void SESSION::send_boss_meteo_packet(int c_id, std::array<CMeteoObject*, BOSSMET
 	}
 }
 
-void SESSION::send_bullet_hit_packet(int c_id, char id, short hp)
+void SESSION::send_bullet_hit_packet(char id, short hp)
 {
 	SC_BULLET_HIT_PACKET p;
 	p.size = sizeof(SC_BULLET_HIT_PACKET);
@@ -250,7 +248,7 @@ void SESSION::send_bullet_hit_packet(int c_id, char id, short hp)
 	do_send(&p);
 }
 
-void SESSION::send_item_packet(int c_id, ITEM_INFO& item)
+void SESSION::send_item_packet(ITEM_INFO& item)
 {
 	SC_ITEM_PACKET p;
 	p.size = sizeof(SC_ITEM_PACKET);

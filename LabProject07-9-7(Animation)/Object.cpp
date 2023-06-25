@@ -1635,8 +1635,8 @@ void CEnemyObject::VelocityUpdate(float fTimeElapsed, XMFLOAT3& player_look)
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
 
-	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(player_look, fTimeElapsed * 50.f, false);
-	xmf3Velocity = Vector3::Add(LookVelocity, xmf3Velocity);
+//	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(player_look, fTimeElapsed * 50.f, false);
+//	xmf3Velocity = Vector3::Add(LookVelocity, xmf3Velocity);
 	XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
 	SetPosition(xmf3Position);
 

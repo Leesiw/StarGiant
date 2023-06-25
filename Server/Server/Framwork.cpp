@@ -120,12 +120,12 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				--scene->cur_monster_num;
 				break; 
 			}
-
+			
 			scene->m_ppEnemies[ex_over->obj_id]->AI(0.033f, scene->m_pSpaceship);
 			scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
 
 			// 款籍苞 面倒贸府
-
+			
 			for (int i = 0; i < ENEMIES; ++i)
 			{
 				if (!scene->m_ppEnemies[i]->GetisAlive()) { continue; }
@@ -145,17 +145,28 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 					scene->m_ppEnemies[i]->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
 				}
 			}
-			ENEMY_INFO info{};
-			info.id = ex_over->obj_id;
-			info.pos = scene->m_ppEnemies[ex_over->obj_id]->GetPosition();
-			info.Quaternion = scene->m_ppEnemies[ex_over->obj_id]->GetQuaternion();
-			info.velocity = scene->m_ppEnemies[ex_over->obj_id]->GetVelocity();
-			for (short pl_id : scene->_plist) {
-				if (pl_id == -1) continue;
-				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].send_enemy_packet(ex_over->obj_id, info);
+
+			if (scene->m_ppEnemies[ex_over->obj_id]->send_num == 0) {
+				ENEMY_INFO info{};
+				info.id = ex_over->obj_id;
+				info.pos = scene->m_ppEnemies[ex_over->obj_id]->GetPosition();
+				info.Quaternion = scene->m_ppEnemies[ex_over->obj_id]->GetQuaternion();
+				info.velocity = scene->m_ppEnemies[ex_over->obj_id]->GetVelocity();
+				for (short pl_id : scene->_plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_enemy_packet(info);
+				}
+				scene->m_ppEnemies[ex_over->obj_id]->send_num = 5;
+
+
+			}
+			else {
+				--scene->m_ppEnemies[ex_over->obj_id]->send_num;
+
 			}
 
+		
 			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(key) };
 			timer_queue.push(ev);
 
@@ -196,20 +207,26 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				for (short pl_id : scene->_plist) {
 					if (pl_id == -1) continue;
 					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_meteo_direction_packet(0, ex_over->obj_id, scene->m_ppMeteoObjects[ex_over->obj_id]);
-					clients[pl_id].send_bullet_hit_packet(0, -1, scene->m_pSpaceship->GetHP());
+					clients[pl_id].send_meteo_direction_packet(ex_over->obj_id, scene->m_ppMeteoObjects[ex_over->obj_id]);
+					clients[pl_id].send_bullet_hit_packet(-1, scene->m_pSpaceship->GetHP());
 
 				}
 			}
-			
-			SC_METEO_PACKET p{};
-			p.size = sizeof(SC_METEO_PACKET);
-			p.type = SC_METEO;
-			p.data.id = ex_over->obj_id;
-			p.data.pos = scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition();
-			
-			scene->Send((char*)& p);
 
+			if (scene->m_ppMeteoObjects[ex_over->obj_id]->send_num == 0) {
+
+				SC_METEO_PACKET p{};
+				p.size = sizeof(SC_METEO_PACKET);
+				p.type = SC_METEO;
+				p.data.id = ex_over->obj_id;
+				p.data.pos = scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition();
+
+				scene->Send((char*)&p);
+				scene->m_ppMeteoObjects[ex_over->obj_id]->send_num == 5;
+			}
+			else {
+				--scene->m_ppMeteoObjects[ex_over->obj_id]->send_num;
+			}
 			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_SPAWN_MISSILE, static_cast<short>(key) };
 			timer_queue.push(ev);
 
@@ -242,7 +259,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 					for (short pl_id : scene->_plist) {
 						if (pl_id == -1) continue;
 						if (clients[pl_id]._state != ST_INGAME) continue;
-						clients[pl_id].send_missile_packet(0, m_info);
+						clients[pl_id].send_missile_packet(m_info);
 					}
 					TIMER_EVENT ev{ static_cast<char>(i), chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
 					timer_queue.push(ev);
@@ -295,7 +312,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				for (short pl_id : scene->_plist) {
 					if (pl_id == -1) continue;
 					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_bullet_hit_packet(0, -1, scene->m_pSpaceship->GetHP());
+					clients[pl_id].send_bullet_hit_packet( -1, scene->m_pSpaceship->GetHP());
 				}
 			}
 
@@ -303,7 +320,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				for (short pl_id : scene->_plist) {
 					if (pl_id == -1) continue;
 					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_missile_packet(0, m_info);
+					clients[pl_id].send_missile_packet(m_info);
 				}
 				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
 				timer_queue.push(ev);
@@ -312,7 +329,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				for (short pl_id : scene->_plist) {
 					if (pl_id == -1) continue;
 					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_remove_missile_packet(0, ex_over->obj_id);
+					clients[pl_id].send_remove_missile_packet(ex_over->obj_id);
 				}
 			}
 			delete ex_over;
@@ -339,7 +356,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			for (short pl_id : scene->_plist) {
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].send_spaceship_packet(0, scene->m_pSpaceship);
+				clients[pl_id].send_spaceship_packet(scene->m_pSpaceship);
 			}
 
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, static_cast<short>(key) };
@@ -356,7 +373,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 					for (short pl_id : scene->_plist) {
 						if (pl_id == -1) continue;
 						if (clients[pl_id]._state != ST_INGAME) continue;
-						clients[pl_id].send_bullet_hit_packet(0, -1, scene->m_pSpaceship->GetHP());
+						clients[pl_id].send_bullet_hit_packet(-1, scene->m_pSpaceship->GetHP());
 					}
 				}
 
@@ -429,8 +446,8 @@ void CGameFramework::SetMission()
 	for (int i = static_cast<int>(MissionType::TU_SIT);
 		i <= static_cast<int>(MissionType::TU_END); ++i) {
 		MissionType m = static_cast<MissionType>(i);
-		levels[m].MaxMonsterNum = 10;
-		levels[m].SpawnMonsterNum = 5;
+		levels[m].MaxMonsterNum = 5;
+		levels[m].SpawnMonsterNum = 3;
 		levels[m].Laser.MAX_HP = 3;
 		levels[m].Laser.ATK = 2;
 		levels[m].Missile.MAX_HP = 5;
@@ -620,7 +637,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			ITEM_INFO info{};
 			info.type = (ItemType)i;
 			info.num = scene->items[info.type];
-			clients[c_id].send_item_packet(0, info);
+			clients[c_id].send_item_packet(info);
 		}
 		break;
 	}
@@ -727,7 +744,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			for (short pl_id : m_pScene->_plist) {
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].send_bullet_packet(0, p->data.pos, p->data.direction, p->attack_time);
+				clients[pl_id].send_bullet_packet( p->data.pos, p->data.direction, p->attack_time);
 
 			}
 			//}

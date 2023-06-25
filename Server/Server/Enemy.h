@@ -32,6 +32,7 @@ protected:
 	// 2 : 공격 타이머가 켜져 있는지
 public:
 	short scene_num;
+	char send_num = 2;
 
 	char id;
 	EnemyType type;
@@ -83,7 +84,7 @@ public:
 
 	void SendPos();
 
-	virtual MissileInfo GetMissileInfo() { MissileInfo info; info.damage = 0; return info; }
+	//virtual MissileInfo GetMissileInfo() { MissileInfo info; info.damage = 0; return info; }
 };
 
 class CMissileEnemy : public CEnemy
@@ -96,7 +97,7 @@ public:
 
 	MissileInfo info;
 public:
-	virtual MissileInfo GetMissileInfo() { enemy_flags &= ~option2; return info; }
+	//virtual MissileInfo GetMissileInfo() { enemy_flags &= ~option2; return info; }
 	virtual void Attack(float fTimeElapsed, CAirplanePlayer* player);
 
 	virtual void SetStatus(MissionType cur_mission);

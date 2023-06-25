@@ -59,6 +59,7 @@ public:
 	XMFLOAT3						m_xmf3Scale;
 
 	int coll_time;
+	char send_num = 5;
 
 	void SetModelId(short id) { model_id = id; }
 	short GetModelID() { return model_id; }

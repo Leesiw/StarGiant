@@ -104,10 +104,10 @@ void CPlayer::Update(float fTimeElapsed)
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(pos, XMFLOAT3(10000.f, 10000.f, 10000.f)));
 
-	if (dist < 800.f)
+	if (dist < 1000.f)
 	{
 		XMFLOAT3 ToGo = Vector3::Subtract(pos, XMFLOAT3(10000.f, 10000.f, 10000.f));
-		ToGo = Vector3::ScalarProduct(ToGo, 800.f);
+		ToGo = Vector3::ScalarProduct(ToGo, 1000.f);
 		ToGo = Vector3::Add(XMFLOAT3(10000.f, 10000.f, 10000.f), ToGo);
 		SetPosition(ToGo);
 	}
@@ -123,7 +123,7 @@ void CPlayer::Update(float fTimeElapsed)
 	}
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
-	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 10.f, false);
+	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 50.f, false);
 	xmf3Velocity = Vector3::Add(xmf3Velocity, LookVelocity);
 	Move(xmf3Velocity, false);
 

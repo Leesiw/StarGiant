@@ -190,6 +190,7 @@ void CScene::Reset()
 
 void CScene::CheckMeteoByPlayerCollisions()
 {
+	/*
 	m_pSpaceship->OnPrepareRender();
 	m_pSpaceship->UpdateTransform();
 	m_pSpaceship->UpdateBoundingBox();
@@ -228,7 +229,7 @@ void CScene::CheckMeteoByPlayerCollisions()
 				}
 			}
 		//}
-	}
+	}*/
 }
 
 void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
@@ -248,7 +249,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 			for (short pl_id : _plist) {
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].send_bullet_hit_packet(0, m_ppEnemies[i]->GetID(), m_ppEnemies[i]->hp);
+				clients[pl_id].send_bullet_hit_packet(m_ppEnemies[i]->GetID(), m_ppEnemies[i]->hp);
 			}
 
 
@@ -307,7 +308,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		for (short pl_id : _plist) {
 			if (pl_id == -1) continue;
 			if (clients[pl_id]._state != ST_INGAME) continue;
-			clients[pl_id].send_bullet_hit_packet(0, BOSS_ID, m_pBoss->BossHP);
+			clients[pl_id].send_bullet_hit_packet(BOSS_ID, m_pBoss->BossHP);
 		}
 		return;
 	}
@@ -361,7 +362,7 @@ void CScene::CheckEnemyCollisions()
 					for (short pl_id : _plist) {
 						if (pl_id == -1) continue;
 						if (clients[pl_id]._state != ST_INGAME) continue;
-						clients[pl_id].send_meteo_direction_packet(0, i, m_ppMeteoObjects[i]);
+						clients[pl_id].send_meteo_direction_packet(i, m_ppMeteoObjects[i]);
 					}
 				}
 			}
@@ -426,8 +427,8 @@ void CScene::CheckMissileCollisions()
 				for (short pl_id : _plist) {
 					if (pl_id == -1) continue;
 					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_remove_missile_packet(0, i);
-					clients[pl_id].send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
+					clients[pl_id].send_remove_missile_packet(i);
+					clients[pl_id].send_bullet_hit_packet(-1, m_pSpaceship->GetHP());
 				}
 			}
 		}
@@ -557,7 +558,7 @@ void CScene::GetJewels()
 	for (short pl_id : _plist) {
 		if (pl_id == -1) continue;
 		if (clients[pl_id]._state != ST_INGAME) continue;
-		clients[pl_id].send_item_packet(0, info);
+		clients[pl_id].send_item_packet(info);
 	}
 
 	// 미션
@@ -595,7 +596,7 @@ void CScene::SpawnEnemy(char id)
 	for (short pl_id : _plist) {
 		if (pl_id == -1) continue;
 		if (clients[pl_id]._state != ST_INGAME) continue;
-		clients[pl_id].send_spawn_enemy_packet(0, e_info);
+		clients[pl_id].send_spawn_enemy_packet(e_info);
 	}
 	++cur_monster_num;
 }
@@ -621,7 +622,7 @@ void CScene::SpawnMeteo(char i)
 	for (short pl_id : _plist) {
 		if (pl_id == -1) continue;
 		if (clients[pl_id]._state != ST_INGAME) continue;
-		clients[pl_id].send_spawn_meteo_packet(0, i, m_ppMeteoObjects[i]);
+		clients[pl_id].send_spawn_meteo_packet(i, m_ppMeteoObjects[i]);
 	}
 }
 
@@ -664,9 +665,9 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	{
 		if (m_ppEnemies[i]->GetisAlive()) { 
 			m_ppEnemies[i]->Animate(fTimeElapsed, m_pSpaceship); 
-
+			/*
 			if (m_ppEnemies[i]->GetLaunchMissile()) {
-				MissileInfo info = m_ppEnemies[i]->GetMissileInfo();
+				//MissileInfo info = m_ppEnemies[i]->GetMissileInfo();
 				if (info.damage == 0) continue;
 				for (int j = 0; j < ENEMY_BULLETS; ++j) {
 					if (!m_ppMissiles[j]->GetisActive()) {
@@ -679,12 +680,12 @@ void CScene::AnimateObjects(float fTimeElapsed)
 						for (short pl_id : _plist) {
 							if (pl_id == -1) continue;
 							if (clients[pl_id]._state != ST_INGAME) continue;
-							clients[pl_id].send_missile_packet(0, m_info);
+							clients[pl_id].send_missile_packet(m_info);
 						}
 						break;
 					}
 				}
-			}
+			}*/
 		}
 	}
 
@@ -701,10 +702,10 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
 				if (m_ppMissiles[i]->GetisActive()) {
-					clients[pl_id].send_missile_packet(0, m_info);
+					clients[pl_id].send_missile_packet(m_info);
 				}
 				else {
-					clients[pl_id].send_remove_missile_packet(0, i);
+					clients[pl_id].send_remove_missile_packet(i);
 				}
 			}
 		}
@@ -748,7 +749,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (short pl_id : _plist) {
 		if (pl_id == -1) continue;
 		if (clients[pl_id]._state != ST_INGAME) continue;
-		clients[pl_id].send_spaceship_packet(3, m_pSpaceship);
+		clients[pl_id].send_spaceship_packet(m_pSpaceship);
 	}
 
 	m_pSpaceship->move_time = 0;
@@ -765,7 +766,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				for (short pl_id : _plist) {
 					if (pl_id == -1) continue;
 					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_enemy_packet(0, info);
+					clients[pl_id].send_enemy_packet(info);
 				}
 			}
 		}
@@ -773,7 +774,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		for (short pl_id : _plist) {
 			if (pl_id == -1) continue;
 			if (clients[pl_id]._state != ST_INGAME) continue;
-			clients[pl_id].send_meteo_packet(0, m_ppMeteoObjects);
+			clients[pl_id].send_meteo_packet(m_ppMeteoObjects);
 			//for (int i = 0; i < 3; ++i) {
 			//	if (_plist[i] == -1) continue;
 			//	if (clients[_plist[i]]._state == !ST_INGAME) { continue; }
@@ -826,7 +827,7 @@ void CScene::Start()
 			// 게임 스타트 패킷 send
 		}
 
-		for (int i = 0; i < METEOS; ++i) {
+		for (char i = 0; i < METEOS; ++i) {
 			TIMER_EVENT ev{ i, chrono::system_clock::now() + 33ms, EV_UPDATE_METEO, num };
 			timer_queue.push(ev);
 		}
