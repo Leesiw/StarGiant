@@ -3,8 +3,8 @@
 #include "stdafx.h"
 #include "SceneManager.h"
 #include "Boss.h"
-
 extern SceneManager scene_manager;
+
 
 Boss::Boss()
 {
@@ -37,16 +37,88 @@ Boss::Boss()
 	//boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 34.65389f, -10.1982f), XMFLOAT3(65.5064392f, 35.0004547f, 77.9787476f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	boundingbox = BoundingOrientedBox{ XMFLOAT3(-33.47668f, 41.86574f, 26.52405), XMFLOAT3(774.8785, 299.2372, 584.7963), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 
+	// Lua 상태 생성
+	m_L = luaL_newstate();
+	luaL_openlibs(m_L);
 
-	
+	// Lua 파일 불러오기
+	if (luaL_loadfile(m_L, "boss_ai.lua") || lua_pcall(m_L, 0, 0, 0))
+	{
+		const char* error = lua_tostring(m_L, -1);
+		printf("Error loading boss_ai.lua: %s\n", error);
+	}
+
+	XMFLOAT3 position;
+
+	position = { position.x = 0.0, position.y = 0.0, position.z = 0.0 };
+
+
+	lua_getglobal(m_L, "state");
+	lua_getglobal(m_L, "motion");
+	lua_getglobal(m_L, "MaxHp");
+
+	lua_getglobal(m_L, "boss_x");
+	lua_getglobal(m_L, "boss_y");
+	lua_getglobal(m_L, "boss_z");
+
+
+	CurState = BossState(lua_tonumber(m_L, -6));
+	CurMotion = BossAnimation(lua_tonumber(m_L, -5));
+
+	MAXBossHP = lua_tonumber(m_L, -4);
+	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+
+
+	//cout << "getpos - " << GetPosition().x << "\n";
+	//cout << "getpos - " << GetPosition().y << "\n";
+	//cout << "getpos - " << GetPosition().z << "\n";
+	//cout << "CurState - " << int(CurState) <<"\n";
+	//cout << "CurMotion - " << int(CurMotion) << "\n";
+	//cout << "MAXBossHP - "<< MAXBossHP << "\n";
+	//cout << "getpos - " << GetPosition().y << "\n";
+	lua_pop(m_L, 6);
+
+	////test
+	//float x, y, z;
+	//x = float(GetPosition().x);
+	//y = float(GetPosition().y);
+	//z = float(GetPosition().z);
+
+	//lua_getglobal(m_L, "updateBossAI");
+	//lua_pushnumber(m_L, MAXBossHP);
+
+	//lua_pushnumber(m_L, x);
+	//lua_pushnumber(m_L, y);
+	//lua_pushnumber(m_L, z);
+	//lua_pushnumber(m_L, 0);
+
+
+	//lua_pcall(m_L, 5, 0, 0);	// 파라미터 개수, 리턴값 개수, 핸들러
+	////int result = lua_tonumber(m_L, -1);	// 리턴값 맨 꼭대기 값
+	////lua_pop(m_L, 1);
+
+	//if (lua_pcall(m_L, 0, 0, 0) != LUA_OK)
+	//{
+	//	const char* error = lua_tostring(m_L, -1);
+	//	printf("Error calling updateBossAI: %s\n", error);
+	//}
+
+	//lua_getglobal(m_L, "boss_x"); lua_getglobal(m_L, "boss_y"); lua_getglobal(m_L, "boss_z");
+	//SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+	//lua_pop(m_L, 3);
+	//cout << "getpos - " << GetPosition().x << "\n";
+
 }
-
 Boss::~Boss() {
 	for (int i = 0; i < m_ppBossMeteoObjects.size(); ++i)
 	{
 		if (m_ppBossMeteoObjects[i]) { delete m_ppBossMeteoObjects[i]; }
 	}
+
+	// Lua 상태 닫기
+	lua_close(m_L);
 }
+
 
 
 void Boss::SendPosition()	// 위치/각도 변화할 때 사용. 
@@ -124,7 +196,7 @@ void Boss::MoveMeteo(float fTimeElapsed)		// 메테오 움직여야 할때 계속 실행. sen
 	for (int i = 0; i < BOSSMETEOS; ++i) {
 		p.data.id = METEOS + i;
 		p.data.pos = m_ppBossMeteoObjects[i]->GetPosition();
-		scene_manager.Send(scene_num, (char*)&p);
+		scene_manager.Send(scene_num, (char*)&p); 
 	}
 }
 
@@ -169,369 +241,60 @@ void Boss::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 }
 
 
-void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHP)
+void Boss::Boss_Ai(float fTimeElapsed, CAirplanePlayer* player, int bossHP)
 {
-	XMFLOAT3 TargetPos = player->GetPosition();
-	XMFLOAT3 BossPos = GetPosition();
-	XMFLOAT3 SubTarget = Vector3::Subtract(TargetPos, BossPos);
-	float Dist = Vector3::Length(SubTarget);
+	//test
+	float x, y, z;
+	x = float(player->GetPosition().x);
+	y = float(player->GetPosition().y);
+	z = float(player->GetPosition().z);
 
-	static int a=0;
+	lua_getglobal(m_L, "updateBossAI");
+	lua_pushnumber(m_L, bossHP);
+	lua_pushnumber(m_L, x);
+	lua_pushnumber(m_L, y);
+	lua_pushnumber(m_L, z);
+	lua_pushnumber(m_L, fTimeElapsed);
 
-	switch (CurState) {
-	case  BossState::APPEAR:
+	lua_pcall(m_L, 5, 0, 0);	// 파라미터 개수, 리턴값 개수, 핸들러
+	//int result = lua_tonumber(m_L, -1);	// 리턴값 맨 꼭대기 값
+	//lua_pop(m_L, 1);
+
+	//if (lua_pcall(m_L, 0, 0, 0) != LUA_OK)
+	//{
+	//	const char* error = lua_tostring(m_L, -1);
+	//	printf("Error calling updateBossAI: %s\n", error);
+	//}
+
+	lua_getglobal(m_L, "boss_x"); lua_getglobal(m_L, "boss_y"); lua_getglobal(m_L, "boss_z");
+	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+	lua_pop(m_L, 3);
+	/*cout << "getpos - " << GetPosition().x << "\n";
+	cout << "getpos - " << GetPosition().y << "\n";
+	cout << "getpos - " << GetPosition().z << "\n";*/
+
+	lua_getglobal(m_L, "boss_z");
+	lua_getglobal(m_L, "state");
+	lua_getglobal(m_L, "motion");
+
+
+	CurState = BossState(lua_tonumber(m_L, -2));
+	CurMotion = BossAnimation(lua_tonumber(m_L, -1));
+	lua_pop(m_L, 2);
+	//cout << " CurState -" << int(CurState) << endl;
+	//cout << " CurMotion -" << int(CurMotion) << endl;
+
+
+
+	SendPosition();
+	SendAnimation();
+	
+
+	if (CurState != BossState::SLEEP)
 	{
-		//적 처치 조건 맞으면 보스 상태 appear로 바꿔서 위치 미니맵 어딘가에 표시 될 수 있는 정도 되는 곳으로 랜덤이든 고정이든 setpos
-		//this->SetPosition(TargetPos.x + 200.0f, TargetPos.y, TargetPos.z + 200.0f);
-		SetPosition(0.0f + 10, 250.0f, 640.0f); 
-		SendPosition();
-
-
-		//일단 첨엔 잠
-		SetState(BossState::SLEEP);
-		stateStartTime = steady_clock::now(); //이거 다 쓰면 걍 ai끝날때 초기화로 바꿔야겟다 나중에..
-
-		break;
+		LookAtPosition(fTimeElapsed, player->GetPosition());
 	}
 
-	case  BossState::SLEEP:
-	{
-		CurMotion = BossAnimation::SLEEP;
-		if(CurMotion !=PastMotion)
-			SendAnimation();
-		SendPosition();
-		//만약에 플레이어가 가까이 오면 idle로 가기 
-		if (Dist < 1500.0f) {
-			SetState(BossState::IDLE);
-			stateStartTime = steady_clock::now();
-		}
-		break;
-	}
-
-	case BossState::IDLE: {
-
-		CurMotion = BossAnimation::IDLE;
-		if (CurMotion != PastMotion)
-			SendAnimation();
-
-		LookAtPosition(fTimeElapsed, TargetPos);
-		SendPosition();
-
-		/*if (Dist > 400.0f)
-			SetState(BossState::SIT_IDLE);*/
-
-
-		//플레이어와 거리가 멀어지면 플레이어 추적
-		if (Dist > 2500.0f) {
-			SetState(BossState::CHASE);
-			stateStartTime = steady_clock::now();
-		}
-
-
-		//attactCoolTime 초마다 공격
-		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= attactCoolTime) {
-			SetState(BossState::ATTACT);
-			randAttact = urdAttack(dree);
-			stateStartTime = steady_clock::now();
-			lastAttackTime = steady_clock::now();
-		}
-
-
-		//10퍼 남으면 스크림 함 해주기
-		else if (float(MAXBossHP / bossHP) <= 0.1 && a == 1)
-		{
-			SetState(BossState::SCREAM);
-			stateStartTime = steady_clock::now();
-			a = 2;
-		}
-
-		//반피되면 피격모션 한번해주기
-		else if (float(bossHP / MAXBossHP) <= 0.5&& a == 0)
-		{
-			SetState(BossState::GET_HIT);
-			stateStartTime = steady_clock::now();
-			a = 1;
-		}
-
-		else if (float(bossHP <= 0)){
-			SetState(BossState::DIE);
-			stateStartTime = steady_clock::now();
-		}
-
-		break;
-	}
-
-	case BossState::ATTACT: {
-		static int aa = 0;
-
-		LookAtPosition(fTimeElapsed, TargetPos);
-		SendPosition();
-
-		if (randAttact > 0.5f) {
-			CurMotion = BossAnimation::BASIC_ATTACT;
-			if (CurState != PastState) {
-				SendAnimation();
-				//cout << "send attack!!\n";
-				if (player->GetHP() > 0) {
-					player->GetAttack(2);
-				}
-
-			}
-
-			//PastState = (BossState)(BossAnimation::BASIC_ATTACT);
-			PastState = BossState::ATTACT;
-
-			SC_BULLET_HIT_PACKET p;
-			p.size = sizeof(SC_BULLET_HIT_PACKET);
-			p.type = SC_BULLET_HIT;
-			p.data.id = -1;
-			p.data.hp = player->GetHP();
-			scene_manager.Send(scene_num, (char*)&p);
-
-			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 1.8) {
-				lastAttackTime = steady_clock::now();
-			
-				SetState(BossState::IDLE);
-			}
-
-
-		}
-		else if (randAttact < 0.2f && a == 0) {
-			CurMotion = BossAnimation::FLAME_ATTACK;
-			if (CurState != PastState) {
-				SendAnimation();
-				if (player->GetHP() > 0) {
-					player->GetAttack(10);
-				}
-				MeteoAttack(fTimeElapsed, TargetPos);
-				a = 1;
-			}
-			//PastState = (BossState)(BossAnimation::FLAME_ATTACK);
-			PastState = BossState::ATTACT;
-
-			
-
-			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 3.5) {
-				lastAttackTime = steady_clock::now();
-				SetState(BossState::IDLE);
-				
-
-				SC_BULLET_HIT_PACKET p;
-				p.size = sizeof(SC_BULLET_HIT_PACKET);
-				p.type = SC_BULLET_HIT;
-				p.data.id = -1;
-				p.data.hp = player->GetHP();
-				scene_manager.Send(scene_num, (char*)&p);
-			}
-		}
-		else
-		{
-			CurMotion = BossAnimation::CLAW_ATTACT;
-			if (CurState != PastState) {
-				SendAnimation();
-				if (player->GetHP() > 0) {
-					player->GetAttack(5);
-				}
-			}
-			//PastState = (BossState)(BossAnimation::CLAW_ATTACT);
-			PastState = BossState::ATTACT;
-			
-			SC_BULLET_HIT_PACKET p;
-			p.size = sizeof(SC_BULLET_HIT_PACKET);
-			p.type = SC_BULLET_HIT;
-			p.data.id = -1;
-			p.data.hp = player->GetHP();
-			scene_manager.Send(scene_num, (char*)&p);
-
-
-			if (duration_cast<seconds>(steady_clock::now() - lastAttackTime).count() >= 2.2) {
-				lastAttackTime = steady_clock::now();
-				SetState(BossState::IDLE);
-
-			}
-		}
-		break;
-	}
-
-	case BossState::SIT_IDLE: {
-		CurMotion = BossAnimation::SIT_IDLE;
-		if (CurMotion != PastMotion)
-			SendAnimation();
-		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= 3) {
-			SetState(BossState::IDLE);
-			stateStartTime = steady_clock::now();
-		}
-
-		break;
-	}
-	case BossState::SCREAM: {
-		CurMotion = BossAnimation::SCREAM;
-		if (CurMotion != PastMotion)
-			SendAnimation();
-
-		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= 3) {
-			SetState(BossState::IDLE);
-			stateStartTime = steady_clock::now();
-		}
-
-		break;
-	}
-
-	case BossState::GET_HIT: {
-		CurMotion = BossAnimation::GET_HIT;
-		if (CurMotion != PastMotion)
-			SendAnimation();
-		//cout << "GET_HIT" << endl;
-
-		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= 1) {
-			SetState(BossState::IDLE);
-			stateStartTime = steady_clock::now();
-		}
-		break;
-
-	}
-
-	case BossState::CHASE: {
-
-		/*if(BossPos.z>=TargetPos.z - 10.0f && BossPos.z <= TargetPos.z + 10.0f)
-		{
-			CurMotion = BossAnimation::FLY_FORWARD;
-
-			if (CurMotion != PastMotion)
-				SendAnimation();
-			PastState = (BossState)(BossAnimation::FLY_FORWARD);
-
-		}*/
-
-		{
-			CurMotion = BossAnimation::FLY_FORWARD;
-
-			if (CurMotion != PastMotion)
-				SendAnimation();
-			PastState = (BossState)(BossAnimation::FLY_FORWARD);
-		}
-
-		MoveBoss(fTimeElapsed, TargetPos ,Dist);
-		SendPosition();
-
-		if (Dist <= 2000.0f) {
-			SetState(BossState::IDLE);
-			stateStartTime = steady_clock::now();
-		}
-
-		break;
-
-	}
-
-	case BossState::WALK: {
-		CurMotion = BossAnimation::WALK;
-		if (CurMotion != PastMotion)
-			SendAnimation();
-		cout << "WALK" << endl;
-
-		break;
-
-	}
-	case BossState::RUN: {
-		CurMotion = BossAnimation::RUN;
-		if (CurMotion != PastMotion)
-			SendAnimation();
-		cout << "RUN" << endl;
-
-		break;
-
-	}
-	case BossState::BASIC_ATTACT: {
-
-		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= 1) {
-			SetState(BossState::IDLE);
-			stateStartTime = steady_clock::now();
-		}
-
-
-		//cout << "BASIC_ATTACT" << endl;
-
-		break;
-
-	}
-	case BossState::CLAW_ATTACT: {
-
-		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= 1) {
-			SetState(BossState::IDLE);
-			stateStartTime = steady_clock::now();
-		}
-
-		//cout << "CLAW_ATTACT" << endl;
-
-		break;
-
-	}
-	case BossState::FLAME_ATTACK: {
-		cout << "FLAME_ATTACK" << endl;
-
-		break;
-
-	}	case BossState::DEFEND: {
-		cout << "DEFEND" << endl;
-
-		break;
-
-	}	case BossState::TAKE_OFF: {
-		cout << "TAKE_OFF" << endl;
-
-		break;
-
-	}
-
-	case BossState::FLY_FLOAT: {
-		cout << "FLY_FLOAT" << endl;
-		break;
-
-	}
-
-
-	case BossState::FLY_FLAME_ATTACK: {
-		cout << "FLY_FLAME_ATTACK" << endl;
-
-		break;
-	}
-
-	case BossState::FLY_FORWARD: {
-		cout << "FLY_FORWARD" << endl;
-
-		break;
-	}
-	case BossState::FLY_GLIDE: {
-		cout << "FLY_GLIDE" << endl;
-
-		break;
-	}
-	case BossState::LAND: {
-		cout << "LAND" << endl;
-
-		break;
-	}
-
-	case BossState::DIE: {
-		//cout << "DIE" << endl;
-		CurMotion = BossAnimation::DIE;
-		if (CurMotion != PastMotion)
-			SendAnimation();
-
-		break;
-	}
-	default:
-		break;
-	}
-
-	if ((CurState != BossState::ATTACT) && (CurState != BossState::CHASE)) {
-		PastState = CurState;
-	}
-	if(a==1)
-		MoveMeteo(fTimeElapsed);
-
-	/*cout << "curstate - " << int(CurState) <<endl;
-	cout << "paststate - " << int(PastState) << endl;*/
 
 }
 
