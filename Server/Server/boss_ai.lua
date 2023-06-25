@@ -29,18 +29,25 @@ BossState = {
 CLAW_COOL_TIME = 5
 FLAME_COOL_TIME = 10
 
--- 보스의 초기 상태
 
-state = BossState.IDLE
-motion = BossState.IDLE
+
+
+-- 보스의 초기 상태
+state = BossState.SLEEP
+motion = BossState.SLEEP
 MaxHp = 100
 
-boss_x = 1000
-boss_y = 1000
-boss_z = 1000
+boss_x = 5000   --위치
+boss_y = 5000
+boss_z = 5000
 
 
 curHp = MaxHp
+
+
+--true false
+onappear = true
+onIdle = false
 
 
 -- 공격 상태와 쿨타임 변수 초기화
@@ -81,7 +88,7 @@ function updateBossAI(hp, bpx, bpy, bpz, elapsedTime)
         attack(frameTime)
     end
     -- 보스의 다음 상태를 결정합니다.
-    nextState()
+    nextState( bpx, bpy, bpz)
 end
 
 -- 보스의 잠자는 동작
@@ -89,6 +96,7 @@ function sleep()
     -- 보스가 잠자는 동안의 동작을 정의합니다.
     print("보스가 sleep 중입니다.")
     -- TODO: 보스의 잠자는 동작을 구현합니다.
+
 end
 
 
@@ -96,7 +104,7 @@ end
 function idle(frameTime)
     --print("idle 상태")
    -- print(frameTime)
-    if not attackState and frameTime >= attackCooldown then
+   if not attackState and frameTime >= attackCooldown then
         local attackType
         
         if curHp <= (MaxHp / 2) then
@@ -125,7 +133,10 @@ function idle(frameTime)
                 attackState = true
             end
         end
-    end
+   end
+
+
+
 end
 
 -- 보스의 appear 상태 동작
@@ -134,9 +145,9 @@ function appear(bpx, bpy, bpz)
     print("보스가 appear 상태입니다.")
     -- TODO: 보스의 appear 상태 동작을 구현합니다.
     -- 플레이어의 위치로 세팅
-    boss_x = bpx + 1000
-    boss_y = bpy + 1000
-    boss_z = bpz + 1000
+    boss_x = bpx + 2300
+    boss_y = bpy + 0
+    boss_z = bpz + 0
 end
 
 
@@ -205,8 +216,9 @@ function die()
 end
 
 
-function nextState()
-    --print("다음으로")
+function nextState(bpx, bpy, bpz)
+    print("다음으로")
+    local distance = CalculateDistance(boss_x, boss_y, boss_z, bpx, bpy, bpz)
 
     if state == BossState.IDLE then
         if curHp <= 0 then
@@ -220,6 +232,41 @@ function nextState()
             print("공격, 프레임타임 0으로 초기화")
         end
         -- 다른 조건에 따른 상태 변경 로직을 추가하세요
+
+
+    elseif state == BossState.SLEEP then
+        print("SLEEP로 바꿉니다")
+        state = BossState.SLEEP
+        motion = BossState.SLEEP
+
+        -- appear로
+        if onappear == true then
+            state = BossState.APPEAR
+            print("APPEAR로 바꿉니다")
+            onappear = false
+        end
+
+        if distance <= 1500 then
+            print(onIdle)
+            onIdle = true
+        else
+            print(onIdle)
+            onIdle = false
+        end   
+
+        if onIdle == true then
+            print("onIdle")
+            state = BossState.IDLE
+            motion = BossState.IDLE
+        end
+
+
+    elseif state == BossState.APPEAR then
+          state = BossState.SLEEP
+          motion = BossState.SLEEP
+
+
+
     elseif state == BossState.ATTACK then
         if attackState == false then
             state = BossState.IDLE
@@ -231,9 +278,24 @@ function nextState()
     end
 end
 
--- 보스가 특정 위치를 바라보도록 하는 함수
-function LookAtPosition()
-    return true;
+-- idle로 바꿈
+function setonidle(a)
+    onIdle = a;
+end
+
+function SubtractVectors(v1, v2)
+    return { v1[1] - v2[1], v1[2] - v2[2], v1[3] - v2[3] }
+end
+
+function LengthVector(v)
+    return math.sqrt(v[1]^2 + v[2]^2 + v[3]^2)
+end
+
+function CalculateDistance(x1, y1, z1, x2, y2, z2)
+    local dx = x2 - x1
+    local dy = y2 - y1
+    local dz = z2 - z1
+    return math.sqrt(dx^2 + dy^2 + dz^2)
 end
 
 return {

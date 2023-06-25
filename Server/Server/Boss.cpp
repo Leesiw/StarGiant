@@ -67,45 +67,46 @@ Boss::Boss()
 
 	MAXBossHP = lua_tonumber(m_L, -4);
 	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+
+
+	cout << "getpos - " << GetPosition().x << "\n";
+	cout << "getpos - " << GetPosition().y << "\n";
+	cout << "getpos - " << GetPosition().z << "\n";
 	cout << "CurState - " << int(CurState) <<"\n";
 	cout << "CurMotion - " << int(CurMotion) << "\n";
 	cout << "MAXBossHP - "<< MAXBossHP << "\n";
 	cout << "getpos - " << GetPosition().y << "\n";
 	lua_pop(m_L, 6);
 
+	////test
+	//float x, y, z;
+	//x = float(GetPosition().x);
+	//y = float(GetPosition().y);
+	//z = float(GetPosition().z);
+
+	//lua_getglobal(m_L, "updateBossAI");
+	//lua_pushnumber(m_L, MAXBossHP);
+
+	//lua_pushnumber(m_L, x);
+	//lua_pushnumber(m_L, y);
+	//lua_pushnumber(m_L, z);
+	//lua_pushnumber(m_L, 0);
 
 
+	//lua_pcall(m_L, 5, 0, 0);	// 파라미터 개수, 리턴값 개수, 핸들러
+	////int result = lua_tonumber(m_L, -1);	// 리턴값 맨 꼭대기 값
+	////lua_pop(m_L, 1);
 
+	//if (lua_pcall(m_L, 0, 0, 0) != LUA_OK)
+	//{
+	//	const char* error = lua_tostring(m_L, -1);
+	//	printf("Error calling updateBossAI: %s\n", error);
+	//}
 
-	//test
-	float x, y, z;
-	x = float(GetPosition().x);
-	y = float(GetPosition().y);
-	z = float(GetPosition().z);
-
-	lua_getglobal(m_L, "updateBossAI");
-	lua_pushnumber(m_L, MAXBossHP);
-
-	lua_pushnumber(m_L, x);
-	lua_pushnumber(m_L, y);
-	lua_pushnumber(m_L, z);
-	lua_pushnumber(m_L, 0);
-
-
-	lua_pcall(m_L, 5, 0, 0);	// 파라미터 개수, 리턴값 개수, 핸들러
-	//int result = lua_tonumber(m_L, -1);	// 리턴값 맨 꼭대기 값
-	//lua_pop(m_L, 1);
-
-	if (lua_pcall(m_L, 0, 0, 0) != LUA_OK)
-	{
-		const char* error = lua_tostring(m_L, -1);
-		printf("Error calling updateBossAI: %s\n", error);
-	}
-
-	lua_getglobal(m_L, "boss_x"); lua_getglobal(m_L, "boss_y"); lua_getglobal(m_L, "boss_z");
-	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
-	lua_pop(m_L, 3);
-	cout << "getpos - " << GetPosition().x << "\n";
+	//lua_getglobal(m_L, "boss_x"); lua_getglobal(m_L, "boss_y"); lua_getglobal(m_L, "boss_z");
+	//SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+	//lua_pop(m_L, 3);
+	//cout << "getpos - " << GetPosition().x << "\n";
 
 }
 Boss::~Boss() {
@@ -244,9 +245,9 @@ void Boss::Boss_Ai(float fTimeElapsed, CAirplanePlayer* player, int bossHP)
 {
 	//test
 	float x, y, z;
-	x = float(GetPosition().x);
-	y = float(GetPosition().y);
-	z = float(GetPosition().z);
+	x = float(player->GetPosition().x);
+	y = float(player->GetPosition().y);
+	z = float(player->GetPosition().z);
 
 	lua_getglobal(m_L, "updateBossAI");
 	lua_pushnumber(m_L, bossHP);
@@ -268,7 +269,9 @@ void Boss::Boss_Ai(float fTimeElapsed, CAirplanePlayer* player, int bossHP)
 	lua_getglobal(m_L, "boss_x"); lua_getglobal(m_L, "boss_y"); lua_getglobal(m_L, "boss_z");
 	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
 	lua_pop(m_L, 3);
-	//cout << "getpos - " << GetPosition().x << "\n";
+	cout << "getpos - " << GetPosition().x << "\n";
+	cout << "getpos - " << GetPosition().y << "\n";
+	cout << "getpos - " << GetPosition().z << "\n";
 
 	lua_getglobal(m_L, "boss_z");
 	lua_getglobal(m_L, "state");
@@ -280,6 +283,8 @@ void Boss::Boss_Ai(float fTimeElapsed, CAirplanePlayer* player, int bossHP)
 	lua_pop(m_L, 2);
 	//cout << " CurState -" << int(CurState) << endl;
 	//cout << " CurMotion -" << int(CurMotion) << endl;
+
+
 
 	SendPosition();
 	SendAnimation();
