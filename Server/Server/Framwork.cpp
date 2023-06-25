@@ -227,7 +227,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			else {
 				--scene->m_ppMeteoObjects[ex_over->obj_id]->send_num;
 			}
-			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_SPAWN_MISSILE, static_cast<short>(key) };
+			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_METEO, static_cast<short>(key) };
 			timer_queue.push(ev);
 
 			delete ex_over;
