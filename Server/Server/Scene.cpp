@@ -295,6 +295,21 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 					}
 				}
 
+				else if (cur_mission == MissionType::KILL_MONSTER3)
+				{
+					++kill_monster_num;
+					for (short pl_id : _plist) {
+						if (pl_id == -1) continue;
+						if (clients[pl_id]._state != ST_INGAME) continue;
+						clients[pl_id].send_kill_num_packet(kill_monster_num);;
+					}
+
+					if (kill_monster_num == 20) {
+						kill_monster_num = 0;
+						MissionClear();
+					}
+				}
+
 				GetJewels();
 			}
 			return;
@@ -325,6 +340,22 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 		if (m_ppMeteoObjects[i]->m_xmOOBB.Intersects(pos, dir, dist)) //총알/적 충돌시
 		{
 			SpawnMeteo(i);
+
+			if (cur_mission == MissionType::KILL_METEOR) {
+				++kill_monster_num;
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_kill_num_packet(kill_monster_num);;
+				}
+
+				if (kill_monster_num == 20) {
+					kill_monster_num = 0;
+					MissionClear();
+					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 30s, EV_MISSION_CLEAR, num };	// 블랙홀
+					timer_queue.push(ev);
+				}
+			}
 			return;
 		}
 	}
@@ -453,15 +484,25 @@ void CScene::CheckMissionComplete()
 		if (dist < 1000.f) {
 			MissionClear();
 		}
-		break;
+		return;
 	}
 	case MissionType::FIND_BOSS: {
 		float dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));		// 임시 좌표
 		if (dist < 1500.0f) {
 			MissionClear();
 		}
+		return;
+	}
+	case MissionType::GO_CENTER_REAL: {
+		XMFLOAT3 player_pos = m_pSpaceship->GetPosition();
+		XMFLOAT3 planet_pos{ 0.f, 0.f, 0.f }; // 임시 좌표
 
-		break;
+		float dist = Vector3::Length(Vector3::Subtract(player_pos, planet_pos));
+		if (dist < 1000.f) {
+			MissionClear();
+		}
+
+		return;
 	}
 	}
 	
@@ -540,12 +581,7 @@ void CScene::GetJewels()
 	// 미션
 	if (cur_mission == MissionType::GET_JEWELS)
 	{
-		if (std::find_if(items.begin(), items.end(),
-			[](const auto& item) {
-			return item.second == 0;
-		}) == items.end()) {	// 0이 없을 때
-			MissionClear();
-		}
+		MissionClear();
 	}
 }
 
