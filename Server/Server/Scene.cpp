@@ -349,7 +349,7 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 					clients[pl_id].send_kill_num_packet(kill_monster_num);;
 				}
 
-				if (kill_monster_num == 20) {
+				if (kill_monster_num == 5) {
 					kill_monster_num = 0;
 					MissionClear();
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 30s, EV_MISSION_CLEAR, num };	// ºí·¢È¦
