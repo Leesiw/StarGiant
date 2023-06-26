@@ -95,9 +95,10 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			std::random_shuffle(ppEnemies.begin(), ppEnemies.end());
 
 			char spawn_num = levels[scene->cur_mission].SpawnMonsterNum;
-
+			
 			for (int i = 0; i < ENEMIES; ++i)
 			{
+				if (levels[scene->cur_mission].MaxMonsterNum <= scene->cur_monster_num) { break; }
 				if (spawn_num <= 0) { break; }
 				if (!ppEnemies[i]->GetisAlive()) {
 					scene->SpawnEnemy(ppEnemies[i]->GetID());
