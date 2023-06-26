@@ -83,6 +83,7 @@ private:
 	UINT						m_nSwapChainBufferIndex;
 
 	ID3D12Resource				*m_ppd3dSwapChainBackBuffers[m_nSwapChainBuffers];
+	ID3D12Resource				* m_pd3dGodRayShadowMap;				//±×¸²ÀÚ¸Ê 
 	ID3D12DescriptorHeap		*m_pd3dRtvDescriptorHeap = NULL;
 
 	ID3D12Resource				*m_pd3dDepthStencilBuffer = NULL;
