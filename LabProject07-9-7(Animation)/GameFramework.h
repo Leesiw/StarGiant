@@ -105,6 +105,8 @@ private:
 	CScene						*m_pScene = NULL;
 	CAirplanePlayer						*m_pPlayer[3] = {};
 	CCamera						*m_pCamera = NULL;
+	DWORD m_pBeforeCamera = NULL;
+
 
 	POINT						m_ptOldCursorPos;
 

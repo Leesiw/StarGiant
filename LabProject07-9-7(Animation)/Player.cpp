@@ -314,6 +314,10 @@ CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
 		case ATTACT_CAMERA_R:
 			pNewCamera = new CAttactCamera(m_pCamera);
 			break;
+
+		case CUT_SCENE_CAMERA:
+			pNewCamera = new CCutSceneCamera(m_pCamera);
+			break;
 	}
 	if (nCurrentCameraMode == SPACESHIP_CAMERA)
 	{
@@ -342,6 +346,49 @@ CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
 	if (m_pCamera) delete m_pCamera;
 
 	return(pNewCamera);
+}
+
+CCamera* CPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
+{
+	return(NULL);
+}
+
+CCamera* CPlayer::ChangeToCutSceneCamera(DWORD nNewCameraMode, float fTimeElapsed)
+{
+	DWORD nCurrentCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
+	if (nCurrentCameraMode == nNewCameraMode) return(m_pCamera);
+	switch (nNewCameraMode)
+	{
+
+	case CUT_SCENE_CAMERA:
+		SetMaxVelocityXZ(0.0f);
+		SetMaxVelocityY(0.0f);
+		m_pCamera = OnChangeCamera(CUT_SCENE_CAMERA, nCurrentCameraMode);
+		m_pCamera->SetTimeLag(0.0f);
+		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
+		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+		break;
+	default:
+		break;
+	}
+
+	m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
+	Update(fTimeElapsed);
+
+	return(m_pCamera);
+
+}
+
+CCamera* CPlayer::ChangeToBeforeCamera(CCamera* pCamera, float fTimeElapsed)
+{
+	m_pCamera = pCamera;
+	m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, pCamera->GetOffset()));
+	Update(fTimeElapsed);
+
+
+
+	return(m_pCamera);
 }
 
 void CPlayer::OnPrepareRender()
@@ -737,9 +784,7 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 			pastcam = ATTACT_CAMERA_R;
-
 			break;
-
 		default:
 			break;
 	}

@@ -446,8 +446,33 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			b_Inside = !b_Inside;
 			std::cout << "씬 전환";
 			break;
+
+		case 'R': //컷씬 테스트
+			if (!isConnect) {
+				m_pBeforeCamera = m_pPlayer[g_myid]->GetCamera()->GetMode();
+				cout << "m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
+				m_pCamera = m_pPlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+				cout << "m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
+				cout << "r";
+			}
+			break;
+
+		case 'E': //컷씬 테스트 돌아오기
+			if (!isConnect) {
+				if (m_pBeforeCamera != NULL) {
+					m_pCamera = m_pPlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+					//m_pCamera = m_pPlayer[g_myid]->ChangeToBeforeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+					cout << "m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
+				}
+				cout << "e";
+			}
+			break;
+
 		case 'M':
 		{
+			
+
+
 			room_num = static_cast<short>(std::stoi(roomNum));
 			CS_LOGIN_PACKET packet;
 			packet.size = sizeof(packet);
@@ -613,7 +638,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 			break;
 		}
         case WM_RBUTTONDOWN:
-
+			_state = SCENE_INGAME;
 			break;
         case WM_LBUTTONUP:
 			if (isHealing && player_type == PlayerType::INSIDE && AroundSculpture()) {
@@ -664,7 +689,7 @@ void CGameFramework::CheckSceneChange(bool State, int num)
 	if (num == 2)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
 	if (num == 3)m_pCamera = m_pPlayer[g_myid]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
 
-
+	if (num == 4)m_pCamera = m_pPlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 
 
 //추가할 사항 없으면 F에 몰아넣기로 수정

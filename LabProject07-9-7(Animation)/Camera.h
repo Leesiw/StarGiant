@@ -10,6 +10,7 @@
 #define ATTACT_CAMERA_C				0x05
 #define ATTACT_CAMERA_L				0x06
 #define ATTACT_CAMERA_R				0x07
+#define CUT_SCENE_CAMERA			0x09
 
 #include "3DDefinitions.h"
 class Frustrum;
@@ -205,3 +206,12 @@ public:
 
 };
 
+//ÄÆ¾À À§ÇÑ Ä«¸Þ¶ó
+class CCutSceneCamera : public CCamera
+{
+public:
+	CCutSceneCamera(CCamera* pCamera);
+	virtual ~CCutSceneCamera() { }
+
+	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed);
+};
