@@ -347,7 +347,12 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		case OP_UPDATE_BOSS: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
-			if (scene->m_pBoss->BossHP <= 0) { break; }
+			if (scene->m_pBoss->BossHP <= 0) { 
+				scene->MissionClear();
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, key };
+				timer_queue.push(ev);
+				break; 
+			}
 
 			scene->m_pBoss->Boss_Ai(0.033f, scene->m_pSpaceship, scene->m_pBoss->GetHP());
 
@@ -415,6 +420,12 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			delete ex_over;
 			break;
 		}
+		case OP_MISSION_CLEAR: {
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
+			scene->MissionClear();
+			delete ex_over;
+			break;
+		}
 		}
 	}
 }
@@ -478,8 +489,8 @@ void CGameFramework::SetMission()
 	}
 
 	levels[MissionType::GET_JEWELS].NextMission = MissionType::Kill_MONSTER;
-	levels[MissionType::GET_JEWELS].MaxMonsterNum = 15;
-	levels[MissionType::GET_JEWELS].SpawnMonsterNum = 7;
+	levels[MissionType::GET_JEWELS].MaxMonsterNum = 10;
+	levels[MissionType::GET_JEWELS].SpawnMonsterNum = 4;
 	levels[MissionType::GET_JEWELS].Laser.MAX_HP = 5;
 	levels[MissionType::GET_JEWELS].Laser.ATK = 3;
 	levels[MissionType::GET_JEWELS].Missile.MAX_HP = 7;
@@ -488,8 +499,8 @@ void CGameFramework::SetMission()
 	levels[MissionType::GET_JEWELS].PlasmaCannon.ATK = 5;
 
 	levels[MissionType::Kill_MONSTER].NextMission = MissionType::GO_PLANET;
-	levels[MissionType::Kill_MONSTER].MaxMonsterNum = 20;
-	levels[MissionType::Kill_MONSTER].SpawnMonsterNum = 9;
+	levels[MissionType::Kill_MONSTER].MaxMonsterNum = 15;
+	levels[MissionType::Kill_MONSTER].SpawnMonsterNum = 5;
 	levels[MissionType::Kill_MONSTER].Laser.MAX_HP = 10;
 	levels[MissionType::Kill_MONSTER].Laser.ATK = 6;
 	levels[MissionType::Kill_MONSTER].Missile.MAX_HP = 14;
@@ -498,8 +509,8 @@ void CGameFramework::SetMission()
 	levels[MissionType::Kill_MONSTER].PlasmaCannon.ATK = 7;
 
 	levels[MissionType::GO_PLANET].NextMission = MissionType::KILL_MONSTER_ONE_MORE_TIME;
-	levels[MissionType::GO_PLANET].MaxMonsterNum = ENEMIES;
-	levels[MissionType::GO_PLANET].SpawnMonsterNum = 9;
+	levels[MissionType::GO_PLANET].MaxMonsterNum = 15;
+	levels[MissionType::GO_PLANET].SpawnMonsterNum = 5;
 	levels[MissionType::GO_PLANET].Laser.MAX_HP = 15;
 	levels[MissionType::GO_PLANET].Laser.ATK = 10;
 	levels[MissionType::GO_PLANET].Missile.MAX_HP = 17;
@@ -508,8 +519,8 @@ void CGameFramework::SetMission()
 	levels[MissionType::GO_PLANET].PlasmaCannon.ATK = 11;
 
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].NextMission = MissionType::FIND_BOSS;
-	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].MaxMonsterNum = ENEMIES;
-	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].SpawnMonsterNum = 9;
+	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].MaxMonsterNum = 20;
+	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].SpawnMonsterNum = 5;
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].Laser.MAX_HP = 20;
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].Laser.ATK = 18;
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].Missile.MAX_HP = 35;
@@ -527,7 +538,7 @@ void CGameFramework::SetMission()
 	levels[MissionType::FIND_BOSS].PlasmaCannon.MAX_HP = 40;
 	levels[MissionType::FIND_BOSS].PlasmaCannon.ATK = 30;
 
-	levels[MissionType::DEFEAT_BOSS].NextMission = MissionType::DEFEAT_BOSS;
+	levels[MissionType::DEFEAT_BOSS].NextMission = MissionType::GO_CENTER;
 	levels[MissionType::DEFEAT_BOSS].MaxMonsterNum = 0;
 	levels[MissionType::DEFEAT_BOSS].SpawnMonsterNum = 0;
 	levels[MissionType::DEFEAT_BOSS].Laser.MAX_HP = 20;
@@ -536,6 +547,66 @@ void CGameFramework::SetMission()
 	levels[MissionType::DEFEAT_BOSS].Missile.ATK = 20;
 	levels[MissionType::DEFEAT_BOSS].PlasmaCannon.MAX_HP = 40;
 	levels[MissionType::DEFEAT_BOSS].PlasmaCannon.ATK = 30;
+
+	levels[MissionType::GO_CENTER].NextMission = MissionType::KILL_MONSTER3;
+	levels[MissionType::GO_CENTER].MaxMonsterNum = 5;
+	levels[MissionType::GO_CENTER].SpawnMonsterNum = 3;
+	levels[MissionType::GO_CENTER].Laser.MAX_HP = 40;
+	levels[MissionType::GO_CENTER].Laser.ATK = 18;
+	levels[MissionType::GO_CENTER].Missile.MAX_HP = 55;
+	levels[MissionType::GO_CENTER].Missile.ATK = 20;
+	levels[MissionType::GO_CENTER].PlasmaCannon.MAX_HP = 60;
+	levels[MissionType::GO_CENTER].PlasmaCannon.ATK = 30;
+
+	levels[MissionType::KILL_MONSTER3].NextMission = MissionType::KILL_METEOR;
+	levels[MissionType::KILL_MONSTER3].MaxMonsterNum = 15;
+	levels[MissionType::KILL_MONSTER3].SpawnMonsterNum = 6;
+	levels[MissionType::KILL_MONSTER3].Laser.MAX_HP = 40;
+	levels[MissionType::KILL_MONSTER3].Laser.ATK = 18;
+	levels[MissionType::KILL_MONSTER3].Missile.MAX_HP = 55;
+	levels[MissionType::KILL_MONSTER3].Missile.ATK = 20;
+	levels[MissionType::KILL_MONSTER3].PlasmaCannon.MAX_HP = 60;
+	levels[MissionType::KILL_MONSTER3].PlasmaCannon.ATK = 30;
+
+	levels[MissionType::KILL_METEOR].NextMission = MissionType::ESCAPE_BLACK_HOLE;
+	levels[MissionType::KILL_METEOR].MaxMonsterNum = 10;
+	levels[MissionType::KILL_METEOR].SpawnMonsterNum = 4;
+	levels[MissionType::KILL_METEOR].Laser.MAX_HP = 40;
+	levels[MissionType::KILL_METEOR].Laser.ATK = 18;
+	levels[MissionType::KILL_METEOR].Missile.MAX_HP = 55;
+	levels[MissionType::KILL_METEOR].Missile.ATK = 20;
+	levels[MissionType::KILL_METEOR].PlasmaCannon.MAX_HP = 60;
+	levels[MissionType::KILL_METEOR].PlasmaCannon.ATK = 30;
+
+	levels[MissionType::ESCAPE_BLACK_HOLE].NextMission = MissionType::GO_CENTER_REAL;
+	levels[MissionType::ESCAPE_BLACK_HOLE].MaxMonsterNum = 5;
+	levels[MissionType::ESCAPE_BLACK_HOLE].SpawnMonsterNum = 2;
+	levels[MissionType::ESCAPE_BLACK_HOLE].Laser.MAX_HP = 40;
+	levels[MissionType::ESCAPE_BLACK_HOLE].Laser.ATK = 18;
+	levels[MissionType::ESCAPE_BLACK_HOLE].Missile.MAX_HP = 55;
+	levels[MissionType::ESCAPE_BLACK_HOLE].Missile.ATK = 20;
+	levels[MissionType::ESCAPE_BLACK_HOLE].PlasmaCannon.MAX_HP = 60;
+	levels[MissionType::ESCAPE_BLACK_HOLE].PlasmaCannon.ATK = 30;
+
+	levels[MissionType::GO_CENTER_REAL].NextMission = MissionType::KILL_GOD;
+	levels[MissionType::GO_CENTER_REAL].MaxMonsterNum = ENEMIES;
+	levels[MissionType::GO_CENTER_REAL].SpawnMonsterNum = 5;
+	levels[MissionType::GO_CENTER_REAL].Laser.MAX_HP = 40;
+	levels[MissionType::GO_CENTER_REAL].Laser.ATK = 18;
+	levels[MissionType::GO_CENTER_REAL].Missile.MAX_HP = 55;
+	levels[MissionType::GO_CENTER_REAL].Missile.ATK = 20;
+	levels[MissionType::GO_CENTER_REAL].PlasmaCannon.MAX_HP = 60;
+	levels[MissionType::GO_CENTER_REAL].PlasmaCannon.ATK = 30;
+
+	levels[MissionType::KILL_GOD].NextMission = MissionType::KILL_GOD;
+	levels[MissionType::KILL_GOD].MaxMonsterNum = 0;
+	levels[MissionType::KILL_GOD].SpawnMonsterNum = 0;
+	levels[MissionType::KILL_GOD].Laser.MAX_HP = 40;
+	levels[MissionType::KILL_GOD].Laser.ATK = 18;
+	levels[MissionType::KILL_GOD].Missile.MAX_HP = 55;
+	levels[MissionType::KILL_GOD].Missile.ATK = 20;
+	levels[MissionType::KILL_GOD].PlasmaCannon.MAX_HP = 60;
+	levels[MissionType::KILL_GOD].PlasmaCannon.ATK = 30;
 }
 
 void CGameFramework::BuildObjects()
@@ -891,6 +962,12 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 			case EV_RESET_SCENE: {
 				OVER_EXP* ov = new OVER_EXP;
 				ov->_comp_type = OP_RESET_SCENE;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
+				break;
+			}
+			case EV_MISSION_CLEAR: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_MISSION_CLEAR;
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
