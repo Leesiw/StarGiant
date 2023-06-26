@@ -832,7 +832,7 @@ void CScene::Start()
 			timer_queue.push(ev);
 		}
 
-		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_SPAWN_ENEMY, num };
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10s, EV_SPAWN_ENEMY, num };
 		timer_queue.push(ev);
 
 		TIMER_EVENT ev1{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, num };

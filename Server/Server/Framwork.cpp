@@ -166,6 +166,14 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 
 ///			}
 
+				if (ex_over->obj_id >= 23
+					&& scene->m_ppEnemies[ex_over->obj_id]->state == EnemyState::AIMING &&
+					!scene->m_ppEnemies[ex_over->obj_id]->GetAttackTimer()) {
+					scene->m_ppEnemies[ex_over->obj_id]->SetAttackTimerTrue();
+					TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(key) };
+					timer_queue.push(ev);
+				}
+
 		
 			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(key) };
 			timer_queue.push(ev);

@@ -45,6 +45,10 @@ public:
 	void SetisAlive(bool i_a);
 	void SetAttackTimerFalse();
 
+	void SetAttackTimerTrue();
+
+	bool GetAttackTimer();
+
 	char GetHP() { return hp; }
 
 	char GetID() { return id; }

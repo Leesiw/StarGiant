@@ -233,6 +233,14 @@ void CEnemy::SetAttackTimerFalse()
 
 }
 
+void CEnemy::SetAttackTimerTrue()
+{
+	enemy_flags |= option2;
+
+}
+
+bool CEnemy::GetAttackTimer() { return enemy_flags & option2; }
+
 void CEnemy::SetStatus(MissionType cur_mission)
 {
 }
