@@ -351,6 +351,16 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 
 			scene->m_pBoss->Boss_Ai(0.033f, scene->m_pSpaceship, scene->m_pBoss->GetHP());
 
+			float dist;
+			dist = Vector3::Length(Vector3::Subtract(scene->m_pSpaceship->GetPosition(), scene->m_pBoss->GetPosition()));
+			if (dist < 1000.f) // boss ¸·±â
+			{
+				XMFLOAT3 ToGo = Vector3::Subtract(scene->m_pSpaceship->GetPosition(), scene->m_pBoss->GetPosition());
+				ToGo = Vector3::ScalarProduct(ToGo, 800.f);
+				ToGo = Vector3::Add(scene->m_pBoss->GetPosition(), ToGo);
+				scene->m_pSpaceship->SetPosition(ToGo);
+			}
+
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(key) };
 			timer_queue.push(ev);
 			delete ex_over;
@@ -367,6 +377,8 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				if (clients[pl_id]._state != ST_INGAME) continue;
 				clients[pl_id].send_spaceship_packet(scene->m_pSpaceship);
 			}
+
+			scene->CheckMissionComplete();
 
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, static_cast<short>(key) };
 			timer_queue.push(ev);

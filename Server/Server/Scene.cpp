@@ -445,25 +445,6 @@ void CScene::CheckBossCollisions()
 void CScene::CheckMissionComplete()
 {
 	switch (cur_mission) {
-		/*
-	case MissionType::TU_SIT: {
-		break;
-	}
-	case MissionType::TU_KILL: {
-		break;
-	}
-	case MissionType::TU_HILL: {
-		break;
-	}
-	case MissionType::TU_END: {
-		break;
-	}
-	case MissionType::GET_JEWELS: {
-		break;
-	}
-	case MissionType::Kill_MONSTER: {
-		break;
-	}*/
 	case MissionType::GO_PLANET: {
 		XMFLOAT3 player_pos = m_pSpaceship->GetPosition();
 		XMFLOAT3 planet_pos{ 10000.f, 10000.f, 10000.f }; // юс╫ц абг╔
@@ -473,10 +454,7 @@ void CScene::CheckMissionComplete()
 			MissionClear();
 		}
 		break;
-	}/*
-	case MissionType::KILL_MONSTER_ONE_MORE_TIME: {
-		break;
-	}*/
+	}
 	case MissionType::FIND_BOSS: {
 		float dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));		// юс╫ц абг╔
 		if (dist < 1500.0f) {
