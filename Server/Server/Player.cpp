@@ -137,12 +137,12 @@ void CPlayer::Update(float fTimeElapsed)
 
 void CPlayer::OnPrepareRender()
 {
-	m_xmf4x4ToParent._11 = m_xmf3Right.x; m_xmf4x4ToParent._12 = m_xmf3Right.y; m_xmf4x4ToParent._13 = m_xmf3Right.z;
-	m_xmf4x4ToParent._21 = m_xmf3Up.x; m_xmf4x4ToParent._22 = m_xmf3Up.y; m_xmf4x4ToParent._23 = m_xmf3Up.z;
-	m_xmf4x4ToParent._31 = m_xmf3Look.x; m_xmf4x4ToParent._32 = m_xmf3Look.y; m_xmf4x4ToParent._33 = m_xmf3Look.z;
-	m_xmf4x4ToParent._41 = m_xmf3Position.x; m_xmf4x4ToParent._42 = m_xmf3Position.y; m_xmf4x4ToParent._43 = m_xmf3Position.z;
+	m_xmf4x4World._11 = m_xmf3Right.x; m_xmf4x4World._12 = m_xmf3Right.y; m_xmf4x4World._13 = m_xmf3Right.z;
+	m_xmf4x4World._21 = m_xmf3Up.x; m_xmf4x4World._22 = m_xmf3Up.y; m_xmf4x4World._23 = m_xmf3Up.z;
+	m_xmf4x4World._31 = m_xmf3Look.x; m_xmf4x4World._32 = m_xmf3Look.y; m_xmf4x4World._33 = m_xmf3Look.z;
+	m_xmf4x4World._41 = m_xmf3Position.x; m_xmf4x4World._42 = m_xmf3Position.y; m_xmf4x4World._43 = m_xmf3Position.z;
 
-	m_xmf4x4ToParent = Matrix4x4::Multiply(XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z), m_xmf4x4ToParent);
+	m_xmf4x4World = Matrix4x4::Multiply(XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z), m_xmf4x4World);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,6 +244,8 @@ void CAirplanePlayer::Animate(float fTimeElapsed)
 void CAirplanePlayer::Update(float fTimeElapsed)
 {
 	CPlayer::Update(fTimeElapsed);
+	OnPrepareRender();
+	UpdateBoundingBox();
 
 	if (is_update) { return; }
 	XMVECTOR a = XMLoadFloat4(&input_info.Quaternion);
@@ -259,7 +261,6 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 	}
 	is_update = true;
 
-	UpdateBoundingBox();
 }
 
 void CAirplanePlayer::OnPrepareRender()

@@ -60,8 +60,6 @@ void CScene::BuildObjects()
 	}
 
 	// meteo
-	CMeteoObject* meteo = NULL;
-
 	for (int i = 0; i < METEOS; ++i) {
 		m_ppMeteoObjects[i] = new CMeteoObject();
 		XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
@@ -75,9 +73,11 @@ void CScene::BuildObjects()
 
 		if (i < METEOS / 2) {
 			m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+			m_ppMeteoObjects[i]->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		}
 		else {
 			m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
+			m_ppMeteoObjects[i]->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		}
 		m_ppMeteoObjects[i]->SetMovingDirection(random_dir);
 	}
