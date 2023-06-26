@@ -153,7 +153,7 @@ void CMeteoObject::OnInitialize()
 void CMeteoObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 {
 	XMFLOAT3 xmf3Position = GetPosition();
-	xmf3Position = Vector3::Add(xmf3Position, m_xmf3MovingDirection, 100.0f * fTimeElapsed);
+	xmf3Position = Vector3::Add(xmf3Position, m_xmf3MovingDirection, 50.0f * fTimeElapsed);
 	SetPosition(xmf3Position);
 	//printf("pos : %f, %f, %f\n", xmf3Position.x, xmf3Position.y, xmf3Position.z);
 }

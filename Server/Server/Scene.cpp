@@ -63,28 +63,23 @@ void CScene::BuildObjects()
 	CMeteoObject* meteo = NULL;
 
 	for (int i = 0; i < METEOS; ++i) {
-		meteo = new CMeteoObject();
-		meteo->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
-		meteo->SetMovingDirection(XMFLOAT3(urdPos(dree), urdPos(dree), urdPos(dree)));
-		//short id = urdModelID(dree);
-		//meteo->SetModelId(id);
-		//meteo->mesh = true;
-		if (i <  METEOS/2) {
-			meteo->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
-			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+		m_ppMeteoObjects[i] = new CMeteoObject();
+		XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
+		m_ppMeteoObjects[i]->m_xmf4x4ToParent = Matrix4x4::Identity();
+		XMFLOAT3 random_pos{ urdPos(dree) , urdPos(dree), urdPos(dree) };
+		XMFLOAT3 random_dir{ urdDir(dree) , urdDir(dree), urdDir(dree) };
+		if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x;  random_dir.x = -random_dir.x; }
+		if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; random_dir.y = -random_dir.y; }
+		if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; random_dir.z = -random_dir.z; }
+		m_ppMeteoObjects[i]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
+
+		if (i < METEOS / 2) {
+			m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
 		}
 		else {
-			meteo->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
-			// 크기 정확히 모르겠음 임시
-			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256, 0.71804,  -0.0466012 }, XMFLOAT3{ 0.882965, 0.858064, 0.828712 }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
-			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256f, 0.71804f,  -0.0466012f }, XMFLOAT3{ 4.414825f, 4.29032f, 4.14356f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
-			
-			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.0f, 0.0f, -0.066881f }, XMFLOAT3{ 10.0928127f, 10.0928127f, 10.218262f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
-			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
-			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.000628f, -0.011224f, -0.003297f }, XMFLOAT3{ 2.89832f, 2.51931f, 2.78528f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
+			m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
 		}
-		m_ppMeteoObjects[i] = meteo;
-		m_ppMeteoObjects[i]->UpdateTransform(NULL);
+		m_ppMeteoObjects[i]->SetMovingDirection(random_dir);
 	}
 
 	// enemy
@@ -161,16 +156,22 @@ void CScene::Reset()
 	}
 
 	for (int i = 0; i < METEOS; ++i) {
-		m_ppMeteoObjects[i]->SetPosition(urdPos(dree), urdPos(dree), urdPos(dree));
-		m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(urdPos(dree), urdPos(dree), urdPos(dree)));
-		m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
+		XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
+		m_ppMeteoObjects[i]->m_xmf4x4ToParent = Matrix4x4::Identity();
+		XMFLOAT3 random_pos{ urdPos(dree) , urdPos(dree), urdPos(dree) };
+		XMFLOAT3 random_dir{ urdDir(dree) , urdDir(dree), urdDir(dree) };
+		if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x;  random_dir.x = -random_dir.x; }
+		if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; random_dir.y = -random_dir.y; }
+		if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; random_dir.z = -random_dir.z; }
+		m_ppMeteoObjects[i]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
+
 		if (i < METEOS / 2) {
 			m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
 		}
 		else {
 			m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
 		}
-		m_ppMeteoObjects[i]->UpdateTransform(NULL);
+		m_ppMeteoObjects[i]->SetMovingDirection(random_dir);
 	}
 
 	for (int i = 0; i < ENEMIES; ++i) {

@@ -1552,7 +1552,7 @@ CMeteorObject::~CMeteorObject()
 void CMeteorObject::Animate(float fTimeElapsed)
 {
 	XMFLOAT3 xmf3Position = GetPosition();
-	xmf3Position = Vector3::Add(xmf3Position, m_xmf3MovingDirection, 100.0 * fTimeElapsed);
+	xmf3Position = Vector3::Add(xmf3Position, m_xmf3MovingDirection, 50.0 * fTimeElapsed);
 	SetPosition(xmf3Position);
 
 	CGameObject::Animate(fTimeElapsed);
