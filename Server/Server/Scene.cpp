@@ -618,9 +618,10 @@ void CScene::SpawnMeteo(char i)
 	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
 	m_ppMeteoObjects[i]->m_xmf4x4ToParent = Matrix4x4::Identity();
 	XMFLOAT3 random_pos{ urdPos(dree) , urdPos(dree), urdPos(dree) };
-	if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x; }
-	if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; }
-	if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; }
+	XMFLOAT3 random_dir{ urdDir(dree) , urdDir(dree), urdDir(dree) };
+	if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x;  random_dir.x = -random_dir.x; }
+	if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; random_dir.y = -random_dir.y; }
+	if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; random_dir.z = -random_dir.z; }
 	m_ppMeteoObjects[i]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
 
 	if (i < METEOS / 2) {
@@ -629,7 +630,7 @@ void CScene::SpawnMeteo(char i)
 	else {
 		m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
 	}
-	m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(urdPos3(dree), urdPos3(dree), urdPos3(dree)));
+	m_ppMeteoObjects[i]->SetMovingDirection(random_dir);
 
 	for (short pl_id : _plist) {
 		if (pl_id == -1) continue;
@@ -667,7 +668,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	{ 
 		XMFLOAT3 m_pos = m_ppMeteoObjects[i]->GetPosition();
 		float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
-		if (dist > 1500.0f){
+		if (dist > 1000.0f){
 			SpawnMeteo(i);
 		}
 		m_ppMeteoObjects[i]->Animate(fTimeElapsed, NULL); 
