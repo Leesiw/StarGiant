@@ -495,7 +495,7 @@ void CScene::MissionClear()
 	{
 		cur_mission = levels[cur_mission].NextMission;
 
-		if (cur_mission == MissionType::DEFEAT_BOSS) {
+		if (cur_mission == MissionType::DEFEAT_BOSS|| cur_mission == MissionType::FIND_BOSS) {
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, num };
 			timer_queue.push(ev);
 		}
