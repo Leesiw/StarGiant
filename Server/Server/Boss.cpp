@@ -3,8 +3,8 @@
 #include "stdafx.h"
 #include "SceneManager.h"
 #include "Boss.h"
-
 extern SceneManager scene_manager;
+
 
 Boss::Boss()
 {
@@ -23,7 +23,7 @@ Boss::Boss()
 		meteo->SetMovingDirection(XMFLOAT3(urdPos(dree), urdPos(dree), urdPos(dree)));
 		meteo->SetScale(100.0f, 100.0f, 100.0f);
 		if (i < BOSSMETEOS / 2) {
-			// ¹Ù¿îµù ¹Ú½º ¼³Á¤ ºÎÅ¹
+			// Â¹Ã™Â¿Ã®ÂµÃ¹ Â¹ÃšÂ½Âº Â¼Â³ÃÂ¤ ÂºÃÃ…Â¹
 			meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{  -0.0167256f, 0.71804f,  -0.0466012f }, XMFLOAT3{ 4.414825f, 4.29032f, 4.14356f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 			//meteo->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		}
@@ -37,19 +37,91 @@ Boss::Boss()
 	//boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 34.65389f, -10.1982f), XMFLOAT3(65.5064392f, 35.0004547f, 77.9787476f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	boundingbox = BoundingOrientedBox{ XMFLOAT3(-33.47668f, 41.86574f, 26.52405f), XMFLOAT3(774.8785f, 299.2372f, 584.7963f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 
+	// Lua Â»Ã³Ã…Ã‚ Â»Ã½Â¼Âº
+	m_L = luaL_newstate();
+	luaL_openlibs(m_L);
 
-	
+	// Lua Ã†Ã„Ã€Ã ÂºÃ’Â·Â¯Â¿Ã€Â±Ã¢
+	if (luaL_loadfile(m_L, "boss_ai.lua") || lua_pcall(m_L, 0, 0, 0))
+	{
+		const char* error = lua_tostring(m_L, -1);
+		printf("Error loading boss_ai.lua: %s\n", error);
+	}
+
+	XMFLOAT3 position;
+
+	position = { position.x = 0.0, position.y = 0.0, position.z = 0.0 };
+
+
+	lua_getglobal(m_L, "state");
+	lua_getglobal(m_L, "motion");
+	lua_getglobal(m_L, "MaxHp");
+
+	lua_getglobal(m_L, "boss_x");
+	lua_getglobal(m_L, "boss_y");
+	lua_getglobal(m_L, "boss_z");
+
+
+	CurState = BossState(lua_tonumber(m_L, -6));
+	CurMotion = BossAnimation(lua_tonumber(m_L, -5));
+
+	MAXBossHP = lua_tonumber(m_L, -4);
+	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+
+
+	//cout << "getpos - " << GetPosition().x << "\n";
+	//cout << "getpos - " << GetPosition().y << "\n";
+	//cout << "getpos - " << GetPosition().z << "\n";
+	//cout << "CurState - " << int(CurState) <<"\n";
+	//cout << "CurMotion - " << int(CurMotion) << "\n";
+	//cout << "MAXBossHP - "<< MAXBossHP << "\n";
+	//cout << "getpos - " << GetPosition().y << "\n";
+	lua_pop(m_L, 6);
+
+	////test
+	//float x, y, z;
+	//x = float(GetPosition().x);
+	//y = float(GetPosition().y);
+	//z = float(GetPosition().z);
+
+	//lua_getglobal(m_L, "updateBossAI");
+	//lua_pushnumber(m_L, MAXBossHP);
+
+	//lua_pushnumber(m_L, x);
+	//lua_pushnumber(m_L, y);
+	//lua_pushnumber(m_L, z);
+	//lua_pushnumber(m_L, 0);
+
+
+	//lua_pcall(m_L, 5, 0, 0);	// Ã†Ã„Â¶Ã³Â¹ÃŒÃ…Ã Â°Â³Â¼Ã¶, Â¸Â®Ã…ÃÂ°Âª Â°Â³Â¼Ã¶, Ã‡ÃšÂµÃ©Â·Â¯
+	////int result = lua_tonumber(m_L, -1);	// Â¸Â®Ã…ÃÂ°Âª Â¸Ã‡ Â²Ã€Â´Ã«Â±Ã¢ Â°Âª
+	////lua_pop(m_L, 1);
+
+	//if (lua_pcall(m_L, 0, 0, 0) != LUA_OK)
+	//{
+	//	const char* error = lua_tostring(m_L, -1);
+	//	printf("Error calling updateBossAI: %s\n", error);
+	//}
+
+	//lua_getglobal(m_L, "boss_x"); lua_getglobal(m_L, "boss_y"); lua_getglobal(m_L, "boss_z");
+	//SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+	//lua_pop(m_L, 3);
+	//cout << "getpos - " << GetPosition().x << "\n";
+
 }
-
 Boss::~Boss() {
 	for (int i = 0; i < m_ppBossMeteoObjects.size(); ++i)
 	{
 		if (m_ppBossMeteoObjects[i]) { delete m_ppBossMeteoObjects[i]; }
 	}
+
+	// Lua Â»Ã³Ã…Ã‚ Â´ÃÂ±Ã¢
+	lua_close(m_L);
 }
 
 
-void Boss::SendPosition()	// À§Ä¡/°¢µµ º¯È­ÇÒ ¶§ »ç¿ë. 
+
+void Boss::SendPosition()	// Ã€Â§Ã„Â¡/Â°Â¢ÂµÂµ ÂºÂ¯ÃˆÂ­Ã‡Ã’ Â¶Â§ Â»Ã§Â¿Ã«. 
 {
 	SC_MOVE_ENEMY_PACKET p{};
 
@@ -63,7 +135,7 @@ void Boss::SendPosition()	// À§Ä¡/°¢µµ º¯È­ÇÒ ¶§ »ç¿ë.
 	scene_manager.Send(scene_num, (char*)&p);
 }
 
-void Boss::SendAnimation() // ¾Ö´Ï¸ŞÀÌ¼Ç º¯È­ÇßÀ» ¶§ »ç¿ë
+void Boss::SendAnimation() // Â¾Ã–Â´ÃÂ¸ÃÃ€ÃŒÂ¼Ã‡ ÂºÂ¯ÃˆÂ­Ã‡ÃŸÃ€Â» Â¶Â§ Â»Ã§Â¿Ã«
 {
 	SC_ANIMATION_CHANGE_PACKET p{};
 	p.size = sizeof(SC_ANIMATION_CHANGE_PACKET);
@@ -83,7 +155,7 @@ XMFLOAT4 Boss::GetQuaternion()
 	return xmf4;
 }
 
-void Boss::MeteoAttack(float fTimeElapsed, const XMFLOAT3& TargetPos) // °ø°İ ½ÃÀÛ ½Ã ÇÑ ¹ø ½ÇÇà
+void Boss::MeteoAttack(float fTimeElapsed, const XMFLOAT3& TargetPos) // Â°Ã¸Â°Ã Â½ÃƒÃ€Ã› Â½Ãƒ Ã‡Ã‘ Â¹Ã¸ Â½Ã‡Ã‡Ã 
 {
 	XMFLOAT3 xmf3Pos = GetPosition();
 	xmf3Pos.y + 1000.f;
@@ -92,11 +164,11 @@ void Boss::MeteoAttack(float fTimeElapsed, const XMFLOAT3& TargetPos) // °ø°İ ½Ã
 	xmfToPlayer = Vector3::TransformCoord(xmfToPlayer, Matrix4x4::RotationAxis(GetUp(), urdAngle(dree)));
 	
 	XMFLOAT3 directions[5] = {
-	   xmfToPlayer, // Áß½É ¹æÇâ
-	   Vector3::TransformNormal(XMFLOAT3(0.f, 0.f, 1.f), XMMatrixRotationY(XMConvertToRadians(45.f))), // À§ÂÊ ¹æÇâ
-	   Vector3::TransformNormal(XMFLOAT3(0.f, 0.f, 1.f), XMMatrixRotationY(XMConvertToRadians(-45.f))), // ¾Æ·¡ÂÊ ¹æÇâ
-	   Vector3::TransformNormal(XMFLOAT3(1.f, 0.f, 0.f), XMMatrixRotationY(XMConvertToRadians(45.f))), // ¿ŞÂÊ ¹æÇâ
-	   Vector3::TransformNormal(XMFLOAT3(1.f, 0.f, 0.f), XMMatrixRotationY(XMConvertToRadians(-45.f))) // ¿À¸¥ÂÊ ¹æÇâ
+	   xmfToPlayer, // ÃÃŸÂ½Ã‰ Â¹Ã¦Ã‡Ã¢
+	   Vector3::TransformNormal(XMFLOAT3(0.f, 0.f, 1.f), XMMatrixRotationY(XMConvertToRadians(45.f))), // Ã€Â§Ã‚ÃŠ Â¹Ã¦Ã‡Ã¢
+	   Vector3::TransformNormal(XMFLOAT3(0.f, 0.f, 1.f), XMMatrixRotationY(XMConvertToRadians(-45.f))), // Â¾Ã†Â·Â¡Ã‚ÃŠ Â¹Ã¦Ã‡Ã¢
+	   Vector3::TransformNormal(XMFLOAT3(1.f, 0.f, 0.f), XMMatrixRotationY(XMConvertToRadians(45.f))), // Â¿ÃÃ‚ÃŠ Â¹Ã¦Ã‡Ã¢
+	   Vector3::TransformNormal(XMFLOAT3(1.f, 0.f, 0.f), XMMatrixRotationY(XMConvertToRadians(-45.f))) // Â¿Ã€Â¸Â¥Ã‚ÃŠ Â¹Ã¦Ã‡Ã¢
 	};
 
 	for (int i = 0; i < BOSSMETEOS; ++i) {
@@ -107,7 +179,7 @@ void Boss::MeteoAttack(float fTimeElapsed, const XMFLOAT3& TargetPos) // °ø°İ ½Ã
 
 }
 
-void Boss::MoveMeteo(float fTimeElapsed)		// ¸ŞÅ×¿À ¿òÁ÷¿©¾ß ÇÒ¶§ °è¼Ó ½ÇÇà. send±îÁö Æ÷ÇÔµÊ
+void Boss::MoveMeteo(float fTimeElapsed)		// Â¸ÃÃ…Ã—Â¿Ã€ Â¿Ã²ÃÃ·Â¿Â©Â¾ÃŸ Ã‡Ã’Â¶Â§ Â°Ã¨Â¼Ã“ Â½Ã‡Ã‡Ã . sendÂ±Ã®ÃÃ¶ Ã†Ã·Ã‡Ã”ÂµÃŠ
 {
 	for (int i = 0; i < BOSSMETEOS; ++i) {
 		m_ppBossMeteoObjects[i]->Animate(fTimeElapsed);
@@ -124,7 +196,7 @@ void Boss::MoveMeteo(float fTimeElapsed)		// ¸ŞÅ×¿À ¿òÁ÷¿©¾ß ÇÒ¶§ °è¼Ó ½ÇÇà. sen
 	for (int i = 0; i < BOSSMETEOS; ++i) {
 		p.data.id = METEOS + i;
 		p.data.pos = m_ppBossMeteoObjects[i]->GetPosition();
-		scene_manager.Send(scene_num, (char*)&p);
+		scene_manager.Send(scene_num, (char*)&p); 
 	}
 }
 
@@ -136,7 +208,7 @@ void Boss::MoveBoss(float fTimeElapsed, XMFLOAT3 TargetPos, float dist)
 	LookAtPosition(fTimeElapsed, TargetPos);
 
 	XMFLOAT3 BossPos = GetPosition();
-	//¼Óµµ º¯°æÇØÁà¾ßµÊ
+	//Â¼Ã“ÂµÂµ ÂºÂ¯Â°Ã¦Ã‡Ã˜ÃÃ Â¾ÃŸÂµÃŠ
 	XMFLOAT3 xmf3Movement = Vector3::ScalarProduct(GetLook(), speed * fTimeElapsed, true);
 	BossPos = Vector3::Add(BossPos, xmf3Movement);
 	SetPosition(BossPos);
@@ -148,9 +220,9 @@ void Boss::MoveBoss(float fTimeElapsed, XMFLOAT3 TargetPos, float dist)
 void Boss::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 {
 	XMFLOAT3 new_pos = pos;
-	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World)); // ¿ªÇà·Ä
+	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World)); // Â¿ÂªÃ‡Ã Â·Ã„
 
-	new_pos = Vector3::TransformCoord(new_pos, inv_mat); // Å¸°ÙÀÇ À§Ä¡¸¦ Àû ÀÚÃ¼ÀÇ ÁÂÇ¥°è·Î º¯È¯
+	new_pos = Vector3::TransformCoord(new_pos, inv_mat); // Ã…Â¸Â°Ã™Ã€Ã‡ Ã€Â§Ã„Â¡Â¸Â¦ Ã€Ã» Ã€ÃšÃƒÂ¼Ã€Ã‡ ÃÃ‚Ã‡Â¥Â°Ã¨Â·Ã ÂºÂ¯ÃˆÂ¯
 	new_pos = Vector3::Normalize(new_pos);
 
 	float pitch = XMConvertToDegrees(asin(-new_pos.y));
@@ -169,29 +241,58 @@ void Boss::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 }
 
 
-void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* player, int bossHP)
+void Boss::Boss_Ai(float fTimeElapsed, CAirplanePlayer* player, int bossHP)
 {
-	XMFLOAT3 TargetPos = player->GetPosition();
-	XMFLOAT3 BossPos = GetPosition();
-	XMFLOAT3 SubTarget = Vector3::Subtract(TargetPos, BossPos);
-	float Dist = Vector3::Length(SubTarget);
+	//test
+	float x, y, z;
+	x = float(player->GetPosition().x);
+	y = float(player->GetPosition().y);
+	z = float(player->GetPosition().z);
 
-	static int a=0;
+	lua_getglobal(m_L, "updateBossAI");
+	lua_pushnumber(m_L, bossHP);
+	lua_pushnumber(m_L, x);
+	lua_pushnumber(m_L, y);
+	lua_pushnumber(m_L, z);
+	lua_pushnumber(m_L, fTimeElapsed);
 
-	switch (CurState) {
-	case  BossState::APPEAR:
+	lua_pcall(m_L, 5, 0, 0);	// Ã†Ã„Â¶Ã³Â¹ÃŒÃ…Ã Â°Â³Â¼Ã¶, Â¸Â®Ã…ÃÂ°Âª Â°Â³Â¼Ã¶, Ã‡ÃšÂµÃ©Â·Â¯
+	//int result = lua_tonumber(m_L, -1);	// Â¸Â®Ã…ÃÂ°Âª Â¸Ã‡ Â²Ã€Â´Ã«Â±Ã¢ Â°Âª
+	//lua_pop(m_L, 1);
+
+	//if (lua_pcall(m_L, 0, 0, 0) != LUA_OK)
+	//{
+	//	const char* error = lua_tostring(m_L, -1);
+	//	printf("Error calling updateBossAI: %s\n", error);
+	//}
+
+	lua_getglobal(m_L, "boss_x"); lua_getglobal(m_L, "boss_y"); lua_getglobal(m_L, "boss_z");
+	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+	lua_pop(m_L, 3);
+	/*cout << "getpos - " << GetPosition().x << "\n";
+	cout << "getpos - " << GetPosition().y << "\n";
+	cout << "getpos - " << GetPosition().z << "\n";*/
+
+	lua_getglobal(m_L, "boss_z");
+	lua_getglobal(m_L, "state");
+	lua_getglobal(m_L, "motion");
+
+
+	CurState = BossState(lua_tonumber(m_L, -2));
+	CurMotion = BossAnimation(lua_tonumber(m_L, -1));
+	lua_pop(m_L, 2);
+	//cout << " CurState -" << int(CurState) << endl;
+	//cout << " CurMotion -" << int(CurMotion) << endl;
+
+
+
+	SendPosition();
+	SendAnimation();
+	
+
+	if (CurState != BossState::SLEEP)
 	{
-		//Àû Ã³Ä¡ Á¶°Ç ¸ÂÀ¸¸é º¸½º »óÅÂ appear·Î ¹Ù²ã¼­ À§Ä¡ ¹Ì´Ï¸Ê ¾îµò°¡¿¡ Ç¥½Ã µÉ ¼ö ÀÖ´Â Á¤µµ µÇ´Â °÷À¸·Î ·£´ıÀÌµç °íÁ¤ÀÌµç setpos
-		//this->SetPosition(TargetPos.x + 200.0f, TargetPos.y, TargetPos.z + 200.0f);
-		SetPosition(0.0f + 10, 250.0f, 640.0f); 
-		SendPosition();
-
-
-		//ÀÏ´Ü Ã·¿£ Àá
-		SetState(BossState::SLEEP);
-		stateStartTime = steady_clock::now(); //ÀÌ°Å ´Ù ¾²¸é °Á ai³¡³¯¶§ ÃÊ±âÈ­·Î ¹Ù²ã¾ß°Ù´Ù ³ªÁß¿¡..
-
-		break;
+		LookAtPosition(fTimeElapsed, player->GetPosition());
 	}
 
 	case  BossState::SLEEP:
@@ -200,7 +301,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 		if(CurMotion !=PastMotion)
 			SendAnimation();
 		SendPosition();
-		//¸¸¾à¿¡ ÇÃ·¹ÀÌ¾î°¡ °¡±îÀÌ ¿À¸é idle·Î °¡±â 
+		//Â¸Â¸Â¾Ã Â¿Â¡ Ã‡ÃƒÂ·Â¹Ã€ÃŒÂ¾Ã®Â°Â¡ Â°Â¡Â±Ã®Ã€ÃŒ Â¿Ã€Â¸Ã© idleÂ·Ã Â°Â¡Â±Ã¢ 
 		if (Dist < 1500.0f) {
 			SetState(BossState::IDLE);
 			stateStartTime = steady_clock::now();
@@ -221,14 +322,14 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			SetState(BossState::SIT_IDLE);*/
 
 
-		//ÇÃ·¹ÀÌ¾î¿Í °Å¸®°¡ ¸Ö¾îÁö¸é ÇÃ·¹ÀÌ¾î ÃßÀû
+		//Ã‡ÃƒÂ·Â¹Ã€ÃŒÂ¾Ã®Â¿Ã Â°Ã…Â¸Â®Â°Â¡ Â¸Ã–Â¾Ã®ÃÃ¶Â¸Ã© Ã‡ÃƒÂ·Â¹Ã€ÃŒÂ¾Ã® ÃƒÃŸÃ€Ã»
 		if (Dist > 2500.0f) {
 			SetState(BossState::CHASE);
 			stateStartTime = steady_clock::now();
 		}
 
 
-		//attactCoolTime ÃÊ¸¶´Ù °ø°İ
+		//attactCoolTime ÃƒÃŠÂ¸Â¶Â´Ã™ Â°Ã¸Â°Ã
 		if (duration_cast<seconds>(steady_clock::now() - stateStartTime).count() >= attactCoolTime) {
 			SetState(BossState::ATTACT);
 			randAttact = urdAttack(dree);
@@ -237,7 +338,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 		}
 
 
-		//10ÆÛ ³²À¸¸é ½ºÅ©¸² ÇÔ ÇØÁÖ±â
+		//10Ã†Ã› Â³Â²Ã€Â¸Â¸Ã© Â½ÂºÃ…Â©Â¸Â² Ã‡Ã” Ã‡Ã˜ÃÃ–Â±Ã¢
 		else if (float(MAXBossHP / bossHP) <= 0.1 && a == 1)
 		{
 			SetState(BossState::SCREAM);
@@ -245,7 +346,7 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 			a = 2;
 		}
 
-		//¹İÇÇµÇ¸é ÇÇ°İ¸ğ¼Ç ÇÑ¹øÇØÁÖ±â
+		//Â¹ÃÃ‡Ã‡ÂµÃ‡Â¸Ã© Ã‡Ã‡Â°ÃÂ¸Ã°Â¼Ã‡ Ã‡Ã‘Â¹Ã¸Ã‡Ã˜ÃÃ–Â±Ã¢
 		else if (float(bossHP / MAXBossHP) <= 0.5&& a == 0)
 		{
 			SetState(BossState::GET_HIT);
@@ -527,13 +628,10 @@ void Boss::Boss_Ai(float fTimeElapsed, BossState CurState, CAirplanePlayer* play
 	if ((CurState != BossState::ATTACT) && (CurState != BossState::CHASE)) {
 		PastState = CurState;
 	}
-	if(a==1)
+	if(a==1){
 		MoveMeteo(fTimeElapsed);
+	}
 
 	/*cout << "curstate - " << int(CurState) <<endl;
 	cout << "paststate - " << int(PastState) << endl;*/
-
 }
-
-
-

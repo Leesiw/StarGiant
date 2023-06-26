@@ -244,7 +244,7 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
 
     //==
     IWICBitmapDecoder* pwicBitmapDecoder_Lobby;
-    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/lobby.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_Lobby);
+    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/lobby1.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_Lobby);
 
     IWICBitmapFrameDecode* pwicFrameDecode_Lobby;
     pwicBitmapDecoder_Lobby->GetFrame(0, &pwicFrameDecode_Lobby);

@@ -547,6 +547,47 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 		case WM_SIZE:
 			break;
 		case WM_LBUTTONDOWN:
+		{
+			int mouseX = LOWORD(lParam);
+			int mouseY = HIWORD(lParam);
+
+			// 화면의 일정 부분을 나타내는 영역을 정의합니다.
+			int screenAreaLeft = 500;
+			int screenAreaTop = 650;
+			int screenAreaRight = 1100;
+			int screenAreaBottom = 800;
+
+
+			int screenAreaLeft1 = 1100;
+			int screenAreaTop1 = 550;
+			int screenAreaRight1 = 1400;
+			int screenAreaBottom1 = 650;
+
+			if (mouseX >= screenAreaLeft1 && mouseX <= screenAreaRight1 && mouseY >= screenAreaTop1 && mouseY <= screenAreaBottom1 && !roomNum.empty()) {
+				room_num = static_cast<short>(std::stoi(roomNum));
+				CS_LOGIN_PACKET packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_LOGIN;
+				packet.room_id = room_num;
+				if (_state == SCENE_LOBBY) {
+					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+				}
+				cout << "매칭";
+			}
+
+			// 나중에 수정해야됨
+			if (mouseX >= screenAreaLeft && mouseX <= screenAreaRight && mouseY >= screenAreaTop && mouseY <= screenAreaBottom && !roomNum.empty()) {
+				CS_NEXT_MISSION_PACKET packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_START;
+				if (_state == SCENE_LOBBY) {
+					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+				}
+				cout << "플레이";
+			}
+
+
+
 			if (player_type >= PlayerType::ATTACK1 && player_type <= PlayerType::ATTACK3) {
 				CS_ATTACK_PACKET packet;
 				packet.size = sizeof(packet);
@@ -570,7 +611,9 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 				}
 			}
 			break;
+		}
         case WM_RBUTTONDOWN:
+
 			break;
         case WM_LBUTTONUP:
 			if (isHealing && player_type == PlayerType::INSIDE && AroundSculpture()) {

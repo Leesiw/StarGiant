@@ -112,7 +112,7 @@ void CScene::BuildObjects()
 	// boss
 	m_pBoss = new Boss();
 	m_pBoss->scene_num = num;
-	m_pBoss->SetPosition(3000.f, 3000.f, 3000.f);
+	//m_pBoss->SetPosition(3000.f, 3000.f, 3000.f);
 }
 
 void CScene::ReleaseObjects()
@@ -494,8 +494,6 @@ void CScene::MissionClear()
 	if (cur_mission != levels[cur_mission].NextMission) 
 	{
 		cur_mission = levels[cur_mission].NextMission;
-		if (cur_mission == MissionType::FIND_BOSS)
-			m_pBoss->SetPosition(Vector3::Add(m_pSpaceship->GetPosition(), XMFLOAT3(2400.0f, 0.f, 0.f)));
 
 		if (cur_mission == MissionType::DEFEAT_BOSS) {
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, num };
@@ -710,10 +708,10 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			}
 		}
 	}
-
 	if (m_pBoss) {
 		m_pBoss->Animate(fTimeElapsed);
-		m_pBoss->Boss_Ai(fTimeElapsed, m_pBoss->GetState(), m_pSpaceship, m_pBoss->GetHP());;
+		if(cur_mission == MissionType::FIND_BOSS || cur_mission == MissionType::DEFEAT_BOSS)
+			m_pBoss->Boss_Ai(fTimeElapsed, m_pSpaceship, m_pBoss->GetHP());;
 	}
 
 	m_pSpaceship->Update(fTimeElapsed);
