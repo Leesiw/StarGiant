@@ -348,7 +348,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			if (scene->_state != ST_INGAME) { break; }
 			if (scene->m_pBoss->BossHP <= 0) { break; }
 
-			scene->m_pBoss->Boss_Ai(0.033f, scene->m_pBoss->GetState(), scene->m_pSpaceship, scene->m_pBoss->GetHP());
+			scene->m_pBoss->Boss_Ai(0.033f, scene->m_pSpaceship, scene->m_pBoss->GetHP());
 
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(key) };
 			timer_queue.push(ev);
