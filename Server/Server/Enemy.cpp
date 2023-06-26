@@ -77,7 +77,7 @@ void CEnemy::MoveAI(float fTimeElapsed, CAirplanePlayer* player)
 	{
 		LookAtPosition(fTimeElapsed, destination);
 
-		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook() , fTimeElapsed * 150.f);
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook() , fTimeElapsed * 200.f);
 		UpdateTransform();
 	}
 	else {
@@ -97,7 +97,7 @@ void CEnemy::AimingAI(float fTimeElapsed, CAirplanePlayer* player)
 
 	if (dist > 30.f)
 	{
-		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, vec, fTimeElapsed * 5.f);
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, vec, fTimeElapsed * 10.f);
 		UpdateTransform();
 	}
 

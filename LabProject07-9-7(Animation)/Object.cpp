@@ -1727,7 +1727,7 @@ void CEnemyObject::MoveAI(float fTimeElapsed, XMFLOAT3& pl_pos)
 	{
 		LookAtPosition(fTimeElapsed, destination);
 
-		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), fTimeElapsed * 150.f);
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), fTimeElapsed * 200.f);
 		UpdateTransform();
 	}
 	else {
@@ -1747,7 +1747,7 @@ void CEnemyObject::AimingAI(float fTimeElapsed, XMFLOAT3& pl_pos)
 
 	if (dist > 30.f)
 	{
-		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, vec, fTimeElapsed * 5.f);
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, vec, fTimeElapsed * 10.f);
 		UpdateTransform();
 	}
 }
