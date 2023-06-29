@@ -95,7 +95,7 @@ void CEnemy::AimingAI(float fTimeElapsed, CAirplanePlayer* player)
 	XMFLOAT3 vec = Vector3::Subtract(destination, xmf3Position);
 	float dist = Vector3::Length(vec);
 
-	if (dist > 30.f)
+	if (dist > 50.f)
 	{
 		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, vec, fTimeElapsed * 10.f);
 		UpdateTransform();
@@ -291,9 +291,9 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 	float fMaxVelocity = 200.f;
 	if (fLength > fMaxVelocity)
 	{
-		m_xmf3Velocity.x *= (fMaxVelocity / fLength) * fTimeElapsed * 30;
-		m_xmf3Velocity.y *= (fMaxVelocity / fLength) * fTimeElapsed * 30;
-		m_xmf3Velocity.z *= (fMaxVelocity / fLength) * fTimeElapsed * 30;
+		m_xmf3Velocity.x *= (fMaxVelocity / fLength) * fTimeElapsed * 50;
+		m_xmf3Velocity.y *= (fMaxVelocity / fLength) * fTimeElapsed * 50;
+		m_xmf3Velocity.z *= (fMaxVelocity / fLength) * fTimeElapsed * 50;
 	}
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);

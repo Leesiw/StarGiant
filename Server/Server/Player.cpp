@@ -117,13 +117,13 @@ void CPlayer::Update(float fTimeElapsed)
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;
 	if (fLength > m_fMaxVelocityXZ)
 	{
-		m_xmf3Velocity.x *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 100;
-		m_xmf3Velocity.y *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 100;
-		m_xmf3Velocity.z *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 100;
+		m_xmf3Velocity.x *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 80;
+		m_xmf3Velocity.y *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 80;
+		m_xmf3Velocity.z *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 80;
 	}
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
-	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 30.f, false);
+	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 20.f, false);
 	xmf3Velocity = Vector3::Add(xmf3Velocity, LookVelocity);
 	Move(xmf3Velocity, false);
 
@@ -151,7 +151,7 @@ CAirplanePlayer::CAirplanePlayer()
 {
 	SetFriction(250.0f);
 	SetGravity(XMFLOAT3(0.0f, -0.0f, 0.0f));
-	SetMaxVelocityXZ(200.0f);
+	SetMaxVelocityXZ(80.0f);
 	SetMaxVelocityY(400.0f);
 	/*
 	for (int i = 0; i < BULLETS; i++)
@@ -256,7 +256,7 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 	m_xmf3Look.x = xmf4x4._31; m_xmf3Look.y = xmf4x4._32; m_xmf3Look.z = xmf4x4._33;
 
 	if (input_info.dwDirection) {
-		Move(input_info.dwDirection, 500.0f * fTimeElapsed, true);
+		Move(input_info.dwDirection, 800.0f * fTimeElapsed, true);
 		input_info.dwDirection = NULL;
 	}
 	is_update = true;
