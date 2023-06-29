@@ -117,13 +117,13 @@ void CPlayer::Update(float fTimeElapsed)
 	float fMaxVelocityXZ = m_fMaxVelocityXZ;
 	if (fLength > m_fMaxVelocityXZ)
 	{
-		m_xmf3Velocity.x *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 30;
-		m_xmf3Velocity.y *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 30;
-		m_xmf3Velocity.z *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 30;
+		m_xmf3Velocity.x *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 100;
+		m_xmf3Velocity.y *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 100;
+		m_xmf3Velocity.z *= (fMaxVelocityXZ / fLength) * fTimeElapsed * 100;
 	}
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
-	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 50.f, false);
+	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 30.f, false);
 	xmf3Velocity = Vector3::Add(xmf3Velocity, LookVelocity);
 	Move(xmf3Velocity, false);
 
