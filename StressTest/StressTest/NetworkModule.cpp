@@ -158,7 +158,7 @@ void ProcessPacket(int ci, unsigned char packet[])
 	case SC_ADD_PLAYER: break;
 	case SC_REMOVE_PLAYER: break;
 	case SC_SPAWN_METEO: break;
-	case SC_METEO_DIRECTION: break;
+	case SC_ALL_METEOR: break;
 	case SC_METEO: break;
 	case SC_MOVE_SPACESHIP:
 	{

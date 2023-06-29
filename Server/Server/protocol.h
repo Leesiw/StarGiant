@@ -16,6 +16,7 @@ const unsigned char option7 = 0x80; // hex for 1000 0000
 constexpr char BULLETS = 50;
 constexpr char METEOS = 20;
 constexpr char BOSSMETEOS = 5;
+constexpr char MISSILES = 8;
 
 constexpr char LASER_ENEMY = 13;
 constexpr char MISSILE_ENEMY = 4;
@@ -36,7 +37,7 @@ constexpr int MAX_USER = MAX_ROOM * 3;
 
 constexpr int PORT_NUM = 4000;
 constexpr int RECV_BUF_SIZE = 10000;
-constexpr int SEND_BUF_SIZE = 200;
+constexpr int SEND_BUF_SIZE = 10000;
 constexpr int NAME_SIZE = 20;
 
 // boss id
@@ -56,7 +57,7 @@ constexpr char SC_ADD_PLAYER = 8;
 constexpr char SC_REMOVE_PLAYER = 9;
 
 constexpr char SC_SPAWN_METEO = 10;
-constexpr char SC_METEO_DIRECTION = 11;
+constexpr char SC_ALL_METEOR = 11;
 constexpr char SC_METEO = 12;
 
 constexpr char SC_MOVE_SPACESHIP = 13;
@@ -334,6 +335,13 @@ struct SC_METEO_PACKET {
 	char	type;
 	METEO_INFO data;
 };
+
+struct SC_ALL_METEOR_PACKET {
+	unsigned char size;
+	char	type;
+	XMFLOAT3 pos[METEOS];
+};
+
 
 // spaceship
 struct CS_SPACESHIP_PACKET {

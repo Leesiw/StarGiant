@@ -390,12 +390,6 @@ void CScene::CheckEnemyCollisions()
 
 					m_ppEnemies[j]->SetVelocity(XMFLOAT3(finalVelX1, finalVelY1, finalVelZ1));
 					m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(finalVelX2, finalVelY2, finalVelZ2));
-
-					for (short pl_id : _plist) {
-						if (pl_id == -1) continue;
-						if (clients[pl_id]._state != ST_INGAME) continue;
-						clients[pl_id].send_meteo_direction_packet(i, m_ppMeteoObjects[i]);
-					}
 				}
 			}
 		}
@@ -632,12 +626,6 @@ void CScene::SpawnMeteo(char i)
 		m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
 	}
 	m_ppMeteoObjects[i]->SetMovingDirection(random_dir);
-
-	for (short pl_id : _plist) {
-		if (pl_id == -1) continue;
-		if (clients[pl_id]._state != ST_INGAME) continue;
-		clients[pl_id].send_spawn_meteo_packet(i, m_ppMeteoObjects[i]);
-	}
 }
 
 void CScene::Send(char* p)
@@ -852,6 +840,8 @@ void CScene::Start()
 		TIMER_EVENT ev1{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, num };
 		timer_queue.push(ev1);
 
+		TIMER_EVENT ev2{ 0, chrono::system_clock::now() + 33ms, EV_SEND_SCENE_INFO, num };
+		timer_queue.push(ev2);
 		return;
 	}
 	_s_lock.unlock();

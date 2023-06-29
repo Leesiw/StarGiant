@@ -14,7 +14,8 @@ using namespace std;
 enum COMP_TYPE { OP_ACCEPT, OP_RECV, OP_SEND, OP_RESET_SCENE,
 	OP_SPAWN_ENEMY, OP_UPDATE_ENEMY, OP_UPDATE_METEO, OP_SPAWN_MISSILE, OP_UPDATE_MISSILE, OP_UPDATE_BOSS,
 	OP_UPDATE_SPACESHIP, OP_HEAL,
-	OP_MISSION_CLEAR
+	OP_MISSION_CLEAR,
+	OP_SEND_SCENE_INFO
 };
 
 
@@ -124,7 +125,6 @@ public:
 	void send_spawn_meteo_packet(char id, CMeteoObject* meteo);
 	void send_spawn_all_meteo_packet(std::array<CMeteoObject*, METEOS> meteo);
 	void send_all_enemy_packet(ENEMY_INFO[], bool[]);
-	void send_meteo_direction_packet(char id, CMeteoObject* meteo);
 	void send_meteo_packet(std::array<CMeteoObject*, METEOS> meteo);
 	void send_boss_meteo_packet(std::array<CMeteoObject*, BOSSMETEOS> meteo);
 	void send_bullet_hit_packet(char id, short hp);

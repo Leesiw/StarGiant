@@ -122,7 +122,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				break; 
 			}
 			
-			scene->m_ppEnemies[ex_over->obj_id]->AI(0.033f, scene->m_pSpaceship);
+			scene->m_ppEnemies[ex_over->obj_id]->AI(0.01f, scene->m_pSpaceship);
 			scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
 
 			// 운석과 충돌처리
@@ -147,7 +147,6 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				}
 			}
 
-		//	if (scene->m_ppEnemies[ex_over->obj_id]->send_num == 0) {
 				ENEMY_INFO info{};
 				info.id = ex_over->obj_id;
 				info.pos = scene->m_ppEnemies[ex_over->obj_id]->GetPosition();
@@ -156,16 +155,8 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				for (short pl_id : scene->_plist) {
 					if (pl_id == -1) continue;
 					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_enemy_packet(info);
+					//clients[pl_id].send_enemy_packet(info);
 				}
-				scene->m_ppEnemies[ex_over->obj_id]->send_num = 5;
-
-
-		//	}
-		//	else {
-		//		--scene->m_ppEnemies[ex_over->obj_id]->send_num;
-
-///			}
 
 				if (ex_over->obj_id >= 23
 					&& scene->m_ppEnemies[ex_over->obj_id]->state == EnemyState::AIMING &&
@@ -175,8 +166,9 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 					timer_queue.push(ev);
 				}
 
+
 		
-			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(key) };
+			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_ENEMY, static_cast<short>(key) };
 			timer_queue.push(ev);
 
 			delete ex_over;
@@ -185,7 +177,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		case OP_UPDATE_METEO: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
-			scene->m_ppMeteoObjects[ex_over->obj_id]->Animate(0.033f);
+			scene->m_ppMeteoObjects[ex_over->obj_id]->Animate(0.01f);
 			
 			XMFLOAT3 p_pos = scene->m_pSpaceship->GetPosition();
 			XMFLOAT3 m_pos = scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition();
@@ -218,23 +210,16 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				}
 			}
 			else {
-				//	if (scene->m_ppMeteoObjects[ex_over->obj_id]->send_num == 0) {
-
 				SC_METEO_PACKET p{};
 				p.size = sizeof(SC_METEO_PACKET);
 				p.type = SC_METEO;
 				p.data.id = ex_over->obj_id;
 				p.data.pos = scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition();
 
-				scene->Send((char*)&p);
-				scene->m_ppMeteoObjects[ex_over->obj_id]->send_num == 5;
-				//	}
-				//	else {
-				--scene->m_ppMeteoObjects[ex_over->obj_id]->send_num;
-				//	}
+				//scene->Send((char*)&p);
 			}
 
-			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_METEO, static_cast<short>(key) };
+			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_METEO, static_cast<short>(key) };
 			timer_queue.push(ev);
 
 			delete ex_over;
@@ -268,7 +253,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 						if (clients[pl_id]._state != ST_INGAME) continue;
 						clients[pl_id].send_missile_packet(m_info);
 					}
-					TIMER_EVENT ev{ static_cast<char>(i), chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
+					TIMER_EVENT ev{ static_cast<char>(i), chrono::system_clock::now() + 30ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
 					timer_queue.push(ev);
 
 					break;
@@ -286,7 +271,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			if (scene->_state != ST_INGAME) { break; }
 			if (!scene->m_ppMissiles[ex_over->obj_id]->GetisActive()) { break; }
 
-			scene->m_ppMissiles[ex_over->obj_id]->Animate(0.033f, scene->m_pSpaceship);
+			scene->m_ppMissiles[ex_over->obj_id]->Animate(0.01f, scene->m_pSpaceship);
 			
 			MISSILE_INFO m_info{};
 			m_info.id = ex_over->obj_id;
@@ -327,9 +312,9 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				for (short pl_id : scene->_plist) {
 					if (pl_id == -1) continue;
 					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_missile_packet(m_info);
+					//clients[pl_id].send_missile_packet(m_info);
 				}
-				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 33ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
+				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
 				timer_queue.push(ev);
 			}
 			else {
@@ -364,7 +349,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				scene->m_pSpaceship->SetPosition(ToGo);
 			}
 
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(key) };
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_BOSS, static_cast<short>(key) };
 			timer_queue.push(ev);
 			delete ex_over;
 			break;
@@ -373,17 +358,17 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
-			scene->m_pSpaceship->Update(0.033f);
+			scene->m_pSpaceship->Update(0.01f);
 
 			for (short pl_id : scene->_plist) {
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].send_spaceship_packet(scene->m_pSpaceship);
+			//	clients[pl_id].send_spaceship_packet(scene->m_pSpaceship);
 			}
 
 			scene->CheckMissionComplete();
 
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, static_cast<short>(key) };
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_SPACESHIP, static_cast<short>(key) };
 			timer_queue.push(ev);
 			delete ex_over;
 			break;
@@ -420,7 +405,69 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		}
 		case OP_MISSION_CLEAR: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
+			if (scene->_state != ST_INGAME) { break; }
 			scene->MissionClear();
+			delete ex_over;
+			break;
+		}
+		case OP_SEND_SCENE_INFO: {	// 우주선 좌표, 적 좌표, 미사일 좌표 한번에 send 
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
+			if (scene->_state != ST_INGAME) { break; }
+			
+			char send_buf[10000];
+			short send_num = 0;
+
+			SC_ALL_METEOR_PACKET m_packet;
+			m_packet.type = SC_ALL_METEOR;
+			m_packet.size = sizeof(SC_ALL_METEOR_PACKET);
+			for (char i = 0; i < METEOS; ++i) {
+				m_packet.pos[i] = scene->m_ppMeteoObjects[i]->GetPosition();
+			}
+			memcpy(&send_buf[0], &m_packet, m_packet.size);
+			send_num += m_packet.size;
+
+			SC_MOVE_SPACESHIP_PACKET s_packet;
+			s_packet.size = sizeof(s_packet);
+			s_packet.type = SC_MOVE_SPACESHIP;
+			s_packet.move_time = scene->m_pSpaceship->move_time;
+			s_packet.data.pos = scene->m_pSpaceship->GetPosition();
+			s_packet.data.Quaternion = scene->m_pSpaceship->input_info.Quaternion;
+			memcpy(&send_buf[send_num], &s_packet, s_packet.size);
+			send_num += s_packet.size;
+
+			for (char i = 0; i < ENEMIES; ++i) {
+				if (!scene->m_ppEnemies[i]->GetisAlive()) { continue; }
+				SC_MOVE_ENEMY_PACKET e_packet;
+				e_packet.size = sizeof(e_packet);
+				e_packet.type = SC_MOVE_ENEMY;
+				e_packet.data.id = i;
+				e_packet.data.pos = scene->m_ppEnemies[i]->GetPosition();
+				e_packet.data.Quaternion = scene->m_ppEnemies[i]->GetQuaternion();
+				memcpy(&send_buf[send_num], &e_packet, e_packet.size);
+				send_num += e_packet.size;
+			}
+
+			for (char i = 0; i < MISSILES; ++i) {
+				if (!scene->m_ppMissiles[i]->GetisActive()) { continue; }
+				SC_MISSILE_PACKET e_packet;
+				e_packet.size = sizeof(e_packet);
+				e_packet.type = SC_MISSILE;
+				e_packet.data.id = i;
+				e_packet.data.pos = scene->m_ppMissiles[i]->GetPosition();
+				e_packet.data.Quaternion = scene->m_ppMissiles[i]->GetQuaternion();
+				memcpy(&send_buf[send_num], &e_packet, e_packet.size);
+				send_num += e_packet.size;
+			}
+
+			for (short pl_id : scene->_plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].do_send(&send_buf, send_num);
+			}
+
+
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 30ms, EV_SEND_SCENE_INFO, static_cast<short>(key) };
+			timer_queue.push(ev);
 			delete ex_over;
 			break;
 		}
@@ -966,6 +1013,12 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 			case EV_MISSION_CLEAR: {
 				OVER_EXP* ov = new OVER_EXP;
 				ov->_comp_type = OP_MISSION_CLEAR;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
+				break;
+			}
+			case EV_SEND_SCENE_INFO: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_SEND_SCENE_INFO;
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}

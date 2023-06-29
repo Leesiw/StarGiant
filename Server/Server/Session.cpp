@@ -199,18 +199,6 @@ void SESSION::send_all_enemy_packet(ENEMY_INFO e_info[], bool alive[])
 	}
 }
 
-void SESSION::send_meteo_direction_packet(char id, CMeteoObject* meteo)
-{
-	SC_METEO_DIRECTION_PACKET p;
-	p.size = sizeof(SC_METEO_DIRECTION_PACKET);
-	p.type = SC_METEO_DIRECTION;
-
-	p.data.id = id;
-	p.data.dir = meteo->GetMovingDirection();
-
-	do_send(&p);
-}
-
 void SESSION::send_meteo_packet(std::array<CMeteoObject*, METEOS> meteo)
 {
 	SC_METEO_PACKET p;

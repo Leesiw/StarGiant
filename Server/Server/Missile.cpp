@@ -27,7 +27,7 @@ void CMissile::Animate(float fTimeElapsed, CGameObject* target)
 	xmf3Position = Vector3::Add(xmf3Position, xmf3Movement);
 	SetPosition(xmf3Position);
 
-	if (m_fTrackingTimeRemaining < -10.f) { Reset(); }
+	if (m_fTrackingTimeRemaining < -4.f) { Reset(); }
 }
 
 void CMissile::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)

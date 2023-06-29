@@ -1496,11 +1496,11 @@ void CGameFramework::RecvServer()
 			buf_cur_size += recv_byte;
 			int packet_size;
 
-			while (buf_cur_size) {
-				packet_size = buf[0];
-				if (buf_cur_size >= packet_size && buf[0] != 0) {
+			while (buf_cur_size > 0) {
+				packet_size = (unsigned char)buf[0];
+				if (buf_cur_size >= packet_size && packet_size != 0) {
 					ProcessPacket(buf);
-					buf_cur_size -= buf[0];
+					buf_cur_size -= packet_size;
 					memcpy(buf, &buf[packet_size], buf_cur_size);
 				}
 				else {
@@ -1630,13 +1630,13 @@ void CGameFramework::ProcessPacket(char* p)
 	case SC_METEO:
 	{
 		SC_METEO_PACKET* packet = reinterpret_cast<SC_METEO_PACKET*>(p);
-		m_pScene->TransformMeteor(packet->data);
+		//m_pScene->TransformMeteor(packet->data);
 		break;
 	}
-	case SC_METEO_DIRECTION:
+	case SC_ALL_METEOR:
 	{
-		SC_METEO_DIRECTION_PACKET* packet = reinterpret_cast<SC_METEO_DIRECTION_PACKET*>(p);
-		m_pScene->m_ppMeteorObjects[packet->data.id]->m_xmf3MovingDirection = packet->data.dir;
+		SC_ALL_METEOR_PACKET* packet = reinterpret_cast<SC_ALL_METEOR_PACKET*>(p);
+		m_pScene->TransformMeteor(packet->pos);
 		break;
 	}
 	case SC_MOVE_SPACESHIP:

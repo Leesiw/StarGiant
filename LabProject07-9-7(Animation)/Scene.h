@@ -93,6 +93,7 @@ public:
 	void RespawnBossMeteor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, SPAWN_METEO_INFO m_info);
 
 	void TransformMeteor(METEO_INFO m_info);
+	void TransformMeteor(XMFLOAT3 m_pos[]);
 
 	virtual void CheckBoomSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position, int Target);
