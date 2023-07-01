@@ -16,6 +16,7 @@
 
 #include "Object.h"
 
+
 class CPlayer : public CGameObject
 {
 protected:
@@ -39,7 +40,7 @@ protected:
 	char						m_cAnimation = 0;
 
 	//¼­¹ö
-	bool is_update = true;
+	volatile bool is_update = true;
 
 public:
 	CPlayer();
@@ -103,7 +104,7 @@ public:
 
 	void Reset();
 
-	void SetInputInfo(SPACESHIP_INPUT_INFO i_info, unsigned int time) { input_info = i_info; is_update = false;  move_time = time; }
+	void SetInputInfo(SPACESHIP_INPUT_INFO i_info, unsigned int time) { input_info = i_info; move_time = time;  is_update = false; }
 	virtual void Animate(float fTimeElapsed);
 	virtual void Update(float fTimeElapsed);
 	virtual void OnPrepareRender();

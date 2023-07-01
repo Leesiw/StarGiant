@@ -243,24 +243,26 @@ void CAirplanePlayer::Animate(float fTimeElapsed)
 
 void CAirplanePlayer::Update(float fTimeElapsed)
 {
+	
+
+	if (!is_update) {
+		XMVECTOR a = XMLoadFloat4(&input_info.Quaternion);
+		XMMATRIX mat = XMMatrixRotationQuaternion(a);
+		XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(Matrix4x4::Identity(), mat);
+		m_xmf3Right.x = xmf4x4._11; m_xmf3Right.y = xmf4x4._12; m_xmf3Right.z = xmf4x4._13;
+		m_xmf3Up.x = xmf4x4._21; m_xmf3Up.y = xmf4x4._22; m_xmf3Up.z = xmf4x4._23;
+		m_xmf3Look.x = xmf4x4._31; m_xmf3Look.y = xmf4x4._32; m_xmf3Look.z = xmf4x4._33;
+
+		if (input_info.dwDirection) {
+			Move(input_info.dwDirection, 800.0f * fTimeElapsed, true);
+			input_info.dwDirection = NULL;
+		}
+		is_update = true;
+	}
+
 	CPlayer::Update(fTimeElapsed);
 	OnPrepareRender();
 	UpdateBoundingBox();
-
-	if (is_update) { return; }
-	XMVECTOR a = XMLoadFloat4(&input_info.Quaternion);
-	XMMATRIX mat = XMMatrixRotationQuaternion(a);
-	XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(Matrix4x4::Identity(), mat);
-	m_xmf3Right.x = xmf4x4._11; m_xmf3Right.y = xmf4x4._12; m_xmf3Right.z = xmf4x4._13;
-	m_xmf3Up.x = xmf4x4._21; m_xmf3Up.y = xmf4x4._22; m_xmf3Up.z = xmf4x4._23;
-	m_xmf3Look.x = xmf4x4._31; m_xmf3Look.y = xmf4x4._32; m_xmf3Look.z = xmf4x4._33;
-
-	if (input_info.dwDirection) {
-		Move(input_info.dwDirection, 800.0f * fTimeElapsed, true);
-		input_info.dwDirection = NULL;
-	}
-	is_update = true;
-
 }
 
 void CAirplanePlayer::OnPrepareRender()

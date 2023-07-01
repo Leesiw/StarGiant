@@ -337,7 +337,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				break; 
 			}
 
-			scene->m_pBoss->Boss_Ai(0.033f, scene->m_pSpaceship, scene->m_pBoss->GetHP());
+			scene->m_pBoss->Boss_Ai(0.01f, scene->m_pSpaceship, scene->m_pBoss->GetHP());
 
 			float dist;
 			dist = Vector3::Length(Vector3::Subtract(scene->m_pSpaceship->GetPosition(), scene->m_pBoss->GetPosition()));
@@ -359,12 +359,6 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
 			scene->m_pSpaceship->Update(0.01f);
-
-			for (short pl_id : scene->_plist) {
-				if (pl_id == -1) continue;
-				if (clients[pl_id]._state != ST_INGAME) continue;
-			//	clients[pl_id].send_spaceship_packet(scene->m_pSpaceship);
-			}
 
 			scene->CheckMissionComplete();
 
@@ -466,7 +460,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			}
 
 
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 30ms, EV_SEND_SCENE_INFO, static_cast<short>(key) };
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20ms, EV_SEND_SCENE_INFO, static_cast<short>(key) };
 			timer_queue.push(ev);
 			delete ex_over;
 			break;
