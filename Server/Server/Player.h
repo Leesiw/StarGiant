@@ -118,6 +118,8 @@ public:
 	virtual ~CTerrainPlayer();
 
 	INSIDE_INPUT_INFO input_info;
+
+	bool cutscene_end = false;
 public:
 	void SetInputInfo(INSIDE_INPUT_INFO i_info) { input_info = i_info; is_update = false; }
 

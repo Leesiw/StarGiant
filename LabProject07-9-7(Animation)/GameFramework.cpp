@@ -457,7 +457,14 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			((CAirplanePlayer*)m_pPlayer[0])->FireBullet(NULL);
 			std::cout << "ÃÑ¾Ë";
 			break;
-		case VK_SPACE:
+		case VK_SPACE: {
+			// ÀÌÈÄ ÄÆ¾À ÁßÀÏ¶§¸¸ º¸³¾ ¼ö ÀÖ°Ô º¯°æ
+			CS_CUTSCENE_END_PACKET my_packet;
+			my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
+			my_packet.type = CS_CUTSCENE_END;
+			send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+			break;
+			/*
 			if (((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion != AnimationState::SIT) {
 				((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = AnimationState::SIT;
 				std::cout << "¾É±â";
@@ -466,9 +473,8 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			{
 				std::cout << "¼­±â";
 				((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = AnimationState::IDLE;
-			}
-
-			break;
+			}*/
+		}
 		case VK_TAB:
 			b_Inside = !b_Inside;
 			std::cout << "¾À ÀüÈ¯";
@@ -530,7 +536,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 			}
 			break;
-
 		case 'F': //FÅ° »óÈ£ÀÛ¿ë ¾É±â
 			if (b_Inside || m_pInsidePlayer[g_myid]->GetSitState())
 			{

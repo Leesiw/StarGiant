@@ -42,7 +42,7 @@ void CScene::Init()
 
 void CScene::BuildObjects()
 {
-	cur_mission = MissionType::TU_SIT;
+	cur_mission = MissionType::CS_TURN;
 
 	// player
 	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
@@ -56,6 +56,7 @@ void CScene::BuildObjects()
 	for (int i = 0; i < 3; ++i) {
 		CTerrainPlayer* pPlayer = new CTerrainPlayer();
 		pPlayer->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 10.0f, 740.0f));
+		pPlayer->cutscene_end = false;
 		m_ppPlayers[i] = pPlayer;
 	}
 
@@ -150,9 +151,10 @@ void CScene::Reset()
 	_plist.fill(-1);
 	//_plist_lock.unlock();
 
-	cur_mission = MissionType::TU_SIT;
+	cur_mission = MissionType::CS_TURN;
 	for (char i = 0; i < 3; ++i) {
 		m_ppPlayers[i]->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 10.0f, 740.0f));
+		m_ppPlayers[i]->cutscene_end = false;
 	}
 
 	for (int i = 0; i < METEOS; ++i) {

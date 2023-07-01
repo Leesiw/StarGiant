@@ -44,8 +44,8 @@ struct Level {
 	MonsterStatus Missile;
 	MonsterStatus Laser;
 
-	char MaxMonsterNum;
-	char SpawnMonsterNum;
+	char MaxMonsterNum = 0;
+	char SpawnMonsterNum = 0;
 
 	bool cutscene = false;
 
