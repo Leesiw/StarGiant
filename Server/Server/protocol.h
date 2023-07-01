@@ -76,9 +76,11 @@ constexpr char SC_KILL_NUM = 25;
 
 constexpr char SC_START = 26;
 
+constexpr char CS_CUTSCENE_END = 27;
+
 // cheat
-constexpr char CS_NEXT_MISSION = 27;
-constexpr char CS_START = 28;
+constexpr char CS_NEXT_MISSION = 28;
+constexpr char CS_START = 29;
 
 enum class PlayerType : char
 {
@@ -476,5 +478,11 @@ struct SC_START_PACKET {
 	unsigned char size;
 	char	type;
 };
+
+struct CS_CUTSCENE_END_PACKET {
+	unsigned char size;
+	char	type;
+};
+
 
 #pragma pack (pop)

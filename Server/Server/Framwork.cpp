@@ -91,6 +91,11 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		case OP_SPAWN_ENEMY: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
+			if (levels[scene->cur_mission].cutscene) {
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_SPAWN_ENEMY, static_cast<short>(key) };
+				timer_queue.push(ev);
+				break;
+			}
 			std::array<CEnemy*, ENEMIES> ppEnemies{ scene->m_ppEnemies };
 			std::random_shuffle(ppEnemies.begin(), ppEnemies.end());
 
@@ -120,6 +125,11 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				scene->m_ppEnemies[ex_over->obj_id]->SetisAlive(false);
 				--scene->cur_monster_num;
 				break; 
+			}
+			if (levels[scene->cur_mission].cutscene) {
+				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_ENEMY, static_cast<short>(key) };
+				timer_queue.push(ev);
+				break;
 			}
 			
 			scene->m_ppEnemies[ex_over->obj_id]->AI(0.01f, scene->m_pSpaceship);
@@ -177,6 +187,12 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		case OP_UPDATE_METEO: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
+			if (levels[scene->cur_mission].cutscene) {
+				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_METEO, static_cast<short>(key) };
+				timer_queue.push(ev);
+				break;
+			}
+
 			scene->m_ppMeteoObjects[ex_over->obj_id]->Animate(0.01f);
 			
 			XMFLOAT3 p_pos = scene->m_pSpaceship->GetPosition();
@@ -209,15 +225,6 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 
 				}
 			}
-			else {
-				SC_METEO_PACKET p{};
-				p.size = sizeof(SC_METEO_PACKET);
-				p.type = SC_METEO;
-				p.data.id = ex_over->obj_id;
-				p.data.pos = scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition();
-
-				//scene->Send((char*)&p);
-			}
 
 			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_METEO, static_cast<short>(key) };
 			timer_queue.push(ev);
@@ -231,6 +238,11 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			if (!scene->m_ppEnemies[ex_over->obj_id]->GetisAlive() || scene->m_ppEnemies[ex_over->obj_id]->state != EnemyState::AIMING) {
 				scene->m_ppEnemies[ex_over->obj_id]->SetAttackTimerFalse();
 				break; 
+			}
+			if (levels[scene->cur_mission].cutscene) {
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(key) };
+				timer_queue.push(ev);
+				break;
 			}
 
 			MissileInfo info{};
@@ -270,6 +282,11 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
 			if (!scene->m_ppMissiles[ex_over->obj_id]->GetisActive()) { break; }
+			if (levels[scene->cur_mission].cutscene) {
+				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_MISSILE, static_cast<short>(key) };
+				timer_queue.push(ev);
+				break;
+			}
 
 			scene->m_ppMissiles[ex_over->obj_id]->Animate(0.01f, scene->m_pSpaceship);
 			
@@ -336,6 +353,11 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				timer_queue.push(ev);
 				break; 
 			}
+			if (levels[scene->cur_mission].cutscene) {
+				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_BOSS, static_cast<short>(key) };
+				timer_queue.push(ev);
+				break;
+			}
 
 			scene->m_pBoss->Boss_Ai(0.01f, scene->m_pSpaceship, scene->m_pBoss->GetHP());
 
@@ -358,6 +380,11 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
+			if (levels[scene->cur_mission].cutscene) {
+				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_SPACESHIP, static_cast<short>(key) };
+				timer_queue.push(ev);
+				break;
+			}
 			scene->m_pSpaceship->Update(0.01f);
 
 			scene->CheckMissionComplete();
@@ -370,6 +397,11 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		case OP_HEAL: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
+			if (levels[scene->cur_mission].cutscene) {
+				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_HEAL, static_cast<short>(key) };
+				timer_queue.push(ev);
+				break;
+			}
 
 			if (scene->heal_player != -1) {
 				if (scene->m_pSpaceship->GetHeal()) {
@@ -407,6 +439,11 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		case OP_SEND_SCENE_INFO: {	// 우주선 좌표, 적 좌표, 미사일 좌표 한번에 send 
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
+			if (levels[scene->cur_mission].cutscene) {
+				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 500ms, EV_SEND_SCENE_INFO, static_cast<short>(key) };
+				timer_queue.push(ev);
+				break;
+			}
 			
 			char send_buf[10000];
 			short send_num = 0;

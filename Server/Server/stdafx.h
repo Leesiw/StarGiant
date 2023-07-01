@@ -46,6 +46,9 @@ struct Level {
 
 	char MaxMonsterNum;
 	char SpawnMonsterNum;
+
+	bool cutscene = false;
+
 };
 
 static std::random_device rdd;
