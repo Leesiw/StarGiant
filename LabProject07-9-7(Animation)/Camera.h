@@ -210,6 +210,9 @@ public:
 class CCutSceneCamera : public CCamera
 {
 public:
+
+	
+
 	CCutSceneCamera(CCamera* pCamera);
 	virtual ~CCutSceneCamera() { }
 

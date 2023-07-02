@@ -591,6 +591,7 @@ CCutSceneCamera::CCutSceneCamera(CCamera* pCamera) : CCamera(pCamera)
 			m_xmf3Right = Vector3::Normalize(m_xmf3Right);
 			m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 		}
+
 	}
 
 }
@@ -599,27 +600,27 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 {
 	if (m_pPlayer)
 	{
-		XMFLOAT4X4 xmf4x4Rotate = Matrix4x4::Identity();
-		XMFLOAT3 xmf3Right = m_pPlayer->GetRightVector();
-		XMFLOAT3 xmf3Up = m_pPlayer->GetUpVector();
-		XMFLOAT3 xmf3Look = m_pPlayer->GetLookVector();
-		xmf4x4Rotate._11 = xmf3Right.x; xmf4x4Rotate._21 = xmf3Up.x; xmf4x4Rotate._31 = xmf3Look.x;
-		xmf4x4Rotate._12 = xmf3Right.y; xmf4x4Rotate._22 = xmf3Up.y; xmf4x4Rotate._32 = xmf3Look.y;
-		xmf4x4Rotate._13 = xmf3Right.z; xmf4x4Rotate._23 = xmf3Up.z; xmf4x4Rotate._33 = xmf3Look.z;
+		// 회전 속도 설정
+		float fRotationSpeed = 1.5f; // 예시: 초당 0.5의 회전 속도
 
-		XMFLOAT3 xmf3Offset = Vector3::TransformCoord(m_xmf3Offset, xmf4x4Rotate);
-		XMFLOAT3 xmf3Position = Vector3::Add(m_pPlayer->GetPosition(), xmf3Offset);
-		XMFLOAT3 xmf3Direction = Vector3::Subtract(xmf3Position, m_xmf3Position);
-		float fLength = Vector3::Length(xmf3Direction);
-		xmf3Direction = Vector3::Normalize(xmf3Direction);
-		float fTimeLagScale = (m_fTimeLag) ? fTimeElapsed * (1.0f / m_fTimeLag) : 1.0f;
-		float fDistance = fLength * fTimeLagScale;
-		if (fDistance > fLength) fDistance = fLength;
-		if (fLength < 0.01f) fDistance = fLength;
-		if (fDistance > 0)
-		{
-			m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Direction, fDistance);
-			SetLookAt(xmf3LookAt);
-		}
+		// 회전 각도 계산
+		float fAngle = fRotationSpeed * fTimeElapsed;
+
+		// 회전 행렬 생성
+		XMFLOAT4X4 xmf4x4Rotate = Matrix4x4::Identity();
+		XMMATRIX xmmtxRotate = XMLoadFloat4x4(&xmf4x4Rotate);
+		XMMATRIX xmmtxRotation = XMMatrixRotationY(fAngle);
+		xmmtxRotate = XMMatrixMultiply(xmmtxRotate, xmmtxRotation);
+		XMStoreFloat4x4(&xmf4x4Rotate, xmmtxRotate);
+
+		// 카메라 위치 계산
+		XMFLOAT3 xmf3Position = Vector3::TransformCoord(m_xmf3Position, xmmtxRotate);
+
+		// 카메라 방향 계산
+		XMFLOAT3 xmf3LookAt = Vector3::TransformCoord(xmf3LookAt, xmmtxRotate);
+
+		// 위치와 방향 업데이트
+		SetPosition(xmf3Position);
+		SetLookAt(xmf3LookAt);
 	}
 }

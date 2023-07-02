@@ -145,7 +145,7 @@ void CPlayer::Rotate(float x, float y, float z, int mode)
 
 		}
 
-		else if (nCurrentCameraMode == ATTACT_CAMERA_C || nCurrentCameraMode == ATTACT_CAMERA_L || nCurrentCameraMode == ATTACT_CAMERA_R)
+		else if (nCurrentCameraMode == ATTACT_CAMERA_C || nCurrentCameraMode == ATTACT_CAMERA_L || nCurrentCameraMode == ATTACT_CAMERA_R || nCurrentCameraMode == CUT_SCENE_CAMERA)
 		{
 			if (x != 0.0f)
 			{
@@ -264,6 +264,7 @@ void CPlayer::Update(float fTimeElapsed)
 	DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (nCurrentCameraMode == DRIVE_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	if (nCurrentCameraMode == CUT_SCENE_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	/*if (nCurrentCameraMode == ATTACT_CAMERA_L) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (nCurrentCameraMode == ATTACT_CAMERA_C) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (nCurrentCameraMode == ATTACT_CAMERA_R) m_pCamera->Update(m_xmf3Position, fTimeElapsed);*/
@@ -361,6 +362,7 @@ CCamera* CPlayer::ChangeToCutSceneCamera(DWORD nNewCameraMode, float fTimeElapse
 	{
 
 	case CUT_SCENE_CAMERA:
+		cout << "CUT_SCENE_CAMERA\n";
 		SetMaxVelocityXZ(0.0f);
 		SetMaxVelocityY(0.0f);
 		m_pCamera = OnChangeCamera(CUT_SCENE_CAMERA, nCurrentCameraMode);

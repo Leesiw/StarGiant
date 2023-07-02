@@ -503,9 +503,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 		case 'M':
 		{
-			
-
-
 			room_num = static_cast<short>(std::stoi(roomNum));
 			CS_LOGIN_PACKET packet;
 			packet.size = sizeof(packet);
