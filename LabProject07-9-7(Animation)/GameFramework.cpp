@@ -342,6 +342,8 @@ void CGameFramework::ChangeSwapChainState()
 void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
 	if (m_pScene) m_pScene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
+
+
 	switch (nMessageID)
 	{
 		case WM_LBUTTONDOWN:
@@ -363,6 +365,8 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
 	if (m_pScene) m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
+	//
+
 
 	switch (nMessageID)
 	{
@@ -1006,6 +1010,8 @@ void CGameFramework::AnimateObjects()
 {
 	RecvServer();
 
+
+
 	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
 
 	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
@@ -1013,6 +1019,8 @@ void CGameFramework::AnimateObjects()
 
 	for (int i = 0; i < 1; ++i)m_pPlayer[i]->Animate(fTimeElapsed);
 	for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Animate(fTimeElapsed);
+
+
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -1046,10 +1054,29 @@ void CGameFramework::MoveToNextFrame()
 void CGameFramework::FrameAdvance()
 {    
 	m_GameTimer.Tick(30.0f);
+
+
 	
 	ProcessInput();
 
 
+	if (curMissionType == MissionType::CS_TURN && b_Inside && m_pInsidePlayer[g_myid] && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+		cout << "CS_TURN\n";
+		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
+		m_pInsideCamera->SetTarget({ 414.456f,224.0f,676.309f }); //왜 여기서 하면 이상해질까
+		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+	}
+
+	if (m_pInsideCamera->getTurn() == false) {
+		CS_CUTSCENE_END_PACKET my_packet;
+		my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
+		my_packet.type = CS_CUTSCENE_END;
+		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
+		m_pInsideCamera->turn = true;
+	}
 
     AnimateObjects();
 
@@ -1122,24 +1149,6 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
 
-	//
-	if (curMissionType == MissionType::CS_TURN && b_Inside && m_pInsidePlayer[g_myid]&&m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
-		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
-		cout << "CS_TURN\n";
-		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
-		m_pInsideCamera->SetTarget({ 414.456f,224.0f,676.309f }); //왜 여기서 하면 이상해질까
-		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
-		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
-	}
-
-	if (m_pInsideCamera->getTurn() == false) {
-		CS_CUTSCENE_END_PACKET my_packet;
-		my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
-		my_packet.type = CS_CUTSCENE_END;
-		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
-		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
-		m_pInsideCamera->turn = true;
-	}
 
 	if ((m_pPlayer && !b_Inside)&& player_type ==PlayerType::MOVE) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Render(m_pd3dCommandList, m_pCamera);
 	if (m_pInsidePlayer && b_Inside)for (int i = 0; i < 3; ++i) {
@@ -1192,6 +1201,7 @@ void CGameFramework::FrameAdvance()
 
 void CGameFramework::UpdateUI()
 {
+
 	vector<wstring> labels;
 	wchar_t position_ui[50];
 	_stprintf_s(position_ui, _countof(position_ui), _T("UI 테스트\n"));
