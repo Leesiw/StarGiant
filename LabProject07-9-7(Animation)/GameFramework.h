@@ -140,6 +140,8 @@ private:
 
 	bool b_Inside;
 	bool b_CameraScene = false;
+
+	bool turnon = true;
 	// 
 	
 

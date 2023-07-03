@@ -116,6 +116,12 @@ public:
 
 	XMFLOAT3 tarPos = { 0,0,0 };
 	void SetTarget(XMFLOAT3 tarpos) { tarPos = tarpos; }
+
+	bool turn = true;
+	bool getTurn() { return turn; }
+
+
+	float fAnglenu = 0;
 };
 
 class CSpaceShipCamera : public CCamera
@@ -213,7 +219,6 @@ public:
 class CCutSceneCamera : public CCamera
 {
 public:
-
 
 
 	CCutSceneCamera(CCamera* pCamera);

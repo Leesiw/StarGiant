@@ -614,12 +614,18 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		// 회전 각도 계산
 		float fAngle = fRotationSpeed * fTimeElapsed;
 
+		// 회전 각도 (도 단위)
+		float fAngleDegrees = XMConvertToDegrees(fAngle);
+
+
+		fAnglenu += fAngleDegrees;
 		// 회전 행렬 생성
 		XMFLOAT4X4 xmf4x4Rotate = Matrix4x4::Identity();
 		XMMATRIX xmmtxRotate = XMLoadFloat4x4(&xmf4x4Rotate);
 		XMMATRIX xmmtxRotation = XMMatrixRotationY(fAngle);
 		xmmtxRotate = XMMatrixMultiply(xmmtxRotation, xmmtxRotate);
 		XMStoreFloat4x4(&xmf4x4Rotate, xmmtxRotate);
+
 
 		// 카메라 위치 계산
 		XMFLOAT3 xmf3Offset = Vector3::Subtract(m_xmf3Position, tarPos);
@@ -642,6 +648,13 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 				SetLookAt(tarPos);
 			}
 		}
-	
+		cout << "fAngle : " << fAnglenu << endl;
+
+		// 회전이 한 바퀴 돌았을 때 turn 변수를 false로 설정
+		if (fAnglenu >= 365.0f)
+		{
+			cout << "turn false\n";
+			turn = false;
+		}
 	}
 }

@@ -484,7 +484,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		{
 
 		if (b_Inside&& m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
-			cout << "발\n";
 			m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
 
 			cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
@@ -495,7 +494,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		}
 
 		else if(m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
-			cout << "시\n";
 			m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
 
 			cout << "m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
@@ -851,7 +849,9 @@ void CGameFramework::BuildObjects()
 	for (int i = 0; i < m_pInsideScene->m_nScenePlayer; ++i) {
 		m_pInsideScene->m_pPlayer[i] = m_pInsidePlayer[i] = pPlayer[i];
 	}
+
 	m_pInsideCamera = m_pInsidePlayer[g_myid]->GetCamera();
+
 
 	m_pd3dCommandList->Close();
 	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -1049,6 +1049,8 @@ void CGameFramework::FrameAdvance()
 	
 	ProcessInput();
 
+
+
     AnimateObjects();
 
 	UpdateUI();
@@ -1080,10 +1082,13 @@ void CGameFramework::FrameAdvance()
 		cout << "돌아와\n";
 	}
 	
-
+	
 
 
 	m_pPlayer[0]->curMissionType = curMissionType;
+
+
+
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
@@ -1116,6 +1121,26 @@ void CGameFramework::FrameAdvance()
 #ifdef _WITH_PLAYER_TOP
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
+
+	//
+	if (curMissionType == MissionType::CS_TURN && b_Inside && m_pInsidePlayer[g_myid]&&m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+		cout << "CS_TURN\n";
+		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
+		m_pInsideCamera->SetTarget({ 414.456f,224.0f,676.309f }); //왜 여기서 하면 이상해질까
+		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+	}
+
+	if (m_pInsideCamera->getTurn() == false) {
+		CS_CUTSCENE_END_PACKET my_packet;
+		my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
+		my_packet.type = CS_CUTSCENE_END;
+		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
+		m_pInsideCamera->turn = true;
+	}
+
 	if ((m_pPlayer && !b_Inside)&& player_type ==PlayerType::MOVE) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Render(m_pd3dCommandList, m_pCamera);
 	if (m_pInsidePlayer && b_Inside)for (int i = 0; i < 3; ++i) {
 		if (m_pInsidePlayer[i]->isAlive) {

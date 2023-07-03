@@ -900,6 +900,7 @@ void CTerrainPlayer::UpdateOnServer(bool rotate_update)
 
 CCamera *CTerrainPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 {
+	cout << "ChangeCamera!!" << endl;
 	DWORD nCurrentCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
 	if (nCurrentCameraMode == nNewCameraMode) return(m_pCamera);
 	switch (nNewCameraMode)
