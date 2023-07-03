@@ -113,6 +113,9 @@ public:
 
 	int SceneTimer = 0;
 	bool CameraSence1(bool ON);
+
+	XMFLOAT3 tarPos = { 0,0,0 };
+	void SetTarget(XMFLOAT3 tarpos) { tarPos = tarpos; }
 };
 
 class CSpaceShipCamera : public CCamera
@@ -211,10 +214,11 @@ class CCutSceneCamera : public CCamera
 {
 public:
 
-	
+
 
 	CCutSceneCamera(CCamera* pCamera);
 	virtual ~CCutSceneCamera() { }
 
+	virtual void SetLookAt(XMFLOAT3& vLookAt);
 	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed);
 };

@@ -283,6 +283,7 @@ namespace Matrix4x4
 		return(xmf4x4Result);
 	}
 
+
 	inline XMFLOAT4X4 Scale(XMFLOAT4X4& xmf4x4Matrix, float fScale)
 	{
 		XMFLOAT4X4 xmf4x4Result;

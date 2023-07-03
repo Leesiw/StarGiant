@@ -264,7 +264,7 @@ void CPlayer::Update(float fTimeElapsed)
 	DWORD nCurrentCameraMode = m_pCamera->GetMode();
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (nCurrentCameraMode == DRIVE_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
-	if (nCurrentCameraMode == CUT_SCENE_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	if (nCurrentCameraMode == CUT_SCENE_CAMERA)	m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	/*if (nCurrentCameraMode == ATTACT_CAMERA_L) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (nCurrentCameraMode == ATTACT_CAMERA_C) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (nCurrentCameraMode == ATTACT_CAMERA_R) m_pCamera->Update(m_xmf3Position, fTimeElapsed);*/
@@ -367,15 +367,17 @@ CCamera* CPlayer::ChangeToCutSceneCamera(DWORD nNewCameraMode, float fTimeElapse
 		SetMaxVelocityY(0.0f);
 		m_pCamera = OnChangeCamera(CUT_SCENE_CAMERA, nCurrentCameraMode);
 		m_pCamera->SetTimeLag(0.0f);
+		m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, -50.0f));
 		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
 		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+		
 		break;
 	default:
 		break;
 	}
 
-	m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
+	//m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
 	Update(fTimeElapsed);
 
 	return(m_pCamera);

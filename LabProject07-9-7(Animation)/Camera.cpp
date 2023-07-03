@@ -583,17 +583,25 @@ CCutSceneCamera::CCutSceneCamera(CCamera* pCamera) : CCamera(pCamera)
 	m_nMode = CUT_SCENE_CAMERA;
 	if (pCamera)
 	{
-		if (pCamera->GetMode() == CUT_SCENE_CAMERA)
-		{
-			m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
-			m_xmf3Right.y = 0.0f;
-			m_xmf3Look.y = 0.0f;
-			m_xmf3Right = Vector3::Normalize(m_xmf3Right);
-			m_xmf3Look = Vector3::Normalize(m_xmf3Look);
-		}
+		cout << "CUT_SCENE_CAMERA 카메라 생성\n";
+		// 카메라 초기 위치 설정
+		m_xmf3Position = XMFLOAT3(tarPos.x, tarPos.y, tarPos.z - 100); // tarPos에서 100만큼 뒤로 이동
 
+		// 카메라 초기 방향 설정 (tarPos를 중심으로 바라봄)
+		XMFLOAT3 xmf3LookAt;
+
+		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+		m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 	}
+}
 
+void CCutSceneCamera::SetLookAt(XMFLOAT3& xmf3LookAt)
+{
+	XMFLOAT4X4 mtxLookAt = Matrix4x4::LookAtLH(m_xmf3Position, xmf3LookAt, m_pPlayer->GetUpVector());
+	m_xmf3Right = XMFLOAT3(mtxLookAt._11, mtxLookAt._21, mtxLookAt._31);
+	m_xmf3Up = XMFLOAT3(mtxLookAt._12, mtxLookAt._22, mtxLookAt._32);
+	m_xmf3Look = XMFLOAT3(mtxLookAt._13, mtxLookAt._23, mtxLookAt._33);
 }
 
 void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
@@ -601,7 +609,7 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 	if (m_pPlayer)
 	{
 		// 회전 속도 설정
-		float fRotationSpeed = 1.5f; // 예시: 초당 0.5의 회전 속도
+		float fRotationSpeed = 1.5f; // 초당 회전 속도
 
 		// 회전 각도 계산
 		float fAngle = fRotationSpeed * fTimeElapsed;
@@ -610,17 +618,30 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		XMFLOAT4X4 xmf4x4Rotate = Matrix4x4::Identity();
 		XMMATRIX xmmtxRotate = XMLoadFloat4x4(&xmf4x4Rotate);
 		XMMATRIX xmmtxRotation = XMMatrixRotationY(fAngle);
-		xmmtxRotate = XMMatrixMultiply(xmmtxRotate, xmmtxRotation);
+		xmmtxRotate = XMMatrixMultiply(xmmtxRotation, xmmtxRotate);
 		XMStoreFloat4x4(&xmf4x4Rotate, xmmtxRotate);
 
 		// 카메라 위치 계산
-		XMFLOAT3 xmf3Position = Vector3::TransformCoord(m_xmf3Position, xmmtxRotate);
+		XMFLOAT3 xmf3Offset = Vector3::Subtract(m_xmf3Position, tarPos);
+		XMVECTOR xmvecOffset = XMLoadFloat3(&xmf3Offset);
 
-		// 카메라 방향 계산
-		XMFLOAT3 xmf3LookAt = Vector3::TransformCoord(xmf3LookAt, xmmtxRotate);
+		// EyeDirection이 0 벡터인 경우에 대한 예외 처리
+		if (!XMVector3Equal(xmvecOffset, XMVectorZero()))
+		{
+			XMVECTOR xmvecPosition = XMVector3Transform(xmvecOffset, xmmtxRotate);
 
-		// 위치와 방향 업데이트
-		SetPosition(xmf3Position);
-		SetLookAt(xmf3LookAt);
+			// 회전 후의 벡터 크기가 0인 경우 방지
+			if (!XMVector3Equal(xmvecPosition, XMVectorZero()))
+			{
+				XMFLOAT3 xmf3Position;
+				XMStoreFloat3(&xmf3Position, xmvecPosition);
+				xmf3Position = Vector3::Add(xmf3Position, tarPos);
+
+				// 위치와 방향 업데이트
+				SetPosition(xmf3Position);
+				SetLookAt(tarPos);
+			}
+		}
+	
 	}
 }

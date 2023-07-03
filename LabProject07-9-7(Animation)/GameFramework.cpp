@@ -375,63 +375,63 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case VK_RETURN:
 			break;
 
-			case '0':
-			case VK_NUMPAD0:
-				cout << "0";
-				roomNum += L"0";
-				break;
+		case '0':
+		case VK_NUMPAD0:
+			cout << "0";
+			roomNum += L"0";
+			break;
 
-			case '1':
-			case VK_NUMPAD1:
-				cout << "1";
-				roomNum += L"1";
+		case '1':
+		case VK_NUMPAD1:
+			cout << "1";
+			roomNum += L"1";
 
-				break;
+			break;
 
-			case '2':
-			case VK_NUMPAD2:
-				cout << "2";
-				roomNum += L"2";
-				break;
+		case '2':
+		case VK_NUMPAD2:
+			cout << "2";
+			roomNum += L"2";
+			break;
 
-			case '3':
-			case VK_NUMPAD3:
-				cout << "3";
-				roomNum += L"3";
-				break;
+		case '3':
+		case VK_NUMPAD3:
+			cout << "3";
+			roomNum += L"3";
+			break;
 
-			case '4':
-			case VK_NUMPAD4:
-				cout << "4";
-				roomNum += L"4";
-				break;
+		case '4':
+		case VK_NUMPAD4:
+			cout << "4";
+			roomNum += L"4";
+			break;
 
-			case '5':
-			case VK_NUMPAD5:
-				cout << "5";
-				roomNum += L"5";
-				break;
+		case '5':
+		case VK_NUMPAD5:
+			cout << "5";
+			roomNum += L"5";
+			break;
 
-			case '6':
-			case VK_NUMPAD6:
-				cout << "6";
-				roomNum += L"6";
-				break;
-			case '7':
-			case VK_NUMPAD7:
-				cout << "7";
-				roomNum += L"7";
-				break;
-			case '8':
-			case VK_NUMPAD8:
-				cout << "8";
-				roomNum += L"8";
-				break;
-			case '9':
-			case VK_NUMPAD9:
-				cout << "9";
-				roomNum += L"9";
-				break;
+		case '6':
+		case VK_NUMPAD6:
+			cout << "6";
+			roomNum += L"6";
+			break;
+		case '7':
+		case VK_NUMPAD7:
+			cout << "7";
+			roomNum += L"7";
+			break;
+		case '8':
+		case VK_NUMPAD8:
+			cout << "8";
+			roomNum += L"8";
+			break;
+		case '9':
+		case VK_NUMPAD9:
+			cout << "9";
+			roomNum += L"9";
+			break;
 
 		case VK_F1:
 		case VK_F2:
@@ -481,25 +481,49 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			break;
 
 		case 'R': //ÄÆ¾À Å×½ºÆ®
-			if (!isConnect) {
-				m_pBeforeCamera = m_pPlayer[g_myid]->GetCamera()->GetMode();
-				cout << "m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
-				m_pCamera = m_pPlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
-				cout << "m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
-				cout << "r";
-			}
-			break;
+		{
+
+		if (b_Inside&& m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+			cout << "¹ß\n";
+			m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
+
+			cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+			//m_pInsideCamera->SetTarget({0,0,0});
+			m_pInsideCamera->SetTarget({ 414.456f,224.f,676.309f });
+			
+			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		}
+
+		else if(m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+			cout << "½Ã\n";
+			m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
+
+			cout << "m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
+			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+
+		}
+		cout << "m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
+		cout << "r";
+
+		break;
+		}
 
 		case 'E': //ÄÆ¾À Å×½ºÆ® µ¹¾Æ¿À±â
-			if (!isConnect) {
-				if (m_pBeforeCamera != NULL) {
+		{
+			if (m_pBeforeCamera != NULL) {
+				if (b_Inside) {
+					m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+					cout << "Inside m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
+				}
+				else {
 					m_pCamera = m_pPlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
-					//m_pCamera = m_pPlayer[g_myid]->ChangeToBeforeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
 					cout << "m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
 				}
-				cout << "e";
 			}
+			cout << "e";
+
 			break;
+		}
 
 		case 'M':
 		{
