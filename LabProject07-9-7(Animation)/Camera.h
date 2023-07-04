@@ -53,7 +53,7 @@ protected:
 	ID3D12Resource					*m_pd3dcbCamera = NULL;
 	VS_CB_CAMERA_INFO				*m_pcbMappedCamera = NULL;
 
-
+	float m_shakingTime = 0.0f;
 public:
 	CCamera();
 	CCamera(CCamera *pCamera);
@@ -110,6 +110,7 @@ public:
 	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f) { }
 	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed) { }
 	virtual void SetLookAt(XMFLOAT3& xmf3LookAt) { }
+	virtual void Shaking(float fShakeAmount, float fTimeElapsed);
 
 	int SceneTimer = 0;
 	bool CameraSence1(bool ON);
@@ -119,7 +120,7 @@ public:
 
 	bool turn = true;
 	bool getTurn() { return turn; }
-
+	bool m_bCameraShaking = false;
 
 	float fAnglenu = 0;
 };

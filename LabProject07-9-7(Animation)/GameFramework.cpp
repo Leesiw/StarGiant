@@ -759,6 +759,31 @@ bool CGameFramework::AroundSculpture()
 	return false;
 }
 
+void CGameFramework::CameraUpdateChange()
+{
+	if (m_pPlayer[0]->getHp() > 85 && m_pPlayer[0]->getHp() < 90 && m_pCamera->m_bCameraShaking ==false) { //언제 쉐이킹할까
+		m_pCamera->m_bCameraShaking = true;
+	}
+
+	if (curMissionType == MissionType::CS_TURN && b_Inside && m_pInsidePlayer[g_myid] && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+		cout << "CS_TURN\n";
+		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
+		m_pInsideCamera->SetTarget({ 414.456f,224.0f,676.309f });
+		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+	}
+
+	if (m_pInsideCamera->getTurn() == false) {
+		CS_CUTSCENE_END_PACKET my_packet;
+		my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
+		my_packet.type = CS_CUTSCENE_END;
+		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
+		m_pInsideCamera->turn = true;
+	}
+}
+
 void error_display(const char* msg, int err_no)
 {
 	WCHAR* lpMsgBuf;
@@ -1058,25 +1083,9 @@ void CGameFramework::FrameAdvance()
 
 	
 	ProcessInput();
+	CameraUpdateChange();
 
-
-	if (curMissionType == MissionType::CS_TURN && b_Inside && m_pInsidePlayer[g_myid] && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
-		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
-		cout << "CS_TURN\n";
-		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
-		m_pInsideCamera->SetTarget({ 414.456f,224.0f,676.309f }); //왜 여기서 하면 이상해질까
-		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
-		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
-	}
-
-	if (m_pInsideCamera->getTurn() == false) {
-		CS_CUTSCENE_END_PACKET my_packet;
-		my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
-		my_packet.type = CS_CUTSCENE_END;
-		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
-		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
-		m_pInsideCamera->turn = true;
-	}
+	
 
     AnimateObjects();
 

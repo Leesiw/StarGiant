@@ -146,6 +146,25 @@ void CCamera::SetViewportsAndScissorRects(ID3D12GraphicsCommandList *pd3dCommand
 	pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect);
 }
 
+void CCamera::Shaking(float fShakeAmount, float fTimeElapsed)
+{
+	m_shakingTime += fTimeElapsed;
+	XMFLOAT3 xmf3ShakeOffset = XMFLOAT3(
+		fShakeAmount * (float)(rand() % 100 - 50) / 50.0f,  // x 축 쉐이킹
+		fShakeAmount * (float)(rand() % 100 - 50) / 50.0f,  // y 축 쉐이킹
+		fShakeAmount * (float)(rand() % 100 - 50) / 50.0f   // z 축 쉐이킹
+	);
+
+	m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3ShakeOffset);
+
+	if (m_shakingTime > 1) {
+		m_shakingTime = 0;
+		m_bCameraShaking = false;
+	}
+}
+
+
+
 bool CCamera::CameraSence1(bool ON)
 {
 	if (SceneTimer != 20&&ON) {
@@ -486,6 +505,13 @@ void CDriveCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		xmf4x4Rotate._11 = xmf3Right.x; xmf4x4Rotate._21 = xmf3Up.x; xmf4x4Rotate._31 = xmf3Look.x;
 		xmf4x4Rotate._12 = xmf3Right.y; xmf4x4Rotate._22 = xmf3Up.y; xmf4x4Rotate._32 = xmf3Look.y;
 		xmf4x4Rotate._13 = xmf3Right.z; xmf4x4Rotate._23 = xmf3Up.z; xmf4x4Rotate._33 = xmf3Look.z;
+
+		if (m_bCameraShaking)  // 카메라 쉐이킹 신호 체크
+		{
+			Shaking(1.0f, fTimeElapsed);
+		}
+
+
 
 		XMFLOAT3 xmf3Offset = Vector3::TransformCoord(m_xmf3Offset, xmf4x4Rotate);
 		XMFLOAT3 xmf3Position = Vector3::Add(m_pPlayer->GetPosition(), xmf3Offset);
