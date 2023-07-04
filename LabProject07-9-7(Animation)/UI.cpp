@@ -551,9 +551,15 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst)
 
     if (sst == 0) {
         m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_Lobby, &d2dPoint_Lobby);
+
+
         for (auto textBlock : m_vLobbyBlocks)
         {
-            m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBlackBrush);
+            if (noData) {
+                m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextGrayBrush);
+            }
+            else
+                m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBlackBrush);
         }
     }
 
@@ -612,6 +618,8 @@ void UILayer::ReleaseResources()
     }
     m_pd2dTextBrush->Release();
     m_pd2dTextBlackBrush->Release();
+    m_pd2dTextGrayBrush->Release();
+
 
     Redbrush->Release();
     Whitebrush->Release();
@@ -659,6 +667,9 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
 
     if (m_pd2dTextBlackBrush) m_pd2dTextBlackBrush->Release();
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &m_pd2dTextBlackBrush);
+
+    if (m_pd2dTextGrayBrush) m_pd2dTextGrayBrush->Release();
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::LightGray), &m_pd2dTextGrayBrush);
 
     const float fFontSize = m_fHeight / 25.0f;
     const float fFontSize_Scripts = m_fHeight / 25.0f;

@@ -1266,7 +1266,14 @@ void CGameFramework::UpdateUI()
 
 	m_pUILayer->UpdateLabels_Jew(uiJew);
 
-	m_pUILayer->UpdateLabels_Lobby(roomNum);
+	if (roomNum.empty()) {
+		cout << "비어있음";
+		m_pUILayer->UpdateLabels_Lobby(L"room number");
+	}
+	else {
+		m_pUILayer->UpdateLabels_Lobby(roomNum);
+		m_pUILayer->noData = false;
+	}
 
 	m_pUILayer->UpdateHp(m_pPlayer[0]->hp, m_pPlayer[0]->max_hp);
 	/*if(m_pScene->m_ppBoss->GetState()!= BossState::SLEEP)*/

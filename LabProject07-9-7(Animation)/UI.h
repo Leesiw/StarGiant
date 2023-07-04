@@ -32,6 +32,8 @@ public:
     float angle = 0;
     float angle2 = 0;
 
+    bool noData = true;
+
 
     void UpdateHp(short curhp, short maxHp = 100);
     void UpdateBossHp(short curhp, short maxHp = 100);
@@ -65,7 +67,6 @@ private:
 
 
 
-
     float m_fWidth;
     float m_fHeight;
 
@@ -81,6 +82,8 @@ private:
     ID2D1DeviceContext2* m_pd2dDeviceContext = NULL;
     ID2D1SolidColorBrush* m_pd2dTextBrush = NULL;
     ID2D1SolidColorBrush* m_pd2dTextBlackBrush = NULL;
+    ID2D1SolidColorBrush* m_pd2dTextGrayBrush = NULL;
+
 
 
     ID2D1SolidColorBrush* Redbrush = NULL;
@@ -93,6 +96,7 @@ private:
     IDWriteTextFormat* m_pdwJewFormat = NULL;
 
     IDWriteTextFormat* m_pdwLobbyFormat = NULL;
+
 
 
 
