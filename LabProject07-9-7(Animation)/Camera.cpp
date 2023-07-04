@@ -146,6 +146,25 @@ void CCamera::SetViewportsAndScissorRects(ID3D12GraphicsCommandList *pd3dCommand
 	pd3dCommandList->RSSetScissorRects(1, &m_d3dScissorRect);
 }
 
+void CCamera::Shaking(float fShakeAmount, float fTimeElapsed)
+{
+	m_shakingTime += fTimeElapsed;
+	XMFLOAT3 xmf3ShakeOffset = XMFLOAT3(
+		fShakeAmount * (float)(rand() % 100 - 50) / 50.0f,  // x 축 쉐이킹
+		fShakeAmount * (float)(rand() % 100 - 50) / 50.0f,  // y 축 쉐이킹
+		fShakeAmount * (float)(rand() % 100 - 50) / 50.0f   // z 축 쉐이킹
+	);
+
+	m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3ShakeOffset);
+
+	if (m_shakingTime > 1) {
+		m_shakingTime = 0;
+		m_bCameraShaking = false;
+	}
+}
+
+
+
 bool CCamera::CameraSence1(bool ON)
 {
 	if (SceneTimer != 20&&ON) {
@@ -487,6 +506,13 @@ void CDriveCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		xmf4x4Rotate._12 = xmf3Right.y; xmf4x4Rotate._22 = xmf3Up.y; xmf4x4Rotate._32 = xmf3Look.y;
 		xmf4x4Rotate._13 = xmf3Right.z; xmf4x4Rotate._23 = xmf3Up.z; xmf4x4Rotate._33 = xmf3Look.z;
 
+		if (m_bCameraShaking)  // 카메라 쉐이킹 신호 체크
+		{
+			Shaking(1.0f, fTimeElapsed);
+		}
+
+
+
 		XMFLOAT3 xmf3Offset = Vector3::TransformCoord(m_xmf3Offset, xmf4x4Rotate);
 		XMFLOAT3 xmf3Position = Vector3::Add(m_pPlayer->GetPosition(), xmf3Offset);
 		XMFLOAT3 xmf3Direction = Vector3::Subtract(xmf3Position, m_xmf3Position);
@@ -583,43 +609,78 @@ CCutSceneCamera::CCutSceneCamera(CCamera* pCamera) : CCamera(pCamera)
 	m_nMode = CUT_SCENE_CAMERA;
 	if (pCamera)
 	{
-		if (pCamera->GetMode() == CUT_SCENE_CAMERA)
-		{
-			m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
-			m_xmf3Right.y = 0.0f;
-			m_xmf3Look.y = 0.0f;
-			m_xmf3Right = Vector3::Normalize(m_xmf3Right);
-			m_xmf3Look = Vector3::Normalize(m_xmf3Look);
-		}
-	}
+		cout << "CUT_SCENE_CAMERA 카메라 생성\n";
+		// 카메라 초기 위치 설정
+		m_xmf3Position = XMFLOAT3(tarPos.x, tarPos.y, tarPos.z - 100); // tarPos에서 100만큼 뒤로 이동
 
+		// 카메라 초기 방향 설정 (tarPos를 중심으로 바라봄)
+		XMFLOAT3 xmf3LookAt;
+
+		m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+		m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	}
+}
+
+void CCutSceneCamera::SetLookAt(XMFLOAT3& xmf3LookAt)
+{
+	XMFLOAT4X4 mtxLookAt = Matrix4x4::LookAtLH(m_xmf3Position, xmf3LookAt, m_pPlayer->GetUpVector());
+	m_xmf3Right = XMFLOAT3(mtxLookAt._11, mtxLookAt._21, mtxLookAt._31);
+	m_xmf3Up = XMFLOAT3(mtxLookAt._12, mtxLookAt._22, mtxLookAt._32);
+	m_xmf3Look = XMFLOAT3(mtxLookAt._13, mtxLookAt._23, mtxLookAt._33);
 }
 
 void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 {
 	if (m_pPlayer)
 	{
-		XMFLOAT4X4 xmf4x4Rotate = Matrix4x4::Identity();
-		XMFLOAT3 xmf3Right = m_pPlayer->GetRightVector();
-		XMFLOAT3 xmf3Up = m_pPlayer->GetUpVector();
-		XMFLOAT3 xmf3Look = m_pPlayer->GetLookVector();
-		xmf4x4Rotate._11 = xmf3Right.x; xmf4x4Rotate._21 = xmf3Up.x; xmf4x4Rotate._31 = xmf3Look.x;
-		xmf4x4Rotate._12 = xmf3Right.y; xmf4x4Rotate._22 = xmf3Up.y; xmf4x4Rotate._32 = xmf3Look.y;
-		xmf4x4Rotate._13 = xmf3Right.z; xmf4x4Rotate._23 = xmf3Up.z; xmf4x4Rotate._33 = xmf3Look.z;
+		// 회전 속도 설정
+		float fRotationSpeed = 1.5f; // 초당 회전 속도
 
-		XMFLOAT3 xmf3Offset = Vector3::TransformCoord(m_xmf3Offset, xmf4x4Rotate);
-		XMFLOAT3 xmf3Position = Vector3::Add(m_pPlayer->GetPosition(), xmf3Offset);
-		XMFLOAT3 xmf3Direction = Vector3::Subtract(xmf3Position, m_xmf3Position);
-		float fLength = Vector3::Length(xmf3Direction);
-		xmf3Direction = Vector3::Normalize(xmf3Direction);
-		float fTimeLagScale = (m_fTimeLag) ? fTimeElapsed * (1.0f / m_fTimeLag) : 1.0f;
-		float fDistance = fLength * fTimeLagScale;
-		if (fDistance > fLength) fDistance = fLength;
-		if (fLength < 0.01f) fDistance = fLength;
-		if (fDistance > 0)
+		// 회전 각도 계산
+		float fAngle = fRotationSpeed * fTimeElapsed;
+
+		// 회전 각도 (도 단위)
+		float fAngleDegrees = XMConvertToDegrees(fAngle);
+
+
+		fAnglenu += fAngleDegrees;
+		// 회전 행렬 생성
+		XMFLOAT4X4 xmf4x4Rotate = Matrix4x4::Identity();
+		XMMATRIX xmmtxRotate = XMLoadFloat4x4(&xmf4x4Rotate);
+		XMMATRIX xmmtxRotation = XMMatrixRotationY(fAngle);
+		xmmtxRotate = XMMatrixMultiply(xmmtxRotation, xmmtxRotate);
+		XMStoreFloat4x4(&xmf4x4Rotate, xmmtxRotate);
+
+
+		// 카메라 위치 계산
+		XMFLOAT3 xmf3Offset = Vector3::Subtract(m_xmf3Position, tarPos);
+		XMVECTOR xmvecOffset = XMLoadFloat3(&xmf3Offset);
+
+		// EyeDirection이 0 벡터인 경우에 대한 예외 처리
+		if (!XMVector3Equal(xmvecOffset, XMVectorZero()))
 		{
-			m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Direction, fDistance);
-			SetLookAt(xmf3LookAt);
+			XMVECTOR xmvecPosition = XMVector3Transform(xmvecOffset, xmmtxRotate);
+
+			// 회전 후의 벡터 크기가 0인 경우 방지
+			if (!XMVector3Equal(xmvecPosition, XMVectorZero()))
+			{
+				XMFLOAT3 xmf3Position;
+				XMStoreFloat3(&xmf3Position, xmvecPosition);
+				xmf3Position = Vector3::Add(xmf3Position, tarPos);
+
+				// 위치와 방향 업데이트
+				SetPosition(xmf3Position);
+				SetLookAt(tarPos);
+			}
+		}
+		cout << "fAngle : " << fAnglenu << endl;
+
+		// 회전이 한 바퀴 돌았을 때 turn 변수를 false로 설정
+		if (fAnglenu >= 365.0f)
+		{
+			cout << "turn false\n";
+			turn = false;
 		}
 	}
 }

@@ -64,6 +64,8 @@ public:
 	//
 	void CheckSceneChange(bool State, int num);
 	bool AroundSculpture();
+	void CameraUpdateChange();
+
 
 private:
 	HINSTANCE					m_hInstance;
@@ -140,6 +142,8 @@ private:
 
 	bool b_Inside;
 	bool b_CameraScene = false;
+
+	bool turnon = true;
 	// 
 	
 

@@ -408,8 +408,10 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	CLoadedModelInfo* pMascotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Doggy_V0.bin", NULL);
 	m_ppMascot = new CMascotObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMascotModel, 1);
 	m_ppMascot->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppMascot->SetPosition(530.219f, 250.f - 30.0f, 593.263f);
-	m_ppMascot->SetScale(10.0f, 10.0f, 10.0f);
+	//m_ppMascot->SetPosition(530.219f, 250.f - 30.0f, 593.263f);
+	m_ppMascot->SetPosition(414.456f, 224.f, 676.309f);
+
+	m_ppMascot->SetScale(100.0f, 100.0f, 100.0f);
 	if (pMascotModel) delete pMascotModel;
 
 	//=====================================
@@ -1188,6 +1190,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	for (int i = 0; i < m_nShaders; i++) if (m_ppShaders[i]) m_ppShaders[i]->Render(pd3dCommandList, pCamera);
 	if (m_nShaders>0) m_ppShaders[0]->SetPlayerPosition(m_pPlayer[0]->GetPosition());
 
+
+	//cout << "x : " << m_pPlayer[0]->GetPosition().x << endl;
+	//cout << "y : " << m_pPlayer[0]->GetPosition().y << endl;
+	//cout << "z : " << m_pPlayer[0]->GetPosition().z << endl;
+	//cout << "\n";
 
 
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
