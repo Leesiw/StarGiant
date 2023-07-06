@@ -779,6 +779,11 @@ void CGameFramework::CameraUpdateChange()
 		my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
 		my_packet.type = CS_CUTSCENE_END;
 		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+
+	}
+	if (curMissionType == MissionType::TU_SIT && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA)
+	{
+		cout << "ÄÆ¾À ³¡";
 		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
 		m_pInsideCamera->turn = true;
 	}
