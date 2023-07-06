@@ -538,6 +538,17 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			delete ex_over;
 			break;
 		}
+		case OP_BLACK_HOLE: {
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
+			if (scene->_state != ST_INGAME) { break; }
+			if (scene->cur_mission != MissionType::ESCAPE_BLACK_HOLE) { break; }
+
+			// 플레이어 / 운석 / 적 끌어당기기
+
+			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_BLACK_HOLE, static_cast<short>(key) };
+			timer_queue.push(ev);
+			break;
+		}
 		}
 	}
 }
@@ -1117,6 +1128,12 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 			case EV_SEND_SCENE_INFO: {
 				OVER_EXP* ov = new OVER_EXP;
 				ov->_comp_type = OP_SEND_SCENE_INFO;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
+				break;
+			}
+			case EV_BLACK_HOLE: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_BLACK_HOLE;
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}

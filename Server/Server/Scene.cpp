@@ -516,6 +516,11 @@ void CScene::MissionClear()
 			timer_queue.push(ev);
 		}
 
+		if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, num };
+			timer_queue.push(ev);
+		}
+
 		for (short pl_id : _plist) {
 			if (pl_id == -1) continue;
 			if (clients[pl_id]._state != ST_INGAME) continue;
