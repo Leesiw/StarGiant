@@ -107,6 +107,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				if (spawn_num <= 0) { break; }
 				if (!ppEnemies[i]->GetisAlive()) {
 					scene->SpawnEnemy(ppEnemies[i]->GetID());
+					scene->m_ppEnemies[ppEnemies[i]->GetID()]->prev_time = chrono::steady_clock::now();
 					TIMER_EVENT ev_u{ ppEnemies[i]->GetID(), chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(key) };
 					timer_queue.push(ev_u);
 					--spawn_num;
@@ -127,12 +128,17 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				break; 
 			}
 			if (levels[scene->cur_mission].cutscene) {
+				scene->m_ppEnemies[ex_over->obj_id]->prev_time = chrono::steady_clock::now();
 				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_ENEMY, static_cast<short>(key) };
 				timer_queue.push(ev);
 				break;
 			}
 			
-			scene->m_ppEnemies[ex_over->obj_id]->AI(0.01f, scene->m_pSpaceship);
+			auto time_now = chrono::steady_clock::now();
+			std::chrono::duration<float> elapsed_time = (time_now - scene->m_ppEnemies[ex_over->obj_id]->prev_time);
+			scene->m_ppEnemies[ex_over->obj_id]->prev_time = time_now;
+
+			scene->m_ppEnemies[ex_over->obj_id]->AI(elapsed_time.count(), scene->m_pSpaceship);
 			scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
 
 			// 款籍苞 面倒贸府
@@ -188,12 +194,16 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
 			if (levels[scene->cur_mission].cutscene) {
+				scene->m_ppMeteoObjects[ex_over->obj_id]->prev_time = chrono::steady_clock::now();
 				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_METEO, static_cast<short>(key) };
 				timer_queue.push(ev);
 				break;
 			}
 
-			scene->m_ppMeteoObjects[ex_over->obj_id]->Animate(0.01f);
+			auto time_now = chrono::steady_clock::now();
+			std::chrono::duration<float> elapsed_time = (time_now - scene->m_ppMeteoObjects[ex_over->obj_id]->prev_time);
+			scene->m_ppMeteoObjects[ex_over->obj_id]->prev_time = time_now;
+			scene->m_ppMeteoObjects[ex_over->obj_id]->Animate(elapsed_time.count());
 			
 			XMFLOAT3 p_pos = scene->m_pSpaceship->GetPosition();
 			XMFLOAT3 m_pos = scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition();
@@ -265,6 +275,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 						if (clients[pl_id]._state != ST_INGAME) continue;
 						clients[pl_id].send_missile_packet(m_info);
 					}
+					scene->m_ppMissiles[i]->prev_time = chrono::steady_clock::now();
 					TIMER_EVENT ev{ static_cast<char>(i), chrono::system_clock::now() + 30ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
 					timer_queue.push(ev);
 
@@ -283,12 +294,16 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			if (scene->_state != ST_INGAME) { break; }
 			if (!scene->m_ppMissiles[ex_over->obj_id]->GetisActive()) { break; }
 			if (levels[scene->cur_mission].cutscene) {
+				scene->m_ppMissiles[ex_over->obj_id]->prev_time = chrono::steady_clock::now();
 				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_MISSILE, static_cast<short>(key) };
 				timer_queue.push(ev);
 				break;
 			}
 
-			scene->m_ppMissiles[ex_over->obj_id]->Animate(0.01f, scene->m_pSpaceship);
+			auto time_now = chrono::steady_clock::now();
+			std::chrono::duration<float> elapsed_time = (time_now - scene->m_ppMissiles[ex_over->obj_id]->prev_time);
+			scene->m_ppMissiles[ex_over->obj_id]->prev_time = time_now;
+			scene->m_ppMissiles[ex_over->obj_id]->Animate(elapsed_time.count(), scene->m_pSpaceship);
 			
 			MISSILE_INFO m_info{};
 			m_info.id = ex_over->obj_id;
@@ -301,7 +316,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			{
 				scene->m_ppMissiles[ex_over->obj_id]->SetisActive(false);
 				// 面倒贸府
-
+				/*
 				XMFLOAT3 xmf3Sub = scene->m_pSpaceship->GetPosition();
 				xmf3Sub = Vector3::Subtract(scene->m_ppMissiles[ex_over->obj_id]->GetPosition(), xmf3Sub);
 				if (Vector3::Length(xmf3Sub) > 0.0001f) {
@@ -312,8 +327,8 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 
 				XMFLOAT3 vel2 = scene->m_pSpaceship->GetVelocity();
 
-				scene->m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
-
+			//	scene->m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+			*/
 				if (scene->m_pSpaceship->GetHP() > 0) {
 					scene->m_pSpaceship->GetAttack(scene->m_ppMissiles[ex_over->obj_id]->GetDamage());
 				}
@@ -393,6 +408,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 						if (scene->_plist[i] != -1) { continue; }
 						scene->m_ppPlayers[i]->cutscene_end = false;
 					}
+					scene->m_pSpaceship->prev_time = chrono::steady_clock::now();
 					TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_SPACESHIP, static_cast<short>(key) };
 					timer_queue.push(ev);
 					break;
@@ -402,7 +418,10 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				timer_queue.push(ev);
 				break;
 			}
-			scene->m_pSpaceship->Update(0.01f);
+			auto time_now = chrono::steady_clock::now();
+			std::chrono::duration<float> elapsed_time = (time_now - scene->m_pSpaceship->prev_time);
+			scene->m_pSpaceship->prev_time = time_now;
+			scene->m_pSpaceship->Update(elapsed_time.count());
 
 			scene->CheckMissionComplete();
 

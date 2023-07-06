@@ -27,6 +27,8 @@ public:
 	XMFLOAT3 GetUp();
 	XMFLOAT3 GetRight();
 
+	chrono::steady_clock::time_point prev_time;
+
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 xmf3Position);
 	virtual void SetScale(float x, float y, float z);
