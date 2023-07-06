@@ -153,6 +153,12 @@ void ProcessPacket(int ci, unsigned char packet[])
 		}
 		SendPacket(ci, &change_packet);
 
+
+		CS_NEXT_MISSION_PACKET cutscene_packet;
+
+		cutscene_packet.size = sizeof(cutscene_packet);
+		cutscene_packet.type = CS_CUTSCENE_END;
+		SendPacket(ci, &cutscene_packet);
 	}
 	case SC_CHANGE: break;
 	case SC_ADD_PLAYER: break;
