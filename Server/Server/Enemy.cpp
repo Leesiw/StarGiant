@@ -291,9 +291,9 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 	float fMaxVelocity = 200.f;
 	if (fLength > fMaxVelocity)
 	{
-		m_xmf3Velocity.x *= (fMaxVelocity / fLength) * fTimeElapsed * 50;
-		m_xmf3Velocity.y *= (fMaxVelocity / fLength) * fTimeElapsed * 50;
-		m_xmf3Velocity.z *= (fMaxVelocity / fLength) * fTimeElapsed * 50;
+		m_xmf3Velocity.x *= (fMaxVelocity / fLength) * fTimeElapsed * 40;
+		m_xmf3Velocity.y *= (fMaxVelocity / fLength) * fTimeElapsed * 40;
+		m_xmf3Velocity.z *= (fMaxVelocity / fLength) * fTimeElapsed * 40;
 	}
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
