@@ -2136,3 +2136,40 @@ CMascotObject::CMascotObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 CMascotObject::~CMascotObject()
 {
 }
+
+CBlackHole::CBlackHole(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nWidth, UINT nHeight, UINT nDepth) : CGameObject(1)
+{
+	CTexturedRectMesh* pUIMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, nWidth, nHeight, nDepth);
+	SetMesh(pUIMesh);
+
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	m_blackholeTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	m_blackholeTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/blackhole.dds", 0);
+
+	CUIShader* m_blackholeShader;
+	CMaterial* m_blackholeMaterial;
+
+
+	m_blackholeShader = new CUIShader(); //ui쉐이더 쓰고있음 바꾸는거 권장...
+
+	m_blackholeShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	m_blackholeShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CScene::CreateShaderResourceViews(pd3dDevice, m_blackholeTexture, 15, false);
+
+	m_blackholeMaterial = new CMaterial(1);
+	m_blackholeMaterial->SetTexture(m_blackholeTexture, 0);
+	m_blackholeMaterial->SetShader(m_blackholeShader);
+	SetMaterial(0, m_blackholeMaterial);
+}
+
+void CBlackHole::Animate(float fElapsedTime)
+{
+	CGameObject::Animate(fElapsedTime);
+}
+
+void CBlackHole::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	CGameObject::Render(pd3dCommandList, pCamera);
+}

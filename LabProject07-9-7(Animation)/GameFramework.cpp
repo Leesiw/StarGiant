@@ -1272,7 +1272,6 @@ void CGameFramework::UpdateUI()
 	m_pUILayer->UpdateLabels_Jew(uiJew);
 
 	if (roomNum.empty()) {
-		cout << "비어있음";
 		m_pUILayer->UpdateLabels_Lobby(L"room number");
 	}
 	else {
@@ -1917,6 +1916,7 @@ void CGameFramework::ProcessPacket(char* p)
 	case SC_BLACK_HOLE:
 	{
 		SC_BLACK_HOLE_PACKET* packet = reinterpret_cast<SC_BLACK_HOLE_PACKET*>(p);
+		m_pScene->setBlackholePos(packet->pos);
 		// packet->pos; 블랙홀 위치
 	}
 	default:

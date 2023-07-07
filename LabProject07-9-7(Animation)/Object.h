@@ -803,3 +803,16 @@ public:
 	CMascotObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks);
 	virtual ~CMascotObject();
 };
+
+//====================================================================================================
+class CBlackHole : public CGameObject
+{
+public:
+	CBlackHole() {};
+	virtual ~CBlackHole() {};
+	CBlackHole(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nWidth = 20, UINT nHeight = 20, UINT nDepth = 0);
+	virtual void Animate(float fElapsedTime);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+public:
+	CTexture* m_blackholeTexture;
+};

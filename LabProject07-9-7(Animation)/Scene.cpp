@@ -288,6 +288,13 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		//AddDieSprite(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, XMFLOAT3(435.f, 250.f, 640.f));
 	}
 	//=====================================XMFLOAT3(425.0f, 250.0f, 640.0f);
+
+	//===================================== 블랙홀
+	m_ppBlackhole = new CBlackHole(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, 20, 20, 0);
+	m_ppBlackhole->SetPosition(0.0f, 0.0f, 0.0f);
+
+	//=====================================
+
 	BuildBoss(pd3dDevice, pd3dCommandList);
 	BuildUI(pd3dDevice, pd3dCommandList);
 
@@ -550,6 +557,10 @@ void CScene::ReleaseObjects()
 		delete[] m_ppSprite;
 	}
 
+	if (m_ppBlackhole)
+	{
+		delete m_ppBlackhole;
+	}
 
 	if (landob)
 	{
@@ -920,6 +931,10 @@ void CScene::TransformMeteor(XMFLOAT3 m_pos[])
 	}
 }
 
+void CScene::setBlackholePos(XMFLOAT3 m_pos)
+{
+	m_ppBlackhole->SetPosition(m_pos);
+}
 
 void CScene::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
 {
@@ -1133,6 +1148,10 @@ bool CScene::ProcessInput(UCHAR* pKeysBuffer)
 void CScene::AnimateObjects(float fTimeElapsed)
 {
 	m_fElapsedTime = fTimeElapsed;
+	m_eTime += fTimeElapsed;
+	if (m_eTime >= 36) {
+		m_eTime = 0.0f;
+	}
 
 	if (m_ppHierarchicalGameObjects)
 	{
@@ -1165,6 +1184,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			//m_ppUI[i]->SetPosition(m_pPlayer[0]->GetPosition().x, m_pPlayer[0]->GetPosition().y, m_pPlayer[0]->GetPosition().z);
 		}
 	}
+	/*if (m_ppBlackhole)m_ppBlackhole->Rotate(0,0,m_eTime);*/
 }
 
 
@@ -1302,7 +1322,13 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 
 
-
+	if (m_ppBlackhole)
+	{
+		//m_ppBlackhole->SetPosition(xmf3Position);
+		m_ppBlackhole->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+		m_ppBlackhole->Rotate(0.0f, 0.0f, m_eTime * 10);
+		m_ppBlackhole->Render(pd3dCommandList, pCamera);
+	}
 
 
 	if (m_ppBoss) {

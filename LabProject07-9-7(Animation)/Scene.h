@@ -95,6 +95,9 @@ public:
 	void TransformMeteor(METEO_INFO m_info);
 	void TransformMeteor(XMFLOAT3 m_pos[]);
 
+	void setBlackholePos(XMFLOAT3 m_pos);
+
+
 	virtual void CheckBoomSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position, int Target);
 	virtual void AddDieSprite(XMFLOAT3 Position, int Target);
@@ -133,6 +136,9 @@ public:
 
 	float								m_fElapsedTime = 0.0f;
 
+	float								m_eTime = 0.0f;
+
+
 	int									m_nGameObjects = 0;
 	CGameObject							**m_ppGameObjects = NULL;
 
@@ -160,6 +166,7 @@ public:
 
 	CMascotObject* m_ppMascot;
 
+	CBlackHole* m_ppBlackhole;
 
 	CUI								*m_ppUI[UI_CNT];
 
