@@ -543,6 +543,10 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			if (scene->_state != ST_INGAME) { break; }
 			if (scene->cur_mission != MissionType::ESCAPE_BLACK_HOLE) { break; }
 
+			auto time_now = chrono::steady_clock::now();
+			std::chrono::duration<float> elapsed_time = (time_now - scene->b_prev_time);
+			scene->b_prev_time = time_now;
+
 			// 플레이어 / 운석 / 적 끌어당기기
 
 			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_BLACK_HOLE, static_cast<short>(key) };

@@ -46,7 +46,7 @@ void CScene::BuildObjects()
 
 	// player
 	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
-	pAirplanePlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+	pAirplanePlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 100.0f));
 	pAirplanePlayer->mesh = true;
 	pAirplanePlayer->boundingbox = BoundingOrientedBox{ XMFLOAT3(-0.000000f, -0.000000f, -0.000096f), XMFLOAT3(15.5f, 15.5f, 3.90426f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	m_pSpaceship = pAirplanePlayer;
@@ -139,7 +139,7 @@ void CScene::ReleaseObjects()
 void CScene::Reset()
 {
 	_id = -1;
-	m_pSpaceship->SetPosition(XMFLOAT3(0.f, 0.f, 0.f));
+	m_pSpaceship->SetPosition(XMFLOAT3(0.f, 0.f, 100.f));
 	m_pSpaceship->Reset();
 
 	items[ItemType::JEWEL_ATT] = 0;
@@ -525,6 +525,8 @@ void CScene::MissionClear()
 			p.pos = black_hole_pos;
 			Send((char*) & p);
 
+
+			b_prev_time = chrono::steady_clock::now();
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, num };
 			timer_queue.push(ev);
 		}
