@@ -547,7 +547,54 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			std::chrono::duration<float> elapsed_time = (time_now - scene->b_prev_time);
 			scene->b_prev_time = time_now;
 
-			// 플레이어 / 운석 / 적 끌어당기기
+			XMFLOAT3 pos;
+			XMFLOAT3 ToBlackHole;
+			float dist;
+			pos = scene->m_pSpaceship->GetPosition();
+			ToBlackHole = Vector3::Subtract(scene->black_hole_pos, pos);
+			dist = Vector3::Length(ToBlackHole);
+			ToBlackHole = Vector3::ScalarProduct(ToBlackHole, 50.f * elapsed_time.count());
+			scene->m_pSpaceship->SetPosition(Vector3::Add(pos, ToBlackHole));
+			if (dist < 50.f) {
+				scene->m_pSpaceship->GetAttack(3);
+				for (short pl_id : scene->_plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_bullet_hit_packet(-1, scene->m_pSpaceship->GetHP());
+				}
+			}
+
+			for (char i = 0; i < METEOS; ++i) {
+				pos = scene->m_ppMeteoObjects[i]->GetPosition();
+				dist = Vector3::Length(Vector3::Subtract(pos, scene->black_hole_pos));
+				if (dist < 20.f) {
+					scene->SpawnMeteo(i);
+					continue;
+				}
+				ToBlackHole = Vector3::Subtract(scene->black_hole_pos, pos);
+				dist = Vector3::Length(ToBlackHole);
+				ToBlackHole = Vector3::ScalarProduct(ToBlackHole, 50.f * elapsed_time.count());
+				scene->m_ppMeteoObjects[i]->SetPosition(Vector3::Add(pos, ToBlackHole));
+			}
+
+			for (char i = 0; i < ENEMIES; ++i) {
+				if (!scene->m_ppEnemies[i]->GetisAlive()) { continue; }
+				pos = scene->m_ppEnemies[i]->GetPosition();
+				dist = Vector3::Length(Vector3::Subtract(pos, scene->black_hole_pos));
+				if (dist < 50.f) {
+					scene->m_ppEnemies[i]->hp -= 3;
+					for (short pl_id : scene->_plist) {
+						if (pl_id == -1) continue;
+						if (clients[pl_id]._state != ST_INGAME) continue;
+						clients[pl_id].send_bullet_hit_packet(i, scene->m_ppEnemies[i]->hp);
+					}
+					continue;
+				}
+				ToBlackHole = Vector3::Subtract(scene->black_hole_pos, pos);
+				dist = Vector3::Length(ToBlackHole);
+				ToBlackHole = Vector3::ScalarProduct(ToBlackHole, 50.f * elapsed_time.count());
+				scene->m_ppEnemies[i]->SetPosition(Vector3::Add(pos, ToBlackHole));
+			}
 
 			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_BLACK_HOLE, static_cast<short>(key) };
 			timer_queue.push(ev);
