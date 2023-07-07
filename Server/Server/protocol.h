@@ -78,9 +78,13 @@ constexpr char SC_START = 26;
 
 constexpr char CS_CUTSCENE_END = 27;
 
+constexpr char SC_BLACK_HOLE = 28;	// 블랙홀 위치 전송
+
 // cheat
-constexpr char CS_NEXT_MISSION = 28;
-constexpr char CS_START = 29;
+constexpr char CS_NEXT_MISSION = 29;
+constexpr char CS_START = 30;
+
+
 
 enum class PlayerType : char
 {
@@ -470,6 +474,14 @@ struct SC_KILL_NUM_PACKET {
 	char type;
 
 	char num;
+};
+
+
+struct SC_BLACK_HOLE_PACKET {
+	unsigned char size;
+	char	type;
+
+	XMFLOAT3 pos;
 };
 
 
