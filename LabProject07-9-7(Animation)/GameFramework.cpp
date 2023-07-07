@@ -1914,6 +1914,11 @@ void CGameFramework::ProcessPacket(char* p)
 		_state = SCENE_INGAME;
 		break;
 	}
+	case SC_BLACK_HOLE:
+	{
+		SC_BLACK_HOLE_PACKET* packet = reinterpret_cast<SC_BLACK_HOLE_PACKET*>(p);
+		// packet->pos; ºí·¢È¦ À§Ä¡
+	}
 	default:
 		printf("Unknown PACKET type [%d]\n", p[1]);
 		break;

@@ -517,7 +517,15 @@ void CScene::MissionClear()
 		}
 
 		if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, num };
+			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -300.f);
+
+			SC_BLACK_HOLE_PACKET p{};
+			p.size = sizeof(SC_BLACK_HOLE_PACKET);
+			p.type = SC_BLACK_HOLE;
+			p.pos = black_hole_pos;
+			Send((char*) & p);
+
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, num };
 			timer_queue.push(ev);
 		}
 
@@ -790,7 +798,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			//	clients[pl_id].send_change_packet(i, clients[_plist[i]].type);
 			//}
 		}
-		send_time = 0;
 //	}
 
 		/*
@@ -814,7 +821,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	//CheckObjectByBulletCollisions();
 	//CheckEnemyByBulletCollisions();
 
-	++send_time;
 }
 
 

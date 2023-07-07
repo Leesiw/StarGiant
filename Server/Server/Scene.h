@@ -80,6 +80,6 @@ public:
 	array<short, 3> _plist;
 	mutex _plist_lock;
 
-	// юс╫ц
-	int send_time = 0;
+	XMFLOAT3 black_hole_pos;
+	chrono::steady_clock::time_point b_prev_time;
 };
