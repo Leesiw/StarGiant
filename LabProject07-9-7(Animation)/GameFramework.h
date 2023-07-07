@@ -129,7 +129,7 @@ private:
 
 	int  bossdie = 0;
 
-	short firstSc = 0;
+	short firstSc = -1;
 	MissionType curMissionType = MissionType::TU_SIT;
 	MissionType pastMissionType = MissionType::TU_END;
 

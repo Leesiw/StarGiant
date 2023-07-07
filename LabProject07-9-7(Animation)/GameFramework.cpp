@@ -1313,6 +1313,8 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	wstring planetDist;
 	wstring bossDist;
 	wstring bossDie;
+	wstring centerDist;
+
 
 
 
@@ -1328,11 +1330,17 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	XMVECTOR v1 = XMLoadFloat3(&m_pPlayer[0]->GetPosition());
 	XMVECTOR v2 = XMLoadFloat3(&m_pScene->m_ppBoss->GetPosition());
 	XMVECTOR dist = XMVector3Length(XMVectorSubtract(v2, v1));
+	XMVECTOR center = { 0,0,0 };
+	XMVECTOR distcenter = XMVector3Length(XMVectorSubtract(center, v1));
 
 	float distance;
 	XMStoreFloat(&distance, dist);
+	float distanceCenter;
+	XMStoreFloat(&distanceCenter, distcenter);
 
 	distance = distance - 1500.0f;
+
+	distanceCenter = distanceCenter - 1500.0f;
 
 	enemyCountStr = to_wstring(killCnt);
 	jewelCntStr = to_wstring(jewelCnt);
@@ -1341,7 +1349,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 
 	bossDie = to_wstring(bossdie);
 
-
+	centerDist = to_wstring(distanceCenter);
 
 	wstring uiTextSpace = L" ";
 	wstring uiTextCnt = L" / 20";
@@ -1408,7 +1416,51 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 
 		break;
 	}
+	//2R
+	case MissionType::GO_CENTER:
+	{
+		uiText = L"미션 - 우주의 중심으로 가라 ( ";
+		uiText += centerDist;
+		uiText += L"m 남음 )";
+		break;
+	}
 
+	case MissionType::KILL_MONSTER3:
+	{
+		uiText = L"미션 - 몬스터를 처치하라 ( ";
+		uiText += enemyCountStr;
+		uiText += L" / 몇 마린지 모르겟어... )"; //
+		break;
+	}
+	case MissionType::KILL_METEOR:
+	{
+		uiText = L"미션 - 운석을 처치하라 ( ";
+		uiText += enemyCountStr;
+		uiText += L" / 몇 개?... )"; //
+		break;
+	}
+	case MissionType::ESCAPE_BLACK_HOLE:
+	{
+		uiText = L"미션 - 블랙홀에서 벗어나라! ( ";
+		uiText += L" 시간? 거리?";
+		uiText += L" )"; //
+		break;
+	}
+	case MissionType::GO_CENTER_REAL:
+	{
+		uiText = L"미션 - 진짜 우주의 중심으로 가라! ( ";
+		uiText += centerDist;
+		uiText += L"m 남음 )";
+		break;
+	}
+	case MissionType::KILL_GOD:
+	{
+		uiText = L"미션 - 신을 처치하라 ( ";
+		uiText += bossDie;
+		uiText += L" / 1 )";
+		break;
+	}
+	
 	default:
 		uiText = L"미션 검색중";
 		break;
@@ -1429,6 +1481,16 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	}*/
 
 	switch (mType) {
+	case MissionType::CS_TURN:
+	{
+		uiScripts = L"어서와!";
+		if (firstSc == -1) {
+			firstSc = 0;
+			scriptsOn = true;
+		}
+
+		break;
+	}
 	case MissionType::TU_SIT:
 	{
 		uiScripts = L"우선 조종석에 앉아서 우주선을 조종해 봐!";
@@ -1510,6 +1572,99 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 		uiScripts = L"우주의 평화를 위해서 드래곤을 처치해 줘!!!";
 		if (firstSc == 8) {
 			firstSc = 9;
+			scriptsOn = true;
+		}
+		break;
+	}
+	case MissionType::CS_SHOW_STARGIANT:
+	{
+		uiScripts = L"스타 자이언트야...!";
+		if (firstSc == 9) {
+			firstSc = 10;
+			scriptsOn = true;
+		}
+		break;
+	}
+
+	case MissionType::GO_CENTER:
+	{
+		uiScripts = L"우주의 평화를 위해서 드래곤을 처치해 줘!!!";
+		if (firstSc == 10) {
+			firstSc = 11;
+			scriptsOn = true;
+		}
+		break;
+	}
+
+	case MissionType::KILL_MONSTER3:
+	{
+		uiScripts = L"다시 한번 몬스터를 처치해줘";
+		if (firstSc == 11) {
+			firstSc = 12;
+			scriptsOn = true;
+		}
+		break;
+	}
+	case MissionType::KILL_METEOR:
+	{
+		uiScripts = L"운석을 맞춰서 파괴해줘!";
+		if (firstSc == 12) {
+			firstSc = 13;
+			scriptsOn = true;
+		}
+		break;
+	}
+	case MissionType::CS_SHOW_BLACK_HOLE:
+	{
+		uiScripts = L"이런... 블랙홀이잖아?";
+		if (firstSc == 13) {
+			firstSc = 14;
+			scriptsOn = true;
+		}
+		break;
+	}	
+	case MissionType::ESCAPE_BLACK_HOLE:
+	{
+		uiScripts = L"빨리 블랙홀에서 벗어나야 돼!";
+		if (firstSc == 14) {
+			firstSc = 15;
+			scriptsOn = true;
+		}
+		break;
+	}
+	case MissionType::GO_CENTER_REAL:
+	{
+		uiScripts = L"휴... 이제 진짜 우주의 중심으로 가야 돼";
+		if (firstSc == 15) {
+			firstSc = 16;
+			scriptsOn = true;
+		}
+		break;
+	}
+	case MissionType::CS_SHOW_GOD:
+	{
+		uiScripts = L"이런...";
+		if (firstSc == 16) {
+			firstSc = 17;
+			scriptsOn = true;
+		}
+		break;
+	}	
+	case MissionType::KILL_GOD:
+	{
+		uiScripts = L"신을 처치해야 돼";
+		if (firstSc == 17) {
+			firstSc = 18;
+			scriptsOn = true;
+		}
+		break;
+	}
+
+	case MissionType::CS_ENDING:
+	{
+		uiScripts = L"지금까지 정말 고생많았어!";
+		if (firstSc == 18) {
+			firstSc = 19;
 			scriptsOn = true;
 		}
 		break;
