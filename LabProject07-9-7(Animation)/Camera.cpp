@@ -611,7 +611,7 @@ CCutSceneCamera::CCutSceneCamera(CCamera* pCamera) : CCamera(pCamera)
 	{
 		cout << "CUT_SCENE_CAMERA 카메라 생성\n";
 		// 카메라 초기 위치 설정
-		m_xmf3Position = XMFLOAT3(tarPos.x, tarPos.y, tarPos.z - 100); // tarPos에서 100만큼 뒤로 이동
+		m_xmf3Position = XMFLOAT3(tarPos.x, tarPos.y, tarPos.z - dist); // tarPos에서 100만큼 뒤로 이동
 
 		// 카메라 초기 방향 설정 (tarPos를 중심으로 바라봄)
 		XMFLOAT3 xmf3LookAt;
@@ -680,7 +680,8 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		if (fAnglenu >= 365.0f)
 		{
 			cout << "turn false\n";
-			turn = false;
+			canTurn = false;
+			fAnglenu = 0;
 		}
 	}
 }

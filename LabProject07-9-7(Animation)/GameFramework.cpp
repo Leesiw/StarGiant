@@ -487,19 +487,25 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case 'R': //컷씬 테스트
 		{
 
-		if (b_Inside&& m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
-			m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
+		if (b_Inside&& m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) { //내부일때
+			m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
 
 			cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
-			//m_pInsideCamera->SetTarget({0,0,0});
-			m_pInsideCamera->SetTarget({ 414.456f,224.f,676.309f });
-			
-			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+			b_BeforeCheckInside = true;
+			b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+			m_pCamera->SetTarget(planetPos);
+			m_pCamera->SetDist(1000.0f);
+			cout << "m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
+			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+
+			/*m_pInsideCamera->SetTarget({ 414.456f,224.f,676.309f });
+			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());*/
 		}
 
-		else if(m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
-			m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
+		else if(!b_Inside && m_pPlayer[0]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) { //외부일 때
+			m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode(); //저장하고
 
+			m_pCamera->SetTarget(planetPos);
 			cout << "m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
 			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 
@@ -518,8 +524,17 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 					cout << "Inside m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
 				}
 				else {
-					m_pCamera = m_pPlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
-					cout << "m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
+					if (b_BeforeCheckInside)
+					{
+						b_Inside = true;
+						m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+						cout << "Inside m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
+					}
+					else {
+						m_pCamera = m_pPlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+						cout << "m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
+					}
+
 				}
 			}
 			cout << "e";
@@ -765,15 +780,42 @@ void CGameFramework::CameraUpdateChange()
 		m_pCamera->m_bCameraShaking = true;
 	}
 
+	//CS_TURN은 어차피 플레이어 전부 내부에서 시작함
 	if (curMissionType == MissionType::CS_TURN && b_Inside && m_pInsidePlayer[g_myid] && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
 		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 		cout << "CS_TURN\n";
 		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
 		m_pInsideCamera->SetTarget({ 414.456f,224.0f,676.309f });
+		m_pCamera->SetDist(100.0f);
 		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 	}
 
+	//CS_SHOW_PLANET 내부일때,
+	if (curMissionType == MissionType::CS_SHOW_PLANET && b_Inside && m_pInsidePlayer[g_myid] && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) { 
+		cout << "오거라!!!!!!!!!!!!!!!!!!!!" << endl;
+		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
+		b_BeforeCheckInside = true;
+		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+		m_pCamera->SetTarget(planetPos);
+		m_pCamera->SetDist(1000.0f);
+		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+	}	
+
+	//CS_SHOW_PLANET 외부일때,
+	else if (curMissionType == MissionType::CS_SHOW_PLANET && !b_Inside && m_pPlayer[0]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+		cout << "거라!!!!!!!!!!!!!!!!!!!!" << endl;
+		m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
+		m_pCamera->SetTarget(planetPos);
+		m_pCamera->SetDist(1000.0f);
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+	}
+
+
+
+	//컷씬 끝나면 서버로 보내기
 	if (m_pInsideCamera->getTurn() == false) {
 		CS_CUTSCENE_END_PACKET my_packet;
 		my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
@@ -781,11 +823,28 @@ void CGameFramework::CameraUpdateChange()
 		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 
 	}
-	if (curMissionType == MissionType::TU_SIT && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA)
+
+	//미션 넘어가면 카메라 변경해주기
+	if (curMissionType == MissionType::TU_SIT  && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA)
 	{
-		cout << "컷씬 끝";
 		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
-		m_pInsideCamera->turn = true;
+		m_pInsideCamera->canTurn = true;
+	}
+
+	if ((curMissionType == MissionType::DEFEAT_BOSS || curMissionType == MissionType::GO_PLANET) && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA)
+	{
+		if (b_BeforeCheckInside) {
+			cout << "변경" << endl;
+			b_Inside = true;
+			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+			m_pInsideCamera->canTurn = true;
+			b_BeforeCheckInside = false;
+		}
+		else {
+			cout << "변경2" << endl;
+			m_pCamera = m_pPlayer[0]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+			m_pCamera->canTurn = true;
+		}
 	}
 }
 
@@ -1484,8 +1543,8 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	case MissionType::CS_TURN:
 	{
 		uiScripts = L"어서와!";
-		if (firstSc == -1) {
-			firstSc = 0;
+		if (firstSc == -2) {
+			firstSc = -1;
 			scriptsOn = true;
 		}
 
@@ -1494,9 +1553,8 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	case MissionType::TU_SIT:
 	{
 		uiScripts = L"우선 조종석에 앉아서 우주선을 조종해 봐!";
-		if (firstSc == 0) {
-			cout << "0";
-			firstSc = 1;
+		if (firstSc == -1) {
+			firstSc = 0;
 			scriptsOn = true;
 		}
 	
@@ -1505,9 +1563,8 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	case MissionType::TU_KILL:
 	{
 		uiScripts = L"잘했어! 다음은 공격석에 앉아서 적을 처치해 봐!";
-		if (firstSc == 1) {
-			cout << "1";
-			firstSc = 2;
+		if (firstSc == 0) {
+			firstSc = 1;
 			scriptsOn = true;
 		}
 		break;
@@ -1515,8 +1572,8 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	case MissionType::TU_HILL:
 	{
 		uiScripts = L"이런! 우주선의 체력이 감소했어!\n조각상에서 좌클릭을 해서 체력을 회복시켜 봐!";
-		if (firstSc == 2) {
-			firstSc = 3;
+		if (firstSc == 1) {
+			firstSc = 2;
 			scriptsOn = true;
 		}
 		break;
@@ -1524,8 +1581,8 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	case MissionType::GET_JEWELS:
 	{
 		uiScripts = L"기본 조작은 설명해 줬으니 이제 본격적으로 들어가야겠지?\n드래곤을 물리치기 위해선우리 우주선을 강화해야 해.\n특별한 에너지를 가진 보석을 모아서 능력치를 올려보자!";
-		if (firstSc == 3) {
-			firstSc = 4;
+		if (firstSc == 2) {
+			firstSc = 3;
 			scriptsOn = true;
 		}
 		break;
@@ -1533,15 +1590,25 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	case MissionType::Kill_MONSTER:
 	{
 		uiScripts = L"이런... 우주선을 방해하는 놈들이 있어,\n저놈들을 해치우고 앞으로 나아가자";
-		if (firstSc == 4) {
-			firstSc = 5;
+		if (firstSc == 3) {
+			firstSc = 4;
 			scriptsOn = true;
 		}
 		break;
 	}
+	case MissionType::CS_SHOW_PLANET:
+	{
+		uiScripts = L"좋았어! 00행성에 보스가 있다는 정보를 입수했어!";
+		if (firstSc == 4) {
+			firstSc = 5;
+			scriptsOn = true;
+		}
+
+		break;
+	}
 	case MissionType::GO_PLANET:
 	{
-		uiScripts = L"좋았어! 00행성에 보스가 있다는 정보를 입수했어! \n00행성까지 가자!";
+		uiScripts = L"00행성까지 가자!";
 		if (firstSc == 5) {
 			firstSc = 6;
 			scriptsOn = true;

@@ -116,10 +116,13 @@ public:
 	bool CameraSence1(bool ON);
 
 	XMFLOAT3 tarPos = { 0,0,0 };
-	void SetTarget(XMFLOAT3 tarpos) { tarPos = tarpos; }
+	float dist = -50.0f;
 
-	bool turn = true;
-	bool getTurn() { return turn; }
+	void SetTarget(XMFLOAT3 tarpos) { tarPos = tarpos; }
+	void SetDist(float sdist) { dist = sdist; }
+
+	bool canTurn = true;
+	bool getTurn() { return canTurn; }
 	bool m_bCameraShaking = false;
 
 	float fAnglenu = 0;

@@ -129,7 +129,7 @@ private:
 
 	int  bossdie = 0;
 
-	short firstSc = -1;
+	short firstSc = -2;
 	MissionType curMissionType = MissionType::TU_SIT;
 	MissionType pastMissionType = MissionType::TU_END;
 
@@ -141,6 +141,8 @@ private:
 	CCamera* m_pInsideCamera = NULL;
 
 	bool b_Inside;
+	bool b_BeforeCheckInside = false;
+
 	bool b_CameraScene = false;
 
 	bool turnon = true;
