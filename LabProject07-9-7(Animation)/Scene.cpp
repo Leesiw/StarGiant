@@ -385,6 +385,7 @@ void CScene::BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	cout << "BuildGod\n";
 	CLoadedModelInfo* pGodModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/God.bin", NULL);
 	m_ppGod = new God();
 	m_ppGod->GodObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pGodModel);
@@ -1417,9 +1418,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 	}
 
-
+	static int aaa = 0;
 	if (m_ppGod) {
-		m_ppGod->SetPosition(m_pPlayer[0]->GetPosition());
+		if(aaa==0)
+			m_ppGod->SetPosition(m_pPlayer[0]->GetPosition());
+		aaa = 1;
 		m_ppGod->Animate(m_fElapsedTime);
 		if (!m_ppGod->m_pSkinnedAnimationController) m_ppGod->UpdateTransform(NULL);
 		m_ppGod->ChangeAnimation(m_ppGod->GetAnimation());

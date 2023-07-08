@@ -442,6 +442,14 @@ void CStandardMesh::LoadMeshFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 			nReads = (UINT)::fread(&m_xmf3AABBExtents, sizeof(XMFLOAT3), 1, pInFile);
 
 			m_xmOOBB = BoundingOrientedBox(m_xmf3AABBCenter, m_xmf3AABBExtents, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)); //바운딩 박스
+			cout << "m_xmOOBB : " << m_xmOOBB.Center.x << endl;
+			cout << "m_xmOOBB : " << m_xmOOBB.Center.y << endl;
+			cout << "m_xmOOBB : " << m_xmOOBB.Center.z << endl;
+
+			cout << "m_xmf3AABBExtents : " << m_xmOOBB.Extents.x << endl;
+			cout << "m_xmf3AABBExtents : " << m_xmOOBB.Extents.y << endl;
+			cout << "m_xmf3AABBExtents : " << m_xmOOBB.Extents.z << endl;
+
 
 		}
 		else if (!strcmp(pstrToken, "<Positions>:"))

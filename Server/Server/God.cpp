@@ -13,8 +13,8 @@ God::God()
 	m_xmf4x4World = Matrix4x4::Identity();
 
 
-	//바운딩 박스 아직 설정안함 이거 드래곤꺼
-	boundingbox = BoundingOrientedBox{ XMFLOAT3(-33.47668f, 41.86574f, 26.52405), XMFLOAT3(774.8785, 299.2372, 584.7963), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+	//바운딩 박스 맞는지..확인필요함
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.0674829, -1.20364, -0.872784), XMFLOAT3(20.2724, 11.4494, 13.567), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 
 	// Lua 상태 생성
 	m_L = luaL_newstate();
