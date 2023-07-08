@@ -9,7 +9,7 @@ public:
 	God();
 	virtual ~God() {};
 
-protected:
+public:
 	GodState CurState = GodState::IDLE1;
 	GodState PastState = CurState;
 	GodAnimation CurMotion = GodAnimation::IDLE1;
