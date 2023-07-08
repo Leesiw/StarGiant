@@ -405,7 +405,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				if(cutscene_end == true){
 					scene->MissionClear();
 					for (char i = 0; i < 3; ++i) {
-						if (scene->_plist[i] != -1) { continue; }
+						if (scene->_plist[i] == -1) { continue; }
 						scene->m_ppPlayers[i]->cutscene_end = false;
 					}
 					scene->m_pSpaceship->prev_time = chrono::steady_clock::now();
