@@ -1515,14 +1515,14 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	{
 		uiText = L"미션 - 몬스터를 처치하라 ( ";
 		uiText += enemyCountStr;
-		uiText += L" / 몇 마린지 모르겟어... )"; //
+		uiText += L" / 20 )"; //
 		break;
 	}
 	case MissionType::KILL_METEOR:
 	{
 		uiText = L"미션 - 운석을 처치하라 ( ";
 		uiText += enemyCountStr;
-		uiText += L" / 몇 개?... )"; //
+		uiText += L" / 5 )"; //
 		break;
 	}
 	case MissionType::ESCAPE_BLACK_HOLE:
