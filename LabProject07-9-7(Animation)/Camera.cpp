@@ -632,7 +632,7 @@ void CCutSceneCamera::SetLookAt(XMFLOAT3& xmf3LookAt)
 
 void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 {
-	if (m_pPlayer&& canTurn)
+	if (m_pPlayer && canTurn)
 	{
 		// 회전 속도 설정
 		float fRotationSpeed = 1.5f; // 초당 회전 속도
@@ -642,45 +642,65 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 
 		// 회전 각도 (도 단위)
 		float fAngleDegrees = XMConvertToDegrees(fAngle);
+		fAnglenu += fAngleDegrees; //이걸로 한바퀴 계산할거임
 
-
-		fAnglenu += fAngleDegrees;
 		// 회전 행렬 생성
 		XMFLOAT4X4 xmf4x4Rotate = Matrix4x4::Identity();
 		XMMATRIX xmmtxRotate = XMLoadFloat4x4(&xmf4x4Rotate);
-		XMMATRIX xmmtxRotation = XMMatrixRotationY(fAngle);
-		xmmtxRotate = XMMatrixMultiply(xmmtxRotation, xmmtxRotate);
-		XMStoreFloat4x4(&xmf4x4Rotate, xmmtxRotate);
+		XMMATRIX xmmtxRotation;
 
-
-		// 카메라 위치 계산
-		XMFLOAT3 xmf3Offset = Vector3::Subtract(m_xmf3Position, tarPos);
-		XMVECTOR xmvecOffset = XMLoadFloat3(&xmf3Offset);
-
-		// EyeDirection이 0 벡터인 경우에 대한 예외 처리
-		if (!XMVector3Equal(xmvecOffset, XMVectorZero()))
+		if (canDolly)
 		{
-			XMVECTOR xmvecPosition = XMVector3Transform(xmvecOffset, xmmtxRotate);
+			// 이걸로 회전
+			xmmtxRotation = XMMatrixRotationY(0);
+			// 카메라의 원래 위치에서 tarPos로의 벡터를 얻습니다.
+			XMVECTOR xmvecOffset = XMLoadFloat3(&m_xmf3Position) - XMLoadFloat3(&tarPos);
+			// 얻은 벡터의 길이를 구합니다.
+			float offsetLength = XMVectorGetX(XMVector3Length(xmvecOffset));
+			// 멀어지도록 카메라 위치 조정
+			float dollyDistance = fTimeElapsed * 10.0f;  // 점점 멀어지는 속도 조정
+			XMVECTOR xmvecPosition = xmvecOffset + (xmvecOffset / offsetLength) * dollyDistance;
+			XMFLOAT3 xmf3Position;
+			XMStoreFloat3(&xmf3Position, xmvecPosition);
+			xmf3Position = Vector3::Add(xmf3Position, tarPos); // 뒤로 이동시키기 위해 tarPos를 더합니다.
+			SetPosition(xmf3Position);
+		}
+		else
+		{
+			// 이걸로 회전
+			xmmtxRotation = XMMatrixRotationY(fAngle);
+			// 기존 코드대로 회전
+			xmmtxRotate = XMMatrixMultiply(xmmtxRotation, xmmtxRotate);
+			XMStoreFloat4x4(&xmf4x4Rotate, xmmtxRotate);
+			// 카메라 위치 계산
+			XMFLOAT3 xmf3Offset = Vector3::Subtract(m_xmf3Position, tarPos);
+			XMVECTOR xmvecOffset = XMLoadFloat3(&xmf3Offset);
 
-			// 회전 후의 벡터 크기가 0인 경우 방지
-			if (!XMVector3Equal(xmvecPosition, XMVectorZero()))
+			// EyeDirection이 0 벡터인 경우에 대한 예외 처리
+			if (!XMVector3Equal(xmvecOffset, XMVectorZero()))
 			{
-				XMFLOAT3 xmf3Position;
-				XMStoreFloat3(&xmf3Position, xmvecPosition);
-				xmf3Position = Vector3::Add(xmf3Position, tarPos);
+				XMVECTOR xmvecPosition = XMVector3Transform(xmvecOffset, xmmtxRotate);
 
-				// 위치와 방향 업데이트
-				SetPosition(xmf3Position);
-				SetLookAt(tarPos);
+				// 회전 후의 벡터 크기가 0인 경우 방지
+				if (!XMVector3Equal(xmvecPosition, XMVectorZero()))
+				{
+					XMFLOAT3 xmf3Position;
+					XMStoreFloat3(&xmf3Position, xmvecPosition);
+					xmf3Position = Vector3::Add(xmf3Position, tarPos);
+
+					// 위치와 방향 업데이트
+					SetPosition(xmf3Position);
+					SetLookAt(tarPos);
+				}
 			}
 		}
-		//cout << "fAngle : " << fAnglenu << endl;
 
 		// 회전이 한 바퀴 돌았을 때 turn 변수를 false로 설정
 		if (fAnglenu >= 365.0f)
 		{
 			cout << "turn false\n";
 			canTurn = false;
+			canDolly = false;
 			fAnglenu = 0;
 		}
 	}

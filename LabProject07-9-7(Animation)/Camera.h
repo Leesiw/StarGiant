@@ -36,6 +36,7 @@ protected:
 	float           				m_fRoll;
 	float           				m_fYaw;
 
+
 	DWORD							m_nMode;
 
 	XMFLOAT3						m_xmf3LookAtWorld;
@@ -123,6 +124,8 @@ public:
 
 	bool canTurn = true;
 	bool getTurn() { return canTurn; }
+	bool canDolly = false;
+	bool getDolly() { return canDolly; }
 	bool m_bCameraShaking = false;
 
 	float fAnglenu = 0;
