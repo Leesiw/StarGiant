@@ -503,7 +503,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			send_num += s_packet.size;
 
 			for (char i = 0; i < ENEMIES; ++i) {
-				if (!scene->m_ppEnemies[i]->GetisAlive()) { continue; }
+				if (!scene->m_ppEnemies[i]->hp < 0) { continue; }
 				SC_MOVE_ENEMY_PACKET e_packet;
 				e_packet.size = sizeof(e_packet);
 				e_packet.type = SC_MOVE_ENEMY;
