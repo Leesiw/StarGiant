@@ -793,7 +793,6 @@ void CGameFramework::CameraUpdateChange()
 
 	//CS_SHOW_PLANET 내부일때,
 	if (curMissionType == MissionType::CS_SHOW_PLANET && b_Inside && m_pInsidePlayer[g_myid] && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) { 
-		cout << "오거라!!!!!!!!!!!!!!!!!!!!" << endl;
 		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
 		b_BeforeCheckInside = true;
 		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
@@ -805,7 +804,6 @@ void CGameFramework::CameraUpdateChange()
 
 	//CS_SHOW_PLANET 외부일때,
 	else if (curMissionType == MissionType::CS_SHOW_PLANET && !b_Inside && m_pPlayer[0]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
-		cout << "거라!!!!!!!!!!!!!!!!!!!!" << endl;
 		m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
 		m_pCamera->SetTarget(planetPos);
 		m_pCamera->SetDist(1000.0f);

@@ -16,6 +16,9 @@
 #define SPOT_LIGHT						2
 #define DIRECTIONAL_LIGHT				3
 
+
+constexpr char BLACKHOLEMETEOR = 16;
+
 struct LIGHT
 {
 	XMFLOAT4							m_xmf4Ambient;
@@ -153,6 +156,8 @@ public:
 
 	CMeteorObject						*m_ppMeteorObjects[METEOS];
 	CMeteorObject						*m_ppBossMeteorObjects[BOSSMETEOS];
+
+	CBlackHoleMeteorObject				*m_BlackholeMeteorObjects[BLACKHOLEMETEOR];
 
 
 	CMeteorObject* landob;

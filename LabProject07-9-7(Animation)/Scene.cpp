@@ -293,6 +293,16 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_ppBlackhole = new CBlackHole(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, 20, 20, 0);
 	m_ppBlackhole->SetPosition(0.0f, 0.0f, 0.0f);
 
+	for (int i = 0; i < BLACKHOLEMETEOR; ++i) {
+		CLoadedModelInfo* pMeteoModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Rock4.bin", NULL);
+		m_BlackholeMeteorObjects[i] = new CBlackHoleMeteorObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMeteoModel, 1);
+		m_BlackholeMeteorObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_BlackholeMeteorObjects[i]->SetPosition(0,0,0);
+		float randomScale = 2.0f + static_cast<float>(rand()) / (RAND_MAX / (10.0f - 2.0f));
+		m_BlackholeMeteorObjects[i]->SetScale(randomScale, randomScale, randomScale);
+		if (pMeteoModel) delete pMeteoModel;
+	}
+
 	//=====================================
 
 	BuildBoss(pd3dDevice, pd3dCommandList);
@@ -506,6 +516,12 @@ void CScene::ReleaseObjects()
 	{
 		for (int i = 0; i < BOSSMETEOS; i++) if (m_ppBossMeteorObjects[i]) m_ppBossMeteorObjects[i]->Release();
 		delete[] m_ppBossMeteorObjects;
+	}
+
+	if (m_BlackholeMeteorObjects)
+	{
+		for (int i = 0; i < BLACKHOLEMETEOR; i++) if (m_BlackholeMeteorObjects[i]) m_BlackholeMeteorObjects[i]->Release();
+		delete[] m_BlackholeMeteorObjects;
 	}
 	
 	if (m_ppEnemies)
@@ -883,6 +899,8 @@ void CScene::ReleaseUploadBuffers()
 	for (int i = 0; i < m_nHierarchicalGameObjects; i++) m_ppHierarchicalGameObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < METEOS; i++)if (m_ppMeteorObjects[i] != NULL) m_ppMeteorObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < BOSSMETEOS; i++)if (m_ppBossMeteorObjects[i] != NULL) m_ppBossMeteorObjects[i]->ReleaseUploadBuffers();
+	for (int i = 0; i < BLACKHOLEMETEOR; i++)if (m_BlackholeMeteorObjects[i] != NULL) m_BlackholeMeteorObjects[i]->ReleaseUploadBuffers();
+
 
 	for (int i = 0; i < ENEMIES; i++)if (m_ppEnemies[i])	m_ppEnemies[i]->ReleaseUploadBuffers();
 	if (m_pPlayer[g_myid])m_pPlayer[g_myid]->ReleaseUploadBuffers();
@@ -1287,6 +1305,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 	}
 
+
 	
 
 	for (int i = 0; i < ENEMIES; i++)
@@ -1322,6 +1341,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 
 
+	//=======================블랙홀==========================
 	if (m_ppBlackhole)
 	{
 		//m_ppBlackhole->SetPosition(xmf3Position);
@@ -1329,7 +1349,29 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_ppBlackhole->Rotate(0.0f, 0.0f, m_eTime * 10);
 		m_ppBlackhole->Render(pd3dCommandList, pCamera);
 	}
+	static int aa = 0;
 
+	for (int i = 0; i < BLACKHOLEMETEOR; i++)
+	{
+		if (m_BlackholeMeteorObjects[i])
+		{
+			if (aa == 0) {
+				m_BlackholeMeteorObjects[i]->SetPosition(m_ppBlackhole->GetPosition());
+			}
+			m_BlackholeMeteorObjects[i]->Animate(m_fElapsedTime, m_ppBlackhole->GetPosition());
+			if (!m_BlackholeMeteorObjects[i]->m_pSkinnedAnimationController) m_BlackholeMeteorObjects[i]->UpdateTransform(NULL);
+
+
+			m_BlackholeMeteorObjects[i]->Render(pd3dCommandList, pCamera);
+		}
+
+	/*	cout << "x : " << m_BlackholeMeteorObjects[0]->GetPosition().x << endl;
+		cout << "y : " << m_BlackholeMeteorObjects[0]->GetPosition().y << endl;
+		cout << "z : " << m_BlackholeMeteorObjects[0]->GetPosition().z << endl;*/
+
+	}
+	aa = 1;
+	//=======================================================
 
 	if (m_ppBoss) {
 		m_ppBoss->Animate(m_fElapsedTime);

@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Scene.h"
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers)
@@ -2173,3 +2174,117 @@ void CBlackHole::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCa
 {
 	CGameObject::Render(pd3dCommandList, pCamera);
 }
+
+CBlackHoleMeteorObject::CBlackHoleMeteorObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
+{
+	CLoadedModelInfo* pMeteorModel = pModel;
+	if (!pMeteorModel) pMeteorModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
+
+	SetChild(pMeteorModel->m_pModelRootObject, true);
+	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pMeteorModel);
+
+	// m_fDistanceFromCenter를 10과 50 사이의 랜덤 값
+	m_fDistanceFromCenter = 20.0f + static_cast<float>(rand()) / (RAND_MAX / (150.0f - 20.0f));
+
+	m_fRotationSpeed = 1.0f + static_cast<float>(rand()) / (RAND_MAX / (3.0f - 1.0f));
+
+
+	// m_xmf3MovingDirection를 랜덤한 방향으로 - 
+	float randomAngle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * XM_PI;
+	m_xmf3MovingDirection = XMFLOAT3(cosf(randomAngle), 0.0f, sinf(randomAngle));
+	m_xmf3MovingDirection = Vector3::Normalize(m_xmf3MovingDirection);
+
+}
+
+
+
+void CBlackHoleMeteorObject::Animate(float fTimeElapsed, XMFLOAT3 cPos)
+{
+	// 공전 중심으로부터의 거리와 방향을 계산합니다.
+	XMFLOAT3 xmf3Position = GetPosition();
+	XMFLOAT3 xmf3Direction = Vector3::Subtract(xmf3Position, cPos);
+	float fDistance = m_fDistanceFromCenter;
+
+	// 방향 벡터를 정규화합니다.
+	xmf3Direction = Vector3::Normalize(xmf3Direction);
+
+	ffffTimeElapsed += fTimeElapsed;
+	// 누적된 fTimeElapsed가 3 이상인 경우 공전 방향을 다시 랜덤으로 변경합니다.
+	if (ffffTimeElapsed >= 3.0f)
+	{
+		float randomAngle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * XM_PI;
+		m_xmf3MovingDirection = XMFLOAT3(cosf(randomAngle), 0.0f, sinf(randomAngle));
+		m_xmf3MovingDirection = Vector3::Normalize(m_xmf3MovingDirection);
+		ffffTimeElapsed = 0.0f;
+	}
+
+	// 회전 각도를 계산합니다.
+	float fRotationAngle = m_fRotationSpeed * fTimeElapsed;
+
+	// 회전 행렬을 생성합니다.
+	XMMATRIX xmRotation = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3MovingDirection), fRotationAngle);
+
+	// 방향 벡터를 회전시킵니다.
+	XMVECTOR xmPosition = XMLoadFloat3(&xmf3Direction);
+	xmPosition = XMVector3TransformCoord(xmPosition, xmRotation);
+
+	// 회전된 방향 벡터를 거리만큼 곱하여 새 위치를 계산합니다.
+	xmPosition = XMVectorScale(xmPosition, fDistance);
+
+	// 중심 위치를 더하여 최종 위치를 얻습니다.
+	xmPosition = XMVectorAdd(xmPosition, XMLoadFloat3(&cPos));
+
+	// XMVECTOR를 XMFLOAT3로 변환합니다.
+	XMStoreFloat3(&xmf3Position, xmPosition);
+
+	// 위치를 설정합니다.
+	SetPosition(xmf3Position);
+
+	CGameObject::Animate(fTimeElapsed);
+}
+//회전방향randx
+//void CBlackHoleMeteorObject::Animate(float fTimeElapsed, XMFLOAT3 cPos)
+//{
+//	// 공전 중심으로부터의 거리와 방향을 계산합니다.
+//	XMFLOAT3 xmf3Position = GetPosition();
+//	XMFLOAT3 xmf3Direction = Vector3::Subtract(xmf3Position, cPos);
+//	float fDistance = m_fDistanceFromCenter;
+//
+//	// 방향 벡터를 정규화합니다.
+//	xmf3Direction = Vector3::Normalize(xmf3Direction);
+//
+//
+//	ffffTimeElapsed += fTimeElapsed;
+//	// 누적된 fTimeElapsed가 5 이상인 경우 공전 방향을 다시 랜덤으로 변경합니다.
+//	if (ffffTimeElapsed >= 3.0f)
+//	{
+//		float randomAngle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * XM_PI;
+//		m_xmf3MovingDirection = XMFLOAT3(cosf(randomAngle), 0.0f, sinf(randomAngle));
+//		m_xmf3MovingDirection = Vector3::Normalize(m_xmf3MovingDirection);
+//		ffffTimeElapsed = 0.0f;
+//	}
+//
+//	// 회전 각도를 계산합니다.
+//	float fRotationAngle = m_fRotationSpeed * fTimeElapsed;
+//
+//	// 회전 행렬을 생성합니다.
+//	XMMATRIX xmRotation = XMMatrixRotationAxis(XMLoadFloat3(&XMFLOAT3(0.0f, 1.0f, 0.0f)), fRotationAngle);
+//
+//	// 방향 벡터를 회전시킵니다.
+//	XMVECTOR xmPosition = XMLoadFloat3(&xmf3Direction);
+//	xmPosition = XMVector3TransformCoord(xmPosition, xmRotation);
+//
+//	// 회전된 방향 벡터를 거리만큼 곱하여 새 위치를 계산합니다.
+//	xmPosition = XMVectorScale(xmPosition, fDistance);
+//
+//	// 중심 위치를 더하여 최종 위치를 얻습니다.
+//	xmPosition = XMVectorAdd(xmPosition, XMLoadFloat3(&cPos));
+//
+//	// XMVECTOR를 XMFLOAT3로 변환합니다.
+//	XMStoreFloat3(&xmf3Position, xmPosition);
+//
+//	// 위치를 설정합니다.
+//	SetPosition(xmf3Position);
+//
+//	CGameObject::Animate(fTimeElapsed);
+//}

@@ -816,3 +816,21 @@ public:
 public:
 	CTexture* m_blackholeTexture;
 };
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class CBlackHoleMeteorObject : public CGameObject
+{
+public:
+	CBlackHoleMeteorObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks);
+	virtual ~CBlackHoleMeteorObject() {};
+
+	void Animate(float fTimeElapsed, XMFLOAT3 cPos);
+private:
+	float m_fRotationSpeed = 1.0f;  // 공전 속도
+	float m_fDistanceFromCenter;  // 공전 중심으로부터의 거리
+	XMFLOAT3 m_xmf3MovingDirection;  // 공전 방향
+
+
+	float ffffTimeElapsed = 0.0f;
+};
