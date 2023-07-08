@@ -550,12 +550,15 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			XMFLOAT3 pos;
 			XMFLOAT3 ToBlackHole;
 			float dist;
+			float speed;
 			pos = scene->m_pSpaceship->GetPosition();
 			ToBlackHole = Vector3::Subtract(scene->black_hole_pos, pos);
 			dist = Vector3::Length(ToBlackHole);
-			ToBlackHole = Vector3::ScalarProduct(ToBlackHole, 50.f * elapsed_time.count());
+			speed = 90.f - dist * 0.5f;
+			if (speed < 50.f) { speed = 50.f; }
+			ToBlackHole = Vector3::ScalarProduct(ToBlackHole, speed * elapsed_time.count());
 			scene->m_pSpaceship->SetPosition(Vector3::Add(pos, ToBlackHole));
-			if (dist < 50.f) {
+			if (dist < 30.f) {
 				scene->m_pSpaceship->GetAttack(1);
 				for (short pl_id : scene->_plist) {
 					if (pl_id == -1) continue;
@@ -573,7 +576,9 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				}
 				ToBlackHole = Vector3::Subtract(scene->black_hole_pos, pos);
 				dist = Vector3::Length(ToBlackHole);
-				ToBlackHole = Vector3::ScalarProduct(ToBlackHole, 50.f * elapsed_time.count());
+				speed = 90.f - dist * 0.5f;
+				if (speed < 50.f) { speed = 50.f; }
+				ToBlackHole = Vector3::ScalarProduct(ToBlackHole, speed * elapsed_time.count());
 				scene->m_ppMeteoObjects[i]->SetPosition(Vector3::Add(pos, ToBlackHole));
 			}
 
@@ -592,7 +597,9 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				}
 				ToBlackHole = Vector3::Subtract(scene->black_hole_pos, pos);
 				dist = Vector3::Length(ToBlackHole);
-				ToBlackHole = Vector3::ScalarProduct(ToBlackHole, 50.f * elapsed_time.count());
+				speed = 90.f - dist * 0.5f;
+				if (speed < 50.f) { speed = 50.f; }
+				ToBlackHole = Vector3::ScalarProduct(ToBlackHole, speed * elapsed_time.count());
 				scene->m_ppEnemies[i]->SetPosition(Vector3::Add(pos, ToBlackHole));
 			}
 

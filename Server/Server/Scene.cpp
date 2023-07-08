@@ -515,7 +515,7 @@ void CScene::MissionClear()
 		}
 
 		if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
-			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -300.f);
+			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
 
 			SC_BLACK_HOLE_PACKET p{};
 			p.size = sizeof(SC_BLACK_HOLE_PACKET);
