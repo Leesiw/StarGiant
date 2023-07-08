@@ -1378,6 +1378,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
 		//m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
 		m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
+
+		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
+			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
+		}
+
 		if (m_ppBoss->BossHP <= 0)
 		{
 			m_ppBoss->CurState = BossState::DIE;
