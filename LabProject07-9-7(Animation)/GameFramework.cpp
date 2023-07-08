@@ -2020,6 +2020,11 @@ void CGameFramework::ProcessPacket(char* p)
 			m_pScene->m_ppBoss->SetPosition(packet->data.pos);
 			break;
 		}
+		if (packet->data.id == GOD_ID) {
+			m_pScene->m_ppGod->SetQuaternion(packet->data.Quaternion);
+			m_pScene->m_ppGod->SetPosition(packet->data.pos);
+			break;
+		}
 
 		//if (!m_pScene->m_ppEnemies[packet->data.id]->isAlive) {
 			//m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
@@ -2060,6 +2065,16 @@ void CGameFramework::ProcessPacket(char* p)
 					// 보스 죽음 (게임 클리어?)
 				}
 				m_pScene->m_ppBoss->BossHP = packet->data.hp;
+
+				break;
+			}
+
+			if (packet->data.id == GOD_ID)	// 보스
+			{
+				if (packet->data.hp <= 0) {
+					// 보스 죽음 (게임 클리어?)
+				}
+				m_pScene->m_ppGod->GodHP = packet->data.hp;
 
 				break;
 			}
@@ -2115,6 +2130,11 @@ void CGameFramework::ProcessPacket(char* p)
 		}
 		if (packet->data.id == BOSS_ID) {
 			m_pScene->m_ppBoss->CurMotion = (BossAnimation)packet->data.animation;
+			// 보스 State 변경??
+			break;
+		}
+		if (packet->data.id == GOD_ID) {
+			m_pScene->m_ppGod->CurMotion = (GodAnimation)packet->data.animation;
 			// 보스 State 변경??
 			break;
 		}
