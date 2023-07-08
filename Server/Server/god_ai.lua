@@ -45,17 +45,20 @@ function updateGodAI(hp, bpx, bpy, bpz, elapsedTime)
     attackCooldown = attackCooldown - elapsedTime
 
     if state == GodState.IDLE2 then        -- 보스가 나타날 때
+        print("IDLE2")
         if onappear then
             appear(bpx, bpy, bpz)
             onappear = false
         end
     elseif state == GodState.IDLE1 then    -- 기본상태
+        print("IDLE1")
         idle(frameTime)
     elseif state == GodState.DIE then      -- 보스의 체력이 0 이하일 때 죽음 상태 처리
         if curHp <= 0 then
             die()
         end
     elseif state == GodState.SHOT then     -- 보스가 SHOT 때
+        print("SHOT")
         attack(frameTime)
     end
     -- 보스의 다음 상태를 결정합니다.

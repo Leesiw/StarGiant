@@ -385,7 +385,6 @@ void CScene::BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	cout << "BuildGod\n";
 	CLoadedModelInfo* pGodModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/God.bin", NULL);
 	m_ppGod = new God();
 	m_ppGod->GodObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pGodModel);

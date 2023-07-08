@@ -554,6 +554,11 @@ void CScene::MissionClear()
 			timer_queue.push(ev);
 		}
 
+		if (cur_mission == MissionType::CS_SHOW_GOD) {
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, num };
+			timer_queue.push(ev);
+		}
+
 		for (short pl_id : _plist) {
 			if (pl_id == -1) continue;
 			if (clients[pl_id]._state != ST_INGAME) continue;
@@ -760,7 +765,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 
 	if (m_pGod) {
 		m_pGod->Animate(fTimeElapsed);
-		if (cur_mission == MissionType::CS_SHOW_GOD || cur_mission == MissionType::KILL_GOD)
+		if (cur_mission == MissionType::TU_SIT || cur_mission == MissionType::TU_KILL)
+		//if (cur_mission == MissionType::CS_SHOW_GOD || cur_mission == MissionType::KILL_GOD)
 			m_pGod->God_Ai(fTimeElapsed, m_pSpaceship, m_pGod->GetcurHp());;
 	}
 

@@ -391,6 +391,38 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			delete ex_over;
 			break;
 		}
+		case OP_UPDATE_GOD: {
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
+			if (scene->_state != ST_INGAME) { break; }
+			if (scene->m_pGod->GetcurHp() <= 0) {
+				scene->MissionClear();
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, key };
+				timer_queue.push(ev);
+				break;
+			}
+			if (levels[scene->cur_mission].cutscene) {
+				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_GOD, static_cast<short>(key) };
+				timer_queue.push(ev);
+				break;
+			}
+
+			scene->m_pGod->God_Ai(0.01f, scene->m_pSpaceship, scene->m_pGod->GetcurHp());
+
+			float dist;
+			dist = Vector3::Length(Vector3::Subtract(scene->m_pSpaceship->GetPosition(), scene->m_pGod->GetPosition()));
+			if (dist < 2000.f) // boss ¸·±â
+			{
+				XMFLOAT3 ToGo = Vector3::Subtract(scene->m_pSpaceship->GetPosition(), scene->m_pGod->GetPosition());
+				ToGo = Vector3::ScalarProduct(ToGo, 800.f);
+				ToGo = Vector3::Add(scene->m_pGod->GetPosition(), ToGo);
+				scene->m_pSpaceship->SetPosition(ToGo);
+			}
+
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_GOD, static_cast<short>(key) };
+			timer_queue.push(ev);
+			delete ex_over;
+			break;
+		}
 		case OP_UPDATE_SPACESHIP: {
 			
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
@@ -1154,6 +1186,13 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 			case EV_UPDATE_BOSS: {
 				OVER_EXP* ov = new OVER_EXP;
 				ov->_comp_type = OP_UPDATE_BOSS;
+				ov->obj_id = ev.obj_id;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
+				break;
+			}
+			case EV_UPDATE_GOD: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_UPDATE_GOD;
 				ov->obj_id = ev.obj_id;
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
