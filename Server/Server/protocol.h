@@ -42,6 +42,8 @@ constexpr int NAME_SIZE = 20;
 
 // boss id
 constexpr char BOSS_ID = ENEMIES + 1;
+constexpr char GOD_ID = BOSS_ID + 1;
+
 
 // Packet ID
 constexpr char CS_LOGIN = 0;

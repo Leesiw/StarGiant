@@ -2,6 +2,7 @@
 #include "Session.h"
 #include "Enemy.h"
 #include "Boss.h"
+#include "God.h"
 #include "Missile.h"
 #include "Timer.h"
 
@@ -60,6 +61,8 @@ public:
 	std::unordered_map<ItemType, char>	items;
 
 	Boss* m_pBoss;
+	God* m_pGod;
+
 
 	short _id;
 	short num;

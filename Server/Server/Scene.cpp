@@ -109,6 +109,10 @@ void CScene::BuildObjects()
 	m_pBoss = new Boss();
 	m_pBoss->scene_num = num;
 	//m_pBoss->SetPosition(3000.f, 3000.f, 3000.f);
+
+	// god
+	m_pGod = new God();
+	m_pGod->scene_num = num;
 }
 
 void CScene::ReleaseObjects()
@@ -134,6 +138,8 @@ void CScene::ReleaseObjects()
 		if (m_ppMissiles[i]) { delete m_ppMissiles[i]; }
 	}
 	if (m_pBoss) { delete m_pBoss; }
+	if (m_pGod) { delete m_pGod; }
+
 }
 
 void CScene::Reset()
@@ -189,6 +195,8 @@ void CScene::Reset()
 	heal_player = -1;
 
 	m_pBoss->SetPosition(3000.f, 3000.f, 3000.f);
+	m_pGod->SetPosition(-3000.f, -3000.f, -3000.f);
+
 }
 
 void CScene::CheckMeteoByPlayerCollisions()
@@ -330,6 +338,18 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		}
 		return;
 	}
+
+	m_pGod->UpdateBoundingBox();
+	if (m_pGod->m_xmOOBB.Intersects(pos, dir, dist)) // °« Ãæµ¹Ã³¸®
+	{
+		m_pGod->GodHP -= m_pSpaceship->damage;
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_bullet_hit_packet(GOD_ID, m_pGod->GodHP);
+		}
+		return;
+	}
 }
 
 void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
@@ -466,6 +486,9 @@ void CScene::CheckBossCollisions()
 {
 	if (m_pBoss)
 		m_pBoss->UpdateBoundingBox();
+
+	if (m_pGod)
+		m_pGod->UpdateBoundingBox();
 }
 
 void CScene::CheckMissionComplete()
@@ -733,6 +756,12 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		m_pBoss->Animate(fTimeElapsed);
 		if(cur_mission == MissionType::FIND_BOSS || cur_mission == MissionType::DEFEAT_BOSS)
 			m_pBoss->Boss_Ai(fTimeElapsed, m_pSpaceship, m_pBoss->GetHP());;
+	}
+
+	if (m_pGod) {
+		m_pGod->Animate(fTimeElapsed);
+		if (cur_mission == MissionType::CS_SHOW_GOD || cur_mission == MissionType::KILL_GOD)
+			m_pGod->God_Ai(fTimeElapsed, m_pSpaceship, m_pGod->GetcurHp());;
 	}
 
 	m_pSpaceship->Update(fTimeElapsed);

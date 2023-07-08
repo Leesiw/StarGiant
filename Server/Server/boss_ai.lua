@@ -26,6 +26,7 @@ BossState = {
     COUNT = 22
 }
 
+
 CLAW_COOL_TIME = 5
 FLAME_COOL_TIME = 10
 

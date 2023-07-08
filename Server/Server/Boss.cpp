@@ -273,7 +273,6 @@ void Boss::Boss_Ai(float fTimeElapsed, CAirplanePlayer* player, int bossHP)
 	cout << "getpos - " << GetPosition().y << "\n";
 	cout << "getpos - " << GetPosition().z << "\n";*/
 
-	lua_getglobal(m_L, "boss_z");
 	lua_getglobal(m_L, "state");
 	lua_getglobal(m_L, "motion");
 

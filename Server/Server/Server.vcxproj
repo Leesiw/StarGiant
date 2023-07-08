@@ -130,6 +130,7 @@
     <ClCompile Include="Boss.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Framwork.cpp" />
+    <ClCompile Include="God.cpp" />
     <ClCompile Include="Missile.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="main.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="Boss.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Framework.h" />
+    <ClInclude Include="God.h" />
     <ClInclude Include="Missile.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Object.h" />
