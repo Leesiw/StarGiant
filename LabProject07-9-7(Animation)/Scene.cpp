@@ -306,6 +306,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	//=====================================
 
 	BuildBoss(pd3dDevice, pd3dCommandList);
+	BuildGod(pd3dDevice, pd3dCommandList);
 	BuildUI(pd3dDevice, pd3dCommandList);
 
 
@@ -380,6 +381,17 @@ void CScene::BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	if (pLandModel) delete pLandModel;
 
 
+}
+
+void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	CLoadedModelInfo* pGodModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/God.bin", NULL);
+	m_ppGod = new God();
+	m_ppGod->GodObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pGodModel);
+	m_ppGod->SetPosition(5000.0f, 5000.0f, 5000.0f);
+	m_ppGod->Rotate(0, 0, 0);
+	m_ppGod->SetScale(100.0f, 100.0f, 100.0f);
+	if (pGodModel) delete pGodModel;
 }
 
 void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap)
@@ -588,6 +600,12 @@ void CScene::ReleaseObjects()
 	{
 		m_ppBoss->Release();
 		delete[] m_ppBoss;
+	}
+
+	if (m_ppGod)
+	{
+		m_ppGod->Release();
+		delete[] m_ppGod;
 	}
 
 	if(m_ppMascot)
@@ -1398,6 +1416,27 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			landob->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y - 827.0f, m_ppBoss->GetPosition().z);
 		}
 	}
+
+
+	if (m_ppGod) {
+		m_ppGod->SetPosition(m_pPlayer[0]->GetPosition());
+		m_ppGod->Animate(m_fElapsedTime);
+		if (!m_ppGod->m_pSkinnedAnimationController) m_ppGod->UpdateTransform(NULL);
+		m_ppGod->ChangeAnimation(m_ppGod->GetAnimation());
+
+		if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_GOD) {
+			m_ppGod->ChangeAnimation(GodAnimation::IDLE2);
+		}
+
+		if (m_ppGod->GetcurHp() <= 0)
+		{
+			m_ppGod->SetState(GodState::DEATH);
+		}
+
+		if (!(m_ppGod->GetcurHp() <= 0))
+			m_ppGod->Render(pd3dCommandList, pCamera);
+	}
+
 
 
 	if (m_ppMascot) {

@@ -116,6 +116,20 @@ enum class BossAnimation : char
 	,COUNT
 };
 
+enum class GodState : char
+{
+	IDLE1, IDLE2, MELEE1, MELEE2, SHOT, HIT1, DEATH
+
+	, COUNT
+};
+
+enum class GodAnimation : char
+{
+	IDLE1, IDLE2, MELEE1, MELEE2, SHOT, HIT1, DEATH
+
+	, COUNT
+};
+
 enum class EnemyType : char
 {
 	MISSILE, LASER, PLASMACANNON 

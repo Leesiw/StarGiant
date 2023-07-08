@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "UI.h"
 #include "Boss.h"
+#include "God.h"
 
 
 #define MAX_LIGHTS						16 
@@ -64,6 +65,7 @@ public:
 	void BuildUIInside(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap);
 	void ReleaseObjects();
@@ -150,6 +152,8 @@ public:
 
 
 	Boss* m_ppBoss = NULL;
+	God* m_ppGod = NULL;
+
 
 
 

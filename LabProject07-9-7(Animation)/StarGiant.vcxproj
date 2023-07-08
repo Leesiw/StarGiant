@@ -157,6 +157,7 @@
     <ClInclude Include="DDSTextureLoader12.h" />
     <ClInclude Include="Frustrum.h" />
     <ClInclude Include="GameFramework.h" />
+    <ClInclude Include="God.h" />
     <ClInclude Include="StarGiant.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Object.h" />
@@ -177,6 +178,7 @@
     <ClCompile Include="DDSTextureLoader12.cpp" />
     <ClCompile Include="Frustrum.cpp" />
     <ClCompile Include="GameFramework.cpp" />
+    <ClCompile Include="God.cpp" />
     <ClCompile Include="StarGiant.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Object.cpp" />
