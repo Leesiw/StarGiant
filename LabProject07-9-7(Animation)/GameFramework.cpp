@@ -814,7 +814,8 @@ void CGameFramework::CameraUpdateChange()
 
 
 	//컷씬 끝나면 서버로 보내기
-	if (m_pInsideCamera->getTurn() == false) {
+	if (m_pInsideCamera->getTurn() == false|| m_pCamera->getTurn() == false) {
+		//cout << "보내기";
 		CS_CUTSCENE_END_PACKET my_packet;
 		my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
 		my_packet.type = CS_CUTSCENE_END;
@@ -829,19 +830,22 @@ void CGameFramework::CameraUpdateChange()
 		m_pInsideCamera->canTurn = true;
 	}
 
-	if ((curMissionType == MissionType::DEFEAT_BOSS || curMissionType == MissionType::GO_PLANET) && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA)
+	if ((curMissionType == MissionType::DEFEAT_BOSS || curMissionType == MissionType::GO_PLANET) && (m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA|| m_pPlayer[0]->GetCamera()->GetMode() == CUT_SCENE_CAMERA))
 	{
+		cout << "일로 안옴??";
 		if (b_BeforeCheckInside) {
-			cout << "변경" << endl;
+			cout << "변경\n" << endl;
 			b_Inside = true;
 			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
 			m_pInsideCamera->canTurn = true;
+			m_pCamera->canTurn = true;
 			b_BeforeCheckInside = false;
 		}
 		else {
-			cout << "변경2" << endl;
+			cout << "변경2\n" << endl;
 			m_pCamera = m_pPlayer[0]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
 			m_pCamera->canTurn = true;
+			m_pInsideCamera->canTurn = true;
 		}
 	}
 }

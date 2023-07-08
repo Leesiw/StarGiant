@@ -632,7 +632,7 @@ void CCutSceneCamera::SetLookAt(XMFLOAT3& xmf3LookAt)
 
 void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 {
-	if (m_pPlayer)
+	if (m_pPlayer&& canTurn)
 	{
 		// 회전 속도 설정
 		float fRotationSpeed = 1.5f; // 초당 회전 속도
@@ -674,7 +674,7 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 				SetLookAt(tarPos);
 			}
 		}
-		cout << "fAngle : " << fAnglenu << endl;
+		//cout << "fAngle : " << fAnglenu << endl;
 
 		// 회전이 한 바퀴 돌았을 때 turn 변수를 false로 설정
 		if (fAnglenu >= 365.0f)
