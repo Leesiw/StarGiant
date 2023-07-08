@@ -121,7 +121,7 @@ void CPlayer::Update(float fTimeElapsed)
 	}
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
-	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 30.f, false);
+	XMFLOAT3 LookVelocity = Vector3::ScalarProduct(m_xmf3Look, fTimeElapsed * 20.f, false);
 	xmf3Velocity = Vector3::Add(xmf3Velocity, LookVelocity);
 	Move(xmf3Velocity, false);
 
@@ -152,7 +152,7 @@ CAirplanePlayer::CAirplanePlayer()
 {
 	SetFriction(250.0f);
 	SetGravity(XMFLOAT3(0.0f, -0.0f, 0.0f));
-	SetMaxVelocityXZ(80.0f);
+	SetMaxVelocityXZ(120.0f);
 	SetMaxVelocityY(400.0f);
 	/*
 	for (int i = 0; i < BULLETS; i++)

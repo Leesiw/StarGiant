@@ -556,7 +556,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			ToBlackHole = Vector3::ScalarProduct(ToBlackHole, 50.f * elapsed_time.count());
 			scene->m_pSpaceship->SetPosition(Vector3::Add(pos, ToBlackHole));
 			if (dist < 50.f) {
-				scene->m_pSpaceship->GetAttack(3);
+				scene->m_pSpaceship->GetAttack(1);
 				for (short pl_id : scene->_plist) {
 					if (pl_id == -1) continue;
 					if (clients[pl_id]._state != ST_INGAME) continue;
@@ -912,7 +912,8 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		miss_packet.next_mission = scene->cur_mission;
 		clients[c_id].do_send(&miss_packet);
 
-		if (scene->cur_mission == MissionType::Kill_MONSTER || scene->cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME)
+		if (scene->cur_mission == MissionType::Kill_MONSTER || scene->cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME 
+			|| scene->cur_mission == MissionType::KILL_MONSTER3 || scene->cur_mission == MissionType::KILL_METEOR)
 		{
 			SC_KILL_NUM_PACKET pack{};
 			pack.size = sizeof(pack);

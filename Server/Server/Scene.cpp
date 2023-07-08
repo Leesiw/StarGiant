@@ -355,8 +355,6 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 				if (kill_monster_num == 5) {
 					kill_monster_num = 0;
 					MissionClear();
-					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 30s, EV_MISSION_CLEAR, num };	// ºí·¢È¦
-					timer_queue.push(ev);
 				}
 			}
 			return;
@@ -525,6 +523,8 @@ void CScene::MissionClear()
 			p.pos = black_hole_pos;
 			Send((char*) & p);
 
+			TIMER_EVENT ev1{ 0, chrono::system_clock::now() + 30s, EV_MISSION_CLEAR, num };	// ºí·¢È¦
+			timer_queue.push(ev1);
 
 			b_prev_time = chrono::steady_clock::now();
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, num };
