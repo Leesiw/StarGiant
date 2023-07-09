@@ -7,11 +7,14 @@ GodState = {
     MELEE2 = 3,
     SHOT = 4,
     HIT1 = 5,
-    DEATH = 6
+    DEATH = 6,
+    ATTACK = 7
 
 }
 
-SHOT_COOL_TIME = 5
+SHOT_COOL_TIME = 4
+MELEE1_COOL_TIME = 4
+
 ATTACK_COOL_TIME = 4
 
 
@@ -33,6 +36,10 @@ onappear = true
 -- 공격 상태와 쿨타임 변수 초기화
 attackState = false
 attackCooldown = ATTACK_COOL_TIME
+shotCooldown = SHOT_COOL_TIME
+melee1Cooldown = MELEE1_COOL_TIME
+
+
 
 -- 프레임 시간 관련 변수 초기화
 frameTime = 0
@@ -42,23 +49,21 @@ frameTime = 0
 function updateGodAI(hp, bpx, bpy, bpz, elapsedTime)
     curHp = hp
     frameTime = frameTime + elapsedTime
-    attackCooldown = attackCooldown - elapsedTime
+    shotCooldown = shotCooldown - elapsedTime
+    melee1Cooldown = melee1Cooldown - elapsedTime
 
     if state == GodState.IDLE2 then        -- 보스가 나타날 때
-        print("IDLE2")
         if onappear then
             appear(bpx, bpy, bpz)
             onappear = false
         end
     elseif state == GodState.IDLE1 then    -- 기본상태
-        print("IDLE1")
         idle(frameTime)
     elseif state == GodState.DIE then      -- 보스의 체력이 0 이하일 때 죽음 상태 처리
         if curHp <= 0 then
             die()
         end
-    elseif state == GodState.SHOT then     -- 보스가 SHOT 때
-        print("SHOT")
+    elseif state == GodState.ATTACK then     -- 보스가 ATTACK 때
         attack(frameTime)
     end
     -- 보스의 다음 상태를 결정합니다.
@@ -72,15 +77,30 @@ function idle(frameTime)
     --print("idle 상태")
    -- print(frameTime)
    if not attackState and frameTime >= attackCooldown then
+        local randomIndex = math.random(2)
+        local attackType = randomIndex * 2  --2,4 중 랜덤
+
         if curHp <= (MaxHp / 2) then
-            ATTACK_COOL_TIME = 2
+            SHOT_COOL_TIME = 4
         else
-            ATTACK_COOL_TIME = 4
+            SHOT_COOL_TIME = 8
         end
 
-        shotAttack()
-        attackCooldown = frameTime + 4
-        attackState = true
+        if attackType == tonumber(GodState.SHOT) then
+            shotAttack()
+            attackCooldown = frameTime + SHOT_COOL_TIME
+            attackCooldown = frameTime + ATTACK_COOL_TIME
+            attackState = true
+
+        elseif attackType == tonumber(GodState.MELEE1) then
+            melee1Attack()
+            attackCooldown = frameTime + MELEE1_COOL_TIME
+            attackCooldown = frameTime + ATTACK_COOL_TIME
+
+            attackState = true
+        end
+
+
    end
 end
 
@@ -94,8 +114,14 @@ end
 
 -- 보스의 공격 동작
 function attack(frameTime)
-    motion = GodState.SHOT
-    attackCooldown = 4
+
+    if attackType == tonumber(GodState.SHOT) then
+        motion = GodState.SHOT
+    elseif attackType == tonumber(GodState.MELEE1) then
+        motion = GodState.MELEE1
+    end
+
+    attackCooldown = ATTACK_COOL_TIME
     if frameTime >= attackCooldown then
         attackState = false
     end
@@ -104,6 +130,12 @@ end
 -- SHOT 실행 함수
 function shotAttack()
     motion = GodState.SHOT
+    frameTime = 0
+end
+
+-- SHOT 실행 함수
+function melee1Attack()
+    motion = GodState.MELEE1
     frameTime = 0
 end
 
@@ -118,31 +150,26 @@ function nextState(bpx, bpy, bpz)
     local distance = CalculateDistance(god_x, god_y, god_z, bpx, bpy, bpz)
 
     if state == GodState.IDLE1 then
-        print("IDLE1")
         if curHp <= 0 then
             state = GodState.DEATH
             motion = GodState.DEATH
-        elseif attackState and state ~= GodState.SHOT then
-            state = GodState.SHOT
+        elseif attackState and state ~= GodState.ATTACK then
+            state = GodState.ATTACK
             frameTime = 0
             attackCooldown = ATTACK_COOL_TIME
         end
          
     elseif state == GodState.IDLE2 then
-        print("IDLE2")
-
         state = GodState.IDLE2
         motion = GodState.IDLE2
         if onappear == false then
             state = GodState.IDLE1
         end
- 
-    elseif state == GodState.SHOT then
-        print("SHOT")
 
+    elseif state == GodState.ATTACK then
         if attackState == false then
-            state = GodState.IDLE
-            motion = GodState.IDLE 
+            state = GodState.IDLE1
+            motion = GodState.IDLE1
             frameTime = 0
         end
      
