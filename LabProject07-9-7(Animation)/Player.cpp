@@ -265,9 +265,9 @@ void CPlayer::Update(float fTimeElapsed)
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (nCurrentCameraMode == DRIVE_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (nCurrentCameraMode == CUT_SCENE_CAMERA)	m_pCamera->Update(m_xmf3Position, fTimeElapsed);
-	/*if (nCurrentCameraMode == ATTACT_CAMERA_L) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
-	if (nCurrentCameraMode == ATTACT_CAMERA_C) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
-	if (nCurrentCameraMode == ATTACT_CAMERA_R) m_pCamera->Update(m_xmf3Position, fTimeElapsed);*/
+	//if (nCurrentCameraMode == ATTACT_CAMERA_L) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	//if (nCurrentCameraMode == ATTACT_CAMERA_C) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	//if (nCurrentCameraMode == ATTACT_CAMERA_R) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 
 
 
@@ -308,12 +308,15 @@ CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
 			break;
 		case ATTACT_CAMERA_C:
 			pNewCamera = new CAttactCamera(m_pCamera);
+			pNewCamera->m_nMode = ATTACT_CAMERA_C;
 			break;
 		case ATTACT_CAMERA_L:
 			pNewCamera = new CAttactCamera(m_pCamera);
+			pNewCamera->m_nMode = ATTACT_CAMERA_L;
 			break;
 		case ATTACT_CAMERA_R:
 			pNewCamera = new CAttactCamera(m_pCamera);
+			pNewCamera->m_nMode = ATTACT_CAMERA_R;
 			break;
 
 		case CUT_SCENE_CAMERA:

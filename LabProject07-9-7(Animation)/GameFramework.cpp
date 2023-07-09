@@ -894,6 +894,7 @@ void CGameFramework::CameraUpdateChange()
 			m_pInsideCamera->canTurn = true;
 		}
 	}
+
 }
 
 void error_display(const char* msg, int err_no)
@@ -1203,9 +1204,24 @@ void CGameFramework::FrameAdvance()
 
 	UpdateUI();
 
-	if (std::isnan(m_pCamera->GetPosition().x))cout << "x nan!!\n";
-	if (std::isnan(m_pCamera->GetPosition().y))cout << "y nan!!\n";
-	if (std::isnan(m_pCamera->GetPosition().z))cout << "z nan!!\n";
+	//if (std::isnan(m_pCamera->GetPosition().x))cout << "x nan!!\n";
+	//if (std::isnan(m_pCamera->GetPosition().y))cout << "y nan!!\n";
+	//if (std::isnan(m_pCamera->GetPosition().z))cout << "z nan!!\n";
+
+	//if (std::isnan(m_pInsideCamera->GetPosition().x))cout << "m_pInsideCamera x nan!!\n";
+	//if (std::isnan(m_pInsideCamera->GetPosition().y))cout << "m_pInsideCamera y nan!!\n";
+	//if (std::isnan(m_pInsideCamera->GetPosition().z))cout << "m_pInsideCamera z nan!!\n";
+	//if (std::isnan(m_pCamera->GetLookVector().x))cout << "GetLookVector x nan!!\n";
+	//if (std::isnan(m_pCamera->GetLookVector().y))cout << "GetLookVector y nan!!\n";
+	//if (std::isnan(m_pCamera->GetLookVector().z))cout << "GetLookVector z nan!!\n";
+	//if (std::isnan(m_pCamera->GetUpVector().x))cout << "GetUpVector x nan!!\n";
+	//if (std::isnan(m_pCamera->GetUpVector().y))cout << "GetUpVector y nan!!\n";
+	//if (std::isnan(m_pCamera->GetUpVector().z))cout << "GetUpVector z nan!!\n";
+	//if (std::isnan(m_pCamera->GetRightVector().z))cout << "GetRightVector x nan!!\n";
+	//if (std::isnan(m_pCamera->GetRightVector().z))cout << "GetRightVector y nan!!\n";
+	//if (std::isnan(m_pCamera->GetRightVector().z))cout << "GetRightVector z nan!!\n";
+
+
 
 	//static int b = 0;
 
@@ -1227,7 +1243,25 @@ void CGameFramework::FrameAdvance()
 
 	if (std::isnan(m_pCamera->GetPosition().x)) {
 		m_pCamera->SetPosition(m_pPlayer[0]->GetPosition());
-		cout << "돌아와\n";
+		cout << "m_pCamera GetPosition 돌아와\n";
+	}
+	if (std::isnan(m_pCamera->GetUpVector().x)) {
+		m_pCamera->SetUpVector(m_pPlayer[0]->GetUpVector());
+		cout << "m_pCamera GetUpVector 돌아와\n";
+	}
+
+	if (std::isnan(m_pCamera->GetRightVector().x)) {
+		m_pCamera->SetRightVector(m_pPlayer[0]->GetRightVector());
+		cout << "m_pCamera GetRightVector 돌아와\n";
+	}
+	if (std::isnan(m_pCamera->GetLookVector().x)) {
+		m_pCamera->SetLookVector(m_pPlayer[0]->GetLookVector());
+		cout << "m_pCamera SetLookVector 돌아와\n";
+	}
+
+	if (std::isnan(m_pInsideCamera->GetPosition().x)) {
+		m_pInsideCamera->SetPosition(m_pPlayer[0]->GetPosition());
+		cout << "m_pInsideCamera 돌아와\n";
 	}
 	
 	
