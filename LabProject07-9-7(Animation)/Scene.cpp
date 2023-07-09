@@ -1378,7 +1378,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	{
 		if (m_ppJewel)
 		{
-			m_ppJewel->SetPosition(m_ppBoss->GetPosition());
+			m_ppJewel->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y + 300.0f + m_eTime, m_ppBoss->GetPosition().z);
 			//m_ppJewel->SetPosition(xmf3Position);
 			//m_ppJewel->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 			m_ppJewel->Rotate(0.0f, m_fElapsedTime * 30.0, 0.0f);
