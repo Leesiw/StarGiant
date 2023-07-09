@@ -583,6 +583,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			packet.size = sizeof(packet);
 			packet.type = SC_BLACK_HOLE_TIME;
 			packet.time = scene->black_hole_time;
+			scene->Send((char*)&packet);
 
 			XMFLOAT3 pos;
 			XMFLOAT3 ToBlackHole;
