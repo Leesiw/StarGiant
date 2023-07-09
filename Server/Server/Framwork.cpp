@@ -146,7 +146,9 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			for (int i = 0; i < ENEMIES; ++i)
 			{
 				if (!scene->m_ppEnemies[i]->GetisAlive()) { continue; }
-				if (scene->m_ppEnemies[ex_over->obj_id]->HierarchyIntersects(scene->m_ppEnemies[i]))
+				if (i == ex_over->obj_id) { continue; }
+				//if (scene->m_ppEnemies[ex_over->obj_id]->HierarchyIntersects(scene->m_ppEnemies[i]))
+				if(Vector3::Length(Vector3::Subtract(scene->m_ppEnemies[ex_over->obj_id]->GetPosition(), scene->m_ppEnemies[i]->GetPosition())) < 50.f)
 				{
 					XMFLOAT3 xmf3Sub = scene->m_ppEnemies[i]->GetPosition();
 					xmf3Sub = Vector3::Subtract(scene->m_ppEnemies[ex_over->obj_id]->GetPosition(), xmf3Sub);
