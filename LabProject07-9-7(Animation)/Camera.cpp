@@ -154,8 +154,19 @@ void CCamera::Shaking(float fShakeAmount, float fTimeElapsed)
 		fShakeAmount * (float)(rand() % 100 - 50) / 50.0f,  // y √‡ Ω¶¿Ã≈∑
 		fShakeAmount * (float)(rand() % 100 - 50) / 50.0f   // z √‡ Ω¶¿Ã≈∑
 	);
+	if (std::isnan(fShakeAmount)) {
+		cout << "shaking nan";
+		xmf3ShakeOffset = XMFLOAT3(
+			fShakeAmount * (float)(rand() % 100 - 50) / 50.0f,  // x √‡ Ω¶¿Ã≈∑
+			fShakeAmount * (float)(rand() % 100 - 50) / 50.0f,  // y √‡ Ω¶¿Ã≈∑
+			fShakeAmount * (float)(rand() % 100 - 50) / 50.0f   // z √‡ Ω¶¿Ã≈∑
+		);
+	}
+	else {
+		// Ω¶¿Ã≈© ø¿«¡º¬ ∞ËªÍ
+		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3ShakeOffset);
+	}
 
-	m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3ShakeOffset);
 
 	if (m_shakingTime > 1) {
 		m_shakingTime = 0;

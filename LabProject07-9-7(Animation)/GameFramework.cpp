@@ -836,6 +836,28 @@ void CGameFramework::CameraUpdateChange()
 		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 	}
 
+	//CS_SHOW_STARGIANT 내부일때,
+	if (curMissionType == MissionType::CS_SHOW_STARGIANT && b_Inside && m_pInsidePlayer[g_myid] && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
+		b_BeforeCheckInside = true;
+		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+		m_pCamera->canDolly = true; //줌
+		m_pCamera->SetTarget(m_pScene->m_ppBoss->GetPosition());
+		m_pCamera->SetDist(1300.0f);
+		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+	}
+
+	//CS_SHOW_STARGIANT 외부일때,
+	else if (curMissionType == MissionType::CS_SHOW_STARGIANT && !b_Inside && m_pPlayer[0]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+		m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
+		m_pCamera->SetTarget(m_pScene->m_ppBoss->GetPosition());
+		m_pCamera->SetDist(1300.0f);
+		m_pCamera->canDolly = true; //줌
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+	}
+
 
 
 	//컷씬 끝나면 서버로 보내기
@@ -855,9 +877,10 @@ void CGameFramework::CameraUpdateChange()
 		m_pInsideCamera->canTurn = true;
 	}
 
-	if ((curMissionType == MissionType::DEFEAT_BOSS || curMissionType == MissionType::GO_PLANET) && (m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA|| m_pPlayer[0]->GetCamera()->GetMode() == CUT_SCENE_CAMERA))
+	if ((curMissionType == MissionType::DEFEAT_BOSS || curMissionType == MissionType::GO_PLANET 
+		|| curMissionType == MissionType::GO_CENTER || curMissionType == MissionType::ESCAPE_BLACK_HOLE || curMissionType == MissionType::KILL_GOD)
+		&& (m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA|| m_pPlayer[0]->GetCamera()->GetMode() == CUT_SCENE_CAMERA))
 	{
-		cout << "일로 안옴??";
 		if (b_BeforeCheckInside) {
 			b_Inside = true;
 			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
@@ -2212,7 +2235,6 @@ void CGameFramework::ProcessPacket(char* p)
 	{
 		SC_BLACK_HOLE_TIME_PACKET* packet = reinterpret_cast<SC_BLACK_HOLE_TIME_PACKET*>(p);
 		blackholetime = packet->time;	// 블랙홀 시간 float 타입 30.0f -> 0.0f
-		cout << blackholetime<<endl;
 		break;
 	}
 	default:

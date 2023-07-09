@@ -2288,3 +2288,12 @@ void CBlackHoleMeteorObject::Animate(float fTimeElapsed, XMFLOAT3 cPos)
 //
 //	CGameObject::Animate(fTimeElapsed);
 //}
+
+CJewelObject::CJewelObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
+{
+	CLoadedModelInfo* pJewelModel = pModel;
+	if (!pJewelModel) pJewelModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/SoftStar.bin", NULL);
+
+	SetChild(pJewelModel->m_pModelRootObject, true);
+	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pJewelModel);
+}

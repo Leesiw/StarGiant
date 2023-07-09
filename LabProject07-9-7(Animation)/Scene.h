@@ -163,6 +163,8 @@ public:
 
 	CBlackHoleMeteorObject				*m_BlackholeMeteorObjects[BLACKHOLEMETEOR];
 
+	CJewelObject* m_ppJewel;
+
 
 	CMeteorObject* landob;
 

@@ -172,12 +172,15 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_ppHierarchicalGameObjects[6]->m_pSkinnedAnimationController->SetTrackWeight(1, 0.2f);
 	m_ppHierarchicalGameObjects[6]->SetPosition(350.0f, m_pTerrain->GetHeight(350.0f, 670.0f), 670.0f);
 
-	CLoadedModelInfo* pZebraModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/God.bin", NULL);
+	CLoadedModelInfo* pZebraModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/SoftStar.bin", NULL);
 	m_ppHierarchicalGameObjects[7] = new CEnemyObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pZebraModel, 1);
 	m_ppHierarchicalGameObjects[7]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppHierarchicalGameObjects[7]->SetPosition(280.0f, m_pTerrain->GetHeight(280.0f, 640.0f), 620.0f);
 	m_ppHierarchicalGameObjects[7]->SetScale(1.0f, 1.0f, 1.0f);
 	if (pZebraModel) delete pZebraModel;
+
+
+	
 
 	CLoadedModelInfo* pLionModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/arrow.bin", NULL);
 	m_ppHierarchicalGameObjects[8] = new CLionObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pLionModel, 1);
@@ -304,6 +307,15 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	}
 
 	//=====================================
+	CLoadedModelInfo* pJewelModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/SoftStar.bin", NULL);
+	m_ppJewel = new CJewelObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pJewelModel, 1);
+	m_ppJewel->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	m_ppJewel->SetPosition(280.0f, m_pTerrain->GetHeight(280.0f, 640.0f), 620.0f);
+	m_ppJewel->SetScale(100.0f, 100.0f, 100.0f);
+	if (pJewelModel) delete pJewelModel;
+	//=====================================
+
+
 
 	BuildBoss(pd3dDevice, pd3dCommandList);
 	BuildGod(pd3dDevice, pd3dCommandList);
@@ -588,6 +600,10 @@ void CScene::ReleaseObjects()
 	if (m_ppBlackhole)
 	{
 		delete m_ppBlackhole;
+	}	
+	if (m_ppJewel)
+	{
+		delete m_ppJewel;
 	}
 
 	if (landob)
@@ -1357,8 +1373,18 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppEnemyMissiles[i]->Render(pd3dCommandList, pCamera);
 		}
 	}
-
-
+	//=======================스타자이언트==========================
+	if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_STARGIANT)
+	{
+		if (m_ppJewel)
+		{
+			m_ppJewel->SetPosition(m_ppBoss->GetPosition());
+			//m_ppJewel->SetPosition(xmf3Position);
+			//m_ppJewel->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+			m_ppJewel->Rotate(0.0f, m_fElapsedTime * 30.0, 0.0f);
+			m_ppJewel->Render(pd3dCommandList, pCamera);
+		}
+	}
 	//=======================블랙홀==========================
 	if (m_ppBlackhole)
 	{
@@ -1405,12 +1431,12 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
 		}
 
-		if (m_ppBoss->BossHP <= 0)
+		if (m_ppBoss->BossHP <= 0) 
 		{
 			m_ppBoss->CurState = BossState::DIE;
 		}
 
-		if(!(m_ppBoss->BossHP<=0)&&m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS)
+		if(!(m_ppBoss->BossHP<=0) && m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS && m_pPlayer[0]->curMissionType < MissionType::CS_SHOW_STARGIANT)
 			m_ppBoss->Render(pd3dCommandList, pCamera); 
 	}
 
