@@ -16,6 +16,8 @@ UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_vJewBlocks.resize(1);
     m_vLobbyBlocks.resize(1);
     m_vLobbyMatchingBlocks.resize(1);
+    m_vSkipBlocks.resize(1);
+
 
 
     Initialize(pd3dDevice, pd3dCommandQueue);
@@ -302,9 +304,11 @@ void UILayer::UpdateLabels_Lobby(const std::wstring& strUIText)
 void UILayer::UpdateLabels_LobbyMatching(const std::wstring& strUIText)
 {
     m_vLobbyMatchingBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT / 7 * 3.15, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwLobbyMatchingFormat };
-
 }
-
+void UILayer::UpdateLabels_Skip(const std::wstring& strUIText)
+{
+    m_vSkipBlocks[0] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 4 * 3, FRAME_BUFFER_HEIGHT / 10 * 9.8 , FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT / 10 * 9.5), m_pdwSkipFormat };
+}
 
 void UILayer::UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool live)
 {
@@ -514,12 +518,6 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst)
 
     D2D_POINT_2F d2dPoint_Lobby = { FRAME_BUFFER_WIDTH / 2 - 800, FRAME_BUFFER_HEIGHT / 2 - 450 };
 
-    D2D_POINT_2F d2dPoint_MatchingLobby = { FRAME_BUFFER_WIDTH / 2 - 700, FRAME_BUFFER_HEIGHT / 2 - 350 };
-
-
-
-
-
 
     D2D_RECT_F d2dRect = { 0.0f, 0.0f, 100.0f, 200.0f };
 
@@ -575,10 +573,14 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst)
         for (auto textBlock : m_vLobbyMatchingBlocks)
         {
             m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextGrayBrush);
-        }
-
-
+        }        
     }
+
+    if(mty == MissionType::CS_TURN|| mty == MissionType::CS_SHOW_PLANET || mty == MissionType::CS_BOSS_SCREAM || mty == MissionType::CS_SHOW_STARGIANT || mty == MissionType::CS_SHOW_BLACK_HOLE || mty == MissionType::CS_SHOW_GOD)
+        for (auto textBlock : m_vSkipBlocks)
+        {
+            m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, Redbrush);
+        }
 
 
 
@@ -648,6 +650,8 @@ void UILayer::ReleaseResources()
     m_pdwScriptsFormat->Release();
     m_pdwLobbyFormat->Release();
     m_pdwLobbyMatchingFormat->Release();
+    m_pdwSkipFormat->Release();
+
 
 
     m_pdwJewFormat->Release();
@@ -694,6 +698,8 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
     const float fFontSize_Scripts = m_fHeight / 25.0f;
     const float fFontSize_Lobby = m_fHeight / 10.0f;
     const float fFontSize_MatchingLobby = m_fHeight / 10.0f;
+    const float fFontSize_Skip = m_fHeight / 45.0f;
+
 
 
 
@@ -726,6 +732,11 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
 
     m_pdwLobbyMatchingFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     m_pdwLobbyMatchingFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
+    m_pd2dWriteFactory->CreateTextFormat(L"±¼¸²Ã¼", nullptr, DWRITE_FONT_WEIGHT_MEDIUM, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize_Skip, L"en-us", &m_pdwSkipFormat);
+
+    m_pdwSkipFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+    m_pdwSkipFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
 
     //    m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);

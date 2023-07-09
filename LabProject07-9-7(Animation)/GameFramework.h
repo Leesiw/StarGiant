@@ -125,6 +125,7 @@ private:
 	wstring roomNum;
 	short room_num = 0;
 	short killCnt = 0; 
+	short skipnum;
 	
 	float pDist = 0;
 	float bDist = 0;

@@ -1351,6 +1351,9 @@ void CGameFramework::UpdateUI()
 
 	std::wstring matwst = std::to_wstring(matcnt);
 
+	std::wstring skipwst = std::to_wstring(skipnum);
+
+
 
 	m_pUILayer->UpdateLabels(uiText);
 	m_pUILayer->UpdateLabels_Scripts(uiScripts);
@@ -1367,6 +1370,8 @@ void CGameFramework::UpdateUI()
 		m_pUILayer->UpdateLabels_Lobby(roomNum);
 		m_pUILayer->noData = false;
 	}
+	m_pUILayer->UpdateLabels_Skip(L"½ºÅµÀº spacebar - " + skipwst + L" / 3");
+	
 
 	m_pUILayer->UpdateHp(m_pPlayer[0]->hp, m_pPlayer[0]->max_hp);
 	/*if(m_pScene->m_ppBoss->GetState()!= BossState::SLEEP)*/
@@ -2196,7 +2201,7 @@ void CGameFramework::ProcessPacket(char* p)
 	case SC_CUTSCENE_END_NUM:
 	{
 		SC_CUTSCENE_END_NUM_PACKET* packet = reinterpret_cast<SC_CUTSCENE_END_NUM_PACKET*>(p);
-		packet->num;	// ½ºÅµÇÑ Å¬¶ó ¼ö
+		skipnum = packet->num;	// ½ºÅµÇÑ Å¬¶ó ¼ö
 		break;
 	}
 	default:
