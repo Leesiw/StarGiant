@@ -396,8 +396,6 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			if (scene->_state != ST_INGAME) { break; }
 			if (scene->m_pGod->GetcurHp() <= 0) {
 				scene->MissionClear();
-				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, key };
-				timer_queue.push(ev);
 				break;
 			}
 			if (levels[scene->cur_mission].cutscene) {
