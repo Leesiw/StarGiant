@@ -203,6 +203,9 @@ void ProcessPacket(int ci, unsigned char packet[])
 	case SC_MISSION_START: break;
 	case SC_KILL_NUM: break;
 	case SC_START: break;
+	case SC_BLACK_HOLE: break;
+	case SC_BLACK_HOLE_TIME: break;
+	case SC_CUTSCENE_END_NUM: break;
 	default: MessageBox(hWnd, L"Unknown Packet Type", L"ERROR", 0);
 		while (true);
 	}
@@ -401,7 +404,7 @@ void Test_Thread()
 				my_packet.size = sizeof(my_packet);
 				my_packet.type = CS_ATTACK;
 				my_packet.data.pos = { urdRandom(dree),  urdRandom(dree),  urdRandom(dree) };
-				my_packet.data.direction = { urdRandom(dree),  urdRandom(dree),  urdRandom(dree) };
+				my_packet.data.direction = { 0.f,  1.f,  0.f };
 				my_packet.attack_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
 				SendPacket(i, &my_packet);
 			}
