@@ -49,6 +49,8 @@ public:
 	chrono::steady_clock::time_point scriptsStartTime;
 	bool scriptsOn = false;
 
+	short matcnt = 0;
+
 	// ¼­¹ö
 	bool ConnectServer();
 	void RecvServer();

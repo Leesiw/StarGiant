@@ -658,7 +658,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 			int screenAreaRight1 = 1400;
 			int screenAreaBottom1 = 650;
 
-			if (mouseX >= screenAreaLeft1 && mouseX <= screenAreaRight1 && mouseY >= screenAreaTop1 && mouseY <= screenAreaBottom1 && !roomNum.empty()) {
+			if (mouseX >= screenAreaLeft1 && mouseX <= screenAreaRight1 && mouseY >= screenAreaTop1 && mouseY <= screenAreaBottom1 && !roomNum.empty()) { 
 				room_num = static_cast<short>(std::stoi(roomNum));
 				CS_LOGIN_PACKET packet;
 				packet.size = sizeof(packet);
@@ -1351,6 +1351,8 @@ void CGameFramework::UpdateUI()
 	uiJew += L"\n\n";
 	uiJew += JEWEL_HP;
 
+	std::wstring matwst = std::to_wstring(matcnt);
+
 
 	m_pUILayer->UpdateLabels(uiText);
 	m_pUILayer->UpdateLabels_Scripts(uiScripts);
@@ -1359,8 +1361,11 @@ void CGameFramework::UpdateUI()
 
 	if (roomNum.empty()) {
 		m_pUILayer->UpdateLabels_Lobby(L"room number");
+		m_pUILayer->UpdateLabels_LobbyMatching(L"룸 넘버를 입력하세요");
+
 	}
 	else {
+		m_pUILayer->UpdateLabels_LobbyMatching(matwst + L" / 3");
 		m_pUILayer->UpdateLabels_Lobby(roomNum);
 		m_pUILayer->noData = false;
 	}
@@ -1941,13 +1946,15 @@ void CGameFramework::ProcessPacket(char* p)
 		info.m_fYaw = packet->data.yaw;
 		m_pInsidePlayer[packet->data.id]->SetPlayerInfo(info);
 
-
+		matcnt++;
 		break;
 	}
 	case SC_REMOVE_PLAYER:
 	{
+
 		SC_REMOVE_PLAYER_PACKET* packet = reinterpret_cast<SC_REMOVE_PLAYER_PACKET*>(p);
 		m_pInsidePlayer[packet->id]->isAlive = false;
+		matcnt--;
 		break;
 	}
 	case SC_SPAWN_METEO:

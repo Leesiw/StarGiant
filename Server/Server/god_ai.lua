@@ -137,7 +137,7 @@ function nextState(bpx, bpy, bpz)
     elseif state == GodState.SHOT then
         if attackState == false then
             state = GodState.IDLE
-            motion = GodState.IDLE
+            motion = GodState.IDLE 
             frameTime = 0
         end
      

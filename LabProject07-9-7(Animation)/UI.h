@@ -19,6 +19,8 @@ public:
 
 
     void UpdateLabels_Lobby(const std::wstring& strUIText);
+    void UpdateLabels_LobbyMatching(const std::wstring& strUIText);
+
 
 
 
@@ -96,6 +98,8 @@ private:
     IDWriteTextFormat* m_pdwJewFormat = NULL;
 
     IDWriteTextFormat* m_pdwLobbyFormat = NULL;
+    IDWriteTextFormat* m_pdwLobbyMatchingFormat = NULL;
+
 
 
 
@@ -116,6 +120,7 @@ private:
 
 
 
+
     ID2D1Effect* m_pd2dfxGaussianBlur = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_jew = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_logo = NULL;
@@ -124,6 +129,8 @@ private:
     ID2D1Effect* m_pd2dfxGaussianBlur_nevi2 = NULL;
 
     ID2D1Effect* m_pd2dfxGaussianBlur_Lobby = NULL;
+    ID2D1Effect* m_pd2dfxGaussianBlur_MatchingLobby = NULL;
+
 
 
 
@@ -138,6 +145,8 @@ private:
 
 
     ID2D1Effect* m_pd2dfxSize_Lobby = NULL;
+    ID2D1Effect* m_pd2dfxSize_MatchingLobby = NULL;
+
 
 
 
@@ -156,6 +165,8 @@ private:
     std::vector<TextBlock>          m_vScriptsBlocks;
     std::vector<TextBlock>          m_vJewBlocks;
     std::vector<TextBlock>          m_vLobbyBlocks;
+    std::vector<TextBlock>          m_vLobbyMatchingBlocks;
+
 
 
 
