@@ -1410,7 +1410,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppBoss->CurState = BossState::DIE;
 		}
 
-		if(!(m_ppBoss->BossHP<=0))
+		if(!(m_ppBoss->BossHP<=0)&&m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS)
 			m_ppBoss->Render(pd3dCommandList, pCamera); 
 	}
 
@@ -1439,7 +1439,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppGod->SetState(GodState::DEATH);
 		}
 
-		if (!(m_ppGod->GetcurHp() <= 0))
+		if (!(m_ppGod->GetcurHp() <= 0) && m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD)
 			m_ppGod->Render(pd3dCommandList, pCamera);
 	}
 

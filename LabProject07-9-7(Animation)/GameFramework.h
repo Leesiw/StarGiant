@@ -50,6 +50,7 @@ public:
 	bool scriptsOn = false;
 
 	short matcnt = 0;
+	float blackholetime = 0.0f;
 
 	// ¼­¹ö
 	bool ConnectServer();

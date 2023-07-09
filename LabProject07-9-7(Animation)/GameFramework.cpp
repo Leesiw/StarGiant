@@ -1408,6 +1408,8 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	wstring bossDist;
 	wstring bossDie;
 	wstring centerDist;
+	wstring blackholetimewst;
+
 
 
 
@@ -1437,6 +1439,8 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	distanceCenter = distanceCenter - 1500.0f;
 
 	enemyCountStr = to_wstring(killCnt);
+	blackholetimewst = to_wstring(blackholetime);
+
 	jewelCntStr = to_wstring(jewelCnt);
 	planetDist = to_wstring(pDist);
 	bossDist = to_wstring(distance);
@@ -1536,8 +1540,8 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	case MissionType::ESCAPE_BLACK_HOLE:
 	{
 		uiText = L"미션 - 블랙홀에서 벗어나라! ( ";
-		uiText += L" 시간? 거리?";
-		uiText += L" )"; //
+		uiText += blackholetimewst;
+		uiText += L"s )"; //
 		break;
 	}
 	case MissionType::GO_CENTER_REAL:
@@ -2207,7 +2211,8 @@ void CGameFramework::ProcessPacket(char* p)
 	case SC_BLACK_HOLE_TIME:
 	{
 		SC_BLACK_HOLE_TIME_PACKET* packet = reinterpret_cast<SC_BLACK_HOLE_TIME_PACKET*>(p);
-		packet->time;	// 블랙홀 시간 float 타입 30.0f -> 0.0f
+		blackholetime = packet->time;	// 블랙홀 시간 float 타입 30.0f -> 0.0f
+		cout << blackholetime<<endl;
 		break;
 	}
 	default:
