@@ -118,6 +118,7 @@ function nextState(bpx, bpy, bpz)
     local distance = CalculateDistance(god_x, god_y, god_z, bpx, bpy, bpz)
 
     if state == GodState.IDLE1 then
+        print("IDLE1")
         if curHp <= 0 then
             state = GodState.DEATH
             motion = GodState.DEATH
@@ -128,6 +129,8 @@ function nextState(bpx, bpy, bpz)
         end
          
     elseif state == GodState.IDLE2 then
+        print("IDLE2")
+
         state = GodState.IDLE2
         motion = GodState.IDLE2
         if onappear == false then
@@ -135,6 +138,8 @@ function nextState(bpx, bpy, bpz)
         end
  
     elseif state == GodState.SHOT then
+        print("SHOT")
+
         if attackState == false then
             state = GodState.IDLE
             motion = GodState.IDLE 

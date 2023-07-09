@@ -18,7 +18,7 @@ public:
 	BossState CurState = BossState::SLEEP;
 	BossState PastState = CurState;
 	BossState NextState = CurState;
-
+	  
 	BossAnimation CurMotion = BossAnimation::SLEEP;
 	BossAnimation PastMotion = CurMotion;
 

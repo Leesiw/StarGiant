@@ -20,6 +20,8 @@ public:
 
     void UpdateLabels_Lobby(const std::wstring& strUIText);
     void UpdateLabels_LobbyMatching(const std::wstring& strUIText);
+    void UpdateLabels_Skip(const std::wstring& strUIText);
+
 
 
 
@@ -99,6 +101,8 @@ private:
 
     IDWriteTextFormat* m_pdwLobbyFormat = NULL;
     IDWriteTextFormat* m_pdwLobbyMatchingFormat = NULL;
+    IDWriteTextFormat* m_pdwSkipFormat = NULL;
+
 
 
 
@@ -166,6 +170,8 @@ private:
     std::vector<TextBlock>          m_vJewBlocks;
     std::vector<TextBlock>          m_vLobbyBlocks;
     std::vector<TextBlock>          m_vLobbyMatchingBlocks;
+    std::vector<TextBlock>          m_vSkipBlocks;
+
 
 
 
