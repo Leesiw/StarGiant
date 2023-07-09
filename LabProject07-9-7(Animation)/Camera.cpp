@@ -611,7 +611,7 @@ CCutSceneCamera::CCutSceneCamera(CCamera* pCamera) : CCamera(pCamera)
 	{
 		cout << "CUT_SCENE_CAMERA 카메라 생성\n";
 		// 카메라 초기 위치 설정
-		m_xmf3Position = XMFLOAT3(tarPos.x, tarPos.y, tarPos.z - dist); // tarPos에서 100만큼 뒤로 이동
+		m_xmf3Position = XMFLOAT3(tarPos.x, tarPos.y, tarPos.z - dist); // tarPos에서 dist만큼 뒤로 이동
 
 		// 카메라 초기 방향 설정 (tarPos를 중심으로 바라봄)
 		XMFLOAT3 xmf3LookAt;
@@ -649,20 +649,20 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		XMMATRIX xmmtxRotate = XMLoadFloat4x4(&xmf4x4Rotate);
 		XMMATRIX xmmtxRotation;
 
-		if (canDolly)
+		if (canDolly) 
 		{
 			// 이걸로 회전
 			xmmtxRotation = XMMatrixRotationY(0);
-			// 카메라의 원래 위치에서 tarPos로의 벡터를 얻습니다.
+			// 카메라의 원래 위치에서 tarPos로의 벡터를 얻음
 			XMVECTOR xmvecOffset = XMLoadFloat3(&m_xmf3Position) - XMLoadFloat3(&tarPos);
-			// 얻은 벡터의 길이를 구합니다.
+			// 얻은 벡터의 길이를 구하고
 			float offsetLength = XMVectorGetX(XMVector3Length(xmvecOffset));
 			// 멀어지도록 카메라 위치 조정
-			float dollyDistance = fTimeElapsed * 10.0f;  // 점점 멀어지는 속도 조정
+			float dollyDistance = fTimeElapsed * -15.0f;  // 점점 멀어지는 속도 조정
 			XMVECTOR xmvecPosition = xmvecOffset + (xmvecOffset / offsetLength) * dollyDistance;
 			XMFLOAT3 xmf3Position;
 			XMStoreFloat3(&xmf3Position, xmvecPosition);
-			xmf3Position = Vector3::Add(xmf3Position, tarPos); // 뒤로 이동시키기 위해 tarPos를 더합니다.
+			xmf3Position = Vector3::Add(xmf3Position, tarPos); // 뒤로 이동시키기 위해 tarPos를 더하기
 			SetPosition(xmf3Position);
 		}
 		else

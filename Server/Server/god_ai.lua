@@ -126,7 +126,7 @@ function nextState(bpx, bpy, bpz)
             frameTime = 0
             attackCooldown = ATTACK_COOL_TIME
         end
-        
+         
     elseif state == GodState.IDLE2 then
         state = GodState.IDLE2
         motion = GodState.IDLE2

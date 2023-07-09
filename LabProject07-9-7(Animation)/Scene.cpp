@@ -1390,7 +1390,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 	aa = 1;
 	//=======================================================
-
+	static int aaaa = 0;
 	if (m_ppBoss) {
 		m_ppBoss->Animate(m_fElapsedTime);
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
@@ -1398,6 +1398,10 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
 
 		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
+			if (aaaa == 0) {
+				m_ppBoss->Rotate(0, 180, 0);
+				aaaa = 1;
+			}
 			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
 		}
 

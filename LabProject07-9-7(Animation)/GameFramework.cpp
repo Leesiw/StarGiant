@@ -859,7 +859,6 @@ void CGameFramework::CameraUpdateChange()
 	{
 		cout << "일로 안옴??";
 		if (b_BeforeCheckInside) {
-			cout << "변경\n" << endl;
 			b_Inside = true;
 			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
 			m_pInsideCamera->canTurn = true;
@@ -867,7 +866,6 @@ void CGameFramework::CameraUpdateChange()
 			b_BeforeCheckInside = false;
 		}
 		else {
-			cout << "변경2\n" << endl;
 			m_pCamera = m_pPlayer[0]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
 			m_pCamera->canTurn = true;
 			m_pInsideCamera->canTurn = true;
