@@ -2199,6 +2199,12 @@ void CGameFramework::ProcessPacket(char* p)
 		packet->num;	// 스킵한 클라 수
 		break;
 	}
+	case SC_BLACK_HOLE_TIME:
+	{
+		SC_BLACK_HOLE_TIME_PACKET* packet = reinterpret_cast<SC_BLACK_HOLE_TIME_PACKET*>(p);
+		packet->time;	// 블랙홀 시간 float 타입 30.0f -> 0.0f
+		break;
+	}
 	default:
 		printf("Unknown PACKET type [%d]\n", p[1]);
 		break;

@@ -82,10 +82,11 @@ constexpr char CS_CUTSCENE_END = 27;
 constexpr char SC_CUTSCENE_END_NUM = 28;
 
 constexpr char SC_BLACK_HOLE = 29;	// 블랙홀 위치 전송
+constexpr char SC_BLACK_HOLE_TIME = 30;
 
 // cheat
-constexpr char CS_NEXT_MISSION = 30;
-constexpr char CS_START = 31;
+constexpr char CS_NEXT_MISSION = 31;
+constexpr char CS_START = 32;
 
 
 
@@ -518,6 +519,12 @@ struct SC_CUTSCENE_END_NUM_PACKET {
 	unsigned char size;
 	char	type;
 	char num;
+};
+
+struct SC_BLACK_HOLE_TIME_PACKET {
+	unsigned char size;
+	char	type;
+	float time;
 };
 
 
