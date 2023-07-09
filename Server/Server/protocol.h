@@ -79,12 +79,13 @@ constexpr char SC_KILL_NUM = 25;
 constexpr char SC_START = 26;
 
 constexpr char CS_CUTSCENE_END = 27;
+constexpr char SC_CUTSCENE_END_NUM = 28;
 
-constexpr char SC_BLACK_HOLE = 28;	// 블랙홀 위치 전송
+constexpr char SC_BLACK_HOLE = 29;	// 블랙홀 위치 전송
 
 // cheat
-constexpr char CS_NEXT_MISSION = 29;
-constexpr char CS_START = 30;
+constexpr char CS_NEXT_MISSION = 30;
+constexpr char CS_START = 31;
 
 
 
@@ -511,6 +512,14 @@ struct CS_CUTSCENE_END_PACKET {
 	unsigned char size;
 	char	type;
 };
+
+
+struct SC_CUTSCENE_END_NUM_PACKET {
+	unsigned char size;
+	char	type;
+	char num;
+};
+
 
 
 #pragma pack (pop)

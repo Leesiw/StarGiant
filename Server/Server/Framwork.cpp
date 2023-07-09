@@ -1125,6 +1125,18 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
 			if (levels[scene->cur_mission].cutscene) {
 				scene->m_ppPlayers[clients[c_id].room_pid]->cutscene_end = true;
+				char num = 0;
+				for (char i = 0; i < 3; ++i) {
+					if (scene->m_ppPlayers[i]->cutscene_end) {
+						++num;
+					}
+				}
+
+				SC_CUTSCENE_END_NUM_PACKET packet{};
+				packet.size = sizeof(SC_CUTSCENE_END_NUM_PACKET);
+				packet.type = SC_CUTSCENE_END_NUM;
+				packet.num = num;
+				scene->Send((char*)& packet);
 			}
 		}	
 		break;

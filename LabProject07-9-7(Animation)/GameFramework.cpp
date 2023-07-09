@@ -2193,6 +2193,12 @@ void CGameFramework::ProcessPacket(char* p)
 		m_pScene->setBlackholePos(packet->pos);
 		// packet->pos; 블랙홀 위치
 	}
+	case SC_CUTSCENE_END_NUM:
+	{
+		SC_CUTSCENE_END_NUM_PACKET* packet = reinterpret_cast<SC_CUTSCENE_END_NUM_PACKET*>(p);
+		packet->num;	// 스킵한 클라 수
+		break;
+	}
 	default:
 		printf("Unknown PACKET type [%d]\n", p[1]);
 		break;
