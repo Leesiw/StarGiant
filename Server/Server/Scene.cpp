@@ -43,6 +43,8 @@ void CScene::Init()
 void CScene::BuildObjects()
 {
 	cur_mission = MissionType::CS_TURN;
+	black_hole_time = 30.f;
+
 
 	// player
 	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
@@ -147,6 +149,8 @@ void CScene::Reset()
 	_id = -1;
 	m_pSpaceship->SetPosition(XMFLOAT3(0.f, 0.f, 100.f));
 	m_pSpaceship->Reset();
+
+	black_hole_time = 30.f;
 
 	items[ItemType::JEWEL_ATT] = 0;
 	items[ItemType::JEWEL_DEF] = 0;
@@ -545,9 +549,6 @@ void CScene::MissionClear()
 			p.type = SC_BLACK_HOLE;
 			p.pos = black_hole_pos;
 			Send((char*) & p);
-
-			TIMER_EVENT ev1{ 0, chrono::system_clock::now() + 30s, EV_MISSION_CLEAR, num };	// ºí·¢È¦
-			timer_queue.push(ev1);
 
 			b_prev_time = chrono::steady_clock::now();
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, num };

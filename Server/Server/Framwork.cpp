@@ -576,6 +576,13 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			auto time_now = chrono::steady_clock::now();
 			std::chrono::duration<float> elapsed_time = (time_now - scene->b_prev_time);
 			scene->b_prev_time = time_now;
+			scene->black_hole_time -= elapsed_time.count();
+			if (scene->black_hole_time <= 0.f) { scene->MissionClear(); break; }
+
+			SC_BLACK_HOLE_TIME_PACKET packet;
+			packet.size = sizeof(packet);
+			packet.type = SC_BLACK_HOLE_TIME;
+			packet.time = scene->black_hole_time;
 
 			XMFLOAT3 pos;
 			XMFLOAT3 ToBlackHole;

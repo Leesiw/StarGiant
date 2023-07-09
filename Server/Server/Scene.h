@@ -85,4 +85,5 @@ public:
 
 	XMFLOAT3 black_hole_pos;
 	chrono::steady_clock::time_point b_prev_time;
+	float black_hole_time;
 };
