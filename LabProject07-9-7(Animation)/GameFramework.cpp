@@ -1514,7 +1514,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 
 	distance = distance - 1500.0f;
 
-	distanceCenter = distanceCenter - 1500.0f;
+	distanceCenter = distanceCenter;
 
 	enemyCountStr = to_wstring(killCnt);
 	blackholetimewst = to_wstring(blackholetime);

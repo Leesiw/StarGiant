@@ -575,15 +575,21 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst)
             m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextGrayBrush);
         }        
     }
+    else
+    {
+        m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarRight, FRAME_BUFFER_HEIGHT - 50), Whitebrush); //배경
+        if (hpbarRight - hpBar > hpbarLeft)
+            m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarRight - hpBar, FRAME_BUFFER_HEIGHT - 50), Redbrush); // hp
+    }
 
-    if(mty == MissionType::CS_TURN|| mty == MissionType::CS_SHOW_PLANET || mty == MissionType::CS_BOSS_SCREAM || mty == MissionType::CS_SHOW_STARGIANT || mty == MissionType::CS_SHOW_BLACK_HOLE || mty == MissionType::CS_SHOW_GOD)
+    if(mty == MissionType::CS_SHOW_PLANET || mty == MissionType::CS_BOSS_SCREAM || mty == MissionType::CS_SHOW_STARGIANT || mty == MissionType::CS_SHOW_BLACK_HOLE || mty == MissionType::CS_SHOW_GOD)
         for (auto textBlock : m_vSkipBlocks)
         {
             m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, Redbrush);
         }
 
 
-
+    cout << "mty :" << int(mty) << endl;
 
 
     for (auto& a : m_enemyDot)
@@ -598,9 +604,7 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst)
 
 
 
-    m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarRight, FRAME_BUFFER_HEIGHT - 50), Whitebrush); //배경
-    if(hpbarRight - hpBar> hpbarLeft)
-        m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarRight - hpBar, FRAME_BUFFER_HEIGHT - 50), Redbrush); // hp
+    
 
 
     if (mty == MissionType::DEFEAT_BOSS) {
