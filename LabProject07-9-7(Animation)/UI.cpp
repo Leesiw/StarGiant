@@ -589,9 +589,6 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst)
         }
 
 
-    cout << "mty :" << int(mty) << endl;
-
-
     for (auto& a : m_enemyDot)
     {
         if(!(a.x == 100.0f && a.z == FRAME_BUFFER_HEIGHT / 2.0f + 100.0f))
