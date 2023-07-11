@@ -785,7 +785,7 @@ void CGameFramework::CameraUpdateChange()
 		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 		cout << "CS_TURN\n";
 		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
-		m_pInsideCamera->SetTarget({ 414.456f,224.0f,676.309f });
+		m_pInsideCamera->SetTarget({ 530.219f, 230.f, 593.263f });
 		m_pCamera->SetDist(100.0f);
 		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
@@ -1347,7 +1347,7 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
-	m_pUILayer->Render(m_nSwapChainBufferIndex, curMissionType, m_pScene->m_ppBoss->CurState, _state);
+	m_pUILayer->Render(m_nSwapChainBufferIndex, curMissionType, m_pScene->m_ppBoss->CurState, _state, m_GameTimer.GetTimeElapsed());
 
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;

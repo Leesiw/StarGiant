@@ -178,7 +178,7 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     //==
 
     IWICBitmapDecoder* pwicBitmapDecoder_logo;
-    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/clear.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_logo);
+    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/clear1.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_logo);
 
     IWICBitmapFrameDecode* pwicFrameDecode_lo;
     pwicBitmapDecoder_logo->GetFrame(0, &pwicFrameDecode_lo);
@@ -481,7 +481,7 @@ XMFLOAT4X4 UILayer::UpdateMat(const XMFLOAT3& pos)
     return matrix;
 }
 
-void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst)
+void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float etime)
 {
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
@@ -539,8 +539,11 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst)
     m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur, &d2dPoint);
     m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_jew, &d2dPoint_jew);
 
-    if(bst ==BossState::DIE)
-        m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_logo, &d2dPoint_logo);
+    if (bst == BossState::DIE && mty == MissionType::CS_SHOW_STARGIANT) {
+        actime += etime;
+        if (actime < 3)
+            m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_logo, &d2dPoint_logo);
+    }
 
     m_pd2dDeviceContext->SetTransform(matTM);
 

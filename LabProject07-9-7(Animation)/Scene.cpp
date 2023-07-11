@@ -449,7 +449,7 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	CLoadedModelInfo* pMascotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/robot.bin", NULL);
 	m_ppMascot = new CMascotObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMascotModel, 1);
 	m_ppMascot->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppMascot->SetPosition(530.219f, 250.f - 30.0f, 593.263f);
+	m_ppMascot->SetPosition(530.219f, 230.f, 593.263f);
 	//m_ppMascot->SetPosition(414.456f, 224.f, 676.309f);
 
 	m_ppMascot->SetScale(20.0f, 20.0f, 20.0f);

@@ -45,7 +45,7 @@ public:
 
     XMFLOAT4X4 UpdateMat(const XMFLOAT3& ppos);
 
-    void Render(UINT nFrame, MissionType mty = MissionType::TU_SIT, BossState bst = BossState::SLEEP, int sst = 0);
+    void Render(UINT nFrame, MissionType mty = MissionType::TU_SIT, BossState bst = BossState::SLEEP, int sst = 0, float etime = 0);
     void ReleaseResources();
     void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height);
 
@@ -76,6 +76,8 @@ private:
 
     float hpBar = 0;
     float BosshpBar = 0;
+
+    float actime = 0;
 
 
     ID3D11DeviceContext* m_pd3d11DeviceContext = NULL;
