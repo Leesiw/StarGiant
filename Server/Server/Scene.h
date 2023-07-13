@@ -40,9 +40,20 @@ public:
 
 	void GetJewels();
 
+	void SpawnEnemy();
+	void UpdateEnemy(char obj_id);
+	void UpdateMeteo(char obj_id);
+	void SpawnMissile(char obj_id);
+	void UpdateMissile(char obj_id);
+	void UpdateBoss();
+	void UpdateGod();
+	void UpdateSpaceship();
+	void Heal();
+	void SendSceneInfo();
+	void BlackHole();
+
 	void SpawnEnemy(char id);
 
-	void SpawnEnemy();
 	void SpawnMeteo(char i);
 
 	void Send(char* p);

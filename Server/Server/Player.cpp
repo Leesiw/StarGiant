@@ -223,7 +223,12 @@ bool CAirplanePlayer::GetHeal()
 		hp += heal;
 	}
 	else {
-		hp = max_hp;
+		if (hp == max_hp) {
+			hp = max_hp;
+		}
+		else {
+			return false;
+		}
 	}
 	return true;
 }

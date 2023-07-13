@@ -630,6 +630,521 @@ void CScene::GetJewels()
 	}
 }
 
+void CScene::SpawnEnemy()
+{
+	if (_state != ST_INGAME) { return; }
+	if (levels[cur_mission].cutscene) {
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_SPAWN_ENEMY, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+	std::array<CEnemy*, ENEMIES> ppEnemies{ m_ppEnemies };
+	std::random_shuffle(ppEnemies.begin(), ppEnemies.end());
+
+	char spawn_num = levels[cur_mission].SpawnMonsterNum;
+
+	for (int i = 0; i < ENEMIES; ++i)
+	{
+		if (levels[cur_mission].MaxMonsterNum <= cur_monster_num) { break; }
+		if (spawn_num <= 0) { break; }
+		if (!ppEnemies[i]->GetisAlive()) {
+			SpawnEnemy(ppEnemies[i]->GetID());
+			m_ppEnemies[ppEnemies[i]->GetID()]->prev_time = chrono::steady_clock::now();
+			TIMER_EVENT ev_u{ ppEnemies[i]->GetID(), chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(num) };
+			timer_queue.push(ev_u);
+			--spawn_num;
+		}
+	}
+	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_SPAWN_ENEMY, static_cast<short>(num) };
+	timer_queue.push(ev);
+}
+
+void CScene::UpdateEnemy(char obj_id)
+{
+	if (_state != ST_INGAME) { return; }
+	if (m_ppEnemies[obj_id]->hp <= 0) {
+		m_ppEnemies[obj_id]->SetisAlive(false);
+		--cur_monster_num;
+		return;
+	}
+	if (levels[cur_mission].cutscene) {
+		m_ppEnemies[obj_id]->prev_time = chrono::steady_clock::now();
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_ENEMY, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+
+	auto time_now = chrono::steady_clock::now();
+	std::chrono::duration<float> elapsed_time = (time_now - m_ppEnemies[obj_id]->prev_time);
+	m_ppEnemies[obj_id]->prev_time = time_now;
+
+	m_ppEnemies[obj_id]->AI(elapsed_time.count(), m_pSpaceship);
+	//scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
+
+	// 운석과 충돌처리
+
+	for (int i = 0; i < ENEMIES; ++i)
+	{
+		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
+		if (i == obj_id) { continue; }
+		//if (scene->m_ppEnemies[ex_over->obj_id]->HierarchyIntersects(scene->m_ppEnemies[i]))
+		if (Vector3::Length(Vector3::Subtract(m_ppEnemies[obj_id]->GetPosition(), m_ppEnemies[i]->GetPosition())) < 30.f)
+		{
+			XMFLOAT3 xmf3Sub = m_ppEnemies[i]->GetPosition();
+			xmf3Sub = Vector3::Subtract(m_ppEnemies[obj_id]->GetPosition(), xmf3Sub);
+			if (Vector3::Length(xmf3Sub) > 0.0001f) {
+				xmf3Sub = Vector3::Normalize(xmf3Sub);
+			}
+			XMFLOAT3 vel = m_ppEnemies[obj_id]->GetVelocity();
+			float fLen = Vector3::Length(vel) / 10.f;
+			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+			XMFLOAT3 vel2 = m_ppEnemies[i]->GetVelocity();
+
+			m_ppEnemies[obj_id]->SetVelocity(Vector3::Add(vel, xmf3Sub));
+			m_ppEnemies[i]->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+		}
+	}
+
+	if (obj_id >= 23
+		&& m_ppEnemies[obj_id]->state == EnemyState::AIMING &&
+		!m_ppEnemies[obj_id]->GetAttackTimer()) {
+		m_ppEnemies[obj_id]->SetAttackTimerTrue();
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(num) };
+		timer_queue.push(ev);
+	}
+
+
+
+	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_ENEMY, static_cast<short>(num) };
+	timer_queue.push(ev);
+
+}
+
+void CScene::UpdateMeteo(char obj_id)
+{
+	if (_state != ST_INGAME) { return; }
+	if (levels[cur_mission].cutscene) {
+		m_ppMeteoObjects[obj_id]->prev_time = chrono::steady_clock::now();
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_METEO, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+
+	auto time_now = chrono::steady_clock::now();
+	std::chrono::duration<float> elapsed_time = (time_now - m_ppMeteoObjects[obj_id]->prev_time);
+	m_ppMeteoObjects[obj_id]->prev_time = time_now;
+	m_ppMeteoObjects[obj_id]->Animate(elapsed_time.count());
+
+	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
+	XMFLOAT3 m_pos = m_ppMeteoObjects[obj_id]->GetPosition();
+	float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
+	if (dist > 1500.0f) {
+		SpawnMeteo(obj_id);
+	}
+	BoundingOrientedBox meteor_bbox = m_ppMeteoObjects[obj_id]->UpdateBoundingBox();
+	BoundingOrientedBox spaceship_bbox = m_pSpaceship->UpdateBoundingBox();
+
+	if (spaceship_bbox.Intersects(meteor_bbox))
+	{
+		XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
+		xmf3Sub = Vector3::Subtract(m_ppMeteoObjects[obj_id]->GetPosition(), xmf3Sub);
+		if (Vector3::Length(xmf3Sub) > 0.0001f) {
+			xmf3Sub = Vector3::Normalize(xmf3Sub);
+		}
+		XMFLOAT3 vel = m_pSpaceship->GetVelocity();
+		float fLen = Vector3::Length(vel);
+		xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+
+		m_pSpaceship->SetVelocity(Vector3::Add(vel, xmf3Sub));
+		m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 2);
+
+		SpawnMeteo(obj_id);
+
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_bullet_hit_packet(-1, m_pSpaceship->GetHP());
+
+		}
+	}
+
+	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_METEO, static_cast<short>(num) };
+	timer_queue.push(ev);
+}
+
+void CScene::SpawnMissile(char obj_id)
+{
+	if (_state != ST_INGAME) { return; }
+	if (!m_ppEnemies[obj_id]->GetisAlive() || m_ppEnemies[obj_id]->state != EnemyState::AIMING) {
+		m_ppEnemies[obj_id]->SetAttackTimerFalse();
+		return;
+	}
+	if (levels[cur_mission].cutscene) {
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+
+	MissileInfo info{};
+	info.StartPos = m_ppEnemies[obj_id]->GetPosition();
+	info.Quaternion = m_ppEnemies[obj_id]->GetQuaternion();
+	info.damage = levels[ cur_mission].Missile.ATK;
+
+	// 미사일 생성, 미사일 타이머 push
+	for (char i = 0; i < ENEMY_BULLETS; ++i) {
+		if (!m_ppMissiles[i]->GetisActive()) {
+			m_ppMissiles[i]->SetNewMissile(info);
+
+			MISSILE_INFO m_info{};
+			m_info.id = i;
+			m_info.pos = info.StartPos;
+			m_info.Quaternion = info.Quaternion;
+
+			for (short pl_id : _plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_missile_packet(m_info);
+			}
+			m_ppMissiles[i]->prev_time = chrono::steady_clock::now();
+			TIMER_EVENT ev{ i, chrono::system_clock::now() + 30ms, EV_UPDATE_MISSILE, static_cast<short>(num) };
+			timer_queue.push(ev);
+
+			break;
+		}
+	}
+
+	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(num) };
+	timer_queue.push(ev);
+}
+
+void CScene::UpdateMissile(char obj_id)
+{
+	if (_state != ST_INGAME) { return; }
+	if (!m_ppMissiles[obj_id]->GetisActive()) { return; }
+	if (levels[cur_mission].cutscene) {
+		m_ppMissiles[obj_id]->prev_time = chrono::steady_clock::now();
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_MISSILE, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+
+	auto time_now = chrono::steady_clock::now();
+	std::chrono::duration<float> elapsed_time = (time_now - m_ppMissiles[obj_id]->prev_time);
+	m_ppMissiles[obj_id]->prev_time = time_now;
+	m_ppMissiles[obj_id]->Animate(elapsed_time.count(), m_pSpaceship);
+
+	MISSILE_INFO m_info{};
+	m_info.id = obj_id;
+	m_info.pos = m_ppMissiles[obj_id]->GetPosition();
+	//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
+	m_info.Quaternion = m_ppMissiles[obj_id]->GetQuaternion();
+
+	BoundingOrientedBox missile_bbox = m_ppMissiles[obj_id]->UpdateBoundingBox();
+	BoundingOrientedBox spaceship_bbox = m_ppMissiles[obj_id]->UpdateBoundingBox();
+
+	if (missile_bbox.Intersects(spaceship_bbox))
+	{
+		m_ppMissiles[obj_id]->SetisActive(false);
+		// 충돌처리
+
+		XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
+		xmf3Sub = Vector3::Subtract(m_ppMissiles[obj_id]->GetPosition(), xmf3Sub);
+		if (Vector3::Length(xmf3Sub) > 0.0001f) {
+			xmf3Sub = Vector3::Normalize(xmf3Sub);
+		}
+		float fLen = 100.f;
+		xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+
+		XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
+		m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+
+		if (m_pSpaceship->GetHP() > 0) {
+			m_pSpaceship->GetAttack(m_ppMissiles[obj_id]->GetDamage());
+		}
+
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_bullet_hit_packet(-1, m_pSpaceship->GetHP());
+		}
+	}
+
+	if (m_ppMissiles[obj_id]->GetisActive()) {
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_MISSILE, static_cast<short>(num) };
+		timer_queue.push(ev);
+	}
+	else {
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_remove_missile_packet(obj_id);
+		}
+	}
+}
+
+void CScene::UpdateBoss()
+{
+	if (_state != ST_INGAME) { return; }
+	if (m_pBoss->BossHP <= 0) {
+		MissionClear();
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+	if (levels[cur_mission].cutscene) {
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_BOSS, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+
+	m_pBoss->Boss_Ai(0.01f, m_pSpaceship, m_pBoss->GetHP());
+
+	float dist;
+	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));
+	if (dist < 1000.f) // boss 막기
+	{
+		XMFLOAT3 ToGo = Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition());
+		ToGo = Vector3::ScalarProduct(ToGo, 800.f);
+		ToGo = Vector3::Add(m_pBoss->GetPosition(), ToGo);
+		m_pSpaceship->SetPosition(ToGo);
+	}
+
+	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_BOSS, static_cast<short>(num) };
+	timer_queue.push(ev);
+}
+
+void CScene::UpdateGod()
+{
+	if (_state != ST_INGAME) { return; }
+	if (m_pGod->GetcurHp() <= 0) {
+		MissionClear();
+		return;
+	}
+	if (levels[cur_mission].cutscene) {
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_GOD, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+
+	m_pGod->God_Ai(0.01f, m_pSpaceship, m_pGod->GetcurHp());
+
+	float dist;
+	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pGod->GetPosition()));
+	if (dist < 2000.f) // boss 막기
+	{
+		XMFLOAT3 ToGo = Vector3::Subtract(m_pSpaceship->GetPosition(), m_pGod->GetPosition());
+		ToGo = Vector3::ScalarProduct(ToGo, 800.f);
+		ToGo = Vector3::Add(m_pGod->GetPosition(), ToGo);
+		m_pSpaceship->SetPosition(ToGo);
+	}
+
+	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_GOD, static_cast<short>(num) };
+	timer_queue.push(ev);
+}
+
+void CScene::UpdateSpaceship()
+{
+	if (_state != ST_INGAME) { return; }
+	if (levels[cur_mission].cutscene) {
+		bool cutscene_end = true;
+		for (char i = 0; i < 3; ++i) {
+			if (_plist[i] == -1) { continue; }
+			if (m_ppPlayers[i]->cutscene_end == false) { cutscene_end = false; }
+		}
+
+		if (cutscene_end == true) {
+			MissionClear();
+			for (char i = 0; i < 3; ++i) {
+				if (_plist[i] == -1) { continue; }
+				m_ppPlayers[i]->cutscene_end = false;
+			}
+			m_pSpaceship->prev_time = chrono::steady_clock::now();
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_SPACESHIP, static_cast<short>(num) };
+			timer_queue.push(ev);
+			return;
+		}
+
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_SPACESHIP, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+	auto time_now = chrono::steady_clock::now();
+	std::chrono::duration<float> elapsed_time = (time_now - m_pSpaceship->prev_time);
+	m_pSpaceship->prev_time = time_now;
+	m_pSpaceship->Update(elapsed_time.count());
+
+	CheckMissionComplete();
+
+	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_SPACESHIP, static_cast<short>(num) };
+	timer_queue.push(ev);
+}
+
+void CScene::Heal()
+{
+	if (_state != ST_INGAME) { return; }
+	if (levels[cur_mission].cutscene) {
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+
+	if (heal_player != -1) {
+		if (m_pSpaceship->GetHeal()) {
+			for (short pl_id : _plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_bullet_hit_packet(-1, m_pSpaceship->GetHP());
+			}
+		}
+
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, static_cast<short>(num) };
+		timer_queue.push(ev);
+	}
+}
+
+void CScene::SendSceneInfo()
+{
+	if (_state != ST_INGAME) { return; }
+	if (levels[cur_mission].cutscene) {
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 500ms, EV_SEND_SCENE_INFO, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+
+	char send_buf[10000];
+	short send_num = 0;
+
+	SC_ALL_METEOR_PACKET m_packet;
+	m_packet.type = SC_ALL_METEOR;
+	m_packet.size = sizeof(SC_ALL_METEOR_PACKET);
+	for (char i = 0; i < METEOS; ++i) {
+		m_packet.pos[i] = m_ppMeteoObjects[i]->GetPosition();
+	}
+	memcpy(&send_buf[0], &m_packet, m_packet.size);
+	send_num += m_packet.size;
+
+	SC_MOVE_SPACESHIP_PACKET s_packet;
+	s_packet.size = sizeof(s_packet);
+	s_packet.type = SC_MOVE_SPACESHIP;
+	s_packet.move_time = m_pSpaceship->move_time;
+	s_packet.data.pos = m_pSpaceship->GetPosition();
+	s_packet.data.Quaternion = m_pSpaceship->input_info.Quaternion;
+	memcpy(&send_buf[send_num], &s_packet, s_packet.size);
+	send_num += s_packet.size;
+
+	for (char i = 0; i < ENEMIES; ++i) {
+		if (m_ppEnemies[i]->hp <= 0) { continue; }
+		SC_MOVE_ENEMY_PACKET e_packet;
+		e_packet.size = sizeof(e_packet);
+		e_packet.type = SC_MOVE_ENEMY;
+		e_packet.data.id = i;
+		e_packet.data.pos = m_ppEnemies[i]->GetPosition();
+		e_packet.data.Quaternion = m_ppEnemies[i]->GetQuaternion();
+		memcpy(&send_buf[send_num], &e_packet, e_packet.size);
+		send_num += e_packet.size;
+	}
+
+	for (char i = 0; i < MISSILES; ++i) {
+		if (!m_ppMissiles[i]->GetisActive()) { continue; }
+		SC_MISSILE_PACKET e_packet;
+		e_packet.size = sizeof(e_packet);
+		e_packet.type = SC_MISSILE;
+		e_packet.data.id = i;
+		e_packet.data.pos = m_ppMissiles[i]->GetPosition();
+		e_packet.data.Quaternion = m_ppMissiles[i]->GetQuaternion();
+		memcpy(&send_buf[send_num], &e_packet, e_packet.size);
+		send_num += e_packet.size;
+	}
+
+	for (short pl_id : _plist) {
+		if (pl_id == -1) continue;
+		if (clients[pl_id]._state != ST_INGAME) continue;
+		clients[pl_id].do_send(&send_buf, send_num);
+	}
+
+
+	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20ms, EV_SEND_SCENE_INFO, static_cast<short>(num) };
+	timer_queue.push(ev);
+}
+
+void CScene::BlackHole()
+{
+	if (_state != ST_INGAME) { return; }
+	if (cur_mission != MissionType::ESCAPE_BLACK_HOLE) { return; }
+
+	auto time_now = chrono::steady_clock::now();
+	std::chrono::duration<float> elapsed_time = (time_now - b_prev_time);
+	b_prev_time = time_now;
+	black_hole_time -= elapsed_time.count();
+	if (black_hole_time <= 0.f) { MissionClear(); return; }
+
+	SC_BLACK_HOLE_TIME_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_BLACK_HOLE_TIME;
+	packet.time = black_hole_time;
+	Send((char*)&packet);
+
+	XMFLOAT3 pos;
+	XMFLOAT3 ToBlackHole;
+	float dist;
+	float speed;
+	pos = m_pSpaceship->GetPosition();
+	ToBlackHole = Vector3::Subtract(black_hole_pos, pos);
+	dist = Vector3::Length(ToBlackHole);
+	speed = 90.f - dist * 0.5f;
+	if (speed < 50.f) { speed = 50.f; }
+	ToBlackHole = Vector3::ScalarProduct(ToBlackHole, speed * elapsed_time.count());
+	m_pSpaceship->SetPosition(Vector3::Add(pos, ToBlackHole));
+	if (dist < 30.f) {
+		m_pSpaceship->GetAttack(1);
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_bullet_hit_packet(-1, m_pSpaceship->GetHP());
+		}
+	}
+
+	for (char i = 0; i < METEOS; ++i) {
+		pos = m_ppMeteoObjects[i]->GetPosition();
+		dist = Vector3::Length(Vector3::Subtract(pos, black_hole_pos));
+		if (dist < 20.f) {
+			SpawnMeteo(i);
+			continue;
+		}
+		ToBlackHole = Vector3::Subtract(black_hole_pos, pos);
+		dist = Vector3::Length(ToBlackHole);
+		speed = 90.f - dist * 0.5f;
+		if (speed < 50.f) { speed = 50.f; }
+		ToBlackHole = Vector3::ScalarProduct(ToBlackHole, speed * elapsed_time.count());
+		m_ppMeteoObjects[i]->SetPosition(Vector3::Add(pos, ToBlackHole));
+	}
+
+	for (char i = 0; i < ENEMIES; ++i) {
+		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
+		pos = m_ppEnemies[i]->GetPosition();
+		dist = Vector3::Length(Vector3::Subtract(pos, black_hole_pos));
+		if (dist < 50.f) {
+			m_ppEnemies[i]->hp -= 3;
+			for (short pl_id : _plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_bullet_hit_packet(i, m_ppEnemies[i]->hp);
+			}
+			continue;
+		}
+		ToBlackHole = Vector3::Subtract(black_hole_pos, pos);
+		dist = Vector3::Length(ToBlackHole);
+		speed = 90.f - dist * 0.5f;
+		if (speed < 50.f) { speed = 50.f; }
+		ToBlackHole = Vector3::ScalarProduct(ToBlackHole, speed * elapsed_time.count());
+		m_ppEnemies[i]->SetPosition(Vector3::Add(pos, ToBlackHole));
+	}
+
+	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_BLACK_HOLE, static_cast<short>(num) };
+	timer_queue.push(ev);
+
+}
+
 void CScene::SpawnEnemy(char id)
 {
 	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();

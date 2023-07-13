@@ -90,402 +90,55 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		}
 		case OP_SPAWN_ENEMY: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			if (levels[scene->cur_mission].cutscene) {
-				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_SPAWN_ENEMY, static_cast<short>(key) };
-				timer_queue.push(ev);
-				break;
-			}
-			std::array<CEnemy*, ENEMIES> ppEnemies{ scene->m_ppEnemies };
-			std::random_shuffle(ppEnemies.begin(), ppEnemies.end());
-
-			char spawn_num = levels[scene->cur_mission].SpawnMonsterNum;
-			
-			for (int i = 0; i < ENEMIES; ++i)
-			{
-				if (levels[scene->cur_mission].MaxMonsterNum <= scene->cur_monster_num) { break; }
-				if (spawn_num <= 0) { break; }
-				if (!ppEnemies[i]->GetisAlive()) {
-					scene->SpawnEnemy(ppEnemies[i]->GetID());
-					scene->m_ppEnemies[ppEnemies[i]->GetID()]->prev_time = chrono::steady_clock::now();
-					TIMER_EVENT ev_u{ ppEnemies[i]->GetID(), chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(key) };
-					timer_queue.push(ev_u);
-					--spawn_num;
-				}
-			}
-			TIMER_EVENT ev{0, chrono::system_clock::now() + 20s, EV_SPAWN_ENEMY, static_cast<short>(key) };
-			timer_queue.push(ev);
-
+			scene->SpawnEnemy();
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_ENEMY: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			if (scene->m_ppEnemies[ex_over->obj_id]->hp <= 0) { 
-				scene->m_ppEnemies[ex_over->obj_id]->SetisAlive(false);
-				--scene->cur_monster_num;
-				break; 
-			}
-			if (levels[scene->cur_mission].cutscene) {
-				scene->m_ppEnemies[ex_over->obj_id]->prev_time = chrono::steady_clock::now();
-				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_ENEMY, static_cast<short>(key) };
-				timer_queue.push(ev);
-				break;
-			}
-			
-			auto time_now = chrono::steady_clock::now();
-			std::chrono::duration<float> elapsed_time = (time_now - scene->m_ppEnemies[ex_over->obj_id]->prev_time);
-			scene->m_ppEnemies[ex_over->obj_id]->prev_time = time_now;
-
-			scene->m_ppEnemies[ex_over->obj_id]->AI(elapsed_time.count(), scene->m_pSpaceship);
-			//scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
-
-			// 운석과 충돌처리
-			
-			for (int i = 0; i < ENEMIES; ++i)
-			{
-				if (!scene->m_ppEnemies[i]->GetisAlive()) { continue; }
-				if (i == ex_over->obj_id) { continue; }
-				//if (scene->m_ppEnemies[ex_over->obj_id]->HierarchyIntersects(scene->m_ppEnemies[i]))
-				if(Vector3::Length(Vector3::Subtract(scene->m_ppEnemies[ex_over->obj_id]->GetPosition(), scene->m_ppEnemies[i]->GetPosition())) < 30.f)
-				{
-					XMFLOAT3 xmf3Sub = scene->m_ppEnemies[i]->GetPosition();
-					xmf3Sub = Vector3::Subtract(scene->m_ppEnemies[ex_over->obj_id]->GetPosition(), xmf3Sub);
-					if (Vector3::Length(xmf3Sub) > 0.0001f) {
-						xmf3Sub = Vector3::Normalize(xmf3Sub);
-					}
-					XMFLOAT3 vel = scene->m_ppEnemies[ex_over->obj_id]->GetVelocity();
-					float fLen = Vector3::Length(vel) / 10.f;
-					xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
-					XMFLOAT3 vel2 = scene->m_ppEnemies[i]->GetVelocity();
-
-					scene->m_ppEnemies[ex_over->obj_id]->SetVelocity(Vector3::Add(vel, xmf3Sub));
-					scene->m_ppEnemies[i]->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
-				}
-			}
-
-				ENEMY_INFO info{};
-				info.id = ex_over->obj_id;
-				info.pos = scene->m_ppEnemies[ex_over->obj_id]->GetPosition();
-				info.Quaternion = scene->m_ppEnemies[ex_over->obj_id]->GetQuaternion();
-				info.velocity = scene->m_ppEnemies[ex_over->obj_id]->GetVelocity();
-				for (short pl_id : scene->_plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					//clients[pl_id].send_enemy_packet(info);
-				}
-
-				if (ex_over->obj_id >= 23
-					&& scene->m_ppEnemies[ex_over->obj_id]->state == EnemyState::AIMING &&
-					!scene->m_ppEnemies[ex_over->obj_id]->GetAttackTimer()) {
-					scene->m_ppEnemies[ex_over->obj_id]->SetAttackTimerTrue();
-					TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(key) };
-					timer_queue.push(ev);
-				}
-
-
-		
-			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_ENEMY, static_cast<short>(key) };
-			timer_queue.push(ev);
-
+			scene->UpdateEnemy(ex_over->obj_id);
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_METEO: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			if (levels[scene->cur_mission].cutscene) {
-				scene->m_ppMeteoObjects[ex_over->obj_id]->prev_time = chrono::steady_clock::now();
-				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_METEO, static_cast<short>(key) };
-				timer_queue.push(ev);
-				break;
-			}
-
-			auto time_now = chrono::steady_clock::now();
-			std::chrono::duration<float> elapsed_time = (time_now - scene->m_ppMeteoObjects[ex_over->obj_id]->prev_time);
-			scene->m_ppMeteoObjects[ex_over->obj_id]->prev_time = time_now;
-			scene->m_ppMeteoObjects[ex_over->obj_id]->Animate(elapsed_time.count());
-			
-			XMFLOAT3 p_pos = scene->m_pSpaceship->GetPosition();
-			XMFLOAT3 m_pos = scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition();
-			float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
-			if (dist > 1500.0f) {
-				scene->SpawnMeteo(ex_over->obj_id);
-			}
-			BoundingOrientedBox meteor_bbox = scene->m_ppMeteoObjects[ex_over->obj_id]->UpdateBoundingBox();
-			BoundingOrientedBox spaceship_bbox = scene->m_pSpaceship->UpdateBoundingBox();
-
-			if (spaceship_bbox.Intersects(meteor_bbox))
-			{
-				XMFLOAT3 xmf3Sub = scene->m_pSpaceship->GetPosition();
-				xmf3Sub = Vector3::Subtract(scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition(), xmf3Sub);
-				if (Vector3::Length(xmf3Sub) > 0.0001f) {
-					xmf3Sub = Vector3::Normalize(xmf3Sub);
-				}
-				XMFLOAT3 vel = scene->m_pSpaceship->GetVelocity();
-				float fLen = Vector3::Length(vel);
-				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
-
-				scene->m_pSpaceship->SetVelocity(Vector3::Add(vel, xmf3Sub));
-				scene->m_pSpaceship->SetHP(scene->m_pSpaceship->GetHP() - 2);
-				
-				scene->SpawnMeteo(ex_over->obj_id);
-				
-				for (short pl_id : scene->_plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_bullet_hit_packet(-1, scene->m_pSpaceship->GetHP());
-
-				}
-			}
-
-			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_METEO, static_cast<short>(key) };
-			timer_queue.push(ev);
-
+			scene->UpdateMeteo(ex_over->obj_id);
 			delete ex_over;
 			break;
 		}
 		case OP_SPAWN_MISSILE: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			if (!scene->m_ppEnemies[ex_over->obj_id]->GetisAlive() || scene->m_ppEnemies[ex_over->obj_id]->state != EnemyState::AIMING) {
-				scene->m_ppEnemies[ex_over->obj_id]->SetAttackTimerFalse();
-				break; 
-			}
-			if (levels[scene->cur_mission].cutscene) {
-				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(key) };
-				timer_queue.push(ev);
-				break;
-			}
-
-			MissileInfo info{};
-			info.StartPos = scene->m_ppEnemies[ex_over->obj_id]->GetPosition();
-			info.Quaternion = scene->m_ppEnemies[ex_over->obj_id]->GetQuaternion();
-			info.damage = levels[scene->cur_mission].Missile.ATK;
-
-			// 미사일 생성, 미사일 타이머 push
-			for (int i = 0; i < ENEMY_BULLETS; ++i) {
-				if (!scene->m_ppMissiles[i]->GetisActive()) {
-					scene->m_ppMissiles[i]->SetNewMissile(info);
-
-					MISSILE_INFO m_info{};
-					m_info.id = i;
-					m_info.pos = info.StartPos;
-					m_info.Quaternion = info.Quaternion;
-
-					for (short pl_id : scene->_plist) {
-						if (pl_id == -1) continue;
-						if (clients[pl_id]._state != ST_INGAME) continue;
-						clients[pl_id].send_missile_packet(m_info);
-					}
-					scene->m_ppMissiles[i]->prev_time = chrono::steady_clock::now();
-					TIMER_EVENT ev{ static_cast<char>(i), chrono::system_clock::now() + 30ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
-					timer_queue.push(ev);
-
-					break;
-				}
-			}
-
-			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(key) };
-			timer_queue.push(ev);
+			scene->SpawnMissile(ex_over->obj_id);
 			delete ex_over;
 			break;
 		}
-
 		case OP_UPDATE_MISSILE: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			if (!scene->m_ppMissiles[ex_over->obj_id]->GetisActive()) { break; }
-			if (levels[scene->cur_mission].cutscene) {
-				scene->m_ppMissiles[ex_over->obj_id]->prev_time = chrono::steady_clock::now();
-				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_MISSILE, static_cast<short>(key) };
-				timer_queue.push(ev);
-				break;
-			}
-
-			auto time_now = chrono::steady_clock::now();
-			std::chrono::duration<float> elapsed_time = (time_now - scene->m_ppMissiles[ex_over->obj_id]->prev_time);
-			scene->m_ppMissiles[ex_over->obj_id]->prev_time = time_now;
-			scene->m_ppMissiles[ex_over->obj_id]->Animate(elapsed_time.count(), scene->m_pSpaceship);
-			
-			MISSILE_INFO m_info{};
-			m_info.id = ex_over->obj_id;
-			m_info.pos = scene->m_ppMissiles[ex_over->obj_id]->GetPosition();
-			//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
-			m_info.Quaternion = scene->m_ppMissiles[ex_over->obj_id]->GetQuaternion();
-
-			BoundingOrientedBox missile_bbox = scene->m_ppMissiles[ex_over->obj_id]->UpdateBoundingBox();
-			BoundingOrientedBox spaceship_bbox = scene->m_ppMissiles[ex_over->obj_id]->UpdateBoundingBox();
-
-			if (missile_bbox.Intersects(spaceship_bbox))
-			{
-				scene->m_ppMissiles[ex_over->obj_id]->SetisActive(false);
-				// 충돌처리
-				
-				XMFLOAT3 xmf3Sub = scene->m_pSpaceship->GetPosition();
-				xmf3Sub = Vector3::Subtract(scene->m_ppMissiles[ex_over->obj_id]->GetPosition(), xmf3Sub);
-				if (Vector3::Length(xmf3Sub) > 0.0001f) {
-					xmf3Sub = Vector3::Normalize(xmf3Sub);
-				}
-				float fLen = 100.f;
-				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
-
-				XMFLOAT3 vel2 = scene->m_pSpaceship->GetVelocity();
-				scene->m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
-			
-				if (scene->m_pSpaceship->GetHP() > 0) {
-					scene->m_pSpaceship->GetAttack(scene->m_ppMissiles[ex_over->obj_id]->GetDamage());
-				}
-
-				for (short pl_id : scene->_plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_bullet_hit_packet( -1, scene->m_pSpaceship->GetHP());
-				}
-			}
-
-			if (scene->m_ppMissiles[ex_over->obj_id]->GetisActive()) {
-				for (short pl_id : scene->_plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					//clients[pl_id].send_missile_packet(m_info);
-				}
-				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_MISSILE, static_cast<short>(key) };
-				timer_queue.push(ev);
-			}
-			else {
-				for (short pl_id : scene->_plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_remove_missile_packet(ex_over->obj_id);
-				}
-			}
+			scene->UpdateMissile(ex_over->obj_id);
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_BOSS: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			if (scene->m_pBoss->BossHP <= 0) { 
-				scene->MissionClear();
-				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(key) };
-				timer_queue.push(ev);
-				break; 
-			}
-			if (levels[scene->cur_mission].cutscene) {
-				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_BOSS, static_cast<short>(key) };
-				timer_queue.push(ev);
-				break;
-			}
-
-			scene->m_pBoss->Boss_Ai(0.01f, scene->m_pSpaceship, scene->m_pBoss->GetHP());
-
-			float dist;
-			dist = Vector3::Length(Vector3::Subtract(scene->m_pSpaceship->GetPosition(), scene->m_pBoss->GetPosition()));
-			if (dist < 1000.f) // boss 막기
-			{
-				XMFLOAT3 ToGo = Vector3::Subtract(scene->m_pSpaceship->GetPosition(), scene->m_pBoss->GetPosition());
-				ToGo = Vector3::ScalarProduct(ToGo, 800.f);
-				ToGo = Vector3::Add(scene->m_pBoss->GetPosition(), ToGo);
-				scene->m_pSpaceship->SetPosition(ToGo);
-			}
-
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_BOSS, static_cast<short>(key) };
-			timer_queue.push(ev);
+			scene->UpdateBoss();
 			delete ex_over;
 			break;
 		}
 		case OP_UPDATE_GOD: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			if (scene->m_pGod->GetcurHp() <= 0) {
-				scene->MissionClear();
-				break;
-			}
-			if (levels[scene->cur_mission].cutscene) {
-				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_GOD, static_cast<short>(key) };
-				timer_queue.push(ev);
-				break;
-			}
-
-			scene->m_pGod->God_Ai(0.01f, scene->m_pSpaceship, scene->m_pGod->GetcurHp());
-
-			float dist;
-			dist = Vector3::Length(Vector3::Subtract(scene->m_pSpaceship->GetPosition(), scene->m_pGod->GetPosition()));
-			if (dist < 2000.f) // boss 막기
-			{
-				XMFLOAT3 ToGo = Vector3::Subtract(scene->m_pSpaceship->GetPosition(), scene->m_pGod->GetPosition());
-				ToGo = Vector3::ScalarProduct(ToGo, 800.f);
-				ToGo = Vector3::Add(scene->m_pGod->GetPosition(), ToGo);
-				scene->m_pSpaceship->SetPosition(ToGo);
-			}
-
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_GOD, static_cast<short>(key) };
-			timer_queue.push(ev);
+			scene->UpdateGod();
 			delete ex_over;
 			break;
 		}
-		case OP_UPDATE_SPACESHIP: {
-			
+		case OP_UPDATE_SPACESHIP: {	
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			if (levels[scene->cur_mission].cutscene) {
-				bool cutscene_end = true;
-				for (char i = 0; i < 3; ++i) {
-					if (scene->_plist[i] == -1) { continue; }
-					if (scene->m_ppPlayers[i]->cutscene_end == false) { cutscene_end = false; }
-				}
-
-				if(cutscene_end == true){
-					scene->MissionClear();
-					for (char i = 0; i < 3; ++i) {
-						if (scene->_plist[i] == -1) { continue; }
-						scene->m_ppPlayers[i]->cutscene_end = false;
-					}
-					scene->m_pSpaceship->prev_time = chrono::steady_clock::now();
-					TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_SPACESHIP, static_cast<short>(key) };
-					timer_queue.push(ev);
-					break;
-				}
-
-				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_SPACESHIP, static_cast<short>(key) };
-				timer_queue.push(ev);
-				break;
-			}
-			auto time_now = chrono::steady_clock::now();
-			std::chrono::duration<float> elapsed_time = (time_now - scene->m_pSpaceship->prev_time);
-			scene->m_pSpaceship->prev_time = time_now;
-			scene->m_pSpaceship->Update(elapsed_time.count());
-
-			scene->CheckMissionComplete();
-
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_SPACESHIP, static_cast<short>(key) };
-			timer_queue.push(ev);
+			scene->UpdateSpaceship();
 			delete ex_over;
 			break;
 		}
 		case OP_HEAL: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			if (levels[scene->cur_mission].cutscene) {
-				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 1s, EV_HEAL, static_cast<short>(key) };
-				timer_queue.push(ev);
-				break;
-			}
-
-			if (scene->heal_player != -1) {
-				if (scene->m_pSpaceship->GetHeal()) {
-					for (short pl_id : scene->_plist) {
-						if (pl_id == -1) continue;
-						if (clients[pl_id]._state != ST_INGAME) continue;
-						clients[pl_id].send_bullet_hit_packet(-1, scene->m_pSpaceship->GetHP());
-					}
-				}
-
-				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, static_cast<short>(key) };
-				timer_queue.push(ev);
-			}
+			scene->Heal();
 			delete ex_over;
 			break;
 		}
@@ -509,145 +162,14 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		}
 		case OP_SEND_SCENE_INFO: {	// 우주선 좌표, 적 좌표, 미사일 좌표 한번에 send 
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			if (levels[scene->cur_mission].cutscene) {
-				TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 500ms, EV_SEND_SCENE_INFO, static_cast<short>(key) };
-				timer_queue.push(ev);
-				break;
-			}
-			
-			char send_buf[10000];
-			short send_num = 0;
-
-			SC_ALL_METEOR_PACKET m_packet;
-			m_packet.type = SC_ALL_METEOR;
-			m_packet.size = sizeof(SC_ALL_METEOR_PACKET);
-			for (char i = 0; i < METEOS; ++i) {
-				m_packet.pos[i] = scene->m_ppMeteoObjects[i]->GetPosition();
-			}
-			memcpy(&send_buf[0], &m_packet, m_packet.size);
-			send_num += m_packet.size;
-
-			SC_MOVE_SPACESHIP_PACKET s_packet;
-			s_packet.size = sizeof(s_packet);
-			s_packet.type = SC_MOVE_SPACESHIP;
-			s_packet.move_time = scene->m_pSpaceship->move_time;
-			s_packet.data.pos = scene->m_pSpaceship->GetPosition();
-			s_packet.data.Quaternion = scene->m_pSpaceship->input_info.Quaternion;
-			memcpy(&send_buf[send_num], &s_packet, s_packet.size);
-			send_num += s_packet.size;
-
-			for (char i = 0; i < ENEMIES; ++i) {
-				if (scene->m_ppEnemies[i]->hp < 0) { continue; }
-				SC_MOVE_ENEMY_PACKET e_packet;
-				e_packet.size = sizeof(e_packet);
-				e_packet.type = SC_MOVE_ENEMY;
-				e_packet.data.id = i;
-				e_packet.data.pos = scene->m_ppEnemies[i]->GetPosition();
-				e_packet.data.Quaternion = scene->m_ppEnemies[i]->GetQuaternion();
-				memcpy(&send_buf[send_num], &e_packet, e_packet.size);
-				send_num += e_packet.size;
-			}
-
-			for (char i = 0; i < MISSILES; ++i) {
-				if (!scene->m_ppMissiles[i]->GetisActive()) { continue; }
-				SC_MISSILE_PACKET e_packet;
-				e_packet.size = sizeof(e_packet);
-				e_packet.type = SC_MISSILE;
-				e_packet.data.id = i;
-				e_packet.data.pos = scene->m_ppMissiles[i]->GetPosition();
-				e_packet.data.Quaternion = scene->m_ppMissiles[i]->GetQuaternion();
-				memcpy(&send_buf[send_num], &e_packet, e_packet.size);
-				send_num += e_packet.size;
-			}
-
-			for (short pl_id : scene->_plist) {
-				if (pl_id == -1) continue;
-				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].do_send(&send_buf, send_num);
-			}
-
-
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20ms, EV_SEND_SCENE_INFO, static_cast<short>(key) };
-			timer_queue.push(ev);
+			scene->SendSceneInfo();
 			delete ex_over;
 			break;
 		}
 		case OP_BLACK_HOLE: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			if (scene->cur_mission != MissionType::ESCAPE_BLACK_HOLE) { break; }
-
-			auto time_now = chrono::steady_clock::now();
-			std::chrono::duration<float> elapsed_time = (time_now - scene->b_prev_time);
-			scene->b_prev_time = time_now;
-			scene->black_hole_time -= elapsed_time.count();
-			if (scene->black_hole_time <= 0.f) { scene->MissionClear(); break; }
-
-			SC_BLACK_HOLE_TIME_PACKET packet;
-			packet.size = sizeof(packet);
-			packet.type = SC_BLACK_HOLE_TIME;
-			packet.time = scene->black_hole_time;
-			scene->Send((char*)&packet);
-
-			XMFLOAT3 pos;
-			XMFLOAT3 ToBlackHole;
-			float dist;
-			float speed;
-			pos = scene->m_pSpaceship->GetPosition();
-			ToBlackHole = Vector3::Subtract(scene->black_hole_pos, pos);
-			dist = Vector3::Length(ToBlackHole);
-			speed = 90.f - dist * 0.5f;
-			if (speed < 50.f) { speed = 50.f; }
-			ToBlackHole = Vector3::ScalarProduct(ToBlackHole, speed * elapsed_time.count());
-			scene->m_pSpaceship->SetPosition(Vector3::Add(pos, ToBlackHole));
-			if (dist < 30.f) {
-				scene->m_pSpaceship->GetAttack(1);
-				for (short pl_id : scene->_plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_bullet_hit_packet(-1, scene->m_pSpaceship->GetHP());
-				}
-			}
-
-			for (char i = 0; i < METEOS; ++i) {
-				pos = scene->m_ppMeteoObjects[i]->GetPosition();
-				dist = Vector3::Length(Vector3::Subtract(pos, scene->black_hole_pos));
-				if (dist < 20.f) {
-					scene->SpawnMeteo(i);
-					continue;
-				}
-				ToBlackHole = Vector3::Subtract(scene->black_hole_pos, pos);
-				dist = Vector3::Length(ToBlackHole);
-				speed = 90.f - dist * 0.5f;
-				if (speed < 50.f) { speed = 50.f; }
-				ToBlackHole = Vector3::ScalarProduct(ToBlackHole, speed * elapsed_time.count());
-				scene->m_ppMeteoObjects[i]->SetPosition(Vector3::Add(pos, ToBlackHole));
-			}
-
-			for (char i = 0; i < ENEMIES; ++i) {
-				if (!scene->m_ppEnemies[i]->GetisAlive()) { continue; }
-				pos = scene->m_ppEnemies[i]->GetPosition();
-				dist = Vector3::Length(Vector3::Subtract(pos, scene->black_hole_pos));
-				if (dist < 50.f) {
-					scene->m_ppEnemies[i]->hp -= 3;
-					for (short pl_id : scene->_plist) {
-						if (pl_id == -1) continue;
-						if (clients[pl_id]._state != ST_INGAME) continue;
-						clients[pl_id].send_bullet_hit_packet(i, scene->m_ppEnemies[i]->hp);
-					}
-					continue;
-				}
-				ToBlackHole = Vector3::Subtract(scene->black_hole_pos, pos);
-				dist = Vector3::Length(ToBlackHole);
-				speed = 90.f - dist * 0.5f;
-				if (speed < 50.f) { speed = 50.f; }
-				ToBlackHole = Vector3::ScalarProduct(ToBlackHole, speed * elapsed_time.count());
-				scene->m_ppEnemies[i]->SetPosition(Vector3::Add(pos, ToBlackHole));
-			}
-
-			TIMER_EVENT ev{ ex_over->obj_id, chrono::system_clock::now() + 10ms, EV_BLACK_HOLE, static_cast<short>(key) };
-			timer_queue.push(ev);
+			scene->BlackHole();
+			delete ex_over;
 			break;
 		}
 		}
