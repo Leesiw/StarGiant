@@ -263,7 +263,6 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 
 	CPlayer::Update(fTimeElapsed);
 	OnPrepareRender();
-	UpdateBoundingBox();
 }
 
 void CAirplanePlayer::OnPrepareRender()

@@ -257,7 +257,9 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 	for (int i = 0; i < ENEMIES; ++i)
 	{
 		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
-		if (m_ppEnemies[i]->m_xmOOBB.Intersects(pos, dir, dist)) //총알/적 충돌시
+		BoundingOrientedBox enemy_bbox = m_ppEnemies[i]->UpdateBoundingBox();
+
+		if (enemy_bbox.Intersects(pos, dir, dist)) //총알/적 충돌시
 		{
 			m_ppEnemies[i]->hp -= m_pSpaceship->damage;
 
@@ -331,8 +333,8 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		}
 	}
 
-	m_pBoss->UpdateBoundingBox();
-	if (m_pBoss->m_xmOOBB.Intersects(pos, dir, dist)) // 보스 충돌처리
+	BoundingOrientedBox boss_bbox = m_pBoss->UpdateBoundingBox();
+	if (boss_bbox.Intersects(pos, dir, dist)) // 보스 충돌처리
 	{
 		m_pBoss->BossHP -= m_pSpaceship->damage;
 		for (short pl_id : _plist) {
@@ -343,8 +345,9 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		return;
 	}
 
+	BoundingOrientedBox god_bbox = m_pGod->UpdateBoundingBox();
 	m_pGod->UpdateBoundingBox();
-	if (m_pGod->m_xmOOBB.Intersects(pos, dir, dist)) // 갓 충돌처리
+	if (god_bbox.Intersects(pos, dir, dist)) // 갓 충돌처리
 	{
 		m_pGod->GodHP -= m_pSpaceship->damage;
 		for (short pl_id : _plist) {
@@ -362,9 +365,10 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 	XMVECTOR pos = XMLoadFloat3(&data.pos);
 	XMVECTOR dir = XMLoadFloat3(&data.direction);
 
-	for (int i = 0; i < METEOS; ++i)
+	for (char i = 0; i < METEOS; ++i)
 	{
-		if (m_ppMeteoObjects[i]->m_xmOOBB.Intersects(pos, dir, dist)) //총알/적 충돌시
+		BoundingOrientedBox meteor_bbox = m_ppMeteoObjects[i]->UpdateBoundingBox();
+		if (meteor_bbox.Intersects(pos, dir, dist)) //총알/적 충돌시
 		{
 			SpawnMeteo(i);
 
@@ -399,7 +403,7 @@ void CScene::CheckEnemyCollisions()
 			m_ppMeteoObjects[i]->UpdateBoundingBox();
 			for (int j = 0; j < ENEMIES; ++j) {
 				
-				if (m_ppEnemies[j]->HierarchyIntersects(m_ppMeteoObjects[i]))
+				//if (m_ppEnemies[j]->HierarchyIntersects(m_ppMeteoObjects[i]))
 				{
 					//m_ppMeteoObjects[i]->coll_time = time(NULL);
 					XMFLOAT3 vel1 = m_ppEnemies[j]->GetVelocity();
@@ -426,7 +430,7 @@ void CScene::CheckEnemyCollisions()
 		for (int j = i + 1; j < ENEMIES; ++j) 
 		{
 			if (!m_ppEnemies[j]->GetisAlive()) { continue; }
-			if (m_ppEnemies[i]->HierarchyIntersects(m_ppEnemies[j]))
+		//	if (m_ppEnemies[i]->HierarchyIntersects(m_ppEnemies[j]))
 			{
 				XMFLOAT3 xmf3Sub = m_ppEnemies[j]->GetPosition();
 				xmf3Sub = Vector3::Subtract(m_ppEnemies[i]->GetPosition(), xmf3Sub);
@@ -453,7 +457,7 @@ void CScene::CheckMissileCollisions()
 	for (int i = 0; i < ENEMY_BULLETS; ++i) {
 		if (m_ppMissiles[i]->GetisActive()) {
 			m_ppMissiles[i]->UpdateBoundingBox();
-			if (m_ppMissiles[i]->HierarchyIntersects(m_pSpaceship))
+			//if (m_ppMissiles[i]->HierarchyIntersects(m_pSpaceship))
 			{
 				m_ppMissiles[i]->SetisActive(false);
 				// 충돌처리

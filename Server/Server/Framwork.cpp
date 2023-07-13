@@ -139,7 +139,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			scene->m_ppEnemies[ex_over->obj_id]->prev_time = time_now;
 
 			scene->m_ppEnemies[ex_over->obj_id]->AI(elapsed_time.count(), scene->m_pSpaceship);
-			scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
+			//scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
 
 			// 款籍苞 面倒贸府
 			
@@ -148,7 +148,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				if (!scene->m_ppEnemies[i]->GetisAlive()) { continue; }
 				if (i == ex_over->obj_id) { continue; }
 				//if (scene->m_ppEnemies[ex_over->obj_id]->HierarchyIntersects(scene->m_ppEnemies[i]))
-				if(Vector3::Length(Vector3::Subtract(scene->m_ppEnemies[ex_over->obj_id]->GetPosition(), scene->m_ppEnemies[i]->GetPosition())) < 50.f)
+				if(Vector3::Length(Vector3::Subtract(scene->m_ppEnemies[ex_over->obj_id]->GetPosition(), scene->m_ppEnemies[i]->GetPosition())) < 30.f)
 				{
 					XMFLOAT3 xmf3Sub = scene->m_ppEnemies[i]->GetPosition();
 					xmf3Sub = Vector3::Subtract(scene->m_ppEnemies[ex_over->obj_id]->GetPosition(), xmf3Sub);
@@ -213,8 +213,10 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			if (dist > 1500.0f) {
 				scene->SpawnMeteo(ex_over->obj_id);
 			}
-			scene->m_ppMeteoObjects[ex_over->obj_id]->UpdateBoundingBox();
-			if (scene->m_pSpaceship->HierarchyIntersects(scene->m_ppMeteoObjects[ex_over->obj_id]))
+			BoundingOrientedBox meteor_bbox = scene->m_ppMeteoObjects[ex_over->obj_id]->UpdateBoundingBox();
+			BoundingOrientedBox spaceship_bbox = scene->m_pSpaceship->UpdateBoundingBox();
+
+			if (spaceship_bbox.Intersects(meteor_bbox))
 			{
 				XMFLOAT3 xmf3Sub = scene->m_pSpaceship->GetPosition();
 				xmf3Sub = Vector3::Subtract(scene->m_ppMeteoObjects[ex_over->obj_id]->GetPosition(), xmf3Sub);
@@ -313,12 +315,14 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
 			m_info.Quaternion = scene->m_ppMissiles[ex_over->obj_id]->GetQuaternion();
 
-			scene->m_ppMissiles[ex_over->obj_id]->UpdateBoundingBox();
-			if (scene->m_ppMissiles[ex_over->obj_id]->HierarchyIntersects(scene->m_pSpaceship))
+			BoundingOrientedBox missile_bbox = scene->m_ppMissiles[ex_over->obj_id]->UpdateBoundingBox();
+			BoundingOrientedBox spaceship_bbox = scene->m_ppMissiles[ex_over->obj_id]->UpdateBoundingBox();
+
+			if (missile_bbox.Intersects(spaceship_bbox))
 			{
 				scene->m_ppMissiles[ex_over->obj_id]->SetisActive(false);
 				// 面倒贸府
-				/*
+				
 				XMFLOAT3 xmf3Sub = scene->m_pSpaceship->GetPosition();
 				xmf3Sub = Vector3::Subtract(scene->m_ppMissiles[ex_over->obj_id]->GetPosition(), xmf3Sub);
 				if (Vector3::Length(xmf3Sub) > 0.0001f) {
@@ -328,9 +332,8 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
 
 				XMFLOAT3 vel2 = scene->m_pSpaceship->GetVelocity();
-
-			//	scene->m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
-			*/
+				scene->m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+			
 				if (scene->m_pSpaceship->GetHP() > 0) {
 					scene->m_pSpaceship->GetAttack(scene->m_ppMissiles[ex_over->obj_id]->GetDamage());
 				}
@@ -366,7 +369,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			if (scene->_state != ST_INGAME) { break; }
 			if (scene->m_pBoss->BossHP <= 0) { 
 				scene->MissionClear();
-				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, key };
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(key) };
 				timer_queue.push(ev);
 				break; 
 			}
@@ -535,7 +538,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			send_num += s_packet.size;
 
 			for (char i = 0; i < ENEMIES; ++i) {
-				if (!scene->m_ppEnemies[i]->hp < 0) { continue; }
+				if (scene->m_ppEnemies[i]->hp < 0) { continue; }
 				SC_MOVE_ENEMY_PACKET e_packet;
 				e_packet.size = sizeof(e_packet);
 				e_packet.type = SC_MOVE_ENEMY;

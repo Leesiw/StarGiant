@@ -22,22 +22,24 @@ void CGameObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	m_xmf4x4World = (pxmf4x4Parent) ? Matrix4x4::Multiply(m_xmf4x4ToParent, *pxmf4x4Parent) : m_xmf4x4ToParent;
 }
 
-void CGameObject::UpdateBoundingBox()
+BoundingOrientedBox CGameObject::UpdateBoundingBox()
 {
+	BoundingOrientedBox				m_xmOOBB;
 	boundingbox.Transform(m_xmOOBB, XMLoadFloat4x4(&m_xmf4x4World));
 	XMStoreFloat4(&m_xmOOBB.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBB.Orientation)));
+	return m_xmOOBB;
 }
-
+/*
 bool CGameObject::HierarchyIntersects(CGameObject* pCollisionGameObject, bool isSecond)
 {
-	if (m_xmOOBB.Intersects(pCollisionGameObject->m_xmOOBB)) return true;
+	//if (m_xmOOBB.Intersects(pCollisionGameObject->m_xmOOBB)) return true;
 
 	if (isSecond)
 		return false;
 
 	return pCollisionGameObject->HierarchyIntersects(this, true);
 }
-
+*/
 void CGameObject::SetPosition(float x, float y, float z)
 {
 	m_xmf4x4ToParent._41 = x;
