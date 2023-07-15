@@ -786,7 +786,7 @@ void CGameFramework::CameraUpdateChange()
 		cout << "CS_TURN\n";
 		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
 		m_pInsideCamera->SetTarget({ 530.219f, 230.f, 593.263f });
-		m_pCamera->SetDist(100.0f);
+		m_pInsideCamera->SetDist(-25.0f);
 		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 	}

@@ -174,7 +174,7 @@ function attack(frameTime)
        -- print(motion)
       --  print("FLAME_ATTACK")
     end
-
+ 
     --print(frameTime)
     attackCooldown = 4
     if frameTime >= attackCooldown then
