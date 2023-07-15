@@ -291,6 +291,51 @@ float4 PS_UI(VS_UI_OUTPUT input) : SV_TARGET
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+
+struct VS_PARTICLE_INPUT
+{
+	float3 position : POSITION;
+	float2 uv : TEXCOORD;
+	float4 color : COLOR;
+};
+
+struct VS_PARTICLE_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD0;
+	float4 color : COLOR;
+};
+
+VS_PARTICLE_OUTPUT VS_PARTICLE(VS_PARTICLE_INPUT input)
+{
+	VS_PARTICLE_OUTPUT output;
+
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.uv = input.uv;
+
+	// 픽셀 쉐이더의 입자 색상
+	output.color = input.color;
+
+	return(output);
+}
+
+Texture2D gtxtPARTICLETexture : register(t19);
+
+float4 PS_PARTICLE(VS_PARTICLE_OUTPUT input) : SV_TARGET
+{
+	float4 textureColor;
+	float4 finalColor;
+
+	textureColor = gtxtPARTICLETexture.Sample(gssWrap, input.uv);
+	finalColor = textureColor * input.color;
+
+	return (finalColor);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct VS_SPRITE_INPUT
 {
@@ -471,6 +516,12 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 	
 }
 
+
+
+
+
+
+
 //
 //Texture2D<float4> noiseTexture1; // 첫 번째 noise 텍스처
 //Texture2D<float4> noiseTexture2; // 두 번째 noise 텍스처
@@ -504,3 +555,4 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 //
 //	return float4(color, 1.0f);
 //}
+

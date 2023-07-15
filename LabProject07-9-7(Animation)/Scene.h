@@ -198,6 +198,7 @@ public:
 	CSkyBox								*m_pSkyBox = NULL;
 	CHeightMapTerrain					*m_pTerrain = NULL;
 
+	CParticleObject* m_pParticle = NULL;
 
 
 	LIGHT								*m_pLights = NULL;

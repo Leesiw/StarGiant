@@ -120,6 +120,9 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
+	m_pParticle = new CParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+
+
 
 
 	XMFLOAT3 xmf3Scale(8.0f, 2.0f, 8.0f);
@@ -523,6 +526,8 @@ void CScene::ReleaseObjects()
 
 	if (m_pTerrain) delete m_pTerrain;
 	if (m_pSkyBox) delete m_pSkyBox;
+	if (m_pParticle) delete m_pParticle;
+
 
 	if (m_ppHierarchicalGameObjects)
 	{
@@ -652,7 +657,7 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
 
-	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[15];
+	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[16];
 
 	pd3dDescriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	pd3dDescriptorRanges[0].NumDescriptors = 1;
@@ -742,9 +747,15 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	pd3dDescriptorRanges[14].NumDescriptors = 1;
 	pd3dDescriptorRanges[14].BaseShaderRegister = 18; //t18: gtxtSprite2Texture2
 	pd3dDescriptorRanges[14].RegisterSpace = 0;
-	pd3dDescriptorRanges[14].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	pd3dDescriptorRanges[14].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;	
+	
+	pd3dDescriptorRanges[15].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	pd3dDescriptorRanges[15].NumDescriptors = 1;
+	pd3dDescriptorRanges[15].BaseShaderRegister = 19; //t19: gtxtPARTICLETexture
+	pd3dDescriptorRanges[15].RegisterSpace = 0;
+	pd3dDescriptorRanges[15].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER pd3dRootParameters[21];
+	D3D12_ROOT_PARAMETER pd3dRootParameters[22];
 
 	pd3dRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	pd3dRootParameters[0].Descriptor.ShaderRegister = 1; //Camera
@@ -853,6 +864,11 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	pd3dRootParameters[20].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[14]); //Sprite2 texture
 	pd3dRootParameters[20].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
+	pd3dRootParameters[21].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	pd3dRootParameters[21].DescriptorTable.NumDescriptorRanges = 1;
+	pd3dRootParameters[21].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[15]); //PARTICLE
+	pd3dRootParameters[21].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
 	D3D12_STATIC_SAMPLER_DESC pd3dSamplerDescs[2];
 
 	pd3dSamplerDescs[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -927,6 +943,8 @@ void CScene::ReleaseShaderVariables()
 void CScene::ReleaseUploadBuffers()
 {
 	if (m_pSkyBox) m_pSkyBox->ReleaseUploadBuffers();
+	if (m_pParticle) m_pParticle->ReleaseUploadBuffers();
+
 	if (m_pTerrain) m_pTerrain->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nShaders; i++) m_ppShaders[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->ReleaseUploadBuffers();
@@ -1256,6 +1274,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	pd3dCommandList->SetGraphicsRootConstantBufferView(2, d3dcbLightsGpuVirtualAddress); //Lights
 
 	if (m_pSkyBox) m_pSkyBox->Render(pd3dCommandList, pCamera);
+
+
 	//if (m_pTerrain && !b_Inside) m_pTerrain->Render(pd3dCommandList, pCamera);
 
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->Render(pd3dCommandList, pCamera);
@@ -1275,6 +1295,12 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 	XMFLOAT3 xmf3Position2 = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 10.0f, false));
+
+	if (m_pParticle) {
+		m_pParticle->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+		m_pParticle->SetPosition(m_pPlayer[0]->GetPosition());
+		m_pParticle->Render(pd3dCommandList, pCamera);
+	}
 
 	XMFLOAT3 tar = { 10000.0f,10000.0f,10000.0f };
 	if (m_pPlayer[0]->curMissionType == MissionType::GO_PLANET) {

@@ -1957,7 +1957,7 @@ void CMissileObject::ResetRotate()
 
 CUIObject::CUIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
-	CSkyBoxMesh* pSkyBoxMesh = new CSkyBoxMesh(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 2.0f);
+	CSkyBoxMesh* pSkyBoxMesh = new CSkyBoxMesh(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f);
 	SetMesh(pSkyBoxMesh);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -2296,4 +2296,29 @@ CJewelObject::CJewelObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 	SetChild(pJewelModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pJewelModel);
+}
+
+//================================
+CParticleObject::CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
+{
+	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f);
+	SetMesh(pParticleMesh);
+	cout << "CParticleObject\n";
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CTexture* pParticleTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/star.dds", 0); //star
+
+
+	CParticleShader* pParticleShader = new CParticleShader(); //CParticleShader CUIShader
+	pParticleShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pParticleShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CScene::CreateShaderResourceViews(pd3dDevice, pParticleTexture, 21, false);
+
+	CMaterial* pParticleMaterial = new CMaterial(1);
+	pParticleMaterial->SetTexture(pParticleTexture);
+	pParticleMaterial->SetShader(pParticleShader);
+
+	SetMaterial(0, pParticleMaterial);
 }
