@@ -1073,6 +1073,7 @@ CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 			m_pxmf3Positions[4] = XMFLOAT3(fx, +fy, +fz);
 			m_pxmf3Positions[5] = XMFLOAT3(fx, +fy, -fz);
 			texture[0] = XMFLOAT2(0.0f, 1.0f);
+
 		}
 		else
 		{
@@ -1082,7 +1083,15 @@ CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 			m_pxmf3Positions[3] = XMFLOAT3(fx, -fy, -fz);
 			m_pxmf3Positions[4] = XMFLOAT3(fx, +fy, -fz);
 			m_pxmf3Positions[5] = XMFLOAT3(fx, +fy, +fz);
-			texture[0] = XMFLOAT2(0.0f, 0.0f);
+
+
+			texture[0] = XMFLOAT2(1.0f, 1.0f);
+			texture[1] = XMFLOAT2(1.0f, 0.0f);
+			texture[2] = XMFLOAT2(0.0f, 0.0f);
+			texture[3] = XMFLOAT2(0.0f, 0.0f);
+			texture[4] = XMFLOAT2(0.0f, 1.0f);
+			texture[5] = XMFLOAT2(1.0f, 1.0f);
+
 		}
 	}
 	else if (fHeight == 0.0f)
@@ -1095,7 +1104,7 @@ CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 			m_pxmf3Positions[3] = XMFLOAT3(-fx, fy, +fz); 
 			m_pxmf3Positions[4] = XMFLOAT3(-fx, fy, -fz); 
 			m_pxmf3Positions[5] = XMFLOAT3(+fx, fy, -fz);
-			texture[0] = XMFLOAT2(1.0f, 1.0f);
+
 		}
 		else
 		{
@@ -1105,7 +1114,7 @@ CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 			m_pxmf3Positions[3] = XMFLOAT3(-fx, fy, -fz); 
 			m_pxmf3Positions[4] = XMFLOAT3(-fx, fy, +fz); 
 			m_pxmf3Positions[5] = XMFLOAT3(+fx, fy, +fz);
-			texture[0] = XMFLOAT2(1.0f, 0.0f);
+
 		}
 	}
 	else if (fDepth == 0.0f)
@@ -1118,7 +1127,7 @@ CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 			m_pxmf3Positions[3] = XMFLOAT3(-fx, -fy, fz); 
 			m_pxmf3Positions[4] = XMFLOAT3(-fx, +fy, fz); 
 			m_pxmf3Positions[5] = XMFLOAT3(+fx, +fy, fz);
-			texture[0] = XMFLOAT2(0.0f, 0.0f);
+
 		}
 		else
 		{
@@ -1128,7 +1137,14 @@ CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 			m_pxmf3Positions[3] = XMFLOAT3(+fx, -fy, fz); 
 			m_pxmf3Positions[4] = XMFLOAT3(+fx, +fy, fz); 
 			m_pxmf3Positions[5] = XMFLOAT3(-fx, +fy, fz); 
-			texture[0] = XMFLOAT2(1.0f, 0.0f);
+
+			texture[0] = XMFLOAT2(0.0f, 1.0f);
+			texture[1] = XMFLOAT2(0.0f, 0.0f);
+			texture[2] = XMFLOAT2(1.0f, 0.0f);
+			texture[3] = XMFLOAT2(1.0f, 0.0f);
+			texture[4] = XMFLOAT2(1.0f, 1.0f);
+			texture[5] = XMFLOAT2(0.0f, 1.0f);
+
 		}
 	}
 
