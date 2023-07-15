@@ -992,7 +992,7 @@ void CRayLineMesh::ReleaseUploadBuffers()
 void CRayLineMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSet)
 {
 	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);
-
+	 
 	D3D12_VERTEX_BUFFER_VIEW pVertexBufferViews[2] = { m_d3dPositionBufferView, m_d3dTextureCoord0BufferView };
 	pd3dCommandList->IASetVertexBuffers(m_nSlot, 2, pVertexBufferViews);
 
@@ -1017,138 +1017,39 @@ CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	color = new XMFLOAT4[6];
 	texture = new XMFLOAT2[6];
 
-	SetParticle(m_currentParticleCount);
-	for (int i = 0; i < m_currentParticleCount; i++)
-	{
-		// 왼쪽 아래.
-		m_pxmf3Positions[index] = XMFLOAT3(m_particleList[i].positionX - m_particleSize, m_particleList[i].positionY - m_particleSize, m_particleList[i].positionZ);
-		cout << "m_pxmf3Positions[index] - " << m_pxmf3Positions[index].x << endl;
-		texture[index] = XMFLOAT2(0.0f, 1.0f);
-		color[index] = XMFLOAT4(m_particleList[i].red, m_particleList[i].green, m_particleList[i].blue, 1.0f);
-		index++;
+	//SetParticle(m_currentParticleCount);
 
-		// 왼쪽 위.
-		m_pxmf3Positions[index] = XMFLOAT3(m_particleList[i].positionX - m_particleSize, m_particleList[i].positionY + m_particleSize, m_particleList[i].positionZ);
-		texture[index] = XMFLOAT2(0.0f, 0.0f);
-		color[index] = XMFLOAT4(m_particleList[i].red, m_particleList[i].green, m_particleList[i].blue, 1.0f);
-		index++;
-
-		// 오른쪽 아래.
-		m_pxmf3Positions[index] = XMFLOAT3(m_particleList[i].positionX + m_particleSize, m_particleList[i].positionY - m_particleSize, m_particleList[i].positionZ);
-		texture[index] = XMFLOAT2(1.0f, 1.0f);
-		color[index] = XMFLOAT4(m_particleList[i].red, m_particleList[i].green, m_particleList[i].blue, 1.0f);
-		index++;
-
-		// 오른쪽 아래.
-		m_pxmf3Positions[index] = XMFLOAT3(m_particleList[i].positionX + m_particleSize, m_particleList[i].positionY - m_particleSize, m_particleList[i].positionZ);
-		texture[index] = XMFLOAT2(1.0f, 1.0f);
-		color[index] = XMFLOAT4(m_particleList[i].red, m_particleList[i].green, m_particleList[i].blue, 1.0f);
-		index++;
-
-		// 왼쪽 위.
-		m_pxmf3Positions[index] = XMFLOAT3(m_particleList[i].positionX - m_particleSize, m_particleList[i].positionY + m_particleSize, m_particleList[i].positionZ);
-		texture[index] = XMFLOAT2(0.0f, 0.0f);
-		color[index] = XMFLOAT4(m_particleList[i].red, m_particleList[i].green, m_particleList[i].blue, 1.0f);
-		index++;
-
-		// 오른쪽 위.
-		m_pxmf3Positions[index] = XMFLOAT3(m_particleList[i].positionX + m_particleSize, m_particleList[i].positionY + m_particleSize, m_particleList[i].positionZ);
-		texture[index] = XMFLOAT2(1.0f, 0.0f);
-		color[index] = XMFLOAT4(m_particleList[i].red, m_particleList[i].green, m_particleList[i].blue, 1.0f);
-		index++;
-	}
-	
 	//위치 이상해서 rect 가져다 써봤음 => 되네..?
 	float fxPosition = 0, fyPosition = 0, fzPosition = 0;
 	float fx = (fWidth * 0.5f) + fxPosition, fy = (fHeight * 0.5f) + fyPosition, fz = (fDepth * 0.5f) + fzPosition;
 
-	if (fWidth == 0.0f)
-	{
-		if (fxPosition > 0.0f)
-		{
-			m_pxmf3Positions[0] = XMFLOAT3(fx, +fy, -fz); 
-			m_pxmf3Positions[1] = XMFLOAT3(fx, -fy, -fz);
-			m_pxmf3Positions[2] = XMFLOAT3(fx, -fy, +fz);
-			m_pxmf3Positions[3] = XMFLOAT3(fx, -fy, +fz);
-			m_pxmf3Positions[4] = XMFLOAT3(fx, +fy, +fz);
-			m_pxmf3Positions[5] = XMFLOAT3(fx, +fy, -fz);
-			texture[0] = XMFLOAT2(0.0f, 1.0f);
+	m_pxmf3Positions[0] = XMFLOAT3(-fx, +fy, fz);
+	m_pxmf3Positions[1] = XMFLOAT3(-fx, -fy, fz);
+	m_pxmf3Positions[2] = XMFLOAT3(+fx, -fy, fz);
+	m_pxmf3Positions[3] = XMFLOAT3(+fx, -fy, fz);
+	m_pxmf3Positions[4] = XMFLOAT3(+fx, +fy, fz);
+	m_pxmf3Positions[5] = XMFLOAT3(-fx, +fy, fz);
 
-		}
-		else
-		{
-			m_pxmf3Positions[0] = XMFLOAT3(fx, +fy, +fz); 
-			m_pxmf3Positions[1] = XMFLOAT3(fx, -fy, +fz);
-			m_pxmf3Positions[2] = XMFLOAT3(fx, -fy, -fz); 
-			m_pxmf3Positions[3] = XMFLOAT3(fx, -fy, -fz);
-			m_pxmf3Positions[4] = XMFLOAT3(fx, +fy, -fz);
-			m_pxmf3Positions[5] = XMFLOAT3(fx, +fy, +fz);
+	texture[0] = XMFLOAT2(1.0f, 0.0f);
+	texture[1] = XMFLOAT2(1.0f, 1.0f);
+	texture[2] = XMFLOAT2(0.0f, 1.0f);
+	texture[3] = XMFLOAT2(0.0f, 1.0f);
+	texture[4] = XMFLOAT2(0.0f, 0.0f);
+	texture[5] = XMFLOAT2(1.0f, 0.0f);
 
 
-			texture[0] = XMFLOAT2(1.0f, 1.0f);
-			texture[1] = XMFLOAT2(1.0f, 0.0f);
-			texture[2] = XMFLOAT2(0.0f, 0.0f);
-			texture[3] = XMFLOAT2(0.0f, 0.0f);
-			texture[4] = XMFLOAT2(0.0f, 1.0f);
-			texture[5] = XMFLOAT2(1.0f, 1.0f);
+	color[0] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	color[1] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	color[2] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	color[3] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	color[4] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	color[5] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
-		}
-	}
-	else if (fHeight == 0.0f)
-	{
-		if (fyPosition > 0.0f)
-		{
-			m_pxmf3Positions[0] = XMFLOAT3(+fx, fy, -fz); 
-			m_pxmf3Positions[1] = XMFLOAT3(+fx, fy, +fz); 
-			m_pxmf3Positions[2] = XMFLOAT3(-fx, fy, +fz);
-			m_pxmf3Positions[3] = XMFLOAT3(-fx, fy, +fz); 
-			m_pxmf3Positions[4] = XMFLOAT3(-fx, fy, -fz); 
-			m_pxmf3Positions[5] = XMFLOAT3(+fx, fy, -fz);
 
-		}
-		else
-		{
-			m_pxmf3Positions[0] = XMFLOAT3(+fx, fy, +fz); 
-			m_pxmf3Positions[1] = XMFLOAT3(+fx, fy, -fz);
-			m_pxmf3Positions[2] = XMFLOAT3(-fx, fy, -fz); 
-			m_pxmf3Positions[3] = XMFLOAT3(-fx, fy, -fz); 
-			m_pxmf3Positions[4] = XMFLOAT3(-fx, fy, +fz); 
-			m_pxmf3Positions[5] = XMFLOAT3(+fx, fy, +fz);
 
-		}
-	}
-	else if (fDepth == 0.0f)
-	{
-		if (fzPosition > 0.0f)
-		{
-			m_pxmf3Positions[0] = XMFLOAT3(+fx, +fy, fz); 
-			m_pxmf3Positions[1] = XMFLOAT3(+fx, -fy, fz); 
-			m_pxmf3Positions[2] = XMFLOAT3(-fx, -fy, fz); 
-			m_pxmf3Positions[3] = XMFLOAT3(-fx, -fy, fz); 
-			m_pxmf3Positions[4] = XMFLOAT3(-fx, +fy, fz); 
-			m_pxmf3Positions[5] = XMFLOAT3(+fx, +fy, fz);
 
-		}
-		else
-		{
-			m_pxmf3Positions[0] = XMFLOAT3(-fx, +fy, fz); 
-			m_pxmf3Positions[1] = XMFLOAT3(-fx, -fy, fz); 
-			m_pxmf3Positions[2] = XMFLOAT3(+fx, -fy, fz);
-			m_pxmf3Positions[3] = XMFLOAT3(+fx, -fy, fz); 
-			m_pxmf3Positions[4] = XMFLOAT3(+fx, +fy, fz); 
-			m_pxmf3Positions[5] = XMFLOAT3(-fx, +fy, fz); 
 
-			texture[0] = XMFLOAT2(0.0f, 1.0f);
-			texture[1] = XMFLOAT2(0.0f, 0.0f);
-			texture[2] = XMFLOAT2(1.0f, 0.0f);
-			texture[3] = XMFLOAT2(1.0f, 0.0f);
-			texture[4] = XMFLOAT2(1.0f, 1.0f);
-			texture[5] = XMFLOAT2(0.0f, 1.0f);
-
-		}
-	}
-
-	m_nVertices = index;
+	m_nVertices = 6;
 
 	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
 
@@ -1208,9 +1109,9 @@ void CParticleMesh::SetParticle(int index)
 		float green = 0;
 		float blue = 0;
 
-		m_particleList[i].positionX = positionX;
-		m_particleList[i].positionY = positionY;
-		m_particleList[i].positionZ = positionZ;
+		//m_particleList[i].positionX = positionX;
+		//m_particleList[i].positionY = positionY;
+		//m_particleList[i].positionZ = positionZ;
 
 		m_particleList[i].red = red;
 		m_particleList[i].green = green;

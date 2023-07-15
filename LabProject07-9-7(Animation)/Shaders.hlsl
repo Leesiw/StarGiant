@@ -331,6 +331,8 @@ float4 PS_PARTICLE(VS_PARTICLE_OUTPUT input) : SV_TARGET
 	textureColor = gtxtPARTICLETexture.Sample(gssWrap, input.uv);
 	finalColor = textureColor * input.color;
 
+
+	//finalColor = float4(0.0, 0.0, 1.0, 1.0);
 	return (finalColor);
 }
 

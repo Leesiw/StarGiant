@@ -120,7 +120,6 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
-	m_pParticle = new CParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 
 
@@ -308,6 +307,9 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_BlackholeMeteorObjects[i]->SetScale(randomScale, randomScale, randomScale);
 		if (pMeteoModel) delete pMeteoModel;
 	}
+
+	m_pParticle = new CParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+
 
 	//=====================================
 	CLoadedModelInfo* pJewelModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/SoftStar.bin", NULL);

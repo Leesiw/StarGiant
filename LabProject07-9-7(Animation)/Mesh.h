@@ -316,8 +316,8 @@ private:
 		XMFLOAT4 color;
 	};
 
-	XMFLOAT2* texture;
-	XMFLOAT4* color;
+	XMFLOAT2* texture = NULL;
+	XMFLOAT4* color = NULL;
 
 	ID3D12Resource* m_pd3dTextureBuffer = NULL;
 	ID3D12Resource* m_pd3dColorBuffer = NULL;

@@ -2301,7 +2301,7 @@ CJewelObject::CJewelObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 //================================
 CParticleObject::CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
-	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f);
+	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
 	SetMesh(pParticleMesh);
 	cout << "CParticleObject\n";
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -2317,7 +2317,7 @@ CParticleObject::CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	CScene::CreateShaderResourceViews(pd3dDevice, pParticleTexture, 21, false);
 
 	CMaterial* pParticleMaterial = new CMaterial(1);
-	pParticleMaterial->SetTexture(pParticleTexture);
+	pParticleMaterial->SetTexture(pParticleTexture, 0);
 	pParticleMaterial->SetShader(pParticleShader);
 
 	SetMaterial(0, pParticleMaterial);
