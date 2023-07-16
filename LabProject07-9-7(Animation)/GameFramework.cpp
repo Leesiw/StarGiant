@@ -793,6 +793,11 @@ void CGameFramework::CameraUpdateChange()
 		m_pCamera->m_bCameraShaking = true;
 		a = 3;
 	}
+	if (a == 3 && m_pPlayer[0]->getHp() < 20 && m_pCamera->m_bCameraShaking == false) {
+		m_pCamera->maxShakingTime = 1.5f;
+		m_pCamera->m_bCameraShaking = true;
+		a = 4;
+	}
 
 	if (b==0 && curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
 		m_pCamera->maxShakingTime = 1.0f;
@@ -806,7 +811,7 @@ void CGameFramework::CameraUpdateChange()
 		float distance;
 		XMStoreFloat(&distance, dist);
 
-		if (distance <= 50.0f) {
+		if (distance <= 300.0f) {
 			m_pCamera->maxShakingTime = 0.5f;
 			m_pCamera->m_bCameraShaking = true;
 		}

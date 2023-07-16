@@ -58,6 +58,8 @@ public:
 	virtual ~CCamera();
 
 	DWORD							m_nMode;
+	XMFLOAT4X4						m_xmf4x4View;
+	XMFLOAT4X4						m_xmf4x4Projection;
 
 	XMFLOAT4X4						m_xmf4x4View;
 	XMFLOAT4X4						m_xmf4x4Projection;
@@ -220,7 +222,7 @@ public:
 	float GetzNear() { return zNear; };
 	float GetzFar() { return zFar; };
 
-	// Frustrum Á¤º¸
+	// Frustrum ï¿½ï¿½ï¿½ï¿½
 	float fovy;
 	float aspect;
 	float zNear;
@@ -231,7 +233,7 @@ public:
 
 };
 
-//ÄÆ¾À À§ÇÑ Ä«¸Þ¶ó
+//ï¿½Æ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½
 class CCutSceneCamera : public CCamera
 {
 public:
