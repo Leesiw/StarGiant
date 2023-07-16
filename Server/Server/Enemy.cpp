@@ -233,6 +233,10 @@ void CEnemy::SetAttackTimerFalse()
 
 }
 
+void CEnemy::SetHPMax(MissionType mission)
+{
+}
+
 void CEnemy::SetAttackTimerTrue()
 {
 	enemy_flags |= option2;
@@ -365,6 +369,11 @@ void CMissileEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 	info.damage = missile_damage;
 }
 
+void CMissileEnemy::SetHPMax(MissionType mission)
+{
+	hp = levels[mission].Missile.MAX_HP;
+}
+
 void CMissileEnemy::SetStatus(MissionType cur_mission)
 {
 	hp = levels[cur_mission].Missile.MAX_HP;
@@ -405,6 +414,11 @@ void CLaserEnemy::SetStatus(MissionType cur_mission)
 	damage = levels[cur_mission].Laser.ATK;
 }
 
+void CLaserEnemy::SetHPMax(MissionType mission)
+{
+	hp = levels[mission].Laser.MAX_HP;
+}
+
 void CLaserEnemy::Animate(float fTimeElapsed)
 {
 }
@@ -437,6 +451,11 @@ void CPlasmaCannonEnemy::SetStatus(MissionType cur_mission)
 {
 	hp = levels[cur_mission].PlasmaCannon.MAX_HP;
 	damage = levels[cur_mission].PlasmaCannon.ATK;
+}
+
+void CPlasmaCannonEnemy::SetHPMax(MissionType mission)
+{
+	hp = levels[mission].PlasmaCannon.MAX_HP;
 }
 
 void CPlasmaCannonEnemy::Animate(float fTimeElapsed)
