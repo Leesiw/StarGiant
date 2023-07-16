@@ -107,6 +107,11 @@ void CScene::BuildObjects()
 		m_ppMissiles[i] = new CMissile;
 	}
 
+	can_sit[0] = true;
+	can_sit[1] = true;
+	can_sit[2] = true;
+	can_sit[3] = true;
+
 	// boss
 	m_pBoss = new Boss();
 	m_pBoss->scene_num = num;
@@ -197,6 +202,10 @@ void CScene::Reset()
 	kill_monster_num = 0;
 	cur_monster_num = 0;
 	heal_player = -1;
+	can_sit[0] = true;
+	can_sit[1] = true;
+	can_sit[2] = true;
+	can_sit[3] = true;
 
 	m_pBoss->SetPosition(3000.f, 3000.f, 3000.f);
 	m_pGod->SetPosition(-3000.f, -3000.f, -3000.f);
@@ -1033,7 +1042,7 @@ void CScene::SendSceneInfo()
 	send_num += s_packet.size;
 
 	for (char i = 0; i < ENEMIES; ++i) {
-		if (m_ppEnemies[i]->hp <= 0) { continue; }
+		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
 		SC_MOVE_ENEMY_PACKET e_packet;
 		e_packet.size = sizeof(e_packet);
 		e_packet.type = SC_MOVE_ENEMY;

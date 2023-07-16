@@ -88,8 +88,7 @@ public:
 
 	MissionType cur_mission;
 
-	std::atomic_bool move;
-	std::atomic_bool attack[3];
+	std::atomic_bool can_sit[4];
 
 	SCENE_STATE _state;
 	mutex _s_lock;

@@ -506,6 +506,11 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		CS_CHANGE_PACKET* p = reinterpret_cast<CS_CHANGE_PACKET*>(packet);
 		if (p->player_type == PlayerType::INSIDE)
 		{
+			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+			if (clients[c_id].type >= PlayerType::MOVE) {
+				char sit_num = (char)clients[c_id].type - (char)PlayerType::MOVE;
+				scene->can_sit[sit_num] = true;
+			};
 			clients[c_id].type = PlayerType::INSIDE;
 
 			SC_LOGIN_INFO_PACKET packet{};
@@ -515,8 +520,6 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			packet.type = SC_CHANGE;
 
 			scene_manager.Send(clients[c_id].room_id, (char*)&packet);	// 수정	
-
-			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
 
 			SC_MOVE_INSIDE_PACKET pack{};
 			pack.size = sizeof(pack);
@@ -529,26 +532,28 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		else
 		{
-			bool exists = scene_manager.GetCanSit(clients[c_id].room_id, p->player_type);
+			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+			char sit_num = (char)p->player_type - (char)PlayerType::MOVE;
+			bool o_state = true;
+			if (false == atomic_compare_exchange_strong(&scene->can_sit[sit_num], &o_state, false))
+				break;
+		//	bool exists = scene_manager.GetCanSit(clients[c_id].room_id, p->player_type);
+			clients[c_id].type = p->player_type;
 
-			if (exists) {
-				clients[c_id].type = p->player_type;
-
-				// 미션
-				if (scene_manager.GetScene(clients[c_id].room_id)->cur_mission == MissionType::TU_SIT && p->player_type == PlayerType::MOVE)
-				{
-					scene_manager.GetScene(clients[c_id].room_id)->MissionClear();
-				}
-
-
-				SC_LOGIN_INFO_PACKET packet{};
-				packet.data.id = clients[c_id].room_pid;
-				packet.data.player_type = p->player_type;
-				packet.size = sizeof(SC_LOGIN_INFO_PACKET);
-				packet.type = SC_CHANGE;
-
-				scene_manager.Send(clients[c_id].room_id, (char*)&packet);
+			// 미션
+			if (scene_manager.GetScene(clients[c_id].room_id)->cur_mission == MissionType::TU_SIT && p->player_type == PlayerType::MOVE)
+			{
+				scene_manager.GetScene(clients[c_id].room_id)->MissionClear();
 			}
+
+
+			SC_LOGIN_INFO_PACKET packet{};
+			packet.data.id = clients[c_id].room_pid;
+			packet.data.player_type = p->player_type;
+			packet.size = sizeof(SC_LOGIN_INFO_PACKET);
+			packet.type = SC_CHANGE;
+
+			scene_manager.Send(clients[c_id].room_id, (char*)&packet);
 		}
 		break;
 	}
@@ -619,8 +624,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (p->start) {
 			char o_state = -1;
 			if (false == atomic_compare_exchange_strong(&m_pScene->heal_player, &o_state, clients[c_id].room_pid)) {
-				printf("heal_player set 안 됨");
-				return;
+				break;
 			}
 			m_pScene->heal_start = std::chrono::system_clock::now();
 			clients[c_id].send_heal_packet();
@@ -837,6 +841,10 @@ void CGameFramework::disconnect(int c_id)
 		if (scene->heal_player == clients[c_id].room_pid) {
 			scene->heal_player = -1;
 		}
+		if (clients[c_id].type >= PlayerType::MOVE) {
+			char sit_num = (char)clients[c_id].type - (char)PlayerType::MOVE;
+			scene->can_sit[sit_num] = true;
+		};
 		scene->_plist_lock.lock();
 		scene->_plist[clients[c_id].room_pid] = -1;
 
