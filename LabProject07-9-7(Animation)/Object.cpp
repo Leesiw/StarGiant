@@ -2362,6 +2362,7 @@ void CParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
 	CFireMesh* pFireMesh = new CFireMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
+	pFireMesh->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	SetMesh(pFireMesh);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 

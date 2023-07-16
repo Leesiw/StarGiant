@@ -1131,10 +1131,22 @@ CFireMesh::CFireMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	m_noiseb = new NoiseBufferType;
 	::ZeroMemory(m_noiseb, sizeof(NoiseBufferType));
 
+	m_distortionb = new DistortionBufferType;
+	::ZeroMemory(m_distortionb, sizeof(DistortionBufferType));
+
 	m_noiseb->frameTime = 0;
-	m_noiseb->scrollSpeeds = { 0,0,0 };
-	m_noiseb->scales = { 0,0,0 };
+	m_noiseb->scrollSpeeds = XMFLOAT3(1.3f, 2.1f, 2.3f);
+	m_noiseb->scales = XMFLOAT3(1.0f, 2.0f, 3.0f);
 	m_noiseb->padding = 0;
+
+	m_distortionb->distortion1 = XMFLOAT2(0.1f, 0.2f);
+	m_distortionb->distortion2 = XMFLOAT2(0.1f, 0.3f);
+	m_distortionb->distortion3 = XMFLOAT2(0.1f, 0.1f);
+	m_distortionb->distortionScale = 0.8f;
+	m_distortionb->distortionBias = 0.5f;
+
+
+	
 
 	cout << "CFireMesh\n";
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
@@ -1201,11 +1213,20 @@ void CFireMesh::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	m_pd3dcbNoise = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
 	m_pd3dcbNoise->Map(0, NULL, (void**)&m_noiseb);
 
+	UINT ncbElementBytes2 = ((sizeof(m_distortionb) + 255) & ~255);
+	m_pd3dcbDist = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes2, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
+	m_pd3dcbDist->Map(0, NULL, (void**)&m_distortionb);
+
 }
 
 
 void CFireMesh::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	::memcpy(&m_noiseb->frameTime, &frameTime, sizeof(float));
+	::memcpy(&m_noiseb->scrollSpeeds, &scrollSpeeds, sizeof(XMFLOAT3));
+	::memcpy(&m_noiseb->scales, &scales, sizeof(XMFLOAT3));
+	::memcpy(&m_noiseb->padding, &padding, sizeof(float));
+
 	::memcpy(&m_noiseb->frameTime, &frameTime, sizeof(float));
 	::memcpy(&m_noiseb->scrollSpeeds, &scrollSpeeds, sizeof(XMFLOAT3));
 	::memcpy(&m_noiseb->scales, &scales, sizeof(XMFLOAT3));

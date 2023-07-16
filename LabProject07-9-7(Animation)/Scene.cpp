@@ -1329,7 +1329,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->Render(pd3dCommandList, pCamera);
 	for (int i = 0; i < m_nShaders; i++) if (m_ppShaders[i]) m_ppShaders[i]->Render(pd3dCommandList, pCamera);
-	if (m_nShaders>0) m_ppShaders[0]->SetPlayerPosition(m_pPlayer[0]->GetPosition());
+	if (m_nShaders > 0) m_ppShaders[0]->SetPlayerPosition(m_pPlayer[0]->GetPosition());
 
 
 	//cout << "x : " << m_pPlayer[0]->GetPosition().x << endl;
@@ -1346,25 +1346,30 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 	static int aaaaaaa = 0;
-	//for (int i = 0; i < MAX_PARTICLES; ++i) {
-	//	//if (m_pParticle[i]->isLive) {
-	//		//m_pParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-	//		if (aaaaaaa == 0)
-	//			m_pParticle[i]->SetPosition(m_pPlayer[0]->GetPosition());
-	//		m_pParticle[i]->Animate(m_fElapsedTime);
-	//		m_pParticle[i]->Render(pd3dCommandList, pCamera);
-	//	//}
-	//}
+	for (int i = 0; i < MAX_PARTICLES; ++i) {
+		//if (m_pParticle[i]->isLive) {
+		if (!b_Inside) {
+			m_pParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+			if (aaaaaaa == 0)
+				m_pParticle[i]->SetPosition(m_pPlayer[0]->GetPosition());
+			m_pParticle[i]->Animate(m_fElapsedTime);
+			m_pParticle[i]->Render(pd3dCommandList, pCamera);
+			//}
+		}
+	}
 	aaaaaaa = 1;
-	//for (int i = 0; i < MAX_FIRE; ++i) {
-	//	if (m_pFire[i]) {
-	//		//m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-	//		m_pFire[i]->SetPosition(m_pPlayer[0]->GetPosition());
-	//		m_pFire[i]->Animate(m_fElapsedTime);
-	//		m_pFire[i]->Render(pd3dCommandList, pCamera);
-	//	}
+	for (int i = 0; i < MAX_FIRE; ++i) {
+		if (!b_Inside) {
+			if (m_pFire[i]) {
+				m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				m_pFire[i]->SetPosition(m_pPlayer[0]->GetPosition());
+				m_pFire[i]->Animate(m_fElapsedTime);
+				m_pFire[i]->Render(pd3dCommandList, pCamera);
+			}
+		}
+	}
 
-	//}
+
 
 
 

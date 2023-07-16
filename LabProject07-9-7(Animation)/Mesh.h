@@ -383,9 +383,9 @@ class CFireMesh : public CMesh
 private:
 	int index = 6;
 
-	DistortionBufferType *m_distortionb = NULL;
 
 	ID3D12Resource* m_pd3dcbNoise = NULL;
+	ID3D12Resource* m_pd3dcbDist = NULL;
 
 
 	XMFLOAT2* texture = NULL;
@@ -411,10 +411,18 @@ public:
 
 
 	NoiseBufferType* m_noiseb = NULL;
+	DistortionBufferType* m_distortionb = NULL;
+
 	float frameTime = 0;
 	XMFLOAT3 scrollSpeeds = { 0,0, 0 };
 	XMFLOAT3 scales = { 0,0, 0 };
 	float padding = 0;
+
+	XMFLOAT2 distortion1;
+	XMFLOAT2 distortion2;
+	XMFLOAT2 distortion3;
+	float distortionScale;
+	float distortionBias;
 private:
 
 
