@@ -866,6 +866,24 @@ private:
 	float angleY = 0;
 	float angleZ = 0;
 
-	float lifeTime = 4.0f;
+	float lifeTime = 10.0f;
 	float ffTimeElapsed = 0.0f;
 };
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CFireObject : public CGameObject
+{
+public:
+	CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	virtual ~CFireObject() {};
+
+	virtual void Animate(float fElapsedTime);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+
+private:
+	float ffTimeElapsed = 0.0f;
+
+};
+
+
+

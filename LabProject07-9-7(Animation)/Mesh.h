@@ -359,4 +359,63 @@ private:
 	VertexType* m_vertices = nullptr;
 
 
+};/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+struct NoiseBufferType
+{
+	float frameTime;
+	XMFLOAT3 scrollSpeeds;
+	XMFLOAT3 scales;
+	float padding;
+};
+
+struct DistortionBufferType
+{
+	XMFLOAT2 distortion1;
+	XMFLOAT2 distortion2;
+	XMFLOAT2 distortion3;
+	float distortionScale;
+	float distortionBias;
+};
+class CFireMesh : public CMesh
+{
+
+private:
+	int index = 6;
+
+	DistortionBufferType *m_distortionb = NULL;
+
+	ID3D12Resource* m_pd3dcbNoise = NULL;
+
+
+	XMFLOAT2* texture = NULL;
+	//XMFLOAT4* color = NULL;
+
+	ID3D12Resource* m_pd3dTextureBuffer = NULL;
+	//ID3D12Resource* m_pd3dColorBuffer = NULL;
+
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureBufferView;
+	//D3D12_VERTEX_BUFFER_VIEW		m_d3dColorBufferView;
+
+	ID3D12Resource* m_pd3dTextureUploadBuffer = NULL;
+	//ID3D12Resource* m_pd3dColoUploadBuffer = NULL;
+
+
+public:
+	CFireMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth = 20.0f, float fHeight = 20.0f, float fDepth = 20.0f);
+	virtual ~CFireMesh();
+	virtual void ReleaseUploadBuffers();
+	virtual void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+
+
+	NoiseBufferType* m_noiseb = NULL;
+	float frameTime = 0;
+	XMFLOAT3 scrollSpeeds = { 0,0, 0 };
+	XMFLOAT3 scales = { 0,0, 0 };
+	float padding = 0;
+private:
+
+
 };

@@ -292,52 +292,6 @@ float4 PS_UI(VS_UI_OUTPUT input) : SV_TARGET
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-
-struct VS_PARTICLE_INPUT
-{
-	float3 position : POSITION;
-	float2 uv : TEXCOORD;
-	float4 color : COLOR;
-};
-
-struct VS_PARTICLE_OUTPUT
-{
-	float4 position : SV_POSITION;
-	float2 uv : TEXCOORD0;
-	float4 color : COLOR;
-};
-
-VS_PARTICLE_OUTPUT VS_PARTICLE(VS_PARTICLE_INPUT input)
-{
-	VS_PARTICLE_OUTPUT output;
-
-	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
-	output.uv = input.uv;
-
-	// 픽셀 쉐이더의 입자 색상
-	output.color = input.color;
-
-	return(output);
-}
-
-Texture2D gtxtPARTICLETexture : register(t19);
-
-float4 PS_PARTICLE(VS_PARTICLE_OUTPUT input) : SV_TARGET
-{
-	float4 textureColor;
-	float4 finalColor;
-
-	textureColor = gtxtPARTICLETexture.Sample(gssWrap, input.uv);
-	finalColor = textureColor * input.color;
-
-
-	//finalColor = float4(0.0, 0.0, 1.0, 1.0);
-	return (finalColor);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct VS_SPRITE_INPUT
 {
@@ -557,4 +511,152 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 //
 //	return float4(color, 1.0f);
 //}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+
+struct VS_PARTICLE_INPUT
+{
+	float3 position : POSITION;
+	float2 uv : TEXCOORD;
+	float4 color : COLOR;
+};
+
+struct VS_PARTICLE_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD0;
+	float4 color : COLOR;
+};
+
+VS_PARTICLE_OUTPUT VS_PARTICLE(VS_PARTICLE_INPUT input)
+{
+	VS_PARTICLE_OUTPUT output;
+
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.uv = input.uv;
+
+	// 픽셀 쉐이더의 입자 색상
+	output.color = input.color;
+
+	return(output);
+}
+
+Texture2D gtxtPARTICLETexture : register(t19);
+
+float4 PS_PARTICLE(VS_PARTICLE_OUTPUT input) : SV_TARGET
+{
+	float4 textureColor;
+	float4 finalColor;
+
+	textureColor = gtxtPARTICLETexture.Sample(gssWrap, input.uv);
+	finalColor = textureColor * input.color;
+
+
+	//finalColor = float4(0.0, 0.0, 1.0, 1.0);
+	return (finalColor);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+
+cbuffer NoiseBuffer
+{
+	float frameTime = 0;
+	float3 scrollSpeeds = { 1.3f, 2.1f, 2.3f };
+	float3 scales = { 1.0f, 2.0f, 3.0f };
+	float padding = 0;
+};
+
+cbuffer DistortionBuffer
+{
+	float2 distortion1 = { 0.1f, 0.2f };
+	float2 distortion2 = { 0.1f, 0.3f };
+	float2 distortion3 = { 0.1f, 0.1f };
+	float distortionScale = 0.8f;
+	float distortionBias = 0.5f;
+};
+
+
+Texture2D gtxtFIRETexture : register(t20);
+Texture2D gtxtAlphaTexture : register(t21);
+Texture2D gtxtNoiseTexture : register(t22);
+
+struct VS_FIRE_INPUT
+{
+	float3 position : POSITION;
+	float2 uv : TEXCOORD0;
+};
+
+struct VS_FIRE_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD0;
+	float2 uv1 : TEXCOORD1;
+	float2 uv2 : TEXCOORD2;
+	float2 uv3 : TEXCOORD3;
+};
+
+VS_FIRE_OUTPUT VS_FIRE(VS_FIRE_INPUT input)
+{
+	VS_FIRE_OUTPUT output;
+
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.uv = input.uv;
+
+
+	output.uv1 = (input.uv * scales.x);
+	output.uv1.y = output.uv1.y + (frameTime * scrollSpeeds.x);
+
+	output.uv2 = (input.uv * scales.y);
+	output.uv2.y = output.uv2.y + (frameTime * scrollSpeeds.y);
+
+	output.uv3 = (input.uv * scales.z);
+	output.uv3.y = output.uv3.y + (frameTime * scrollSpeeds.z);
+
+	return output;
+}
+
+float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
+{
+	float4 noise1;
+	float4 noise2;
+	float4 noise3;
+	float4 finalNoise;
+	float perturb;
+	float2 noiseCoords;
+	float4 fireColor;
+	float4 alphaColor;
+
+	noise1 = gtxtNoiseTexture.Sample(gssWrap, input.uv1);
+	noise2 = gtxtNoiseTexture.Sample(gssWrap, input.uv2);
+	noise3 = gtxtNoiseTexture.Sample(gssWrap, input.uv3);
+
+	noise1 = (noise1 - 0.5f) * 2.0f;
+	noise2 = (noise2 - 0.5f) * 2.0f;
+	noise3 = (noise3 - 0.5f) * 2.0f;
+
+	noise1.xy = noise1.xy * distortion1.xy;
+	noise2.xy = noise2.xy * distortion2.xy;
+	noise3.xy = noise3.xy * distortion3.xy;
+
+	finalNoise = noise1 + noise2 + noise3;
+
+	perturb = ((1.0f - input.uv.y) * distortionScale) + distortionBias;
+
+	noiseCoords.xy = (finalNoise.xy * perturb) + input.uv.xy;
+
+
+
+	fireColor = gtxtFIRETexture.Sample(gssClamp, noiseCoords.xy);
+
+
+	// 불의 투명도
+	alphaColor = gtxtAlphaTexture.Sample(gssClamp, noiseCoords.xy);
+
+	fireColor.a = alphaColor;
+
+	return fireColor;
+}
 

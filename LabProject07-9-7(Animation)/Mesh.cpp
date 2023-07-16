@@ -1005,7 +1005,6 @@ void CRayLineMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSe
 
 CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight, float fDepth) : CMesh(pd3dDevice, pd3dCommandList)
 {
-	cout << "CParticleMesh\n";
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 	int index = 0;
@@ -1042,10 +1041,6 @@ CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	float green = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
 	float blue = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
 
-
-	cout << red << endl;
-	cout << green << endl;
-	cout << blue << endl;
 
 	color[0] = XMFLOAT4(red, green, blue, 1.0f);
 	color[1] = XMFLOAT4(red, green, blue, 1.0f);
@@ -1131,3 +1126,88 @@ void CParticleMesh::SetParticle(int index)
 
 }
 
+CFireMesh::CFireMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight, float fDepth) : CMesh(pd3dDevice, pd3dCommandList)
+{
+	m_noiseb = new NoiseBufferType;
+	::ZeroMemory(m_noiseb, sizeof(NoiseBufferType));
+
+	m_noiseb->frameTime = 0;
+	m_noiseb->scrollSpeeds = { 0,0,0 };
+	m_noiseb->scales = { 0,0,0 };
+	m_noiseb->padding = 0;
+
+	cout << "CFireMesh\n";
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	m_pxmf3Positions = new XMFLOAT3[6];
+	texture = new XMFLOAT2[6];
+
+	float fxPosition = 0, fyPosition = 0, fzPosition = 0;
+	float fx = (fWidth * 0.5f) + fxPosition, fy = (fHeight * 0.5f) + fyPosition, fz = (fDepth * 0.5f) + fzPosition;
+
+	m_pxmf3Positions[0] = XMFLOAT3(-fx, +fy, fz);
+	m_pxmf3Positions[1] = XMFLOAT3(-fx, -fy, fz);
+	m_pxmf3Positions[2] = XMFLOAT3(+fx, -fy, fz);
+	m_pxmf3Positions[3] = XMFLOAT3(+fx, -fy, fz);
+	m_pxmf3Positions[4] = XMFLOAT3(+fx, +fy, fz);
+	m_pxmf3Positions[5] = XMFLOAT3(-fx, +fy, fz);
+
+	texture[0] = XMFLOAT2(1.0f, 0.0f);
+	texture[1] = XMFLOAT2(1.0f, 1.0f);
+	texture[2] = XMFLOAT2(0.0f, 1.0f);
+	texture[3] = XMFLOAT2(0.0f, 1.0f);
+	texture[4] = XMFLOAT2(0.0f, 0.0f);
+	texture[5] = XMFLOAT2(1.0f, 0.0f);
+
+
+	m_nVertices = 6;
+
+	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
+
+	m_d3dPositionBufferView.BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
+	m_d3dPositionBufferView.StrideInBytes = sizeof(XMFLOAT3);
+	m_d3dPositionBufferView.SizeInBytes = sizeof(XMFLOAT3) * m_nVertices;
+
+	m_pd3dTextureBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, texture, sizeof(XMFLOAT2) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dTextureUploadBuffer);
+
+	m_d3dTextureBufferView.BufferLocation = m_pd3dTextureBuffer->GetGPUVirtualAddress();
+	m_d3dTextureBufferView.StrideInBytes = sizeof(XMFLOAT2);
+	m_d3dTextureBufferView.SizeInBytes = sizeof(XMFLOAT2) * m_nVertices;
+
+}
+
+CFireMesh::~CFireMesh()
+{
+	if (m_pd3dTextureBuffer) m_pd3dTextureBuffer->Release();
+}
+
+void CFireMesh::ReleaseUploadBuffers()
+{
+	CMesh::ReleaseUploadBuffers();
+	if (m_pd3dTextureUploadBuffer) m_pd3dTextureUploadBuffer->Release();
+	m_pd3dTextureUploadBuffer = NULL;
+}
+
+void CFireMesh::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
+{
+	D3D12_VERTEX_BUFFER_VIEW pVertexBufferViews[2] = { m_d3dPositionBufferView, m_d3dTextureBufferView };
+	pd3dCommandList->IASetVertexBuffers(m_nSlot, 2, pVertexBufferViews);
+}
+
+void CFireMesh::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	cout << " CFireMesh CreateShaderVariables\n";
+	UINT ncbElementBytes = ((sizeof(m_noiseb) + 255) & ~255); 
+	m_pd3dcbNoise = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
+	m_pd3dcbNoise->Map(0, NULL, (void**)&m_noiseb);
+
+}
+
+
+void CFireMesh::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	::memcpy(&m_noiseb->frameTime, &frameTime, sizeof(float));
+	::memcpy(&m_noiseb->scrollSpeeds, &scrollSpeeds, sizeof(XMFLOAT3));
+	::memcpy(&m_noiseb->scales, &scales, sizeof(XMFLOAT3));
+	::memcpy(&m_noiseb->padding, &padding, sizeof(float));
+}
