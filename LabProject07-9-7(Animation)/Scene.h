@@ -17,6 +17,8 @@
 #define SPOT_LIGHT						2
 #define DIRECTIONAL_LIGHT				3
 
+#define MAX_PARTICLES					52 
+
 
 constexpr char BLACKHOLEMETEOR = 16;
 
@@ -198,7 +200,7 @@ public:
 	CSkyBox								*m_pSkyBox = NULL;
 	CHeightMapTerrain					*m_pTerrain = NULL;
 
-	CParticleObject* m_pParticle = NULL;
+	CParticleObject* m_pParticle[MAX_PARTICLES] = {};
 
 
 	LIGHT								*m_pLights = NULL;

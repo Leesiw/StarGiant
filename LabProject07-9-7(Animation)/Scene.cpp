@@ -308,7 +308,9 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		if (pMeteoModel) delete pMeteoModel;
 	}
 
-	m_pParticle = new CParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+	for (int i = 0; i < MAX_PARTICLES; ++i) {
+		m_pParticle[i] = new CParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+	}
 
 
 	//=====================================
@@ -945,7 +947,7 @@ void CScene::ReleaseShaderVariables()
 void CScene::ReleaseUploadBuffers()
 {
 	if (m_pSkyBox) m_pSkyBox->ReleaseUploadBuffers();
-	if (m_pParticle) m_pParticle->ReleaseUploadBuffers();
+	for (int i = 0; i < MAX_PARTICLES; ++i)if (m_pParticle[i] != NULL) { m_pParticle[i]->ReleaseUploadBuffers(); };
 
 	if (m_pTerrain) m_pTerrain->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nShaders; i++) m_ppShaders[i]->ReleaseUploadBuffers();
@@ -1295,14 +1297,18 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	XMFLOAT3 xmf3CameraLook = pCamera->GetLookVector();
 	XMFLOAT3 xmf3Position = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 50.0f, false));
 
+	static int aaaaaaa = 0;
 
 	XMFLOAT3 xmf3Position2 = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 10.0f, false));
-
+	for (int i = 0; i < MAX_PARTICLES; ++i)
 	if (m_pParticle) {
-		m_pParticle->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-		m_pParticle->SetPosition(m_pPlayer[0]->GetPosition());
-		m_pParticle->Render(pd3dCommandList, pCamera);
+		m_pParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+		if(aaaaaaa ==0)
+			m_pParticle[i]->SetPosition(m_pPlayer[0]->GetPosition());
+		m_pParticle[i]->Animate(m_fElapsedTime);
+		m_pParticle[i]->Render(pd3dCommandList, pCamera);
 	}
+	aaaaaaa = 1;
 
 	XMFLOAT3 tar = { 10000.0f,10000.0f,10000.0f };
 	if (m_pPlayer[0]->curMissionType == MissionType::GO_PLANET) {

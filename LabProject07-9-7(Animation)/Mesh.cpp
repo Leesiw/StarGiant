@@ -1038,12 +1038,21 @@ CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	texture[5] = XMFLOAT2(1.0f, 0.0f);
 
 
-	color[0] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	color[1] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	color[2] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	color[3] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	color[4] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	color[5] = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	float red = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
+	float green = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
+	float blue = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
+
+
+	cout << red << endl;
+	cout << green << endl;
+	cout << blue << endl;
+
+	color[0] = XMFLOAT4(red, green, blue, 1.0f);
+	color[1] = XMFLOAT4(red, green, blue, 1.0f);
+	color[2] = XMFLOAT4(red, green, blue, 1.0f);
+	color[3] = XMFLOAT4(red, green, blue, 1.0f);
+	color[4] = XMFLOAT4(red, green, blue, 1.0f);
+	color[5] = XMFLOAT4(red, green, blue, 1.0f);
 
 
 
@@ -1105,13 +1114,15 @@ void CParticleMesh::SetParticle(int index)
 		float positionX = (((float)rand() - (float)rand()) / RAND_MAX) * m_particleDeviationX;
 		float positionY = (((float)rand() - (float)rand()) / RAND_MAX) * m_particleDeviationY;
 		float positionZ = (((float)rand() - (float)rand()) / RAND_MAX) * m_particleDeviationZ;
-		float red = 1;
-		float green = 0;
-		float blue = 0;
+		float red = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
+		float green = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
+		float blue = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
 
 		//m_particleList[i].positionX = positionX;
 		//m_particleList[i].positionY = positionY;
 		//m_particleList[i].positionZ = positionZ;
+
+
 
 		m_particleList[i].red = red;
 		m_particleList[i].green = green;

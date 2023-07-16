@@ -2321,4 +2321,46 @@ CParticleObject::CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	pParticleMaterial->SetShader(pParticleShader);
 
 	SetMaterial(0, pParticleMaterial);
+
+	velocity = (float)(rand() % 5);
+	cout << velocity << endl;
+
+	dir = rand() % 7;
+}
+
+void CParticleObject::Animate(float fElapsedTime)
+{
+	ffTimeElapsed += fElapsedTime;
+	if (ffTimeElapsed > lifeTime) isLive = false;
+
+	switch (dir) {
+	case 1:
+		SetPosition(GetPosition().x, GetPosition().y + (velocity * fElapsedTime * 10), GetPosition().z);
+		break;
+	case 2:
+		SetPosition(GetPosition().x, GetPosition().y - (velocity * fElapsedTime * 10), GetPosition().z);
+		break;
+	case 3:
+		SetPosition(GetPosition().x - (velocity * fElapsedTime * 10), GetPosition().y, GetPosition().z);
+		break;
+	case 4:
+		SetPosition(GetPosition().x + (velocity * fElapsedTime * 10), GetPosition().y, GetPosition().z);
+		break;
+	case 5:
+		SetPosition(GetPosition().x + (velocity * fElapsedTime * 10), GetPosition().y - (velocity * fElapsedTime * 10), GetPosition().z);
+		break;
+	case 6:
+		SetPosition(GetPosition().x + (velocity * fElapsedTime * 10), GetPosition().y + (velocity * fElapsedTime * 10), GetPosition().z);
+		break;
+	default:
+		SetPosition(GetPosition().x + (velocity * fElapsedTime * 10), GetPosition().y - (velocity * fElapsedTime * 10), GetPosition().z);
+		break;
+	}
+
+	CGameObject::Animate(fElapsedTime);
+}
+
+void CParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	CGameObject::Render(pd3dCommandList, pCamera);
 }
