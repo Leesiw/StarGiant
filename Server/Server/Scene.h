@@ -38,6 +38,7 @@ public:
 	void CheckMissionComplete();
 	void MissionClear();
 	void SetMission(MissionType mission);
+	void SetMissionFindBoss();
 
 	void GetJewels();
 
@@ -89,6 +90,7 @@ public:
 	MissionType cur_mission;
 
 	std::atomic_bool can_sit[4];
+	std::atomic_bool boss_start;
 
 	SCENE_STATE _state;
 	mutex _s_lock;
