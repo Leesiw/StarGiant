@@ -854,13 +854,18 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 
 	int getMaxParticle() { return m_maxParticles; };
-	bool isLive = false;
+	bool isLive = true;
 private:
 	float velocity = 0;
 	float m_particleVelocity = 0;
 	int m_maxParticles = 0;
 
-	int dir = 0;
+	XMFLOAT3A position;
+
+	float angleX = 0;
+	float angleY = 0;
+	float angleZ = 0;
+
 	float lifeTime = 4.0f;
 	float ffTimeElapsed = 0.0f;
 };

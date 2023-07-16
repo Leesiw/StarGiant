@@ -1300,13 +1300,15 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	static int aaaaaaa = 0;
 
 	XMFLOAT3 xmf3Position2 = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 10.0f, false));
-	for (int i = 0; i < MAX_PARTICLES; ++i)
-	if (m_pParticle) {
-		m_pParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-		if(aaaaaaa ==0)
-			m_pParticle[i]->SetPosition(m_pPlayer[0]->GetPosition());
-		m_pParticle[i]->Animate(m_fElapsedTime);
-		m_pParticle[i]->Render(pd3dCommandList, pCamera);
+
+	for (int i = 0; i < MAX_PARTICLES; ++i) {
+		if (m_pParticle[i]->isLive) {
+			m_pParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+			if (aaaaaaa == 0)
+				m_pParticle[i]->SetPosition(m_pPlayer[0]->GetPosition());
+			m_pParticle[i]->Animate(m_fElapsedTime);
+			m_pParticle[i]->Render(pd3dCommandList, pCamera);
+		}
 	}
 	aaaaaaa = 1;
 
@@ -1392,6 +1394,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	{
 		if (m_ppEnemyBullets[i] && m_ppEnemyBullets[i]->m_bActive)
 		{
+			//cout<<dd;
 			m_ppEnemyBullets[i]->Animate(m_fElapsedTime);
 			if (!m_ppEnemyBullets[i]->m_pSkinnedAnimationController) m_ppEnemyBullets[i]->UpdateTransform(NULL);
 			m_ppEnemyBullets[i]->Render(pd3dCommandList, pCamera);

@@ -2325,37 +2325,31 @@ CParticleObject::CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	velocity = (float)(rand() % 5);
 	cout << velocity << endl;
 
-	dir = rand() % 7;
+	angleX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+	angleY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+	angleZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+
+	position.x = GetPosition().x;
+	position.y = GetPosition().y;
+	position.z = GetPosition().z;
 }
 
 void CParticleObject::Animate(float fElapsedTime)
 {
 	ffTimeElapsed += fElapsedTime;
-	if (ffTimeElapsed > lifeTime) isLive = false;
-
-	switch (dir) {
-	case 1:
-		SetPosition(GetPosition().x, GetPosition().y + (velocity * fElapsedTime * 10), GetPosition().z);
-		break;
-	case 2:
-		SetPosition(GetPosition().x, GetPosition().y - (velocity * fElapsedTime * 10), GetPosition().z);
-		break;
-	case 3:
-		SetPosition(GetPosition().x - (velocity * fElapsedTime * 10), GetPosition().y, GetPosition().z);
-		break;
-	case 4:
-		SetPosition(GetPosition().x + (velocity * fElapsedTime * 10), GetPosition().y, GetPosition().z);
-		break;
-	case 5:
-		SetPosition(GetPosition().x + (velocity * fElapsedTime * 10), GetPosition().y - (velocity * fElapsedTime * 10), GetPosition().z);
-		break;
-	case 6:
-		SetPosition(GetPosition().x + (velocity * fElapsedTime * 10), GetPosition().y + (velocity * fElapsedTime * 10), GetPosition().z);
-		break;
-	default:
-		SetPosition(GetPosition().x + (velocity * fElapsedTime * 10), GetPosition().y - (velocity * fElapsedTime * 10), GetPosition().z);
-		break;
+	if (ffTimeElapsed > lifeTime) {
+		isLive = false;
+		ffTimeElapsed = 0.f;
 	}
+
+	// 랜덤한 방향을 설정하기 위한 각도 계산
+
+	// velocity에 따라 파티클 이동
+	position.x += velocity * cosf(angleX) * fElapsedTime * 100;
+	position.y += velocity * sinf(angleY) * fElapsedTime * 100;
+	position.z += velocity * sinf(angleZ) * fElapsedTime * 100;
+
+	SetPosition(position);
 
 	CGameObject::Animate(fElapsedTime);
 }
