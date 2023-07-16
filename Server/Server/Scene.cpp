@@ -569,6 +569,11 @@ void CScene::MissionClear()
 			timer_queue.push(ev);
 		}
 
+		if (cur_mission == MissionType::GO_CENTER) {
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
+			timer_queue.push(ev);
+		}
+
 		if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
 			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
 
@@ -961,8 +966,6 @@ void CScene::UpdateBoss()
 	if (_state != ST_INGAME) { return; }
 	if (m_pBoss->BossHP <= 0) {
 		SetMission(MissionType::CS_SHOW_STARGIANT);
-		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 30s, EV_MISSION_CLEAR, static_cast<short>(num) };
-		timer_queue.push(ev);
 		return;
 	}
 	if (levels[cur_mission].cutscene) {

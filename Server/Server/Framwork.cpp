@@ -155,8 +155,9 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		}
 		case OP_MISSION_CLEAR: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state != ST_INGAME) { break; }
-			scene->SetMission(MissionType::KILL_MONSTER3);
+			if (scene->_state == ST_INGAME && scene->cur_mission == MissionType::GO_CENTER) {
+				scene->SetMission(MissionType::KILL_MONSTER3);
+			}
 			delete ex_over;
 			break;
 		}
