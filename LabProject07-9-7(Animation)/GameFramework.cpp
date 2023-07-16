@@ -1527,6 +1527,8 @@ void CGameFramework::UpdateUI()
 	m_pUILayer->UpdateHp(m_pPlayer[0]->hp, m_pPlayer[0]->max_hp);
 	/*if(m_pScene->m_ppBoss->GetState()!= BossState::SLEEP)*/
 	m_pUILayer->UpdateBossHp(m_pScene->m_ppBoss->BossHP, m_pScene->m_ppBoss->MAXBossHP);
+	m_pUILayer->UpdateGodBossHp(m_pScene->m_ppGod->GodHP, m_pScene->m_ppGod->MAXGodHP);
+
 	//for (int i = 0; i < ENEMIES; ++i)
 	//{
 	//	m_pUILayer->UpdateDots(i, { 0,0 });

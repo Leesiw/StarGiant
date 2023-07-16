@@ -41,6 +41,8 @@ public:
 
     void UpdateHp(short curhp, short maxHp = 100);
     void UpdateBossHp(short curhp, short maxHp = 100);
+    void UpdateGodBossHp(short curhp, short maxHp = 100);
+
 
 
     XMFLOAT4X4 UpdateMat(const XMFLOAT3& ppos);
@@ -69,13 +71,18 @@ private:
     float bossHpbarBottom = FRAME_BUFFER_HEIGHT / 10 * 1.5;
 
 
-
+    float GodbossHpbarLeft = FRAME_BUFFER_WIDTH / 10;
+    float GodbossHpbarRight = FRAME_BUFFER_WIDTH / 10 * 9;
+    float GodbossHpbarTop = FRAME_BUFFER_HEIGHT / 10 * 1;
+    float GodbossHpbarBottom = FRAME_BUFFER_HEIGHT / 10 * 1.5;
 
     float m_fWidth;
     float m_fHeight;
 
     float hpBar = 0;
     float BosshpBar = 0;
+
+    float GodBosshpBar = 0;
 
     float actime = 0;
 

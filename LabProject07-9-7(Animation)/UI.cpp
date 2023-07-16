@@ -456,6 +456,11 @@ void UILayer::UpdateBossHp(short curhp, short maxHp)
 
 }
 
+void UILayer::UpdateGodBossHp(short curhp, short maxHp)
+{
+    GodBosshpBar = (GodbossHpbarRight - GodbossHpbarLeft) - (float(curhp) / float(maxHp)) * (GodbossHpbarRight - GodbossHpbarLeft);
+}
+
 XMFLOAT4X4 UILayer::UpdateMat(const XMFLOAT3& pos)
 {
     // XMFLOAT3을 XMFLOAT4로 변환
@@ -611,6 +616,12 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
         m_pd2dDeviceContext->FillRectangle(D2D1::RectF(bossHpbarLeft, bossHpbarTop, bossHpbarRight, bossHpbarBottom), Whitebrush); //배경
         if (bossHpbarRight - BosshpBar > bossHpbarLeft)
             m_pd2dDeviceContext->FillRectangle(D2D1::RectF(bossHpbarLeft, bossHpbarTop, bossHpbarRight - BosshpBar, bossHpbarBottom), Redbrush); // hp
+    }
+
+    if (mty == MissionType::KILL_GOD) {
+        m_pd2dDeviceContext->FillRectangle(D2D1::RectF(GodbossHpbarLeft, GodbossHpbarTop, GodbossHpbarRight, GodbossHpbarBottom), Whitebrush); //배경
+        if (GodbossHpbarRight - GodBosshpBar > GodbossHpbarLeft)
+            m_pd2dDeviceContext->FillRectangle(D2D1::RectF(GodbossHpbarLeft, GodbossHpbarTop, GodbossHpbarRight - GodBosshpBar, GodbossHpbarBottom), Redbrush); // hp
     }
 
 
