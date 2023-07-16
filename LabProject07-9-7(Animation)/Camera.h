@@ -43,9 +43,6 @@ protected:
 	XMFLOAT3						m_xmf3Offset;
 	float           				m_fTimeLag;
 
-	XMFLOAT4X4						m_xmf4x4View;
-	XMFLOAT4X4						m_xmf4x4Projection;
-
 	D3D12_VIEWPORT					m_d3dViewport;
 	D3D12_RECT						m_d3dScissorRect;
 
@@ -61,6 +58,11 @@ public:
 	virtual ~CCamera();
 
 	DWORD							m_nMode;
+
+
+	XMFLOAT4X4						m_xmf4x4View;
+	XMFLOAT4X4						m_xmf4x4Projection;
+
 
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void ReleaseShaderVariables();
@@ -108,6 +110,10 @@ public:
 
 	void SetTimeLag(float fTimeLag) { m_fTimeLag = fTimeLag; }
 	float GetTimeLag() { return(m_fTimeLag); }
+
+	void SetView(XMFLOAT4X4 m_xmf4x4View1) { m_xmf4x4View = m_xmf4x4View1; }
+	void SetProjection(XMFLOAT4X4 m_xmf4x4Projection1) { m_xmf4x4Projection = m_xmf4x4Projection1; }
+
 
 	XMFLOAT4X4 GetViewMatrix() { return(m_xmf4x4View); }
 	XMFLOAT4X4 GetProjectionMatrix() { return(m_xmf4x4Projection); }

@@ -88,6 +88,11 @@ public:
 
 	bool ProcessInput(UCHAR *pKeysBuffer);
     void AnimateObjects(float fTimeElapsed);
+
+	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	void OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList);
+
     void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
 	void RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 	void RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
@@ -207,6 +212,12 @@ public:
 	CFireObject* m_pFire[MAX_FIRE] = {};
 
 	CParticleObject* m_pParticle[MAX_PARTICLES] = {};
+
+	CDepthRenderShader* m_pDepthRenderShader = NULL;
+
+	CShadowMapShader* m_pShadowShader = NULL;
+	CTextureToViewportShader* m_pShadowMapToViewport = NULL;
+
 
 
 

@@ -218,7 +218,7 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
 	::ZeroMemory(&d3dDescriptorHeapDesc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
-	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers;// +1; // 랜더 타겟 개수에 그림자 맵을 위한 랜더 타겟 뷰를 추가
+	d3dDescriptorHeapDesc.NumDescriptors = m_nSwapChainBuffers;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	d3dDescriptorHeapDesc.NodeMask = 0;
@@ -284,29 +284,29 @@ void CGameFramework::CreateDepthStencilView()
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_pd3dDevice->CreateDepthStencilView(m_pd3dDepthStencilBuffer, &d3dDepthStencilViewDesc, d3dDsvCPUDescriptorHandle);
 
-	// 그림자 맵을 위한 렌더 타겟 텍스처 생성
-	D3D12_RESOURCE_DESC d3dShadowMapDesc;
-	ZeroMemory(&d3dShadowMapDesc, sizeof(D3D12_RESOURCE_DESC));
-	d3dShadowMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	d3dShadowMapDesc.Alignment = 0;
-	d3dShadowMapDesc.Width = m_nWndClientWidth;
-	d3dShadowMapDesc.Height = m_nWndClientHeight;
-	d3dShadowMapDesc.DepthOrArraySize = 1;
-	d3dShadowMapDesc.MipLevels = 1;
-	d3dShadowMapDesc.Format = DXGI_FORMAT_R32_TYPELESS; // 그림자 맵의 포맷 설정
-	d3dShadowMapDesc.SampleDesc.Count = 1;
-	d3dShadowMapDesc.SampleDesc.Quality = 0;
-	d3dShadowMapDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	d3dShadowMapDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+	//// 그림자 맵을 위한 렌더 타겟 텍스처 생성
+	//D3D12_RESOURCE_DESC d3dShadowMapDesc;
+	//ZeroMemory(&d3dShadowMapDesc, sizeof(D3D12_RESOURCE_DESC));
+	//d3dShadowMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	//d3dShadowMapDesc.Alignment = 0;
+	//d3dShadowMapDesc.Width = m_nWndClientWidth;
+	//d3dShadowMapDesc.Height = m_nWndClientHeight;
+	//d3dShadowMapDesc.DepthOrArraySize = 1;
+	//d3dShadowMapDesc.MipLevels = 1;
+	//d3dShadowMapDesc.Format = DXGI_FORMAT_R32_TYPELESS; // 그림자 맵의 포맷 설정
+	//d3dShadowMapDesc.SampleDesc.Count = 1;
+	//d3dShadowMapDesc.SampleDesc.Quality = 0;
+	//d3dShadowMapDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	//d3dShadowMapDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
-	d3dClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	//d3dClearValue.Format = DXGI_FORMAT_D32_FLOAT;
 
 
-	HRESULT hr = m_pd3dDevice->CreateCommittedResource(&d3dHeapProperties, D3D12_HEAP_FLAG_NONE, &d3dShadowMapDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &d3dClearValue, __uuidof(ID3D12Resource), (void**)&m_pd3dGodRayShadowMap);
-	if (FAILED(hr))
-	{
-		// 그림자 맵 생성에 실패한 경우 처리할 내용 나중에 쓰기 
-	}
+	//HRESULT hr = m_pd3dDevice->CreateCommittedResource(&d3dHeapProperties, D3D12_HEAP_FLAG_NONE, &d3dShadowMapDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &d3dClearValue, __uuidof(ID3D12Resource), (void**)&m_pd3dGodRayShadowMap);
+	//if (FAILED(hr))
+	//{
+	//	// 그림자 맵 생성에 실패한 경우 처리할 내용 나중에 쓰기 
+	//}
 }
 
 
@@ -1242,7 +1242,9 @@ void CGameFramework::FrameAdvance()
 	ProcessInput();
 	CameraUpdateChange();
 
-	
+	m_pScene->OnPrepareRender(m_pd3dCommandList);
+	m_pScene->OnPreRender(m_pd3dCommandList);
+
 
     AnimateObjects();
 
@@ -1339,6 +1341,16 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
+
+	/*float pfClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
+	m_pd3dCommandList->ClearRenderTargetView(m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], pfClearColor/*Colors::Azure, 0, NULL);
+
+	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+
+	m_pd3dCommandList->OMSetRenderTargets(1, &m_pd3dSwapChainBackBufferRTVCPUHandles[m_nSwapChainBufferIndex], TRUE, &d3dDsvCPUDescriptorHandle);
+
+	m_pScene->Render(m_pd3dCommandList, m_pCamera);
+	*/
 
 	if(b_CameraScene)b_Inside = b_CameraScene = m_pInsideCamera->CameraSence1(b_CameraScene);
 	if (m_pScene&&!b_Inside) m_pScene->Render(m_pd3dCommandList, m_pCamera);

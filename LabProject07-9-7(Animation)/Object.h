@@ -44,23 +44,32 @@ struct CB_PLUS_INFO
 class CTexture
 {
 public:
-	CTexture(int nTextureResources = 1, UINT nResourceType = RESOURCE_TEXTURE2D, int nSamplers = 0);
+	CTexture(int nTextureResources = 1, UINT nResourceType = RESOURCE_TEXTURE2D, int nSamplers = 0, int nRootParameters = 0);
 	virtual ~CTexture();
 
 private:
 	int								m_nReferences = 0;
 
 	UINT							m_nTextureType = RESOURCE_TEXTURE2D;
+	UINT* m_pnResourceTypes = NULL;
 
 	int								m_nTextures = 0;
-	ID3D12Resource					**m_ppd3dTextures = NULL;
-	ID3D12Resource					**m_ppd3dTextureUploadBuffers;
+	ID3D12Resource** m_ppd3dTextures = NULL;
+	ID3D12Resource** m_ppd3dTextureUploadBuffers;
+
+	int								m_nRootParameters = 0;
+	int* m_pnRootParameterIndices = NULL;
 
 	int								m_nSamplers = 0;
-	D3D12_GPU_DESCRIPTOR_HANDLE		*m_pd3dSamplerGpuDescriptorHandles = NULL;
+	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSamplerGpuDescriptorHandles = NULL;
+
+	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSrvGpuDescriptorHandles = NULL;
+
+	DXGI_FORMAT* m_pdxgiBufferFormats = NULL;
+	int* m_pnBufferElements = NULL;
 
 public:
-	SRVROOTARGUMENTINFO				*m_pRootArgumentInfos = NULL;
+	SRVROOTARGUMENTINFO* m_pRootArgumentInfos = NULL;
 
 public:
 	void AddRef() { m_nReferences++; }
@@ -69,15 +78,26 @@ public:
 	void SetRootArgument(int nIndex, UINT nRootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dsrvGpuDescriptorHandle);
 	void SetSampler(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSamplerGpuDescriptorHandle);
 
-	void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
-	void UpdateShaderVariable(ID3D12GraphicsCommandList *pd3dCommandList, int nIndex);
+	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, int nIndex);
 	void ReleaseShaderVariables();
 
-	void LoadTextureFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, wchar_t *pszFileName, UINT nIndex, bool bIsDDSFile=true);
+	void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, wchar_t* pszFileName, UINT nIndex, bool bIsDDSFile = true);
+	ID3D12Resource* CreateTexture(ID3D12Device* pd3dDevice, UINT nWidth, UINT nHeight, DXGI_FORMAT dxgiFormat, D3D12_RESOURCE_FLAGS d3dResourceFlags, D3D12_RESOURCE_STATES d3dResourceStates, D3D12_CLEAR_VALUE* pd3dClearValue, UINT nResourceType, UINT nIndex);
+
+	void SetSrvGpuDescriptorHandle(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle);
+	void SetRootParameterIndex(int nIndex, UINT nRootParameterIndex)
+	{
+		m_pnRootParameterIndices[nIndex] = nRootParameterIndex;
+	}
 
 	int GetTextures() { return(m_nTextures); }
-	ID3D12Resource *GetTexture(int nIndex) { return(m_ppd3dTextures[nIndex]); }
+	ID3D12Resource* GetTexture(int nIndex) { return(m_ppd3dTextures[nIndex]); }
 	UINT GetTextureType() { return(m_nTextureType); }
+	UINT GetTextureType(int nIndex) { return(m_pnResourceTypes[nIndex]); }
+	int GetRootParameters() { return(m_nRootParameters); }
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC GetShaderResourceViewDesc(int nIndex);
 
 	void ReleaseUploadBuffers();
 };
