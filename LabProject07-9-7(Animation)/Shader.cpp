@@ -1457,25 +1457,7 @@ D3D12_SHADER_BYTECODE CFireShader::CreatePixelShader()
 	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_FIRE", "ps_5_1", &m_pd3dPixelShaderBlob));
 }
 
- void CFireShader::CreateShaderVariable(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList)
-{
-	//only do once time
-	m_pcbplusShaderVariable = NULL;
-	UINT ncbElementBytes = ((sizeof(CB_PLUS_INFO) + 255) & ~255); //256?? ???
-	m_pcbplusShaderVariable = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER | D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
 
-	m_pcbplusShaderVariable->Map(0, NULL, (void**)&m_pcbPlusInfo);
-}
-
-void CFireShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo)
-{
-	m_pcbPlusInfo->gfCurrentTime = m_GameTimer.GetTimeElapsed();
-	//XMStoreFloat4x4(&m_pcbPlusInfo->gfCurrentTime, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Texture)));
-
-	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbPlusInfo->GetGPUVirtualAddress();
-	pd3dCommandList->SetGraphicsRootConstantBufferView(19, d3dGpuVirtualAddress);
-
-}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

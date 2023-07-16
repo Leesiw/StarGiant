@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+Ôªø//-----------------------------------------------------------------------------
 // File: CGameObject.cpp
 //-----------------------------------------------------------------------------
 
@@ -485,7 +485,7 @@ CAnimationController::CAnimationController(ID3D12Device *pd3dDevice, ID3D12Graph
 	m_ppd3dcbSkinningBoneTransforms = new ID3D12Resource*[m_nSkinnedMeshes];
 	m_ppcbxmf4x4MappedSkinningBoneTransforms = new XMFLOAT4X4*[m_nSkinnedMeshes];
 
-	UINT ncbElementBytes = (((sizeof(XMFLOAT4X4) * SKINNED_ANIMATION_BONES) + 255) & ~255); //256¿« πËºˆ
+	UINT ncbElementBytes = (((sizeof(XMFLOAT4X4) * SKINNED_ANIMATION_BONES) + 255) & ~255); //256Ïùò Î∞∞Ïàò
 	for (int i = 0; i < m_nSkinnedMeshes; i++)
 	{
 		m_ppd3dcbSkinningBoneTransforms[i] = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
@@ -1736,9 +1736,9 @@ void CEnemyObject::VelocityUpdate(float fTimeElapsed, XMFLOAT3& player_look)
 void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 {
 	XMFLOAT3 new_pos = pos;
-	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// ø™«‡∑ƒ
+	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// Ïó≠ÌñâÎ†¨
 
-	new_pos = Vector3::TransformCoord(new_pos, inv_mat); // ≈∏∞Ÿ¿« ¿ßƒ°∏¶ ¿˚ ¿⁄√º¿« ¡¬«•∞Ë∑Œ ∫Ø»Ø
+	new_pos = Vector3::TransformCoord(new_pos, inv_mat); // ÌÉÄÍ≤üÏùò ÏúÑÏπòÎ•º Ï†Å ÏûêÏ≤¥Ïùò Ï¢åÌëúÍ≥ÑÎ°ú Î≥ÄÌôò
 	if (Vector3::Length(new_pos) > 0.0001f) {
 		new_pos = Vector3::Normalize(new_pos);
 	}
@@ -1780,7 +1780,7 @@ void CEnemyObject::AI(float fTimeElapsed, XMFLOAT3& pl_look, XMFLOAT3& pl_pos)
 	switch (state)
 	{
 	case EnemyState::IDLE:
-		if (dist > m_fAttackRange)	// ªÁ∞≈∏Æ √Ê¡∑ æ»µ«∏È ¿Ãµø
+		if (dist > m_fAttackRange)	// ÏÇ¨Í±∞Î¶¨ Ï∂©Ï°± ÏïàÎêòÎ©¥ Ïù¥Îèô
 		{
 			state = EnemyState::MOVE;
 		}
@@ -1789,7 +1789,7 @@ void CEnemyObject::AI(float fTimeElapsed, XMFLOAT3& pl_look, XMFLOAT3& pl_pos)
 			state = EnemyState::AIMING;
 		}
 		break;
-	case EnemyState::AIMING:	// «√∑π¿ÃæÓ πÊ«‚¿ª πŸ∂Û∫∏µµ∑œ «—¥Ÿ
+	case EnemyState::AIMING:	// ÌîåÎ†àÏù¥Ïñ¥ Î∞©Ìñ•ÏùÑ Î∞îÎùºÎ≥¥ÎèÑÎ°ù ÌïúÎã§
 		AimingAI(fTimeElapsed, pl_pos);
 		break;
 	case EnemyState::MOVE:
@@ -1822,7 +1822,7 @@ void CEnemyObject::MoveAI(float fTimeElapsed, XMFLOAT3& pl_pos)
 void CEnemyObject::AimingAI(float fTimeElapsed, XMFLOAT3& pl_pos)
 {
 	XMFLOAT3 player_pos = pl_pos;
-	LookAtPosition(fTimeElapsed, player_pos);	// «√∑π¿ÃæÓ∏¶ ∫∏µµ∑œ »∏¿¸
+	LookAtPosition(fTimeElapsed, player_pos);	// ÌîåÎ†àÏù¥Ïñ¥Î•º Î≥¥ÎèÑÎ°ù ÌöåÏ†Ñ
 
 	XMFLOAT3 destination = Vector3::Add(m_xmf3Destination, player_pos);
 	XMFLOAT3 xmf3Position = GetPosition();
@@ -1923,7 +1923,7 @@ void CBulletObject::Animate(float fElapsedTime)
 
 void CBulletObject::SetEnemyFire4x4(XMFLOAT3 Player_Position)
 {
-	//m_fMovingDistance  ±‚π›¿∏∑Œ UP, Right, directt º≥¡§«ÿ¡÷±‚ 
+	//m_fMovingDistance  Í∏∞Î∞òÏúºÎ°ú UP, Right, directt ÏÑ§Ï†ïÌï¥Ï£ºÍ∏∞ 
 	/*XMFLOAT3 xmf3Position(m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
 	XMFLOAT4X4 mtxLookAt = Matrix4x4::LookAtLH(xmf3Position, Player_Position, m_xmf3Up);*/
 
@@ -2088,7 +2088,7 @@ CSpriteObject::CSpriteObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	CSpriteObjectShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	CSpriteObjectShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 18, false); //PS∏¶ UI  18
+	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 18, false); //PSÎ•º UI  18
 
 	CMaterial* pStriteMaterial = new CMaterial(1);
 	pStriteMaterial->SetTexture(pSpriteTexture);
@@ -2137,7 +2137,7 @@ void CSpriteObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 		case static_cast<int>(SpriteType::EnemyBoom):
 			CGameObject::Render(pd3dCommandList, pCamera);
 			SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f)); 
-			//Ω√∞£ ¡¶«— ƒ⁄µÂ 
+			//ÏãúÍ∞Ñ Ï†úÌïú ÏΩîÎìú 
 			CountDiedTime(1.0f);
 			break;
 		default: break;
@@ -2152,7 +2152,7 @@ void CSpriteObject::CountDiedTime(float dieTime)
 	if (is_Alive) {
 		m_fCntTime += m_fTime;
 		if (m_fCntTime >= dieTime) {
-			is_Alive = false; //ªË¡¶øÎ 
+			is_Alive = false; //ÏÇ≠Ï†úÏö© 
 			m_fCntTime = 0.0f;
 			TargetNum = -1;
 		}
@@ -2165,18 +2165,18 @@ void CSpriteObject::CountDiedTime(float dieTime)
 
 void CSpriteObject::SetfollowPosition(XMFLOAT3 Target, XMFLOAT3 Distance,XMFLOAT3 LookAt)
 {
-	//¡÷¿Œ∞¯ ∞¥√º∑Œ∫Œ≈Õ ∂≥æÓ¡Ææﬂ «œ¥¬ ¿ßƒ° ∫§≈Õ
+	//Ï£ºÏù∏Í≥µ Í∞ùÏ≤¥Î°úÎ∂ÄÌÑ∞ Îñ®Ïñ¥Ï†∏Ïïº ÌïòÎäî ÏúÑÏπò Î≤°ÌÑ∞
 	XMFLOAT3 offset = XMFLOAT3(-LookAt.x * Distance.x, -LookAt.y * Distance.y, -LookAt.z * Distance.z);
 
-	// ¡÷¿Œ∞¯ ∞¥√º¿« ¿ßƒ° ∫§≈ÕøÕ ∞ËªÍµ» ¿ßƒ° ∫§≈Õ∏¶ ¥ı«œ±‚
+	// Ï£ºÏù∏Í≥µ Í∞ùÏ≤¥Ïùò ÏúÑÏπò Î≤°ÌÑ∞ÏôÄ Í≥ÑÏÇ∞Îêú ÏúÑÏπò Î≤°ÌÑ∞Î•º ÎçîÌïòÍ∏∞
 	XMFLOAT3 spaceshipPosition = XMFLOAT3(Target.x + offset.x, Target.y + offset.y, Target.z + offset.z);
 	SetPosition(spaceshipPosition);
-	//ø÷¿Ã∑Ø≥ƒ ¡¯¬• 
+	//ÏôúÏù¥Îü¨ÎÉê ÏßÑÏßú 
 }
 
 void CSpriteObject::SetNewTexture(ID3D12Device* pd3dDevice,CTexture* pSpriteTexture)
 {
-	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 20, false); //PS∏¶ UI  18
+	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 20, false); //PSÎ•º UI  18
 }
 
 
@@ -2184,7 +2184,7 @@ void CSpriteObject::CreateShaderVariable(ID3D12Device* pd3dDevice,ID3D12Graphics
 { 
 	//only do once time
 	m_pcbplusShaderVariable = NULL;
-	UINT ncbElementBytes = ((sizeof(CB_PLUS_INFO) + 255) & ~255); //256¿« πËºˆ
+	UINT ncbElementBytes = ((sizeof(CB_PLUS_INFO) + 255) & ~255); //256Ïùò Î∞∞Ïàò
 	m_pcbplusShaderVariable = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER | D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
 
 	m_pcbplusShaderVariable->Map(0, NULL, (void**)&m_pcbPlusInfo);
@@ -2235,7 +2235,7 @@ CBlackHole::CBlackHole(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CMaterial* m_blackholeMaterial;
 
 
-	m_blackholeShader = new CUIShader(); //uiΩ¶¿Ã¥ı æ≤∞Ì¿÷¿Ω πŸ≤Ÿ¥¬∞≈ ±«¿Â...
+	m_blackholeShader = new CUIShader(); //uiÏâêÏù¥Îçî Ïì∞Í≥†ÏûàÏùå Î∞îÍæ∏ÎäîÍ±∞ Í∂åÏû•...
 
 	m_blackholeShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	m_blackholeShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -2266,13 +2266,13 @@ CBlackHoleMeteorObject::CBlackHoleMeteorObject(ID3D12Device* pd3dDevice, ID3D12G
 	SetChild(pMeteorModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pMeteorModel);
 
-	// m_fDistanceFromCenter∏¶ 10∞˙ 50 ªÁ¿Ã¿« ∑£¥˝ ∞™
+	// m_fDistanceFromCenterÎ•º 10Í≥º 50 ÏÇ¨Ïù¥Ïùò ÎûúÎç§ Í∞í
 	m_fDistanceFromCenter = 20.0f + static_cast<float>(rand()) / (RAND_MAX / (150.0f - 20.0f));
 
 	m_fRotationSpeed = 1.0f + static_cast<float>(rand()) / (RAND_MAX / (3.0f - 1.0f));
 
 
-	// m_xmf3MovingDirection∏¶ ∑£¥˝«— πÊ«‚¿∏∑Œ - 
+	// m_xmf3MovingDirectionÎ•º ÎûúÎç§Ìïú Î∞©Ìñ•ÏúºÎ°ú - 
 	float randomAngle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * XM_PI;
 	m_xmf3MovingDirection = XMFLOAT3(cosf(randomAngle), 0.0f, sinf(randomAngle));
 	m_xmf3MovingDirection = Vector3::Normalize(m_xmf3MovingDirection);
@@ -2283,16 +2283,16 @@ CBlackHoleMeteorObject::CBlackHoleMeteorObject(ID3D12Device* pd3dDevice, ID3D12G
 
 void CBlackHoleMeteorObject::Animate(float fTimeElapsed, XMFLOAT3 cPos)
 {
-	// ∞¯¿¸ ¡ﬂΩ…¿∏∑Œ∫Œ≈Õ¿« ∞≈∏ÆøÕ πÊ«‚¿ª ∞ËªÍ«’¥œ¥Ÿ.
+	// Í≥µÏ†Ñ Ï§ëÏã¨ÏúºÎ°úÎ∂ÄÌÑ∞Ïùò Í±∞Î¶¨ÏôÄ Î∞©Ìñ•ÏùÑ Í≥ÑÏÇ∞Ìï©ÎãàÎã§.
 	XMFLOAT3 xmf3Position = GetPosition();
 	XMFLOAT3 xmf3Direction = Vector3::Subtract(xmf3Position, cPos);
 	float fDistance = m_fDistanceFromCenter;
 
-	// πÊ«‚ ∫§≈Õ∏¶ ¡§±‘»≠«’¥œ¥Ÿ.
+	// Î∞©Ìñ• Î≤°ÌÑ∞Î•º Ï†ïÍ∑úÌôîÌï©ÎãàÎã§.
 	xmf3Direction = Vector3::Normalize(xmf3Direction);
 
 	ffffTimeElapsed += fTimeElapsed;
-	// ¥©¿˚µ» fTimeElapsed∞° 3 ¿ÃªÛ¿Œ ∞ÊøÏ ∞¯¿¸ πÊ«‚¿ª ¥ŸΩ√ ∑£¥˝¿∏∑Œ ∫Ø∞Ê«’¥œ¥Ÿ.
+	// ÎàÑÏ†ÅÎêú fTimeElapsedÍ∞Ä 3 Ïù¥ÏÉÅÏù∏ Í≤ΩÏö∞ Í≥µÏ†Ñ Î∞©Ìñ•ÏùÑ Îã§Ïãú ÎûúÎç§ÏúºÎ°ú Î≥ÄÍ≤ΩÌï©ÎãàÎã§.
 	if (ffffTimeElapsed >= 3.0f)
 	{
 		float randomAngle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * XM_PI;
@@ -2301,44 +2301,44 @@ void CBlackHoleMeteorObject::Animate(float fTimeElapsed, XMFLOAT3 cPos)
 		ffffTimeElapsed = 0.0f;
 	}
 
-	// »∏¿¸ ∞¢µµ∏¶ ∞ËªÍ«’¥œ¥Ÿ.
+	// ÌöåÏ†Ñ Í∞ÅÎèÑÎ•º Í≥ÑÏÇ∞Ìï©ÎãàÎã§.
 	float fRotationAngle = m_fRotationSpeed * fTimeElapsed;
 
-	// »∏¿¸ «‡∑ƒ¿ª ª˝º∫«’¥œ¥Ÿ.
+	// ÌöåÏ†Ñ ÌñâÎ†¨ÏùÑ ÏÉùÏÑ±Ìï©ÎãàÎã§.
 	XMMATRIX xmRotation = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3MovingDirection), fRotationAngle);
 
-	// πÊ«‚ ∫§≈Õ∏¶ »∏¿¸Ω√≈µ¥œ¥Ÿ.
+	// Î∞©Ìñ• Î≤°ÌÑ∞Î•º ÌöåÏ†ÑÏãúÌÇµÎãàÎã§.
 	XMVECTOR xmPosition = XMLoadFloat3(&xmf3Direction);
 	xmPosition = XMVector3TransformCoord(xmPosition, xmRotation);
 
-	// »∏¿¸µ» πÊ«‚ ∫§≈Õ∏¶ ∞≈∏Æ∏∏≈≠ ∞ˆ«œø© ªı ¿ßƒ°∏¶ ∞ËªÍ«’¥œ¥Ÿ.
+	// ÌöåÏ†ÑÎêú Î∞©Ìñ• Î≤°ÌÑ∞Î•º Í±∞Î¶¨ÎßåÌÅº Í≥±ÌïòÏó¨ ÏÉà ÏúÑÏπòÎ•º Í≥ÑÏÇ∞Ìï©ÎãàÎã§.
 	xmPosition = XMVectorScale(xmPosition, fDistance);
 
-	// ¡ﬂΩ… ¿ßƒ°∏¶ ¥ı«œø© √÷¡æ ¿ßƒ°∏¶ æÚΩ¿¥œ¥Ÿ.
+	// Ï§ëÏã¨ ÏúÑÏπòÎ•º ÎçîÌïòÏó¨ ÏµúÏ¢Ö ÏúÑÏπòÎ•º ÏñªÏäµÎãàÎã§.
 	xmPosition = XMVectorAdd(xmPosition, XMLoadFloat3(&cPos));
 
-	// XMVECTOR∏¶ XMFLOAT3∑Œ ∫Ø»Ø«’¥œ¥Ÿ.
+	// XMVECTORÎ•º XMFLOAT3Î°ú Î≥ÄÌôòÌï©ÎãàÎã§.
 	XMStoreFloat3(&xmf3Position, xmPosition);
 
-	// ¿ßƒ°∏¶ º≥¡§«’¥œ¥Ÿ.
+	// ÏúÑÏπòÎ•º ÏÑ§Ï†ïÌï©ÎãàÎã§.
 	SetPosition(xmf3Position);
 
 	CGameObject::Animate(fTimeElapsed);
 }
-//»∏¿¸πÊ«‚randx
+//ÌöåÏ†ÑÎ∞©Ìñ•randx
 //void CBlackHoleMeteorObject::Animate(float fTimeElapsed, XMFLOAT3 cPos)
 //{
-//	// ∞¯¿¸ ¡ﬂΩ…¿∏∑Œ∫Œ≈Õ¿« ∞≈∏ÆøÕ πÊ«‚¿ª ∞ËªÍ«’¥œ¥Ÿ.
+//	// Í≥µÏ†Ñ Ï§ëÏã¨ÏúºÎ°úÎ∂ÄÌÑ∞Ïùò Í±∞Î¶¨ÏôÄ Î∞©Ìñ•ÏùÑ Í≥ÑÏÇ∞Ìï©ÎãàÎã§.
 //	XMFLOAT3 xmf3Position = GetPosition();
 //	XMFLOAT3 xmf3Direction = Vector3::Subtract(xmf3Position, cPos);
 //	float fDistance = m_fDistanceFromCenter;
 //
-//	// πÊ«‚ ∫§≈Õ∏¶ ¡§±‘»≠«’¥œ¥Ÿ.
+//	// Î∞©Ìñ• Î≤°ÌÑ∞Î•º Ï†ïÍ∑úÌôîÌï©ÎãàÎã§.
 //	xmf3Direction = Vector3::Normalize(xmf3Direction);
 //
 //
 //	ffffTimeElapsed += fTimeElapsed;
-//	// ¥©¿˚µ» fTimeElapsed∞° 5 ¿ÃªÛ¿Œ ∞ÊøÏ ∞¯¿¸ πÊ«‚¿ª ¥ŸΩ√ ∑£¥˝¿∏∑Œ ∫Ø∞Ê«’¥œ¥Ÿ.
+//	// ÎàÑÏ†ÅÎêú fTimeElapsedÍ∞Ä 5 Ïù¥ÏÉÅÏù∏ Í≤ΩÏö∞ Í≥µÏ†Ñ Î∞©Ìñ•ÏùÑ Îã§Ïãú ÎûúÎç§ÏúºÎ°ú Î≥ÄÍ≤ΩÌï©ÎãàÎã§.
 //	if (ffffTimeElapsed >= 3.0f)
 //	{
 //		float randomAngle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * XM_PI;
@@ -2347,26 +2347,26 @@ void CBlackHoleMeteorObject::Animate(float fTimeElapsed, XMFLOAT3 cPos)
 //		ffffTimeElapsed = 0.0f;
 //	}
 //
-//	// »∏¿¸ ∞¢µµ∏¶ ∞ËªÍ«’¥œ¥Ÿ.
+//	// ÌöåÏ†Ñ Í∞ÅÎèÑÎ•º Í≥ÑÏÇ∞Ìï©ÎãàÎã§.
 //	float fRotationAngle = m_fRotationSpeed * fTimeElapsed;
 //
-//	// »∏¿¸ «‡∑ƒ¿ª ª˝º∫«’¥œ¥Ÿ.
+//	// ÌöåÏ†Ñ ÌñâÎ†¨ÏùÑ ÏÉùÏÑ±Ìï©ÎãàÎã§.
 //	XMMATRIX xmRotation = XMMatrixRotationAxis(XMLoadFloat3(&XMFLOAT3(0.0f, 1.0f, 0.0f)), fRotationAngle);
 //
-//	// πÊ«‚ ∫§≈Õ∏¶ »∏¿¸Ω√≈µ¥œ¥Ÿ.
+//	// Î∞©Ìñ• Î≤°ÌÑ∞Î•º ÌöåÏ†ÑÏãúÌÇµÎãàÎã§.
 //	XMVECTOR xmPosition = XMLoadFloat3(&xmf3Direction);
 //	xmPosition = XMVector3TransformCoord(xmPosition, xmRotation);
 //
-//	// »∏¿¸µ» πÊ«‚ ∫§≈Õ∏¶ ∞≈∏Æ∏∏≈≠ ∞ˆ«œø© ªı ¿ßƒ°∏¶ ∞ËªÍ«’¥œ¥Ÿ.
+//	// ÌöåÏ†ÑÎêú Î∞©Ìñ• Î≤°ÌÑ∞Î•º Í±∞Î¶¨ÎßåÌÅº Í≥±ÌïòÏó¨ ÏÉà ÏúÑÏπòÎ•º Í≥ÑÏÇ∞Ìï©ÎãàÎã§.
 //	xmPosition = XMVectorScale(xmPosition, fDistance);
 //
-//	// ¡ﬂΩ… ¿ßƒ°∏¶ ¥ı«œø© √÷¡æ ¿ßƒ°∏¶ æÚΩ¿¥œ¥Ÿ.
+//	// Ï§ëÏã¨ ÏúÑÏπòÎ•º ÎçîÌïòÏó¨ ÏµúÏ¢Ö ÏúÑÏπòÎ•º ÏñªÏäµÎãàÎã§.
 //	xmPosition = XMVectorAdd(xmPosition, XMLoadFloat3(&cPos));
 //
-//	// XMVECTOR∏¶ XMFLOAT3∑Œ ∫Ø»Ø«’¥œ¥Ÿ.
+//	// XMVECTORÎ•º XMFLOAT3Î°ú Î≥ÄÌôòÌï©ÎãàÎã§.
 //	XMStoreFloat3(&xmf3Position, xmPosition);
 //
-//	// ¿ßƒ°∏¶ º≥¡§«’¥œ¥Ÿ.
+//	// ÏúÑÏπòÎ•º ÏÑ§Ï†ïÌï©ÎãàÎã§.
 //	SetPosition(xmf3Position);
 //
 //	CGameObject::Animate(fTimeElapsed);
@@ -2423,9 +2423,9 @@ void CParticleObject::Animate(float fElapsedTime)
 		ffTimeElapsed = 0.f;
 	}
 
-	// ∑£¥˝«— πÊ«‚¿ª º≥¡§«œ±‚ ¿ß«— ∞¢µµ ∞ËªÍ
+	// ÎûúÎç§Ìïú Î∞©Ìñ•ÏùÑ ÏÑ§Ï†ïÌïòÍ∏∞ ÏúÑÌïú Í∞ÅÎèÑ Í≥ÑÏÇ∞
 
-	// velocityø° µ˚∂Û ∆ƒ∆º≈¨ ¿Ãµø
+	// velocityÏóê Îî∞Îùº ÌååÌã∞ÌÅ¥ Ïù¥Îèô
 	position.x += velocity * cosf(angleX) * fElapsedTime * 100;
 	position.y += velocity * sinf(angleY) * fElapsedTime * 100;
 	position.z += velocity * sinf(angleZ) * fElapsedTime * 100;
@@ -2444,7 +2444,8 @@ void CParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 //======================
 CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
-	CFireMesh* pFireMesh = new CFireMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
+	//CFireMesh* pFireMesh = new CFireMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
+	CTexturedRectMesh* pFireMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
 	pFireMesh->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	SetMesh(pFireMesh);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -2477,6 +2478,8 @@ CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 
 
 	SetMaterial(0, pFireMaterial);
+	m_GameTimer.Start();
+	m_GameTimer.Tick(30.0f);
 }
 
 void CFireObject::Animate(float fElapsedTime)
@@ -2486,5 +2489,26 @@ void CFireObject::Animate(float fElapsedTime)
 
 void CFireObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
+	UpdateShaderVariables(pd3dCommandList, m_pcbplusShaderVariable);
 	CGameObject::Render(pd3dCommandList, pCamera);
+}
+
+void CFireObject::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	//only do once time
+	m_pcbplusShaderVariable = NULL;
+	UINT ncbElementBytes = ((sizeof(CB_PLUS_INFO) + 255) & ~255); //256ÔøΩÔøΩ ÔøΩÔøΩÔøΩ
+	m_pcbplusShaderVariable = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER | D3D12_RESOURCE_STATE_GENERIC_READ, NULL);
+
+	m_pcbplusShaderVariable->Map(0, NULL, (void**)&m_pcbPlusInfo);
+}
+
+void CFireObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo)
+{
+	m_pcbPlusInfo->gfCurrentTime = m_GameTimer.GetTimeElapsed();
+	//XMStoreFloat4x4(&m_pcbPlusInfo->gfCurrentTime, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Texture)));
+
+	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbPlusInfo->GetGPUVirtualAddress();
+	pd3dCommandList->SetGraphicsRootConstantBufferView(19, d3dGpuVirtualAddress);
+
 }
