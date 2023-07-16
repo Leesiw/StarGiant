@@ -1652,7 +1652,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	static int aaaaaaa = 0;
 	for (int i = 0; i < MAX_PARTICLES; ++i) {
-
 		if (!b_Inside) {
 			if (m_pParticle[i]->isLive) {
 				m_pParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
@@ -1671,7 +1670,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 				m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 				m_pFire[i]->SetPosition(m_pPlayer[0]->GetPosition());
 				m_pFire[i]->Animate(m_fElapsedTime);
-				m_pFire[i]->Render(pd3dCommandList, pCamera);
+				//m_pFire[i]->Render(pd3dCommandList, pCamera);
 			}
 		}
 	}
@@ -1737,7 +1736,7 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 
 	}
 
-	if (m_ppUI[1] && m_ppBoss->CurMotion == BossAnimation::CLAW_ATTACT)
+	if (m_ppUI[1] && m_ppBoss->CurMotion == BossAnimation::CLAW_ATTACT && m_pPlayer[0]->curMissionType == MissionType::DEFEAT_BOSS)
 	{
 		m_ppUI[1]->Render(pd3dCommandList, pCamera);
 	}
