@@ -39,6 +39,7 @@ struct SRVROOTARGUMENTINFO
 struct CB_PLUS_INFO
 {
 	XMFLOAT4X4 gmtxTexture;
+	float		gfCurrentTime;
 };
 
 class CTexture

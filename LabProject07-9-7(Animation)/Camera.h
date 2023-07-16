@@ -43,8 +43,6 @@ protected:
 	XMFLOAT3						m_xmf3Offset;
 	float           				m_fTimeLag;
 
-	
-
 	D3D12_VIEWPORT					m_d3dViewport;
 	D3D12_RECT						m_d3dScissorRect;
 
@@ -221,7 +219,7 @@ public:
 	float GetzNear() { return zNear; };
 	float GetzFar() { return zFar; };
 
-	// Frustrum Á¤º¸
+	// Frustrum ï¿½ï¿½ï¿½ï¿½
 	float fovy;
 	float aspect;
 	float zNear;
@@ -232,7 +230,7 @@ public:
 
 };
 
-//ÄÆ¾À À§ÇÑ Ä«¸Þ¶ó
+//ï¿½Æ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½
 class CCutSceneCamera : public CCamera
 {
 public:
