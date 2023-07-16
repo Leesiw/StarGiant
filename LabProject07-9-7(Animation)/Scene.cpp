@@ -1412,6 +1412,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	XMFLOAT3 xmf3Position2 = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 10.0f, false));
 
 
+	static int setplstart = 0;
+	if (setplstart ==0 && m_pPlayer[0]->curMissionType == MissionType::CS_TURN) {
+		m_pPlayer[g_myid]->SetPosition({ 520.219f + g_myid * 10, 230.f, 593.263f });
+		setplstart = 1;
+	}
 
 
 
@@ -1532,7 +1537,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		//m_ppBlackhole->SetPosition(xmf3Position);
 		m_ppBlackhole->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 		m_ppBlackhole->Rotate(0.0f, 0.0f, m_eTime * 10);
-		m_ppBlackhole->Render(pd3dCommandList, pCamera);
+		if(m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_BLACK_HOLE|| m_pPlayer[0]->curMissionType == MissionType::ESCAPE_BLACK_HOLE)
+			m_ppBlackhole->Render(pd3dCommandList, pCamera);
 	}
 	static int aa = 0;
 
@@ -1546,8 +1552,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_BlackholeMeteorObjects[i]->Animate(m_fElapsedTime, m_ppBlackhole->GetPosition());
 			if (!m_BlackholeMeteorObjects[i]->m_pSkinnedAnimationController) m_BlackholeMeteorObjects[i]->UpdateTransform(NULL);
 
-
-			m_BlackholeMeteorObjects[i]->Render(pd3dCommandList, pCamera);
+			if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_BLACK_HOLE || m_pPlayer[0]->curMissionType == MissionType::ESCAPE_BLACK_HOLE)
+				m_BlackholeMeteorObjects[i]->Render(pd3dCommandList, pCamera);
 		}
 
 	/*	cout << "x : " << m_BlackholeMeteorObjects[0]->GetPosition().x << endl;
@@ -1591,11 +1597,12 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	static int aaa = 0;
 	if (m_ppGod) {
-		if (aaa == 0) {
-			m_ppGod->SetPosition(m_pPlayer[0]->GetPosition());
-			m_ppBoss->Rotate(0, 180, 0);
-		}
-		aaa = 1;
+		m_fbosscutTime += m_fElapsedTime;
+		//if (aaa == 0) {
+		//	m_ppGod->SetPosition(m_pPlayer[0]->GetPosition());
+		//	m_ppBoss->Rotate(0, 180, 0);
+		//}
+		//aaa = 1;
 		m_ppGod->Animate(m_fElapsedTime);
 		if (!m_ppGod->m_pSkinnedAnimationController) m_ppGod->UpdateTransform(NULL);
 		m_ppGod->ChangeAnimation(m_ppGod->GetAnimation());
@@ -1609,6 +1616,10 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppGod->SetState(GodState::DEATH);
 		}
 
+		//if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD)
+		//{
+		//	m_ppGod->SetPosition(m_pPlayer[0]->GetPosition().x + 3300 - m_fbosscutTime * 10, m_pPlayer[0]->GetPosition().y, m_pPlayer[0]->GetPosition().z);
+		//}
 		if (!(m_ppGod->GetcurHp() <= 0) && m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD)
 			m_ppGod->Render(pd3dCommandList, pCamera);
 	}
