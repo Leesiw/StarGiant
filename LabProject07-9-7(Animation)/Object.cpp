@@ -2450,13 +2450,13 @@ CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	CTexture* pfireTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pfireTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/fire01.dds", 0); 
+	pfireTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/fire01.dds", 0); // fire mix color
 
 	CTexture* palphaTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	palphaTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/alpha01.dds", 0);
 
 	CTexture* pnoiseTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pnoiseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/noise01.dds", 0);
+	pnoiseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/noise01.dds", 0);//fre material texture
 
 	CFireShader* pFireShader = new CFireShader();
 	pFireShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
