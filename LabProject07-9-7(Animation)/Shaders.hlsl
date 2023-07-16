@@ -572,7 +572,8 @@ float4 PS_PARTICLE(VS_PARTICLE_OUTPUT input) : SV_TARGET
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-
+SamplerState gssFIRE1 : register(s4);
+SamplerState gssFIRE2 : register(s5);
 cbuffer NoiseBuffer
 {
 	float frameTime = 0;
@@ -641,9 +642,9 @@ float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
 	float4 fireColor;
 	float4 alphaColor;
 
-	noise1 = gtxtNoiseTexture.Sample(gssWrap, input.uv1);
-	noise2 = gtxtNoiseTexture.Sample(gssWrap, input.uv2);
-	noise3 = gtxtNoiseTexture.Sample(gssWrap, input.uv3);
+	noise1 = gtxtNoiseTexture.Sample(gssFIRE1, input.uv1);
+	noise2 = gtxtNoiseTexture.Sample(gssFIRE1, input.uv2);
+	noise3 = gtxtNoiseTexture.Sample(gssFIRE1, input.uv3);
 
 	noise1 = (noise1 - 0.5f) * 2.0f;
 	noise2 = (noise2 - 0.5f) * 2.0f;
@@ -661,15 +662,16 @@ float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
 
 
 
-	fireColor = gtxtFIRETexture.Sample(gssClamp, noiseCoords.xy);
+	fireColor = gtxtFIRETexture.Sample(gssFIRE2, noiseCoords.xy);
 
 
 	// 불의 투명도
-	alphaColor = gtxtAlphaTexture.Sample(gssClamp, noiseCoords.xy);
+	alphaColor = gtxtAlphaTexture.Sample(gssFIRE2, noiseCoords.xy);
 
 	fireColor.a = alphaColor;
 
-	return fireColor;
+	//return fireColor;
+	return float4(1.0f,1.0f,0.0f,0.0f);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

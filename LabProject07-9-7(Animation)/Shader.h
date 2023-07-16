@@ -6,7 +6,6 @@
 
 #include "Object.h"
 #include "Camera.h"
-#include "Timer.h"
 
 struct TOOBJECTSPACEINFO
 {
@@ -21,7 +20,7 @@ struct TOLIGHTSPACES
 
 struct LIGHT;
 struct LIGHTS;
-class CGameTimer;
+
 
 class CShader
 {
@@ -353,11 +352,6 @@ public:
 	CFireShader() {};
 	virtual ~CFireShader() {};
 
-	CB_PLUS_INFO* m_pcbPlusInfo = NULL;
-	ID3D12Resource* m_pcbplusShaderVariable = NULL;
-	CGameTimer					m_GameTimer;
-
-
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_RASTERIZER_DESC CreateRasterizerState();
 	virtual D3D12_BLEND_DESC CreateBlendState();
@@ -365,8 +359,7 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
 
-	void CreateShaderVariable(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
+
 
 };
 

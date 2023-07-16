@@ -6,6 +6,8 @@
 
 #include "Mesh.h"
 #include "Camera.h"
+ #include "Timer.h"
+
 
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
@@ -16,6 +18,7 @@
 
 class CShader;
 class CStandardShader;
+class CGameTimer;
 
 enum class AnimationState
 {
@@ -900,8 +903,16 @@ public:
 	CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual ~CFireObject() {};
 
+
+	CB_PLUS_INFO* m_pcbPlusInfo = NULL;
+	ID3D12Resource* m_pcbplusShaderVariable = NULL;
+	CGameTimer					m_GameTimer;
+	
 	virtual void Animate(float fElapsedTime);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
+	
 
 private:
 	float ffTimeElapsed = 0.0f;

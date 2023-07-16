@@ -264,111 +264,122 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 	XMVECTOR pos = XMLoadFloat3(&data.pos);
 	XMVECTOR dir = XMLoadFloat3(&data.direction);
 
-	for (int i = 0; i < ENEMIES; ++i)
+	float dist_from_enemy = 1000.f;
+	char num = -1;
+
+	for (char i = 0; i < ENEMIES; ++i)
 	{
 		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
 		BoundingOrientedBox enemy_bbox = m_ppEnemies[i]->UpdateBoundingBox();
 
 		if (enemy_bbox.Intersects(pos, dir, dist)) //醚舅/利 面倒矫
 		{
-			m_ppEnemies[i]->hp -= m_pSpaceship->damage;
+			float d_f_e = Vector3::Length(Vector3::Subtract(data.pos, m_ppEnemies[i]->GetPosition()));
+			if (d_f_e < dist_from_enemy) {
+				num = i;
+				dist_from_enemy = d_f_e;
+			}
+		}
+	}
 
+	if (num != -1) {
+		m_ppEnemies[num]->hp -= m_pSpaceship->damage;
+
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_bullet_hit_packet(m_ppEnemies[num]->GetID(), m_ppEnemies[num]->hp);
+		}
+
+
+		if (m_ppEnemies[num]->hp <= 0) {
+			m_ppEnemies[num]->SetisAlive(false);
+
+			// 固记
+			if (cur_mission == MissionType::TU_KILL)
+			{
+				SetMission(MissionType::TU_HILL);
+				//MissionClear();
+			}
+
+			// 固记
+			else if (cur_mission == MissionType::Kill_MONSTER)
+			{
+				++kill_monster_num;
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_kill_num_packet(kill_monster_num);
+				}
+
+				if (kill_monster_num == 15) {
+					kill_monster_num = 0;
+					SetMission(MissionType::CS_SHOW_PLANET);
+					//MissionClear();
+				}
+			}
+
+			// 固记
+			else if (cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME)
+			{
+				++kill_monster_num;
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_kill_num_packet(kill_monster_num);;
+				}
+
+				if (kill_monster_num == 20) {
+					kill_monster_num = 0;
+					SetMissionFindBoss();
+				}
+			}
+
+			else if (cur_mission == MissionType::KILL_MONSTER3)
+			{
+				++kill_monster_num;
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_kill_num_packet(kill_monster_num);;
+				}
+
+				if (kill_monster_num == 20) {
+					kill_monster_num = 0;
+					SetMission(MissionType::KILL_METEOR);
+				}
+			}
+
+			GetJewels();
+		}
+	}
+
+	if (cur_mission == MissionType::DEFEAT_BOSS) {
+		BoundingOrientedBox boss_bbox = m_pBoss->UpdateBoundingBox();
+		if (boss_bbox.Intersects(pos, dir, dist)) // 焊胶 面倒贸府
+		{
+			m_pBoss->BossHP -= m_pSpaceship->damage;
 			for (short pl_id : _plist) {
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].send_bullet_hit_packet(m_ppEnemies[i]->GetID(), m_ppEnemies[i]->hp);
-			}
-
-
-			if (m_ppEnemies[i]->hp <= 0) { 
-				m_ppEnemies[i]->SetisAlive(false);
-
-				// 固记
-				if (cur_mission == MissionType::TU_KILL) 
-				{
-					SetMission(MissionType::TU_HILL);
-					//MissionClear();
-				}
-
-				// 固记
-				else if (cur_mission == MissionType::Kill_MONSTER)
-				{
-					++kill_monster_num;
-					for (short pl_id : _plist) {
-						if (pl_id == -1) continue;
-						if (clients[pl_id]._state != ST_INGAME) continue;
-						clients[pl_id].send_kill_num_packet(kill_monster_num);
-					}
-
-					if (kill_monster_num == 15) {
-						kill_monster_num = 0;
-						SetMission(MissionType::CS_SHOW_PLANET);
-						//MissionClear();
-					}
-				}
-
-				// 固记
-				else if (cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME)
-				{
-					++kill_monster_num;
-					for (short pl_id : _plist) {
-						if (pl_id == -1) continue;
-						if (clients[pl_id]._state != ST_INGAME) continue;
-						clients[pl_id].send_kill_num_packet(kill_monster_num);;
-					}
-
-					if (kill_monster_num == 20) {
-						kill_monster_num = 0;
-						SetMissionFindBoss();
-					}
-				}
-
-				else if (cur_mission == MissionType::KILL_MONSTER3)
-				{
-					++kill_monster_num;
-					for (short pl_id : _plist) {
-						if (pl_id == -1) continue;
-						if (clients[pl_id]._state != ST_INGAME) continue;
-						clients[pl_id].send_kill_num_packet(kill_monster_num);;
-					}
-
-					if (kill_monster_num == 20) {
-						kill_monster_num = 0;
-						SetMission(MissionType::KILL_METEOR);
-					}
-				}
-
-				GetJewels();
+				clients[pl_id].send_bullet_hit_packet(BOSS_ID, m_pBoss->BossHP);
 			}
 			return;
 		}
 	}
 
-	BoundingOrientedBox boss_bbox = m_pBoss->UpdateBoundingBox();
-	if(cur_mission == MissionType::DEFEAT_BOSS)
-	if (boss_bbox.Intersects(pos, dir, dist)) // 焊胶 面倒贸府
-	{
-		m_pBoss->BossHP -= m_pSpaceship->damage;
-		for (short pl_id : _plist) {
-			if (pl_id == -1) continue;
-			if (clients[pl_id]._state != ST_INGAME) continue;
-			clients[pl_id].send_bullet_hit_packet(BOSS_ID, m_pBoss->BossHP);
+	if (cur_mission == MissionType::KILL_GOD) {
+		BoundingOrientedBox god_bbox = m_pGod->UpdateBoundingBox();
+		if (god_bbox.Intersects(pos, dir, dist)) // 矮 面倒贸府
+		{
+			m_pGod->GodHP -= m_pSpaceship->damage;
+			for (short pl_id : _plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_bullet_hit_packet(GOD_ID, m_pGod->GodHP);
+			}
+			return;
 		}
-		return;
-	}
-
-	BoundingOrientedBox god_bbox = m_pGod->UpdateBoundingBox();
-	m_pGod->UpdateBoundingBox();
-	if (cur_mission == MissionType::KILL_GOD)
-	if (god_bbox.Intersects(pos, dir, dist)) // 矮 面倒贸府
-	{
-		m_pGod->GodHP -= m_pSpaceship->damage;
-		for (short pl_id : _plist) {
-			if (pl_id == -1) continue;
-			if (clients[pl_id]._state != ST_INGAME) continue;
-			clients[pl_id].send_bullet_hit_packet(GOD_ID, m_pGod->GodHP);
-		}
-		return;
 	}
 }
 
