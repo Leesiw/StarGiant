@@ -95,10 +95,11 @@ void CEnemy::AimingAI(float fTimeElapsed, CAirplanePlayer* player)
 	XMFLOAT3 vec = Vector3::Subtract(destination, xmf3Position);
 	float dist = Vector3::Length(vec);
 
-	if (dist > 50.f)
+	if (dist > 300.f)
 	{
-		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, vec, fTimeElapsed * 10.f);
-		UpdateTransform();
+		state = EnemyState::MOVE;
+		//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, vec, fTimeElapsed * 10.f);
+		//UpdateTransform();
 	}
 
 	if (m_fCoolTimeRemaining <= 0.0f)

@@ -152,7 +152,7 @@ CAirplanePlayer::CAirplanePlayer()
 {
 	SetFriction(250.0f);
 	SetGravity(XMFLOAT3(0.0f, -0.0f, 0.0f));
-	SetMaxVelocityXZ(120.0f);
+	SetMaxVelocityXZ(100.0f);
 	SetMaxVelocityY(400.0f);
 	/*
 	for (int i = 0; i < BULLETS; i++)
