@@ -79,7 +79,7 @@ public:
 	short num;
 
 	std::chrono::system_clock::time_point heal_start;
-	char heal_player = -1;
+	std::atomic_char heal_player = -1;
 
 //	bool						m_bIsRunning = true;
 
@@ -87,6 +87,9 @@ public:
 	char						cur_monster_num = 0;
 
 	MissionType cur_mission;
+
+	std::atomic_bool move;
+	std::atomic_bool attack[3];
 
 	SCENE_STATE _state;
 	mutex _s_lock;
