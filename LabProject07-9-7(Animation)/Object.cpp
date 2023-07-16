@@ -1957,7 +1957,7 @@ void CMissileObject::ResetRotate()
 
 CUIObject::CUIObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
-	CSkyBoxMesh* pSkyBoxMesh = new CSkyBoxMesh(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 2.0f);
+	CSkyBoxMesh* pSkyBoxMesh = new CSkyBoxMesh(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f);
 	SetMesh(pSkyBoxMesh);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -2296,4 +2296,112 @@ CJewelObject::CJewelObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 	SetChild(pJewelModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pJewelModel);
+}
+
+//================================
+CParticleObject::CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
+{
+	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
+	SetMesh(pParticleMesh);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CTexture* pParticleTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/star.dds", 0); //star
+
+
+	CParticleShader* pParticleShader = new CParticleShader(); //CParticleShader CUIShader
+	pParticleShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pParticleShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CScene::CreateShaderResourceViews(pd3dDevice, pParticleTexture, 21, false);
+
+	CMaterial* pParticleMaterial = new CMaterial(1);
+	pParticleMaterial->SetTexture(pParticleTexture, 0);
+	pParticleMaterial->SetShader(pParticleShader);
+
+	SetMaterial(0, pParticleMaterial);
+
+	velocity = (float)(rand() % 5);
+
+	angleX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+	angleY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+	angleZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+
+	position.x = GetPosition().x;
+	position.y = GetPosition().y;
+	position.z = GetPosition().z;
+}
+
+void CParticleObject::Animate(float fElapsedTime)
+{
+	ffTimeElapsed += fElapsedTime;
+	if (ffTimeElapsed > lifeTime) {
+		isLive = false;
+		ffTimeElapsed = 0.f;
+	}
+
+	// 랜덤한 방향을 설정하기 위한 각도 계산
+
+	// velocity에 따라 파티클 이동
+	position.x += velocity * cosf(angleX) * fElapsedTime * 100;
+	position.y += velocity * sinf(angleY) * fElapsedTime * 100;
+	position.z += velocity * sinf(angleZ) * fElapsedTime * 100;
+
+	SetPosition(position);
+
+	CGameObject::Animate(fElapsedTime);
+}
+
+void CParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	CGameObject::Render(pd3dCommandList, pCamera);
+}
+
+
+//======================
+CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
+{
+	CFireMesh* pFireMesh = new CFireMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
+	pFireMesh->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	SetMesh(pFireMesh);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CTexture* pfireTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pfireTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/fire01.dds", 0); 
+
+	CTexture* palphaTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	palphaTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/alpha01.dds", 0);
+
+	CTexture* pnoiseTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pnoiseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/noise01.dds", 0);
+
+	CFireShader* pFireShader = new CFireShader();
+	pFireShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pFireShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CScene::CreateShaderResourceViews(pd3dDevice, pfireTexture, 22, false);
+	CScene::CreateShaderResourceViews(pd3dDevice, palphaTexture, 23, false);
+	CScene::CreateShaderResourceViews(pd3dDevice, pnoiseTexture, 24, false);
+
+
+
+	CMaterial* pFireMaterial = new CMaterial(3);
+	pFireMaterial->SetTexture(pfireTexture, 0);
+	pFireMaterial->SetTexture(palphaTexture, 1);
+	pFireMaterial->SetTexture(pnoiseTexture, 2);
+
+	pFireMaterial->SetShader(pFireShader);
+
+
+	SetMaterial(0, pFireMaterial);
+}
+
+void CFireObject::Animate(float fElapsedTime)
+{
+	CGameObject::Animate(fElapsedTime);
+}
+
+void CFireObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	CGameObject::Render(pd3dCommandList, pCamera);
 }

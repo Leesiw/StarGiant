@@ -124,7 +124,7 @@ public:
 	bool CameraSence1(bool ON);
 
 	XMFLOAT3 tarPos = { 0,0,0 };
-	float dist = -50.0f;
+	float dist = -10.0f;
 
 	void SetTarget(XMFLOAT3 tarpos) { tarPos = tarpos; }
 	void SetDist(float sdist) { dist = sdist; }

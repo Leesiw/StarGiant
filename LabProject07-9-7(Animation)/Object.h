@@ -842,3 +842,48 @@ public:
 	CJewelObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks);
 	virtual ~CJewelObject() {};
 };
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CParticleObject : public CGameObject
+{
+public:
+	CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	virtual ~CParticleObject() {};
+
+	virtual void Animate(float fElapsedTime);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+
+	int getMaxParticle() { return m_maxParticles; };
+	bool isLive = true;
+private:
+	float velocity = 0;
+	float m_particleVelocity = 0;
+	int m_maxParticles = 0;
+
+	XMFLOAT3A position;
+
+	float angleX = 0;
+	float angleY = 0;
+	float angleZ = 0;
+
+	float lifeTime = 15.0f;
+	float ffTimeElapsed = 0.0f;
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CFireObject : public CGameObject
+{
+public:
+	CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	virtual ~CFireObject() {};
+
+	virtual void Animate(float fElapsedTime);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+
+private:
+	float ffTimeElapsed = 0.0f;
+
+};
+
+
+
