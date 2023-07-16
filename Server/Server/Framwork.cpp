@@ -616,15 +616,19 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		CS_HEAL_PACKET* p = reinterpret_cast<CS_HEAL_PACKET*>(packet);
 		CScene* m_pScene = scene_manager.GetScene(clients[c_id].room_id);
 
-		if (p->start && m_pScene->heal_player == -1) {
+		if (p->start) {
+			char o_state = -1;
+			if (false == atomic_compare_exchange_strong(&m_pScene->heal_player, &o_state, clients[c_id].room_pid)) {
+				printf("heal_player set ¾È µÊ");
+				return;
+			}
 			m_pScene->heal_start = std::chrono::system_clock::now();
-			m_pScene->heal_player = c_id;
 			clients[c_id].send_heal_packet();
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, clients[c_id].room_id};
 			timer_queue.push(ev);
 		}
 		else {
-			if (m_pScene->heal_player == c_id) {
+			if (m_pScene->heal_player == clients[c_id].room_pid) {
 				m_pScene->heal_player = -1;
 
 				// ¹Ì¼Ç
