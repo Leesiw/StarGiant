@@ -37,6 +37,7 @@ public:
 
 	void CheckMissionComplete();
 	void MissionClear();
+	void SetMission(MissionType mission);
 
 	void GetJewels();
 
@@ -84,7 +85,6 @@ public:
 //	bool						m_bIsRunning = true;
 
 	char						kill_monster_num = 0;
-	char						cur_monster_num = 0;
 
 	MissionType cur_mission;
 

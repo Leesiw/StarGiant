@@ -156,7 +156,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		case OP_MISSION_CLEAR: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state != ST_INGAME) { break; }
-			scene->MissionClear();
+			scene->SetMission(MissionType::KILL_MONSTER3);
 			delete ex_over;
 			break;
 		}
@@ -543,7 +543,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			// 미션
 			if (scene_manager.GetScene(clients[c_id].room_id)->cur_mission == MissionType::TU_SIT && p->player_type == PlayerType::MOVE)
 			{
-				scene_manager.GetScene(clients[c_id].room_id)->MissionClear();
+				scene->SetMission(MissionType::TU_KILL);
 			}
 
 
@@ -638,8 +638,8 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 				// 미션
 				if (m_pScene->cur_mission == MissionType::TU_HILL)
 				{
-					m_pScene->MissionClear();
-					m_pScene->MissionClear(); // 일단 TU_END 건너뜀
+					m_pScene->SetMission(MissionType::GET_JEWELS);
+					//m_pScene->MissionClear(); // 일단 TU_END 건너뜀
 				}
 			}
 		}
