@@ -776,8 +776,41 @@ bool CGameFramework::AroundSculpture()
 
 void CGameFramework::CameraUpdateChange()
 {
-	if (m_pPlayer[0]->getHp() > 85 && m_pPlayer[0]->getHp() < 90 && m_pCamera->m_bCameraShaking ==false) { //언제 쉐이킹할까
+	static int a = 0;
+	static int b = 0;
+	if (a==0 &&m_pPlayer[0]->getHp() < 90 && m_pCamera->m_bCameraShaking ==false) { 
+		m_pCamera->maxShakingTime = 1.f;
 		m_pCamera->m_bCameraShaking = true;
+		a = 1;
+	}
+	if (a == 1 && m_pPlayer[0]->getHp() < 80 && m_pCamera->m_bCameraShaking == false) {
+		m_pCamera->maxShakingTime = 1.f;
+		m_pCamera->m_bCameraShaking = true;
+		a = 2;
+	}
+	if (a == 2 && m_pPlayer[0]->getHp() < 50 && m_pCamera->m_bCameraShaking == false) {
+		m_pCamera->maxShakingTime = 1.5f;
+		m_pCamera->m_bCameraShaking = true;
+		a = 3;
+	}
+
+	if (b==0 && curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
+		m_pCamera->maxShakingTime = 1.0f;
+		m_pCamera->m_bCameraShaking = true;
+		b = 1;
+	}
+	if (b == 1 && curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
+		XMVECTOR v1 = XMLoadFloat3(&m_pPlayer[0]->GetPosition());
+		XMVECTOR v2 = XMLoadFloat3(&m_pScene->m_ppBlackhole->GetPosition());
+		XMVECTOR dist = XMVector3Length(XMVectorSubtract(v2, v1));
+		float distance;
+		XMStoreFloat(&distance, dist);
+
+		if (distance <= 50.0f) {
+			m_pCamera->maxShakingTime = 0.5f;
+			m_pCamera->m_bCameraShaking = true;
+		}
+
 	}
 
 	//CS_TURN은 어차피 플레이어 전부 내부에서 시작함
@@ -865,7 +898,7 @@ void CGameFramework::CameraUpdateChange()
 		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
 		m_pCamera->canDolly = true; //줌
 		m_pCamera->SetTarget(m_pScene->m_ppBlackhole->GetPosition());
-		m_pCamera->SetDist(1000.0f);
+		m_pCamera->SetDist(100.0f);
 		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 	}
@@ -874,7 +907,7 @@ void CGameFramework::CameraUpdateChange()
 	else if (curMissionType == MissionType::CS_SHOW_BLACK_HOLE && !b_Inside && m_pPlayer[0]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
 		m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
 		m_pCamera->SetTarget(m_pScene->m_ppBlackhole->GetPosition());
-		m_pCamera->SetDist(1000.0f);
+		m_pCamera->SetDist(100.0f);
 		m_pCamera->canDolly = true; //줌
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
@@ -887,8 +920,8 @@ void CGameFramework::CameraUpdateChange()
 		b_BeforeCheckInside = true;
 		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
 		m_pCamera->canDolly = true; //줌
-		m_pCamera->SetTarget(m_pScene->m_ppBlackhole->GetPosition());
-		m_pCamera->SetDist(1000.0f);
+		m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
+		m_pCamera->SetDist(2500.0f);
 		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 	}
@@ -896,8 +929,8 @@ void CGameFramework::CameraUpdateChange()
 	//CS_SHOW_GOD 외부일때,
 	else if (curMissionType == MissionType::CS_SHOW_GOD && !b_Inside && m_pPlayer[0]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
 		m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
-		m_pCamera->SetTarget(m_pScene->m_ppBlackhole->GetPosition());
-		m_pCamera->SetDist(1000.0f);
+		m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
+		m_pCamera->SetDist(2500.0f);
 		m_pCamera->canDolly = true; //줌
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;

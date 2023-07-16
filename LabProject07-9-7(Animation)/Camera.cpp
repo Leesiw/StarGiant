@@ -168,7 +168,7 @@ void CCamera::Shaking(float fShakeAmount, float fTimeElapsed)
 	}
 
 
-	if (m_shakingTime > 1) {
+	if (m_shakingTime > maxShakingTime) {
 		m_shakingTime = 0;
 		m_bCameraShaking = false;
 	}

@@ -1582,7 +1582,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 
 	if (landob) {
-		landob->Render(pd3dCommandList, pCamera);
+		if (m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT)
+			landob->Render(pd3dCommandList, pCamera);
 		if (m_ppBoss) {
 			landob->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y - 827.0f, m_ppBoss->GetPosition().z);
 		}
@@ -1590,8 +1591,10 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	static int aaa = 0;
 	if (m_ppGod) {
-		if(aaa==0)
+		if (aaa == 0) {
 			m_ppGod->SetPosition(m_pPlayer[0]->GetPosition());
+			m_ppBoss->Rotate(0, 180, 0);
+		}
 		aaa = 1;
 		m_ppGod->Animate(m_fElapsedTime);
 		if (!m_ppGod->m_pSkinnedAnimationController) m_ppGod->UpdateTransform(NULL);
