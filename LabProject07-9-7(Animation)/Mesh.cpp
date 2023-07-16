@@ -881,15 +881,15 @@ void CTexturedRectMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, int n
 CRayLineMesh::CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 Vector, float fWidth, float fHeight, float fDepth, float fxPosition, float fyPosition, float fzPosition) : CMesh(pd3dDevice, pd3dCommandList)
 {
 	int m_nNumber = 30;//사각형 각 변을 이만큼 쪼개겟다. 
-	m_nVertices = 2 * m_nNumber * m_nNumber; //사각형에서 라인을 100개씩 그리려고한다. (10x10 인듯? 그럼) 
-	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+	m_nVertices = 6 * m_nNumber * m_nNumber; //사각형에서 라인을 100개씩 그리려고한다. (10x10 인듯? 그럼) 
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	//중심의 좌표가 float fxPosition, float fyPosition, float fzPosition
 	//사각형의 너비가 float fWidth, float fHeight, float fDepth
 	//float fDepth가 그려야할 길이라고 설정한다. 
 
 	m_pxmf3Positions = new XMFLOAT3[m_nVertices];
 	m_pxmf2TextureCoords0 = new XMFLOAT2[m_nVertices];
-	m_pxmf2Vector = new XMFLOAT3[m_nVertices];
+	//m_pxmf2Vector = new XMFLOAT3[m_nVertices];
 
 	/*	XMVECTOR dirVector = XMLoadFloat3(&Vector);
 	XMVECTOR upVector = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);  // 임의의 위쪽 벡터
@@ -904,18 +904,46 @@ CRayLineMesh::CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 	float fx = -(fWidth * 0.5f) + fxPosition, fz = -(fHeight * 0.5f) + fzPosition; //시작점
 	float fy = fyPosition + Vector3::ScalarProduct(XMFLOAT3(fxPosition, fyPosition, fzPosition), fDepth).y; //끝점 //
-	float dx = fWidth / m_nNumber, dy = fHeight / m_nNumber;
+	float dx = fWidth / m_nNumber; //윗변 크기
+	float dy = fHeight / m_nNumber;//아랫변 크기 
 
 	//시작점인듯 
 	int num = 0;
+	//for (int i = 0; i < m_nNumber; i++) {
+	//	for (int z = 0; z < m_nNumber; z++) {
+	//		m_pxmf3Positions[num] = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x,  Vector3::ScalarProduct(Vector,fzPosition).y,Vector3::ScalarProduct(Vector, fz + (dy * z)).z); //시작선분점
+	//							m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3();
+	//		m_pxmf3Positions[num] = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x, Vector3::ScalarProduct(Vector, fy).y, Vector3::ScalarProduct(Vector, fz + (dy * z)).z); //끝선분점 
+	//							m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3(); ;
+	//	}
+	//}
 	for (int i = 0; i < m_nNumber; i++) {
 		for (int z = 0; z < m_nNumber; z++) {
-			m_pxmf3Positions[num] = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x,  Vector3::ScalarProduct(Vector,fzPosition).y,Vector3::ScalarProduct(Vector, fz + (dy * z)).z);
-								m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3();
-			m_pxmf3Positions[num] = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x, Vector3::ScalarProduct(Vector, fy).y, Vector3::ScalarProduct(Vector, fz + (dy * z)).z);
-								m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3(); ;
+			XMFLOAT3 A = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x, Vector3::ScalarProduct(Vector, fzPosition).y, Vector3::ScalarProduct(Vector, fz + (dy * z)).z); //시작선분점
+			XMFLOAT3 B = XMFLOAT3(Vector3::ScalarProduct(Vector, fx + (dx * i)).x, Vector3::ScalarProduct(Vector, fy).y, Vector3::ScalarProduct(Vector, fz + (dy * z)).z); //끝선분점 
+			XMFLOAT2 ATexture = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); 
+			XMFLOAT2 BTexture = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); 
+			//LB 0, LT 1, RB 2, RT 3 
+			m_pxmf3Positions[num] = XMFLOAT3(B.x-dy,B.y,B.z);
+				m_pxmf2TextureCoords0[num] = BTexture; num++; //0
+
+				m_pxmf3Positions[num] = XMFLOAT3(A.x - dx, A.y, A.z);
+				m_pxmf2TextureCoords0[num] = ATexture; num++;//1
+
+				m_pxmf3Positions[num] = XMFLOAT3(B.x + dy, B.y, B.z);
+				m_pxmf2TextureCoords0[num] = BTexture; num++;//2
+
+				m_pxmf3Positions[num] = XMFLOAT3(A.x - dx, A.y, A.z);
+				m_pxmf2TextureCoords0[num] = ATexture; num++;//1
+
+				m_pxmf3Positions[num] = XMFLOAT3(A.x + dx, A.y, A.z);
+				m_pxmf2TextureCoords0[num] = ATexture; num++;//3
+
+				m_pxmf3Positions[num] = XMFLOAT3(B.x + dy, B.y, B.z);
+				m_pxmf2TextureCoords0[num] = BTexture; num++;//2
 		}
 	}
+
 
 	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pxmf3Positions, sizeof(XMFLOAT3) * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
 
@@ -932,8 +960,8 @@ CRayLineMesh::CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 CRayLineMesh::CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 Vector, float fWidth, float fHeight, float fDepth, XMFLOAT3 Position) : CMesh(pd3dDevice, pd3dCommandList)
 {
 	int m_nNumber = 30;//사각형 각 변을 이만큼 쪼개겟다. 
-	m_nVertices = 2 * m_nNumber * m_nNumber; //사각형에서 라인을 100개씩 그리려고한다. (10x10 인듯? 그럼) 
-	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+	m_nVertices = 6 * m_nNumber * m_nNumber; //사각형에서 라인을 100개씩 그리려고한다. (10x10 인듯? 그럼) 
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	//중심의 좌표가 float fxPosition, float fyPosition, float fzPosition
 	//사각형의 너비가 float fWidth, float fHeight, float fDepth
 	//float fDepth가 그려야할 길이라고 설정한다. 
@@ -952,14 +980,41 @@ CRayLineMesh::CRayLineMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	float nfy = nPosition.y;
 	float ndx = fHeight / m_nNumber, ndz = fHeight / m_nNumber;
 
-	//시작점인듯 
+	////시작점인듯 
 	int num = 0;
+	//for (int i = 0; i < m_nNumber; i++) {
+	//	for (int z = 0; z < m_nNumber; z++) {
+	//		m_pxmf3Positions[num] = XMFLOAT3(fx + dx * i, fy, fz + dz * z);
+	//		m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3();
+	//		m_pxmf3Positions[num] = XMFLOAT3(nfx + ndx * i, nfy, nfz + ndz * z);
+	//		m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3(); ;
+	//	}
+	//}
+
 	for (int i = 0; i < m_nNumber; i++) {
 		for (int z = 0; z < m_nNumber; z++) {
-			m_pxmf3Positions[num] = XMFLOAT3(fx + dx * i, fy, fz + dz * z);
-			m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3();
-			m_pxmf3Positions[num] = XMFLOAT3(nfx + ndx * i, nfy, nfz + ndz * z);
-			m_pxmf2TextureCoords0[num] = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z)); num++; //m_pxmf2Vector[i] = XMFLOAT3(); ;
+			XMFLOAT3 A = XMFLOAT3(fx + dx * i, fy, fz + dz * z); //시작선분점
+			XMFLOAT3 B = XMFLOAT3(nfx + ndx * i, nfy, nfz + ndz * z); //끝선분점 
+			XMFLOAT2 ATexture = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z));
+			XMFLOAT2 BTexture = XMFLOAT2((1.0 / m_nNumber * i), (1.0 / m_nNumber * z));
+			//LB 0, LT 1, RB 2, RT 3 
+			m_pxmf3Positions[num] = XMFLOAT3(B.x - ndz, B.y, B.z);
+			m_pxmf2TextureCoords0[num] = BTexture; num++; //0
+
+			m_pxmf3Positions[num] = XMFLOAT3(A.x - ndx, A.y, A.z);
+			m_pxmf2TextureCoords0[num] = ATexture; num++;//1
+
+			m_pxmf3Positions[num] = XMFLOAT3(B.x + ndz, B.y, B.z);
+			m_pxmf2TextureCoords0[num] = BTexture; num++;//2
+
+			m_pxmf3Positions[num] = XMFLOAT3(A.x - ndx, A.y, A.z);
+			m_pxmf2TextureCoords0[num] = ATexture; num++;//1
+
+			m_pxmf3Positions[num] = XMFLOAT3(A.x + ndx, A.y, A.z);
+			m_pxmf2TextureCoords0[num] = ATexture; num++;//3
+
+			m_pxmf3Positions[num] = XMFLOAT3(B.x + ndz, B.y, B.z);
+			m_pxmf2TextureCoords0[num] = BTexture; num++;//2
 		}
 	}
 
