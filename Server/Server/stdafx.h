@@ -34,8 +34,8 @@ using namespace std;
 #pragma comment(lib, "ws2_32") // ws2_32.lib ¸µÅ©
 
 struct MonsterStatus {
-	char MAX_HP;
-	char ATK;
+	char MAX_HP = 10;
+	char ATK = 3;
 };
 
 struct Level {
