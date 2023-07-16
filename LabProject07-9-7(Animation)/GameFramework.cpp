@@ -437,6 +437,16 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			roomNum += L"9";
 			break;
 
+		case VK_BACK:
+		{
+			if (!roomNum.empty())
+			{
+				roomNum.pop_back(); 
+				cout << "¹éÅ°\n"; 
+			}
+			break;
+		}
+
 		case VK_F1:
 		case VK_F2:
 		case VK_F3:
