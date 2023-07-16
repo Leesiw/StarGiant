@@ -61,9 +61,6 @@ public:
 	XMFLOAT4X4						m_xmf4x4View;
 	XMFLOAT4X4						m_xmf4x4Projection;
 
-	XMFLOAT4X4						m_xmf4x4View;
-	XMFLOAT4X4						m_xmf4x4Projection;
-
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void ReleaseShaderVariables();
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
