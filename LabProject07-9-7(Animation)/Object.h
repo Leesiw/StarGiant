@@ -886,7 +886,7 @@ private:
 	float angleY = 0;
 	float angleZ = 0;
 
-	float lifeTime = 15.0f;
+	float lifeTime = 4.0f;
 	float ffTimeElapsed = 0.0f;
 };
 

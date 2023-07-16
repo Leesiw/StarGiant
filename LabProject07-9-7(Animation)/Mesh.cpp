@@ -1208,20 +1208,26 @@ void CFireMesh::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pC
 
 void CFireMesh::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	cout << " CFireMesh CreateShaderVariables\n";
+	/*cout << " CFireMesh CreateShaderVariables\n";
 	UINT ncbElementBytes = ((sizeof(m_noiseb) + 255) & ~255); 
 	m_pd3dcbNoise = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
 	m_pd3dcbNoise->Map(0, NULL, (void**)&m_noiseb);
 
 	UINT ncbElementBytes2 = ((sizeof(m_distortionb) + 255) & ~255);
 	m_pd3dcbDist = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes2, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
-	m_pd3dcbDist->Map(0, NULL, (void**)&m_distortionb);
+	m_pd3dcbDist->Map(0, NULL, (void**)&m_distortionb);*/
 
 }
 
 
 void CFireMesh::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	/*D3D12_GPU_VIRTUAL_ADDRESS d3dcbBoneTransformsGpuVirtualAddress = m_pd3dcbNoise->GetGPUVirtualAddress();
+	pd3dCommandList->SetGraphicsRootConstantBufferView(22, d3dcbBoneTransformsGpuVirtualAddress);	
+	D3D12_GPU_VIRTUAL_ADDRESS d3dcbBoneTransformsGpuVirtualAddress2 = m_pd3dcbDist->GetGPUVirtualAddress();
+	pd3dCommandList->SetGraphicsRootConstantBufferView(23, d3dcbBoneTransformsGpuVirtualAddress2);
+
+
 	::memcpy(&m_noiseb->frameTime, &frameTime, sizeof(float));
 	::memcpy(&m_noiseb->scrollSpeeds, &scrollSpeeds, sizeof(XMFLOAT3));
 	::memcpy(&m_noiseb->scales, &scales, sizeof(XMFLOAT3));
@@ -1230,5 +1236,5 @@ void CFireMesh::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList
 	::memcpy(&m_noiseb->frameTime, &frameTime, sizeof(float));
 	::memcpy(&m_noiseb->scrollSpeeds, &scrollSpeeds, sizeof(XMFLOAT3));
 	::memcpy(&m_noiseb->scales, &scales, sizeof(XMFLOAT3));
-	::memcpy(&m_noiseb->padding, &padding, sizeof(float));
+	::memcpy(&m_noiseb->padding, &padding, sizeof(float));*/
 }

@@ -117,6 +117,7 @@ public:
 	virtual void AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position, int Target);
 	virtual void AddDieSprite(XMFLOAT3 Position, int Target);
 
+	void setParticleStart();
 
 protected:
 	ID3D12RootSignature					*m_pd3dGraphicsRootSignature = NULL;
