@@ -24,7 +24,7 @@ cbuffer cbGameObjectInfo : register(b2)
 cbuffer cbPlusInfo : register(b9)//b2
 {
 	matrix		gmtxTexture : packoffset(c0);
-	//float		gfCurrentTime : packoffset(c4); //테스트용
+	float		gfCurrentTime : packoffset(c4); //테스트용
 
 };
 
@@ -619,13 +619,13 @@ VS_FIRE_OUTPUT VS_FIRE(VS_FIRE_INPUT input)
 
 
 	output.uv1 = (input.uv * scales.x);
-	output.uv1.y = output.uv1.y + (frameTime * scrollSpeeds.x);
+	output.uv1.y = output.uv1.y + (gfCurrentTime * scrollSpeeds.x);
 
 	output.uv2 = (input.uv * scales.y);
-	output.uv2.y = output.uv2.y + (frameTime * scrollSpeeds.y);
+	output.uv2.y = output.uv2.y + (gfCurrentTime * scrollSpeeds.y);
 
 	output.uv3 = (input.uv * scales.z);
-	output.uv3.y = output.uv3.y + (frameTime * scrollSpeeds.z);
+	output.uv3.y = output.uv3.y + (gfCurrentTime * scrollSpeeds.z);
 
 	return output;
 }
