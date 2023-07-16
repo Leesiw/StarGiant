@@ -43,6 +43,7 @@ public:
 	bool GetisAlive() { return enemy_flags & option0; }
 	void SetisAlive(bool i_a);
 	void SetAttackTimerFalse();
+	virtual void SetHPMax(MissionType mission);
 
 	void SetAttackTimerTrue();
 
@@ -102,6 +103,7 @@ public:
 public:
 	//virtual MissileInfo GetMissileInfo() { enemy_flags &= ~option2; return info; }
 	virtual void Attack(float fTimeElapsed, CAirplanePlayer* player);
+	virtual void SetHPMax(MissionType mission);
 
 	virtual void SetStatus(MissionType cur_mission);
 
@@ -119,6 +121,7 @@ public:
 	float m_fAvoidReductionRate;	// 상대 가속/방향 전환 시 명중률 떨어지는 정도
 public:
 	virtual void SetStatus(MissionType cur_mission);
+	virtual void SetHPMax(MissionType mission);
 
 	virtual void Animate(float fTimeElapsed);
 	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);
@@ -131,6 +134,7 @@ public:
 	virtual ~CPlasmaCannonEnemy();
 public:
 	virtual void SetStatus(MissionType cur_mission);
+	virtual void SetHPMax(MissionType mission);
 
 	virtual void Animate(float fTimeElapsed);
 	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);

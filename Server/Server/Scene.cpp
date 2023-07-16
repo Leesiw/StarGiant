@@ -1213,10 +1213,12 @@ void CScene::SpawnEnemy(char id)
 	if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x; }
 	if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; }
 	if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; }
-	m_ppEnemies[id]->SetisAlive(true);
+
+	m_ppEnemies[id]->SetHPMax(cur_mission);
 	m_ppEnemies[id]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
 	m_ppEnemies[id]->state = EnemyState::IDLE;
 	m_ppEnemies[id]->SetDestination();
+	m_ppEnemies[id]->SetisAlive(true);
 
 	SPAWN_ENEMY_INFO e_info{};
 	e_info.id = m_ppEnemies[id]->GetID();
