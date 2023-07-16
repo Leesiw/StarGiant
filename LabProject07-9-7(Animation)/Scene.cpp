@@ -1669,8 +1669,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (!b_Inside) {
 			if (m_pParticle[i]->isLive) {
 				m_pParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-				if (aaaaaaa == 0)
-					m_pParticle[i]->SetPosition(m_pPlayer[0]->GetPosition());
 				m_pParticle[i]->Animate(m_fElapsedTime);
 				m_pParticle[i]->Render(pd3dCommandList, pCamera);
 			}
@@ -1858,13 +1856,13 @@ void CScene::AddDieSprite(XMFLOAT3 Position, int Target)
 
 }
 
-void CScene::setParticleStart()
+void CScene::setParticleStart(int cnt, XMFLOAT3 tarPos)
 {
-	for (int i = 1; i < ENEMIES; i++)
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		if (m_ppEnemies[i] && !m_ppEnemies[i]->isAlive) {
-
-		}
+		m_pParticle[i]->isLive = true;
+		m_pParticle[i]->setPos(tarPos);
+			
 	}
 }
 

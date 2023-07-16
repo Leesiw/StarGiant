@@ -2232,6 +2232,7 @@ void CGameFramework::ProcessPacket(char* p)
 					// 보스 죽음 (게임 클리어?)
 				}
 				m_pScene->m_ppBoss->BossHP = packet->data.hp;
+				
 
 				break;
 			}
@@ -2250,10 +2251,13 @@ void CGameFramework::ProcessPacket(char* p)
 				m_pScene->m_ppEnemies[packet->data.id]->isAlive = false;
 				//m_pScene->AddDieSprite(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
 				m_pScene->AddDieSprite(m_pScene->m_ppEnemies[packet->data.id]->GetPosition(), packet->data.id);
+				m_pScene->setParticleStart(10, m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
 
 			}
 			else {
 				m_pScene->m_ppEnemies[packet->data.id]->hp = packet->data.hp;
+				m_pScene->setParticleStart(10, m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
+				cout << "att\n";
 			}
 		}
 		else { // 플레이어 타격

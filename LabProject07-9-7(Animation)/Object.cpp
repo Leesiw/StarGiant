@@ -2384,7 +2384,7 @@ CJewelObject::CJewelObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 //================================
 CParticleObject::CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
-	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
+	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 10.0f, 10.0f, 0.0f);
 	SetMesh(pParticleMesh);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
@@ -2438,6 +2438,13 @@ void CParticleObject::Animate(float fElapsedTime)
 void CParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	CGameObject::Render(pd3dCommandList, pCamera);
+}
+
+void CParticleObject::setPos(XMFLOAT3 pos)
+{
+	position.x = pos.x;
+	position.y = pos.y;
+	position.z = pos.z;
 }
 
 

@@ -874,8 +874,10 @@ public:
 	virtual void Animate(float fElapsedTime);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 
+
+	void setPos(XMFLOAT3 pos);
 	int getMaxParticle() { return m_maxParticles; };
-	bool isLive = true;
+	bool isLive = false;
 private:
 	float velocity = 0;
 	float m_particleVelocity = 0;
@@ -887,7 +889,7 @@ private:
 	float angleY = 0;
 	float angleZ = 0;
 
-	float lifeTime = 4.0f;
+	float lifeTime = 2.0f;
 	float ffTimeElapsed = 0.0f;
 };
 

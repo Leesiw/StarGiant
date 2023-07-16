@@ -17,7 +17,7 @@
 #define SPOT_LIGHT						2
 #define DIRECTIONAL_LIGHT				3
 
-#define MAX_PARTICLES					52 
+#define MAX_PARTICLES					100
 
 #define MAX_FIRE				2
 
@@ -94,6 +94,7 @@ public:
 	void OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList);
 
     void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
+
 	void RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 	void RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 
@@ -117,7 +118,7 @@ public:
 	virtual void AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position, int Target);
 	virtual void AddDieSprite(XMFLOAT3 Position, int Target);
 
-	void setParticleStart();
+	void setParticleStart(int cnt, XMFLOAT3 tarPos);
 
 protected:
 	ID3D12RootSignature					*m_pd3dGraphicsRootSignature = NULL;
