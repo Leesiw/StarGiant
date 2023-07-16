@@ -345,6 +345,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 	}
 
 	BoundingOrientedBox boss_bbox = m_pBoss->UpdateBoundingBox();
+	if(cur_mission == MissionType::DEFEAT_BOSS)
 	if (boss_bbox.Intersects(pos, dir, dist)) // 焊胶 面倒贸府
 	{
 		m_pBoss->BossHP -= m_pSpaceship->damage;
@@ -358,6 +359,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 
 	BoundingOrientedBox god_bbox = m_pGod->UpdateBoundingBox();
 	m_pGod->UpdateBoundingBox();
+	if (cur_mission == MissionType::KILL_GOD)
 	if (god_bbox.Intersects(pos, dir, dist)) // 矮 面倒贸府
 	{
 		m_pGod->GodHP -= m_pSpaceship->damage;

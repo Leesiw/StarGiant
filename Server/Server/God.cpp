@@ -14,7 +14,8 @@ God::God()
 
 
 	//바운딩 박스 맞는지..확인필요함
-	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.0674829, -1.20364, -0.872784), XMFLOAT3(20.2724, 11.4494, 13.567), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+	//boundingbox = BoundingOrientedBox{ XMFLOAT3(0.0674829, -1.20364, -0.872784), XMFLOAT3(20.2724, 11.4494, 13.567), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.3990545, 0.241102, 0.0173169), XMFLOAT3(1077.4508, 662.36458, 1365.8619), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 
 	// Lua 상태 생성
 	m_L = luaL_newstate();
