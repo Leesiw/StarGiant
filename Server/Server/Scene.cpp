@@ -200,7 +200,6 @@ void CScene::Reset()
 	}
 
 	kill_monster_num = 0;
-	cur_monster_num = 0;
 	heal_player = -1;
 	can_sit[0] = true;
 	can_sit[1] = true;
@@ -281,12 +280,12 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 
 			if (m_ppEnemies[i]->hp <= 0) { 
 				m_ppEnemies[i]->SetisAlive(false);
-				--cur_monster_num;
 
 				// 미션
 				if (cur_mission == MissionType::TU_KILL) 
 				{
-					MissionClear();
+					SetMission(MissionType::TU_HILL);
+					//MissionClear();
 				}
 
 				// 미션
@@ -301,7 +300,8 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 
 					if (kill_monster_num == 15) {
 						kill_monster_num = 0;
-						MissionClear();
+						SetMission(MissionType::CS_SHOW_PLANET);
+						//MissionClear();
 					}
 				}
 
@@ -317,7 +317,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 
 					if (kill_monster_num == 20) {
 						kill_monster_num = 0;
-						MissionClear();
+						SetMission(MissionType::FIND_BOSS);
 					}
 				}
 
@@ -332,7 +332,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 
 					if (kill_monster_num == 20) {
 						kill_monster_num = 0;
-						MissionClear();
+						SetMission(MissionType::KILL_METEOR);
 					}
 				}
 
@@ -391,7 +391,7 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 
 				if (kill_monster_num == 5) {
 					kill_monster_num = 0;
-					MissionClear();
+					SetMission(MissionType::CS_SHOW_BLACK_HOLE);
 				}
 			}
 			return;
@@ -517,14 +517,14 @@ void CScene::CheckMissionComplete()
 
 		float dist = Vector3::Length(Vector3::Subtract(player_pos, planet_pos));
 		if (dist < 1000.f) {
-			MissionClear();
+			SetMission(MissionType::KILL_MONSTER_ONE_MORE_TIME);
 		}
 		return;
 	}
 	case MissionType::FIND_BOSS: {
 		float dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));		// 임시 좌표
 		if (dist < 1500.0f) {
-			MissionClear();
+			SetMission(MissionType::CS_BOSS_SCREAM);
 		}
 		return;
 	}
@@ -534,7 +534,7 @@ void CScene::CheckMissionComplete()
 
 		float dist = Vector3::Length(Vector3::Subtract(player_pos, planet_pos));
 		if (dist < 1000.f) {
-			MissionClear();
+			SetMission(MissionType::CS_SHOW_GOD);
 		}
 
 		return;
@@ -581,6 +581,44 @@ void CScene::MissionClear()
 	}
 	else {
 
+	}
+}
+
+void CScene::SetMission(MissionType mission)
+{
+	if (cur_mission != mission)
+	{
+		cur_mission = mission;
+
+		if (cur_mission == MissionType::FIND_BOSS) {
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, num };
+			timer_queue.push(ev);
+		}
+
+		if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
+			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
+
+			SC_BLACK_HOLE_PACKET p{};
+			p.size = sizeof(SC_BLACK_HOLE_PACKET);
+			p.type = SC_BLACK_HOLE;
+			p.pos = black_hole_pos;
+			Send((char*)&p);
+
+			b_prev_time = chrono::steady_clock::now();
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, num };
+			timer_queue.push(ev);
+		}
+
+		if (cur_mission == MissionType::CS_SHOW_GOD) {
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, num };
+			timer_queue.push(ev);
+		}
+
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_mission_start_packet(cur_mission);
+		}
 	}
 }
 
@@ -635,7 +673,7 @@ void CScene::GetJewels()
 	// 미션
 	if (cur_mission == MissionType::GET_JEWELS)
 	{
-		MissionClear();
+		SetMission(MissionType::Kill_MONSTER);
 	}
 }
 
@@ -647,6 +685,10 @@ void CScene::SpawnEnemy()
 		timer_queue.push(ev);
 		return;
 	}
+	char cur_enemy_num = std::count_if(m_ppEnemies.begin(), m_ppEnemies.end(), [](CEnemy* enemy) {
+		return enemy->GetisAlive();
+	});
+
 	std::array<CEnemy*, ENEMIES> ppEnemies{ m_ppEnemies };
 	std::random_shuffle(ppEnemies.begin(), ppEnemies.end());
 
@@ -654,13 +696,14 @@ void CScene::SpawnEnemy()
 
 	for (int i = 0; i < ENEMIES; ++i)
 	{
-		if (levels[cur_mission].MaxMonsterNum <= cur_monster_num) { break; }
+		if (levels[cur_mission].MaxMonsterNum <= cur_enemy_num) { break; }
 		if (spawn_num <= 0) { break; }
 		if (!ppEnemies[i]->GetisAlive()) {
 			SpawnEnemy(ppEnemies[i]->GetID());
 			m_ppEnemies[ppEnemies[i]->GetID()]->prev_time = chrono::steady_clock::now();
 			TIMER_EVENT ev_u{ ppEnemies[i]->GetID(), chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(num) };
 			timer_queue.push(ev_u);
+			++cur_enemy_num;
 			--spawn_num;
 		}
 	}
@@ -673,7 +716,6 @@ void CScene::UpdateEnemy(char obj_id)
 	if (_state != ST_INGAME) { return; }
 	if (m_ppEnemies[obj_id]->hp <= 0) {
 		m_ppEnemies[obj_id]->SetisAlive(false);
-		--cur_monster_num;
 		return;
 	}
 	if (levels[cur_mission].cutscene) {
@@ -895,8 +937,8 @@ void CScene::UpdateBoss()
 {
 	if (_state != ST_INGAME) { return; }
 	if (m_pBoss->BossHP <= 0) {
-		MissionClear();
-		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
+		SetMission(MissionType::CS_SHOW_STARGIANT);
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 30s, EV_MISSION_CLEAR, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
 	}
@@ -1085,7 +1127,7 @@ void CScene::BlackHole()
 	std::chrono::duration<float> elapsed_time = (time_now - b_prev_time);
 	b_prev_time = time_now;
 	black_hole_time -= elapsed_time.count();
-	if (black_hole_time <= 0.f) { MissionClear(); return; }
+	if (black_hole_time <= 0.f) { SetMission(MissionType::GO_CENTER_REAL); return; }
 
 	SC_BLACK_HOLE_TIME_PACKET packet;
 	packet.size = sizeof(packet);
@@ -1179,7 +1221,7 @@ void CScene::SpawnEnemy(char id)
 		if (clients[pl_id]._state != ST_INGAME) continue;
 		clients[pl_id].send_spawn_enemy_packet(e_info);
 	}
-	++cur_monster_num;
+	//++cur_monster_num;
 }
 
 void CScene::SpawnMeteo(char i)
