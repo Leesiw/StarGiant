@@ -262,6 +262,7 @@ public:
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
 	virtual D3D12_BLEND_DESC CreateBlendState();
+	virtual D3D12_RASTERIZER_DESC CreateRasterizerState();
 
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel=NULL, void* pContext = NULL);
 	virtual void AnimateObjects( CCamera* pCamera);

@@ -447,6 +447,18 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 	}
 */
 
+
+	//임시 거리값 
+	float3 Center = float3(gmtxTexture._11, gmtxTexture._12, gmtxTexture._13);
+	float3 Length = float3(gmtxTexture._21, gmtxTexture._22, gmtxTexture._23); // Weight, Height, Depth
+	float Percent = (input.positionL.z - Center.z) / Length.z;// 0~1 을 가장. 
+	float LineState =0.5f;
+	float sinvalue = LineState * sin(Percent * 3.1415 * 2);
+	
+	if(abs(input.positionL.z) % 100 <10.0f)
+	{
+
+	
 	float compositeNoise = 0.15f;
 
 	float4 noise1 = gtxtGODTexture1.Sample(gssWrap, input.uv);
@@ -464,10 +476,6 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 
 	cColor.a = saturate(dot(float3(cColor.a, cColor.g, cColor.b), float3(1.0f, 1.0f, 1.0f)));
 
-	//임시 거리값 
-	float3 Center = float3(gmtxTexture._11, gmtxTexture._12, gmtxTexture._13);
-	float3 Length = float3(gmtxTexture._21, gmtxTexture._22, gmtxTexture._23); // Weight, Height, Depth
-
 	float Distance = distance(input.positionL, Center);
 	float DepthLayer = saturate(Distance / Length.z);
 
@@ -479,9 +487,12 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 	float alphaChannel = 1.0f - saturate(DepthLayer * LengthLayer.x * LengthLayer.y);
 
 	//return float4(1.0f, 1.0f, 1.0f, 1.0* DepthLayer);
-	return float4(1.0f* DepthLayer, 1.0f* LengthLayer.x, 1.0f* LengthLayer.y, alphaChannel);
-
-	
+	return float4(1.0f* DepthLayer, 1.0f* LengthLayer.x, 1.0f* LengthLayer.y, alphaChannel* Percent);
+	}
+	else {
+		return float4(0, 0, 0, 0);
+	}
+	//return float4(0, 0, 0, 0);
 }
 
 
