@@ -682,7 +682,7 @@ float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
 	fireColor.a = alphaColor;
 
 	//return fireColor;
-	return float4(1.0f,1.0f,0.0f,0.0f);
+	return float4(1.0f,1.0f,0.0f,1.0f);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

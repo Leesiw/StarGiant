@@ -18,10 +18,49 @@ BOOL InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
+
+#include <filesystem>
+#include <shlobj.h>
+
+static std::wstring GetLatestWinPixGpuCapturerPath_Cpp17()
+{
+	LPWSTR programFilesPath = nullptr;
+	SHGetKnownFolderPath(FOLDERID_ProgramFiles, KF_FLAG_DEFAULT, NULL, &programFilesPath);
+
+	std::filesystem::path pixInstallationPath = programFilesPath;
+	pixInstallationPath /= "Microsoft PIX";
+
+	std::wstring newestVersionFound;
+
+	for (auto const& directory_entry : std::filesystem::directory_iterator(pixInstallationPath))
+	{
+		if (directory_entry.is_directory())
+		{
+			if (newestVersionFound.empty() || newestVersionFound < directory_entry.path().filename().c_str())
+			{
+				newestVersionFound = directory_entry.path().filename().c_str();
+			}
+		}
+	}
+
+	if (newestVersionFound.empty())
+	{
+		// TODO: Error, no PIX installation found
+	}
+
+	return pixInstallationPath / newestVersionFound / L"WinPixGpuCapturer.dll";
+}
+
+
+
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+
+
+	auto dllname = GetLatestWinPixGpuCapturerPath_Cpp17();
+	LoadLibrary(dllname.c_str());
 
 	MSG msg;
 	HACCEL hAccelTable;

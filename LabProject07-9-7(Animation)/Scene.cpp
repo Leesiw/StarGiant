@@ -1708,7 +1708,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 				m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 				m_pFire[i]->SetPosition(m_pPlayer[0]->GetPosition());
 				m_pFire[i]->Animate(m_fElapsedTime);
-				//m_pFire[i]->Render(pd3dCommandList, pCamera);
+				m_pFire[i]->Render(pd3dCommandList, pCamera);
 			}
 		}
 	}
