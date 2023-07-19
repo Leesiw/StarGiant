@@ -132,33 +132,14 @@ void ProcessPacket(int ci, unsigned char packet[])
 		SC_LOGIN_INFO_PACKET* login_packet = reinterpret_cast<SC_LOGIN_INFO_PACKET*>(packet);
 		active_clients++;
 		g_clients[ci].connected = true;
-
-		CS_NEXT_MISSION_PACKET start_packet;
+		g_clients[ci].id = login_packet->data.id;
 		
-		start_packet.size = sizeof(start_packet);
-		start_packet.type = CS_START;
-		SendPacket(ci, &start_packet);
-
-		CS_CHANGE_PACKET change_packet;
-		change_packet.size = sizeof(change_packet);
-		change_packet.type = CS_CHANGE;
-		if (login_packet->data.id == 0) {
-			change_packet.player_type = PlayerType::MOVE;
+		if (login_packet->data.id == 2) {
+			CS_NEXT_MISSION_PACKET start_packet;
+			start_packet.size = sizeof(start_packet);
+			start_packet.type = CS_START;
+			SendPacket(ci, &start_packet);
 		}
-		else if(login_packet->data.id == 1) {
-			change_packet.player_type = PlayerType::ATTACK1;
-		}
-		else {
-			change_packet.player_type = PlayerType::ATTACK2;
-		}
-		SendPacket(ci, &change_packet);
-
-
-		CS_NEXT_MISSION_PACKET cutscene_packet;
-
-		cutscene_packet.size = sizeof(cutscene_packet);
-		cutscene_packet.type = CS_CUTSCENE_END;
-		SendPacket(ci, &cutscene_packet);
 	}
 	case SC_CHANGE: break;
 	case SC_ADD_PLAYER: break;
@@ -202,7 +183,27 @@ void ProcessPacket(int ci, unsigned char packet[])
 	case SC_HEAL: break;
 	case SC_MISSION_START: break;
 	case SC_KILL_NUM: break;
-	case SC_START: break;
+	case SC_START: {
+		CS_NEXT_MISSION_PACKET cutscene_packet;
+
+		cutscene_packet.size = sizeof(cutscene_packet);
+		cutscene_packet.type = CS_CUTSCENE_END;
+		SendPacket(ci, &cutscene_packet);
+
+		CS_CHANGE_PACKET change_packet;
+		change_packet.size = sizeof(change_packet);
+		change_packet.type = CS_CHANGE;
+		if (g_clients[ci].id == 0) {
+			change_packet.player_type = PlayerType::MOVE;
+		}
+		else if (g_clients[ci].id == 1) {
+			change_packet.player_type = PlayerType::ATTACK1;
+		}
+		else {
+			change_packet.player_type = PlayerType::ATTACK2;
+		}
+		SendPacket(ci, &change_packet);
+		break; }
 	case SC_BLACK_HOLE: break;
 	case SC_BLACK_HOLE_TIME: break;
 	case SC_CUTSCENE_END_NUM: break;
