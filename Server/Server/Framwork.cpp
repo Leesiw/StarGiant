@@ -173,6 +173,12 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			delete ex_over;
 			break;
 		}
+		case OP_CHECK_CUTSCENE_END: {
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
+			scene->CheckCutsceneEnd();
+			delete ex_over;
+			break;
+		}
 		}
 	}
 }
@@ -792,6 +798,12 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 			case EV_BLACK_HOLE: {
 				OVER_EXP* ov = new OVER_EXP;
 				ov->_comp_type = OP_BLACK_HOLE;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
+				break;
+			}
+			case EV_CHECK_CUTSCENE_END: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_CHECK_CUTSCENE_END;
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}

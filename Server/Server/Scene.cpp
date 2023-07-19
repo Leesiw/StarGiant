@@ -564,17 +564,24 @@ void CScene::MissionClear()
 	{
 		cur_mission = levels[cur_mission].NextMission;
 
-		if (cur_mission == MissionType::FIND_BOSS) {
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, num };
+		if (levels[cur_mission].cutscene) {
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
+			timer_queue.push(ev);
+
+			if (cur_mission == MissionType::CS_SHOW_GOD) {
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
+				timer_queue.push(ev);
+			}
+		}
+		else if (cur_mission == MissionType::FIND_BOSS) {
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
 			timer_queue.push(ev);
 		}
-
-		if (cur_mission == MissionType::GO_CENTER) {
+		else if (cur_mission == MissionType::GO_CENTER) {
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
 			timer_queue.push(ev);
 		}
-
-		if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
+		else if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
 			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
 
 			SC_BLACK_HOLE_PACKET p{};
@@ -584,12 +591,7 @@ void CScene::MissionClear()
 			Send((char*) & p);
 
 			b_prev_time = chrono::steady_clock::now();
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, num };
-			timer_queue.push(ev);
-		}
-
-		if (cur_mission == MissionType::CS_SHOW_GOD) {
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, num };
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, static_cast<short>(num) };
 			timer_queue.push(ev);
 		}
 
@@ -610,7 +612,16 @@ void CScene::SetMission(MissionType mission)
 	{
 		cur_mission = mission;
 
-		if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
+		if (levels[cur_mission].cutscene) {
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
+			timer_queue.push(ev);
+
+			if (cur_mission == MissionType::CS_SHOW_GOD) {
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
+				timer_queue.push(ev);
+			}
+		}
+		else if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
 			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
 
 			SC_BLACK_HOLE_PACKET p{};
@@ -620,12 +631,7 @@ void CScene::SetMission(MissionType mission)
 			Send((char*)&p);
 
 			b_prev_time = chrono::steady_clock::now();
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, num };
-			timer_queue.push(ev);
-		}
-
-		if (cur_mission == MissionType::CS_SHOW_GOD) {
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, num };
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, static_cast<short>(num) };
 			timer_queue.push(ev);
 		}
 
@@ -1023,24 +1029,6 @@ void CScene::UpdateSpaceship()
 {
 	if (_state != ST_INGAME) { return; }
 	if (levels[cur_mission].cutscene) {
-		bool cutscene_end = true;
-		for (char i = 0; i < 3; ++i) {
-			if (_plist[i] == -1) { continue; }
-			if (m_ppPlayers[i]->cutscene_end == false) { cutscene_end = false; }
-		}
-
-		if (cutscene_end == true) {
-			MissionClear();
-			for (char i = 0; i < 3; ++i) {
-				if (_plist[i] == -1) { continue; }
-				m_ppPlayers[i]->cutscene_end = false;
-			}
-			m_pSpaceship->prev_time = chrono::steady_clock::now();
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_SPACESHIP, static_cast<short>(num) };
-			timer_queue.push(ev);
-			return;
-		}
-
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_SPACESHIP, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
@@ -1139,7 +1127,6 @@ void CScene::SendSceneInfo()
 		clients[pl_id].do_send(&send_buf, send_num);
 	}
 
-
 	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20ms, EV_SEND_SCENE_INFO, static_cast<short>(num) };
 	timer_queue.push(ev);
 }
@@ -1220,6 +1207,38 @@ void CScene::BlackHole()
 	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_BLACK_HOLE, static_cast<short>(num) };
 	timer_queue.push(ev);
 
+}
+
+void CScene::CheckCutsceneEnd()
+{
+	if (_state != ST_INGAME) { return; }
+	if (!levels[cur_mission].cutscene) { return; }
+
+	bool cutscene_end = true;
+	for (char i = 0; i < 3; ++i) {
+		if (_plist[i] == -1) { continue; }
+		if (m_ppPlayers[i]->cutscene_end == false) { cutscene_end = false; }
+	}
+
+	if (cutscene_end == true) {
+		for (char i = 0; i < 3; ++i) {
+			if (_plist[i] == -1) { continue; }
+			m_ppPlayers[i]->cutscene_end = false;
+		}
+		if (cur_mission != MissionType::CS_BAD_ENDING) {
+			MissionClear();
+		}
+		else {
+			// 이전 분기로 이동
+			// 보석 수 1개씩 줄이기
+			// 위치 이동
+			// 미션 초기화 (kill 수 등)
+		}
+		return;
+	}
+
+	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
+	timer_queue.push(ev);
 }
 
 void CScene::SpawnEnemy(char id)
@@ -1492,6 +1511,9 @@ void CScene::Start()
 
 		TIMER_EVENT ev2{ 0, chrono::system_clock::now() + 33ms, EV_SEND_SCENE_INFO, num };
 		timer_queue.push(ev2);
+
+		TIMER_EVENT ev3{ 0, chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
+		timer_queue.push(ev3);
 		return;
 	}
 	_s_lock.unlock();

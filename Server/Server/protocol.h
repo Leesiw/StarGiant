@@ -174,7 +174,9 @@ enum class MissionType : char
 	CS_SHOW_BLACK_HOLE,
 	ESCAPE_BLACK_HOLE, GO_CENTER_REAL,
 	CS_SHOW_GOD,
-	KILL_GOD, CS_ENDING
+	KILL_GOD, CS_ENDING,
+
+	CS_BAD_ENDING
 };
 
 enum class SpriteType : char

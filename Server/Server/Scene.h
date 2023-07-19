@@ -53,6 +53,7 @@ public:
 	void Heal();
 	void SendSceneInfo();
 	void BlackHole();
+	void CheckCutsceneEnd();
 
 	void SpawnEnemy(char id);
 
