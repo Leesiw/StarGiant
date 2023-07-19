@@ -89,6 +89,7 @@ public:
 	char						kill_monster_num = 0;
 
 	MissionType cur_mission;
+	MissionType prev_mission;
 
 	std::atomic_bool can_sit[4];
 	std::atomic_bool boss_start;

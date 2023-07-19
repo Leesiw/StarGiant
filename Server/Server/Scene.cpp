@@ -753,6 +753,10 @@ void CScene::UpdateEnemy(char obj_id)
 		return;
 	}
 	if (levels[cur_mission].cutscene) {
+		if (cur_mission == MissionType::CS_BAD_ENDING) {
+			m_ppEnemies[obj_id]->SetisAlive(false);
+			return;
+		}
 		m_ppEnemies[obj_id]->prev_time = chrono::steady_clock::now();
 		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_ENEMY, static_cast<short>(num) };
 		timer_queue.push(ev);
@@ -860,11 +864,15 @@ void CScene::UpdateMeteo(char obj_id)
 void CScene::SpawnMissile(char obj_id)
 {
 	if (_state != ST_INGAME) { return; }
-	if (!m_ppEnemies[obj_id]->GetisAlive() || m_ppEnemies[obj_id]->state != EnemyState::AIMING) {
+	if (!m_ppEnemies[obj_id]->GetisAlive()) {
 		m_ppEnemies[obj_id]->SetAttackTimerFalse();
 		return;
 	}
 	if (levels[cur_mission].cutscene) {
+		if (cur_mission == MissionType::CS_BAD_ENDING) {
+			m_ppEnemies[obj_id]->SetAttackTimerFalse();
+			return;
+		}
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
@@ -907,6 +915,10 @@ void CScene::UpdateMissile(char obj_id)
 	if (_state != ST_INGAME) { return; }
 	if (!m_ppMissiles[obj_id]->GetisActive()) { return; }
 	if (levels[cur_mission].cutscene) {
+		if (cur_mission == MissionType::CS_BAD_ENDING) {
+			m_ppMissiles[obj_id]->SetisActive(false);
+			return;
+		}
 		m_ppMissiles[obj_id]->prev_time = chrono::steady_clock::now();
 		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_MISSILE, static_cast<short>(num) };
 		timer_queue.push(ev);
@@ -925,7 +937,7 @@ void CScene::UpdateMissile(char obj_id)
 	m_info.Quaternion = m_ppMissiles[obj_id]->GetQuaternion();
 
 	BoundingOrientedBox missile_bbox = m_ppMissiles[obj_id]->UpdateBoundingBox();
-	BoundingOrientedBox spaceship_bbox = m_ppMissiles[obj_id]->UpdateBoundingBox();
+	BoundingOrientedBox spaceship_bbox = m_pSpaceship->UpdateBoundingBox();
 
 	if (missile_bbox.Intersects(spaceship_bbox))
 	{
