@@ -505,6 +505,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	}
 	case CS_CHANGE: {
 		CS_CHANGE_PACKET* p = reinterpret_cast<CS_CHANGE_PACKET*>(packet);
+		if (clients[c_id].room_id == -1) { break; }
 		if (p->player_type == PlayerType::INSIDE)
 		{
 			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
@@ -561,6 +562,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_SPACESHIP_MOVE: {
 		CS_SPACESHIP_PACKET* p = reinterpret_cast<CS_SPACESHIP_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::MOVE) {
+			if (clients[c_id].room_id == -1) { break; }
 			scene_manager.GetScene(clients[c_id].room_id)->m_pSpaceship->SetInputInfo(p->data, p->move_time);
 		}
 		break;
@@ -568,6 +570,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_INSIDE_MOVE: {
 		CS_INSIDE_PACKET* p = reinterpret_cast<CS_INSIDE_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::INSIDE) {
+			if (clients[c_id].room_id == -1) { break; }
 			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
 			float yaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
 			if (yaw != p->data.yaw)
@@ -599,6 +602,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		break;
 	}
 	case CS_ATTACK: {
+		if (clients[c_id].room_id == -1) { break; }
 		CScene* m_pScene = scene_manager.GetScene(clients[c_id].room_id);
 
 		CS_ATTACK_PACKET* p = reinterpret_cast<CS_ATTACK_PACKET*>(packet);
@@ -619,6 +623,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		break;
 	}
 	case CS_HEAL: {
+		if (clients[c_id].room_id == -1) { break; }
 		CS_HEAL_PACKET* p = reinterpret_cast<CS_HEAL_PACKET*>(packet);
 		CScene* m_pScene = scene_manager.GetScene(clients[c_id].room_id);
 
@@ -647,6 +652,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		break;
 	}
 	case CS_NEXT_MISSION: {
+		if (clients[c_id].room_id == -1) { break; }
 		scene_manager.GetScene(clients[c_id].room_id)->MissionClear();
 		break;
 	}
