@@ -352,7 +352,7 @@ CMissileEnemy::CMissileEnemy()
 
 	enemy_flags &= ~option2;
 
-	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, -0.981136f, -3.06843f), XMFLOAT3(7.79472f, 8.2804f, 9.19255f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, -0.981136f, -3.06843f), XMFLOAT3(11.69208f, 12.4206f, 13.788825f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 }
 
 CMissileEnemy::~CMissileEnemy()
@@ -395,7 +395,7 @@ CLaserEnemy::CLaserEnemy()
 
 	enemy_flags &= ~option2;
 
-	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.037703f, -0.673452f, -0.197806f), XMFLOAT3(3.478002f, 3.023166f, 3.342354f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.037703f, -0.673452f, -0.197806f), XMFLOAT3(5.217003f, 4.534749f, 5.013531f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 }
 
 CLaserEnemy::~CLaserEnemy()
