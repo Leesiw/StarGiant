@@ -919,5 +919,44 @@ private:
 
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CFlameParticleObject : public CGameObject
+{
+public:
+	CFlameParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	virtual ~CFlameParticleObject() {};
+
+	virtual void Animate(float fElapsedTime);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	int getMaxParticle() { return m_maxParticles; };
+	void setTarpos(XMFLOAT3 tarpos) { TargetPos = tarpos; }
+	bool isLive = false;
+
+
+	XMVECTOR direction;
+	int count = 0;
+
+private:
+	float velocity = 1;
+	float m_particleVelocity = 0;
+	int m_maxParticles = 0;
+
+	XMFLOAT3 position;
+
+	XMFLOAT3 TargetPos;
+
+
+	float angleX = 0;
+	float angleY = 0;
+	float angleZ = 0;
+
+	float intervalX = 0;
+	float intervalY = 0;
+	float intervalZ = 0;
+
+	float lifeTime = 20.0f;
+	float ffTimeElapsed = 0.0f;
+};
+
 
 

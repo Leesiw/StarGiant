@@ -2519,3 +2519,77 @@ void CFireObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandLi
 	pd3dCommandList->SetGraphicsRootConstantBufferView(19, d3dGpuVirtualAddress);
 
 }
+
+CFlameParticleObject::CFlameParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
+{
+	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 50.0f, 50.0f, 0.0f);
+	SetMesh(pParticleMesh);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CTexture* pParticleTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/circle.dds", 0); //star
+
+
+	CParticleShader* pParticleShader = new CParticleShader(); //CParticleShader CUIShader
+	pParticleShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pParticleShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CScene::CreateShaderResourceViews(pd3dDevice, pParticleTexture, 21, false);
+
+	CMaterial* pParticleMaterial = new CMaterial(1);
+	pParticleMaterial->SetTexture(pParticleTexture, 0);
+	pParticleMaterial->SetShader(pParticleShader);
+
+	SetMaterial(0, pParticleMaterial);
+
+	
+	velocity = count;
+	//velocity = (float)(rand() % 5);
+
+	angleX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+	angleY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+	angleZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+
+	intervalX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
+	intervalY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
+	intervalZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 150.0f;
+
+
+	position.x = GetPosition().x + intervalX;
+	position.y = GetPosition().y + intervalY;
+	position.z = GetPosition().z + intervalZ;
+
+	direction = XMVectorSubtract(XMLoadFloat3(&TargetPos), XMLoadFloat3(&position));
+	direction = XMVector3Normalize(direction);
+}
+
+void CFlameParticleObject::Animate(float fElapsedTime)
+{
+	ffTimeElapsed += fElapsedTime;
+	if (ffTimeElapsed > lifeTime) {
+		isLive = false;
+		ffTimeElapsed = 0.f;
+	}
+
+	// TargetPos로 향하는 방향 벡터 계산
+	
+
+	// velocity에 따라 파티클 이동
+	XMFLOAT3 velocityVector;
+	XMStoreFloat3(&velocityVector, XMVectorScale(direction, velocity * fElapsedTime * 100));
+
+	position.x += velocity  * fElapsedTime * 10;
+	position.y += velocity  * fElapsedTime * 10;
+	position.z += velocity  * fElapsedTime * 10;
+
+
+	
+	SetPosition(position);
+
+	CGameObject::Animate(fElapsedTime);
+}
+
+void CFlameParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	CGameObject::Render(pd3dCommandList, pCamera);
+}

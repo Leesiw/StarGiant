@@ -312,6 +312,12 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pParticle[i] = new CParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 	}
 
+	for (int i = 0; i < MAX_PARTICLES; ++i) {
+		m_pFlameParticle[i] = new CFlameParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+		m_pFlameParticle[i]->count = i;
+	}
+
+
 	//=====================================
 	CLoadedModelInfo* pJewelModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/SoftStar.bin", NULL);
 	m_ppJewel = new CJewelObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pJewelModel, 1);
@@ -544,6 +550,8 @@ void CScene::ReleaseObjects()
 	if (m_pTerrain) delete m_pTerrain;
 	if (m_pSkyBox) delete m_pSkyBox;
 	if (m_pParticle) delete m_pParticle;
+	if (m_pFlameParticle) delete m_pFlameParticle;
+
 
 	for (int i = 0; i < MAX_FIRE; i++)
 	{
@@ -1083,6 +1091,8 @@ void CScene::ReleaseUploadBuffers()
 	if (m_pSkyBox) m_pSkyBox->ReleaseUploadBuffers();
 		
 	for (int i = 0; i < MAX_PARTICLES; ++i)if (m_pParticle[i] != NULL) { m_pParticle[i]->ReleaseUploadBuffers(); };
+	for (int i = 0; i < MAX_PARTICLES; ++i)if (m_pFlameParticle[i] != NULL) { m_pFlameParticle[i]->ReleaseUploadBuffers(); };
+
 	for (int i = 0; i < MAX_FIRE; ++i)if (m_pFire[i] != NULL) { 
 		m_pFire[i]->ReleaseUploadBuffers(); 
 	};
@@ -1700,18 +1710,36 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			}
 		}
 	}
-	aaaaaaa = 1;
 
-	for (int i = 0; i < MAX_FIRE; ++i) {
+	for (int i = 0; i < MAX_PARTICLES; ++i) {
 		if (!b_Inside) {
-			if (m_pFire[i]) {
-				m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-				m_pFire[i]->SetPosition(m_pPlayer[0]->GetPosition());
-				m_pFire[i]->Animate(m_fElapsedTime);
-				m_pFire[i]->Render(pd3dCommandList, pCamera);
-			}
+			//if (m_pFlameParticle[i]->isLive) {
+				if (aaaaaaa == 0)
+					m_pFlameParticle[i]->SetPosition(m_pPlayer[0]->GetPosition());
+
+				m_pFlameParticle[i]->setTarpos(m_pPlayer[0]->GetPosition());
+				m_pFlameParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				m_pFlameParticle[i]->Rotate(0, 0, m_eTime * 100);
+
+				m_pFlameParticle[i]->Animate(m_fElapsedTime);
+
+				m_pFlameParticle[i]->Render(pd3dCommandList, pCamera);
+			//}
 		}
 	}
+	aaaaaaa = 1;
+
+
+	//for (int i = 0; i < MAX_FIRE; ++i) {
+	//	if (!b_Inside) {
+	//		if (m_pFire[i]) {
+	//			m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+	//			m_pFire[i]->SetPosition(m_pPlayer[0]->GetPosition());
+	//			m_pFire[i]->Animate(m_fElapsedTime);
+	//			m_pFire[i]->Render(pd3dCommandList, pCamera);
+	//		}
+	//	}
+	//}
 
 
 }

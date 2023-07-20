@@ -217,7 +217,7 @@ public:
 	CFireObject* m_pFire[MAX_FIRE] = {};
 
 	CParticleObject* m_pParticle[MAX_PARTICLES] = {};
-
+	CFlameParticleObject* m_pFlameParticle[MAX_PARTICLES] = {};
 	CDepthRenderShader* m_pDepthRenderShader = NULL;
 
 	CShadowMapShader* m_pShadowShader = NULL;
