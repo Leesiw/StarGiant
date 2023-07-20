@@ -665,8 +665,13 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 
 			int screenAreaLeft1 = 1100;
 			int screenAreaTop1 = 550;
-			int screenAreaRight1 = 1400;
+			int screenAreaRight1 = 1450;
 			int screenAreaBottom1 = 650;
+
+			int screenAreaLeft2 = 150;
+			int screenAreaTop2 = 550;
+			int screenAreaRight2 = 450;
+			int screenAreaBottom2 = 650;
 
 			if (mouseX >= screenAreaLeft1 && mouseX <= screenAreaRight1 && mouseY >= screenAreaTop1 && mouseY <= screenAreaBottom1 && !roomNum.empty()) { 
 				room_num = static_cast<short>(std::stoi(roomNum));
@@ -678,6 +683,18 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
 				}
 				cout << "¸ÅÄª";
+			}
+
+			if (mouseX >= screenAreaLeft2 && mouseX <= screenAreaRight2 && mouseY >= screenAreaTop2 && mouseY <= screenAreaBottom2) {
+				cout << "¿ÀÅä¸ÅÄª";
+				CS_LOGIN_PACKET packet;
+				packet.size = sizeof(packet);
+				packet.type = CS_LOGIN;
+				packet.room_id = -1;
+				if (_state == SCENE_LOBBY) {
+					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+				}
+				
 			}
 
 			// ³ªÁß¿¡ ¼öÁ¤ÇØ¾ßµÊ
