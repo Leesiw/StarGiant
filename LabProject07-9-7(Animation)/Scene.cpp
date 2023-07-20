@@ -1715,7 +1715,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (!b_Inside) {
 			//if (m_pFlameParticle[i]->isLive) {
 				if (aaaaaaa == 0)
-					m_pFlameParticle[i]->SetPosition(m_pPlayer[0]->GetPosition());
+					m_pFlameParticle[i]->SetPosition({ 0,0,0 });
 
 				m_pFlameParticle[i]->setTarpos(m_pPlayer[0]->GetPosition());
 				m_pFlameParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));

@@ -2543,7 +2543,7 @@ CFlameParticleObject::CFlameParticleObject(ID3D12Device* pd3dDevice, ID3D12Graph
 	SetMaterial(0, pParticleMaterial);
 
 	
-	velocity = count;
+	velocity = 5;
 	//velocity = (float)(rand() % 5);
 
 	angleX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
@@ -2571,16 +2571,22 @@ void CFlameParticleObject::Animate(float fElapsedTime)
 		ffTimeElapsed = 0.f;
 	}
 
-	// TargetPos로 향하는 방향 벡터 계산
-	
+	// 처음 한 번만 TargetPos로 향하는 방향 벡터 계산
+	if (XMVector3Equal(targetDirection, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f)))
+	{
+		targetDirection = XMVectorSubtract(XMLoadFloat3(&TargetPos), XMLoadFloat3(&position));
+		targetDirection = XMVector3Normalize(targetDirection);
+	}
 
 	// velocity에 따라 파티클 이동
-	XMFLOAT3 velocityVector;
-	XMStoreFloat3(&velocityVector, XMVectorScale(direction, velocity * fElapsedTime * 100));
+	XMVECTOR velocityVector = XMVectorScale(targetDirection, velocity * fElapsedTime * 10);
+	XMFLOAT3 velocityResult;
+	XMStoreFloat3(&velocityResult, velocityVector);
 
-	position.x += velocity  * fElapsedTime * 10;
-	position.y += velocity  * fElapsedTime * 10;
-	position.z += velocity  * fElapsedTime * 10;
+	position.x += velocityResult.x;
+	position.y += velocityResult.y;
+	position.z += velocityResult.z;
+
 
 
 	

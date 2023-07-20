@@ -934,6 +934,7 @@ public:
 
 
 	XMVECTOR direction;
+	XMVECTOR targetDirection = { 0,0,0,0 };
 	int count = 0;
 
 private:
