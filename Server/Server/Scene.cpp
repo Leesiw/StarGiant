@@ -111,7 +111,6 @@ void CScene::BuildObjects()
 	can_sit[1] = true;
 	can_sit[2] = true;
 	can_sit[3] = true;
-	boss_start = false;
 
 	// boss
 	m_pBoss = new Boss();
@@ -206,7 +205,6 @@ void CScene::Reset()
 	can_sit[1] = true;
 	can_sit[2] = true;
 	can_sit[3] = true;
-	boss_start = false;
 
 	m_pBoss->SetPosition(3000.f, 3000.f, 3000.f);
 	m_pGod->SetPosition(-3000.f, -3000.f, -3000.f);
@@ -312,7 +310,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 					clients[pl_id].send_kill_num_packet(kill_monster_num);
 				}
 
-				if (kill_monster_num == 15) {
+				if (kill_monster_num >= 15) {
 					kill_monster_num = 0;
 					SetMission(MissionType::CS_SHOW_PLANET);
 					//MissionClear();
@@ -329,7 +327,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 					clients[pl_id].send_kill_num_packet(kill_monster_num);;
 				}
 
-				if (kill_monster_num == 20) {
+				if (kill_monster_num >= 20) {
 					kill_monster_num = 0;
 					SetMissionFindBoss();
 				}
@@ -344,7 +342,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 					clients[pl_id].send_kill_num_packet(kill_monster_num);;
 				}
 
-				if (kill_monster_num == 20) {
+				if (kill_monster_num >= 20) {
 					kill_monster_num = 0;
 					SetMission(MissionType::KILL_METEOR);
 				}
@@ -565,7 +563,7 @@ void CScene::MissionClear()
 		cur_mission = levels[cur_mission].NextMission;
 
 		if (levels[cur_mission].cutscene) {
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
+			TIMER_EVENT ev{ static_cast<char>(levels[cur_mission].NextMission), chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
 			timer_queue.push(ev);
 
 			if (cur_mission == MissionType::CS_SHOW_GOD) {
@@ -613,13 +611,21 @@ void CScene::SetMission(MissionType mission)
 		cur_mission = mission;
 
 		if (levels[cur_mission].cutscene) {
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
+			TIMER_EVENT ev{ static_cast<char>(levels[mission].NextMission), chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
 			timer_queue.push(ev);
 
 			if (cur_mission == MissionType::CS_SHOW_GOD) {
 				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
 				timer_queue.push(ev);
 			}
+		}
+		else if (cur_mission == MissionType::FIND_BOSS) {
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
+			timer_queue.push(ev);
+		}
+		else if (cur_mission == MissionType::GO_CENTER) {
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
+			timer_queue.push(ev);
 		}
 		else if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
 			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
@@ -645,14 +651,18 @@ void CScene::SetMission(MissionType mission)
 
 void CScene::SetMissionFindBoss()
 {
-	bool o_state = false;
-	if (false == atomic_compare_exchange_strong(&boss_start, &o_state, true))
-		return;
+	if (cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME) {
+		cur_mission = MissionType::FIND_BOSS;
 
-	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, num };
-	timer_queue.push(ev);
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, num };
+		timer_queue.push(ev);
 
-	SetMission(MissionType::FIND_BOSS);
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_mission_start_packet(cur_mission);
+		}
+	}
 	
 }
 
@@ -1221,7 +1231,7 @@ void CScene::BlackHole()
 
 }
 
-void CScene::CheckCutsceneEnd()
+void CScene::CheckCutsceneEnd(MissionType next_mission)
 {
 	if (_state != ST_INGAME) { return; }
 	if (!levels[cur_mission].cutscene) { return; }
@@ -1238,18 +1248,18 @@ void CScene::CheckCutsceneEnd()
 			m_ppPlayers[i]->cutscene_end = false;
 		}
 		if (cur_mission != MissionType::CS_BAD_ENDING && levels[cur_mission].cutscene) {
-			MissionClear();
+			SetMission(next_mission);
 		}
 		else {
-			// 이전 분기로 이동, 가장 최근 컷씬
-			// 보석 수 1개씩 줄이기
-			// 위치 이동, max hp
-			// 미션 초기화 (kill 수 등)
+			
+			m_pSpaceship->SetPosition(levels[prev_mission].RestartPosition);
+			m_pSpaceship->hp = m_pSpaceship->max_hp;
+			SetMission(levels[prev_mission].RestartMission);
 		}
 		return;
 	}
 
-	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
+	TIMER_EVENT ev{ static_cast<char>(next_mission), chrono::system_clock::now() + 1s, EV_CHECK_CUTSCENE_END, static_cast<short>(num)};
 	timer_queue.push(ev);
 }
 
@@ -1524,7 +1534,7 @@ void CScene::Start()
 		TIMER_EVENT ev2{ 0, chrono::system_clock::now() + 33ms, EV_SEND_SCENE_INFO, num };
 		timer_queue.push(ev2);
 
-		TIMER_EVENT ev3{ 0, chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
+		TIMER_EVENT ev3{ 1, chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
 		timer_queue.push(ev3);
 		return;
 	}

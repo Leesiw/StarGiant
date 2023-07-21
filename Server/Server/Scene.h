@@ -53,7 +53,7 @@ public:
 	void Heal();
 	void SendSceneInfo();
 	void BlackHole();
-	void CheckCutsceneEnd();
+	void CheckCutsceneEnd(MissionType next_mission);
 
 	void SpawnEnemy(char id);
 
@@ -92,7 +92,6 @@ public:
 	MissionType prev_mission;
 
 	std::atomic_bool can_sit[4];
-	std::atomic_bool boss_start;
 
 	SCENE_STATE _state;
 	mutex _s_lock;

@@ -175,7 +175,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		}
 		case OP_CHECK_CUTSCENE_END: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			scene->CheckCutsceneEnd();
+			scene->CheckCutsceneEnd(static_cast<MissionType>(ex_over->obj_id));
 			delete ex_over;
 			break;
 		}
@@ -803,6 +803,7 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 			}
 			case EV_CHECK_CUTSCENE_END: {
 				OVER_EXP* ov = new OVER_EXP;
+				ov->obj_id = ev.obj_id;
 				ov->_comp_type = OP_CHECK_CUTSCENE_END;
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;

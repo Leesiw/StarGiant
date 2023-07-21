@@ -49,6 +49,8 @@ struct Level {
 
 	bool cutscene = false;
 
+	MissionType RestartMission;
+	XMFLOAT3 RestartPosition;
 };
 
 static std::random_device rdd;
