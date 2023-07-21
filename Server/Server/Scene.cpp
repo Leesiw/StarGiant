@@ -45,7 +45,7 @@ void CScene::BuildObjects()
 	cur_mission = MissionType::CS_TURN;
 	black_hole_time = 30.f;
 
-
+	invincible_mode = false;
 	// player
 	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
 	pAirplanePlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 100.0f));
@@ -156,6 +156,7 @@ void CScene::Reset()
 	m_pSpaceship->Reset();
 
 	black_hole_time = 30.f;
+	invincible_mode = false;
 
 	items[ItemType::JEWEL_ATT] = 0;
 	items[ItemType::JEWEL_DEF] = 0;
@@ -1055,6 +1056,11 @@ void CScene::UpdateSpaceship()
 		timer_queue.push(ev);
 		return;
 	}
+	if (m_pSpaceship->hp <= 0 && !invincible_mode) {
+		prev_mission = cur_mission;
+		SetMission(MissionType::CS_BAD_ENDING);
+	}
+
 	auto time_now = chrono::steady_clock::now();
 	std::chrono::duration<float> elapsed_time = (time_now - m_pSpaceship->prev_time);
 	m_pSpaceship->prev_time = time_now;
@@ -1247,13 +1253,21 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 			if (_plist[i] == -1) { continue; }
 			m_ppPlayers[i]->cutscene_end = false;
 		}
-		if (cur_mission != MissionType::CS_BAD_ENDING && levels[cur_mission].cutscene) {
-			SetMission(next_mission);
+		if (cur_mission != MissionType::CS_BAD_ENDING) {
+			if (levels[cur_mission].NextMission == next_mission) {
+				SetMission(next_mission);
+			}
 		}
 		else {
-			
 			m_pSpaceship->SetPosition(levels[prev_mission].RestartPosition);
 			m_pSpaceship->hp = m_pSpaceship->max_hp;
+			kill_monster_num = 0;
+			for (short pl_id : _plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_bullet_hit_packet(-1, m_pSpaceship->hp);
+			}
+
 			SetMission(levels[prev_mission].RestartMission);
 		}
 		return;
@@ -1261,6 +1275,11 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 
 	TIMER_EVENT ev{ static_cast<char>(next_mission), chrono::system_clock::now() + 1s, EV_CHECK_CUTSCENE_END, static_cast<short>(num)};
 	timer_queue.push(ev);
+}
+
+void CScene::ChangeInvincibleMode()
+{
+	invincible_mode = !invincible_mode;
 }
 
 void CScene::SpawnEnemy(char id)
