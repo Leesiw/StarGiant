@@ -149,6 +149,20 @@ void CScene::ReleaseObjects()
 
 }
 
+void CScene::ResetScene()
+{
+	_s_lock.lock();
+	if (_state == SCENE_INGAME) {
+		_state = SCENE_RESET;
+		_s_lock.unlock();
+		Reset();
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 60s, EV_RESET_SCENE, num };
+		timer_queue.push(ev);
+		return;
+	}
+	_s_lock.unlock();
+}
+
 void CScene::Reset()
 {
 	_id = -1;
@@ -163,9 +177,17 @@ void CScene::Reset()
 	items[ItemType::JEWEL_HEAL] = 0;
 	items[ItemType::JEWEL_HP] = 0;
 
-	//_plist_lock.lock();
-	_plist.fill(-1);
-	//_plist_lock.unlock();
+	_plist_lock.lock();
+	for (auto& pl : _plist) {
+		if (pl == -1) { break; }
+		clients[pl]._s_lock.lock();
+		clients[pl].room_id = -1;
+		clients[pl].room_pid = -1;
+		clients[pl]._state = ST_ALLOC;
+		clients[pl]._s_lock.unlock();
+		pl = -1;
+	}
+	_plist_lock.unlock();
 
 	cur_mission = MissionType::CS_TURN;
 	for (char i = 0; i < 3; ++i) {
@@ -1023,7 +1045,7 @@ void CScene::UpdateGod()
 {
 	if (_state != ST_INGAME) { return; }
 	if (m_pGod->GetcurHp() <= 0) {
-		MissionClear();
+		SetMission(MissionType::CS_ENDING);
 		return;
 	}
 	if (levels[cur_mission].cutscene) {
@@ -1253,12 +1275,8 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 			if (_plist[i] == -1) { continue; }
 			m_ppPlayers[i]->cutscene_end = false;
 		}
-		if (cur_mission != MissionType::CS_BAD_ENDING) {
-			if (levels[cur_mission].NextMission == next_mission) {
-				SetMission(next_mission);
-			}
-		}
-		else {
+
+		if (cur_mission == MissionType::CS_BAD_ENDING ) {
 			m_pSpaceship->SetPosition(levels[prev_mission].RestartPosition);
 			m_pSpaceship->hp = m_pSpaceship->max_hp;
 			kill_monster_num = 0;
@@ -1269,6 +1287,12 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 			}
 
 			SetMission(levels[prev_mission].RestartMission);
+		}
+		else if (cur_mission == MissionType::CS_ENDING) {
+			ResetScene();
+		}
+		else if (levels[cur_mission].NextMission == next_mission) {
+				SetMission(next_mission);
 		}
 		return;
 	}

@@ -24,6 +24,7 @@ public:
 	void BuildObjects();
 	void ReleaseObjects();
 
+	void ResetScene();
 	void Reset();
 
 	void AnimateObjects(float fTimeElapsed);

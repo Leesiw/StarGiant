@@ -422,8 +422,8 @@ void CGameFramework::SetMission()
 
 	levels[MissionType::CS_ENDING].NextMission = MissionType::CS_ENDING;
 	levels[MissionType::CS_ENDING].cutscene = true;
-	levels[MissionType::KILL_GOD].RestartMission = MissionType::CS_SHOW_GOD;
-	levels[MissionType::KILL_GOD].RestartPosition = XMFLOAT3{ -2900.f ,-2900.f ,-2900.f };
+	levels[MissionType::CS_ENDING].RestartMission = MissionType::CS_SHOW_GOD;
+	levels[MissionType::CS_ENDING].RestartPosition = XMFLOAT3{ -2900.f ,-2900.f ,-2900.f };
 
 	levels[MissionType::CS_BAD_ENDING].NextMission = MissionType::CS_BAD_ENDING;
 	levels[MissionType::CS_BAD_ENDING].cutscene = true;
