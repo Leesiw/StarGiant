@@ -1237,13 +1237,13 @@ void CScene::CheckCutsceneEnd()
 			if (_plist[i] == -1) { continue; }
 			m_ppPlayers[i]->cutscene_end = false;
 		}
-		if (cur_mission != MissionType::CS_BAD_ENDING) {
+		if (cur_mission != MissionType::CS_BAD_ENDING && levels[cur_mission].cutscene) {
 			MissionClear();
 		}
 		else {
-			// 이전 분기로 이동
+			// 이전 분기로 이동, 가장 최근 컷씬
 			// 보석 수 1개씩 줄이기
-			// 위치 이동
+			// 위치 이동, max hp
 			// 미션 초기화 (kill 수 등)
 		}
 		return;

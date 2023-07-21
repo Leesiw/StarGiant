@@ -883,6 +883,7 @@ CTerrainPlayer::~CTerrainPlayer()
 
 void CTerrainPlayer::UpdateOnServer(bool rotate_update)
 {
+	if (type != PlayerType::INSIDE) { return; }
 	if (pow(player_info.pos.x - m_xmf3Position.x, 2) + pow(player_info.pos.z - m_xmf3Position.z, 2) < EPSILON) {
 		motion = AnimationState::IDLE;
 	}
@@ -891,7 +892,6 @@ void CTerrainPlayer::UpdateOnServer(bool rotate_update)
 	}
 
 	if (!is_update) {
-		
 		SetPosition(player_info.pos);
 		if (rotate_update) {
 			Rotate(0.0f, player_info.m_fYaw - m_fYaw, 0.0f);
