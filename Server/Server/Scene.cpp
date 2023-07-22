@@ -179,7 +179,7 @@ void CScene::Reset()
 
 	_plist_lock.lock();
 	for (auto& pl : _plist) {
-		if (pl == -1) { break; }
+		if (pl == -1) { continue; }
 		clients[pl]._s_lock.lock();
 		clients[pl].room_id = -1;
 		clients[pl].room_pid = -1;
