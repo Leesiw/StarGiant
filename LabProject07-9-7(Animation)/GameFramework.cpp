@@ -82,6 +82,19 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	BuildObjects();
 	isConnect = ConnectServer();
 
+	FMOD_RESULT       result;
+	FMOD::System* system(nullptr);
+	FMOD::Sound* sound(nullptr);
+	FMOD::Channel* channel(nullptr);
+	void* extradriverdata(nullptr);
+
+	result = FMOD::System_Create(&system);
+	if (result != FMOD_OK) return -1;
+
+	result = system->init(32, FMOD_INIT_NORMAL, extradriverdata);  
+	system->createSound("Sound/background.wav", FMOD_LOOP_OFF, 0, &sound);
+	result = system->playSound(sound, 0, false, &channel);
+
 	return(true);
 }
 

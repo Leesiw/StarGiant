@@ -48,6 +48,9 @@ using namespace std;
 
 #include <Mmsystem.h>
 
+#include "Sound/fmod/inc/fmod.h"
+#include "Sound/fmod/inc/fmod.hpp"
+
 //서버
 #pragma comment (lib, "WS2_32.LIB")
 #pragma comment (lib, "MSWSock.LIB")
@@ -98,6 +101,10 @@ extern HINSTANCE						ghAppInstance;
 #pragma comment(lib, "d2d1.lib")
 //
 #pragma comment(lib, "dxguid.lib")
+
+#pragma comment(lib, "fmod_vc.lib")
+
+
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
 
