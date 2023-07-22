@@ -1745,7 +1745,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	//}
 
 	static int adfa = 0;
-	m_pPlayer[0]->curMissionType = MissionType::CS_ENDING;
+
 
 	if (m_pPlayer[0]->curMissionType == MissionType::CS_ENDING) {
 
