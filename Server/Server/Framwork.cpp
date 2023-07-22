@@ -225,11 +225,14 @@ void CGameFramework::SetMission()
 {
 	levels[MissionType::CS_TURN].NextMission = MissionType::TU_SIT;
 	levels[MissionType::CS_TURN].cutscene = true;
+	levels[MissionType::CS_TURN].RestartMission = MissionType::CS_TURN;
+	levels[MissionType::CS_TURN].RestartPosition = XMFLOAT3{0.f ,0.f ,100.f};
 
 	levels[MissionType::TU_SIT].NextMission = MissionType::TU_KILL;
 	levels[MissionType::TU_KILL].NextMission = MissionType::TU_HILL;
 	levels[MissionType::TU_HILL].NextMission = MissionType::TU_END;
 	levels[MissionType::TU_END].NextMission = MissionType::GET_JEWELS;
+	
 
 	for (int i = static_cast<int>(MissionType::TU_SIT);
 		i <= static_cast<int>(MissionType::TU_END); ++i) {
@@ -242,6 +245,8 @@ void CGameFramework::SetMission()
 		levels[m].Missile.ATK = 3;
 		levels[m].PlasmaCannon.MAX_HP = 10;
 		levels[m].PlasmaCannon.ATK = 4;
+		levels[m].RestartMission = m;
+		levels[m].RestartPosition = XMFLOAT3{ 0.f ,0.f ,100.f };
 	}
 
 	levels[MissionType::GET_JEWELS].NextMission = MissionType::Kill_MONSTER;
@@ -253,6 +258,8 @@ void CGameFramework::SetMission()
 	levels[MissionType::GET_JEWELS].Missile.ATK = 4;
 	levels[MissionType::GET_JEWELS].PlasmaCannon.MAX_HP = 12;
 	levels[MissionType::GET_JEWELS].PlasmaCannon.ATK = 5;
+	levels[MissionType::GET_JEWELS].RestartMission = MissionType::GET_JEWELS;
+	levels[MissionType::GET_JEWELS].RestartPosition = XMFLOAT3{ 0.f ,0.f ,1000.f };
 
 	levels[MissionType::Kill_MONSTER].NextMission = MissionType::CS_SHOW_PLANET;
 	levels[MissionType::Kill_MONSTER].MaxMonsterNum = 15;
@@ -263,9 +270,13 @@ void CGameFramework::SetMission()
 	levels[MissionType::Kill_MONSTER].Missile.ATK = 8;
 	levels[MissionType::Kill_MONSTER].PlasmaCannon.MAX_HP = 15;
 	levels[MissionType::Kill_MONSTER].PlasmaCannon.ATK = 7;
+	levels[MissionType::Kill_MONSTER].RestartMission = MissionType::Kill_MONSTER;
+	levels[MissionType::Kill_MONSTER].RestartPosition = XMFLOAT3{ 0.f ,0.f ,1000.f };
 
 	levels[MissionType::CS_SHOW_PLANET].NextMission = MissionType::GO_PLANET;
 	levels[MissionType::CS_SHOW_PLANET].cutscene = true;
+	levels[MissionType::CS_SHOW_PLANET].RestartMission = MissionType::CS_SHOW_PLANET;
+	levels[MissionType::CS_SHOW_PLANET].RestartPosition = XMFLOAT3{ 0.f ,0.f ,1000.f };
 
 	levels[MissionType::GO_PLANET].NextMission = MissionType::KILL_MONSTER_ONE_MORE_TIME;
 	levels[MissionType::GO_PLANET].MaxMonsterNum = 15;
@@ -276,6 +287,8 @@ void CGameFramework::SetMission()
 	levels[MissionType::GO_PLANET].Missile.ATK = 12;
 	levels[MissionType::GO_PLANET].PlasmaCannon.MAX_HP = 20;
 	levels[MissionType::GO_PLANET].PlasmaCannon.ATK = 11;
+	levels[MissionType::GO_PLANET].RestartMission = MissionType::CS_SHOW_PLANET;
+	levels[MissionType::GO_PLANET].RestartPosition = XMFLOAT3{ 0.f ,0.f ,1000.f };
 
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].NextMission = MissionType::FIND_BOSS;
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].MaxMonsterNum = 20;
@@ -286,6 +299,8 @@ void CGameFramework::SetMission()
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].Missile.ATK = 20;
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].PlasmaCannon.MAX_HP = 40;
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].PlasmaCannon.ATK = 30;
+	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].RestartMission = MissionType::CS_SHOW_PLANET;
+	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].RestartPosition = XMFLOAT3{ 5000.f ,5000.f ,5000.f };
 
 	levels[MissionType::FIND_BOSS].NextMission = MissionType::CS_BOSS_SCREAM;
 	levels[MissionType::FIND_BOSS].MaxMonsterNum = ENEMIES;
@@ -296,9 +311,13 @@ void CGameFramework::SetMission()
 	levels[MissionType::FIND_BOSS].Missile.ATK = 20;
 	levels[MissionType::FIND_BOSS].PlasmaCannon.MAX_HP = 40;
 	levels[MissionType::FIND_BOSS].PlasmaCannon.ATK = 30;
+	levels[MissionType::FIND_BOSS].RestartMission = MissionType::FIND_BOSS;
+	levels[MissionType::FIND_BOSS].RestartPosition = XMFLOAT3{ 9500.f ,9500.f ,9500.f };
 
 	levels[MissionType::CS_BOSS_SCREAM].NextMission = MissionType::DEFEAT_BOSS;
 	levels[MissionType::CS_BOSS_SCREAM].cutscene = true;
+	levels[MissionType::CS_BOSS_SCREAM].RestartMission = MissionType::CS_BOSS_SCREAM;
+	levels[MissionType::CS_BOSS_SCREAM].RestartPosition = XMFLOAT3{ 2900.f ,2900.f ,2900.f };
 
 	levels[MissionType::DEFEAT_BOSS].NextMission = MissionType::CS_SHOW_STARGIANT;
 	levels[MissionType::DEFEAT_BOSS].MaxMonsterNum = 0;
@@ -309,9 +328,13 @@ void CGameFramework::SetMission()
 	levels[MissionType::DEFEAT_BOSS].Missile.ATK = 20;
 	levels[MissionType::DEFEAT_BOSS].PlasmaCannon.MAX_HP = 40;
 	levels[MissionType::DEFEAT_BOSS].PlasmaCannon.ATK = 30;
+	levels[MissionType::DEFEAT_BOSS].RestartMission = MissionType::CS_BOSS_SCREAM;
+	levels[MissionType::DEFEAT_BOSS].RestartPosition = XMFLOAT3{ 2900.f ,2900.f ,2900.f };
 
 	levels[MissionType::CS_SHOW_STARGIANT].NextMission = MissionType::GO_CENTER;
 	levels[MissionType::CS_SHOW_STARGIANT].cutscene = true;
+	levels[MissionType::CS_SHOW_STARGIANT].RestartMission = MissionType::CS_SHOW_STARGIANT;
+	levels[MissionType::CS_SHOW_STARGIANT].RestartPosition = XMFLOAT3{ 3500.f ,3500.f ,3500.f };
 
 	levels[MissionType::GO_CENTER].NextMission = MissionType::KILL_MONSTER3;
 	levels[MissionType::GO_CENTER].MaxMonsterNum = 5;
@@ -322,6 +345,8 @@ void CGameFramework::SetMission()
 	levels[MissionType::GO_CENTER].Missile.ATK = 20;
 	levels[MissionType::GO_CENTER].PlasmaCannon.MAX_HP = 60;
 	levels[MissionType::GO_CENTER].PlasmaCannon.ATK = 30;
+	levels[MissionType::GO_CENTER].RestartMission = MissionType::CS_SHOW_STARGIANT;
+	levels[MissionType::GO_CENTER].RestartPosition = XMFLOAT3{ 3500.f ,3500.f ,3500.f };
 
 	levels[MissionType::KILL_MONSTER3].NextMission = MissionType::KILL_METEOR;
 	levels[MissionType::KILL_MONSTER3].MaxMonsterNum = 15;
@@ -332,6 +357,9 @@ void CGameFramework::SetMission()
 	levels[MissionType::KILL_MONSTER3].Missile.ATK = 20;
 	levels[MissionType::KILL_MONSTER3].PlasmaCannon.MAX_HP = 60;
 	levels[MissionType::KILL_MONSTER3].PlasmaCannon.ATK = 30;
+	levels[MissionType::KILL_MONSTER3].RestartMission = MissionType::KILL_MONSTER3;
+	levels[MissionType::KILL_MONSTER3].RestartPosition = XMFLOAT3{ 3500.f ,3500.f ,3500.f };
+
 
 	levels[MissionType::KILL_METEOR].NextMission = MissionType::CS_SHOW_BLACK_HOLE;
 	levels[MissionType::KILL_METEOR].MaxMonsterNum = 10;
@@ -342,9 +370,13 @@ void CGameFramework::SetMission()
 	levels[MissionType::KILL_METEOR].Missile.ATK = 20;
 	levels[MissionType::KILL_METEOR].PlasmaCannon.MAX_HP = 60;
 	levels[MissionType::KILL_METEOR].PlasmaCannon.ATK = 30;
+	levels[MissionType::KILL_METEOR].RestartMission = MissionType::KILL_METEOR;
+	levels[MissionType::KILL_METEOR].RestartPosition = XMFLOAT3{ 3500.f ,3500.f ,3500.f };
 
 	levels[MissionType::CS_SHOW_BLACK_HOLE].NextMission = MissionType::ESCAPE_BLACK_HOLE;
 	levels[MissionType::CS_SHOW_BLACK_HOLE].cutscene = true;
+	levels[MissionType::CS_SHOW_BLACK_HOLE].RestartMission = MissionType::CS_SHOW_BLACK_HOLE;
+	levels[MissionType::CS_SHOW_BLACK_HOLE].RestartPosition = XMFLOAT3{ 3500.f ,3500.f ,3500.f };
 
 	levels[MissionType::ESCAPE_BLACK_HOLE].NextMission = MissionType::GO_CENTER_REAL;
 	levels[MissionType::ESCAPE_BLACK_HOLE].MaxMonsterNum = 5;
@@ -355,6 +387,8 @@ void CGameFramework::SetMission()
 	levels[MissionType::ESCAPE_BLACK_HOLE].Missile.ATK = 20;
 	levels[MissionType::ESCAPE_BLACK_HOLE].PlasmaCannon.MAX_HP = 60;
 	levels[MissionType::ESCAPE_BLACK_HOLE].PlasmaCannon.ATK = 30;
+	levels[MissionType::ESCAPE_BLACK_HOLE].RestartMission = MissionType::CS_SHOW_BLACK_HOLE;
+	levels[MissionType::ESCAPE_BLACK_HOLE].RestartPosition = XMFLOAT3{ 3500.f ,3500.f ,3500.f };
 
 	levels[MissionType::GO_CENTER_REAL].NextMission = MissionType::CS_SHOW_GOD;
 	levels[MissionType::GO_CENTER_REAL].MaxMonsterNum = ENEMIES;
@@ -365,10 +399,14 @@ void CGameFramework::SetMission()
 	levels[MissionType::GO_CENTER_REAL].Missile.ATK = 20;
 	levels[MissionType::GO_CENTER_REAL].PlasmaCannon.MAX_HP = 60;
 	levels[MissionType::GO_CENTER_REAL].PlasmaCannon.ATK = 30;
-
+	levels[MissionType::GO_CENTER_REAL].RestartMission = MissionType::CS_SHOW_BLACK_HOLE;
+	levels[MissionType::GO_CENTER_REAL].RestartPosition = XMFLOAT3{ 3500.f ,3500.f ,3500.f };
 
 	levels[MissionType::CS_SHOW_GOD].NextMission = MissionType::KILL_GOD;
 	levels[MissionType::CS_SHOW_GOD].cutscene = true;
+	levels[MissionType::CS_SHOW_GOD].RestartMission = MissionType::CS_SHOW_GOD;
+	levels[MissionType::CS_SHOW_GOD].RestartPosition = XMFLOAT3{ -2900.f ,-2900.f ,-2900.f };
+
 
 	levels[MissionType::KILL_GOD].NextMission = MissionType::CS_ENDING;
 	levels[MissionType::KILL_GOD].MaxMonsterNum = 0;
@@ -379,9 +417,19 @@ void CGameFramework::SetMission()
 	levels[MissionType::KILL_GOD].Missile.ATK = 20;
 	levels[MissionType::KILL_GOD].PlasmaCannon.MAX_HP = 60;
 	levels[MissionType::KILL_GOD].PlasmaCannon.ATK = 30;
+	levels[MissionType::KILL_GOD].RestartMission = MissionType::CS_SHOW_GOD;
+	levels[MissionType::KILL_GOD].RestartPosition = XMFLOAT3{ -2900.f ,-2900.f ,-2900.f };
 
 	levels[MissionType::CS_ENDING].NextMission = MissionType::CS_ENDING;
 	levels[MissionType::CS_ENDING].cutscene = true;
+	levels[MissionType::CS_ENDING].RestartMission = MissionType::CS_SHOW_GOD;
+	levels[MissionType::CS_ENDING].RestartPosition = XMFLOAT3{ -2900.f ,-2900.f ,-2900.f };
+
+	levels[MissionType::CS_BAD_ENDING].NextMission = MissionType::CS_BAD_ENDING;
+	levels[MissionType::CS_BAD_ENDING].cutscene = true;
+	levels[MissionType::CS_BAD_ENDING].RestartMission = MissionType::CS_TURN;
+	levels[MissionType::CS_BAD_ENDING].RestartPosition = XMFLOAT3{ 0.f ,0.f ,100.f };
+
 }
 
 void CGameFramework::BuildObjects()
@@ -660,6 +708,11 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_NEXT_MISSION: {
 		if (clients[c_id].room_id == -1) { break; }
 		scene_manager.GetScene(clients[c_id].room_id)->MissionClear();
+		break;
+	}
+	case CS_INVINCIBLE_MODE: {
+		if (clients[c_id].room_id == -1) { break; }
+		scene_manager.GetScene(clients[c_id].room_id)->ChangeInvincibleMode();
 		break;
 	}
 	case CS_START: {

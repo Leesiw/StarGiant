@@ -489,11 +489,20 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = AnimationState::IDLE;
 			}*/
 		}
-		case VK_TAB:
+		case VK_TAB: {
 			b_Inside = !b_Inside;
 			std::cout << "¾À ÀüÈ¯";
 			break;
+		}
+		case 'I':
+		{
+			CS_NEXT_MISSION_PACKET my_packet;
+			my_packet.size = sizeof(CS_NEXT_MISSION_PACKET);
+			my_packet.type = CS_INVINCIBLE_MODE;
 
+			send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+			break;
+		}
 		case 'R': //ÄÆ¾À Å×½ºÆ®
 		{
 
@@ -2395,6 +2404,12 @@ void CGameFramework::ProcessPacket(char* p)
 		if (curMissionType == MissionType::KILL_MONSTER_ONE_MORE_TIME) {
 			killCnt = 0;
 		}
+		else if (curMissionType == MissionType::CS_BAD_ENDING) {
+			for (int i = 0; i < ENEMIES; ++i) {
+				m_pScene->m_ppEnemies[i]->isAlive = false;
+			}
+		}
+
 		break;
 	}
 	case SC_KILL_NUM:

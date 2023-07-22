@@ -87,6 +87,7 @@ constexpr char SC_BLACK_HOLE_TIME = 30;
 // cheat
 constexpr char CS_NEXT_MISSION = 31;
 constexpr char CS_START = 32;
+constexpr char CS_INVINCIBLE_MODE = 33;
 
 
 

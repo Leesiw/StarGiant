@@ -24,6 +24,7 @@ public:
 	void BuildObjects();
 	void ReleaseObjects();
 
+	void ResetScene();
 	void Reset();
 
 	void AnimateObjects(float fTimeElapsed);
@@ -54,6 +55,8 @@ public:
 	void SendSceneInfo();
 	void BlackHole();
 	void CheckCutsceneEnd(MissionType next_mission);
+
+	void ChangeInvincibleMode();
 
 	void SpawnEnemy(char id);
 
@@ -102,4 +105,6 @@ public:
 	XMFLOAT3 black_hole_pos;
 	chrono::steady_clock::time_point b_prev_time;
 	float black_hole_time;
+
+	bool invincible_mode = false;
 };
