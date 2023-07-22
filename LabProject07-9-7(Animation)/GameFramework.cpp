@@ -813,6 +813,8 @@ bool CGameFramework::AroundSculpture()
 
 void CGameFramework::CameraUpdateChange()
 {
+
+
 	static int a = 0;
 	static int b = 0;
 	if (a==0 &&m_pPlayer[0]->getHp() < 90 && m_pCamera->m_bCameraShaking ==false) { 
@@ -986,9 +988,9 @@ void CGameFramework::CameraUpdateChange()
 		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
 		b_BeforeCheckInside = true;
 		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
-		m_pCamera->canDolly = true; //줌
 		m_pCamera->SetTarget(m_pPlayer[0]->GetPosition());
 		m_pCamera->SetDist(500.0f);
+
 		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 	}
@@ -998,7 +1000,7 @@ void CGameFramework::CameraUpdateChange()
 		m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
 		m_pCamera->SetTarget(m_pPlayer[0]->GetPosition());
 		m_pCamera->SetDist(500.0f);
-		m_pCamera->endc = true; //줌
+
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 	}
@@ -1008,7 +1010,7 @@ void CGameFramework::CameraUpdateChange()
 		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
 		b_BeforeCheckInside = true;
 		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
-		m_pCamera->endc = true; //줌
+		m_pCamera->endc = true;
 		m_pCamera->SetTarget({ m_pScene->m_ppGod->GetPosition().x, m_pScene->m_ppGod->GetPosition().y + 1000, m_pScene->m_ppGod->GetPosition().z });
 		m_pCamera->SetDist(3000.0f);
 		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
@@ -1020,7 +1022,7 @@ void CGameFramework::CameraUpdateChange()
 		m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
 		m_pCamera->SetTarget({ m_pScene->m_ppGod->GetPosition().x, m_pScene->m_ppGod->GetPosition().y + 1000, m_pScene->m_ppGod->GetPosition().z });
 		m_pCamera->SetDist(3000.0f);
-		m_pCamera->canDolly = true; //줌
+		m_pCamera->endc = true;
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 	}
@@ -1043,7 +1045,6 @@ void CGameFramework::CameraUpdateChange()
 	if (curMissionType == MissionType::TU_SIT  && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA)
 	{
 		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
-		m_pInsideCamera->canTurn = true;
 		m_pInsideCamera->canchange = true;
 		m_pCamera->fAnglenu = 0;
 
@@ -1057,12 +1058,38 @@ void CGameFramework::CameraUpdateChange()
 		if (b_BeforeCheckInside) {
 			b_Inside = true;
 			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+			m_pCamera->fAnglenu = 0;
+			m_pInsideCamera->canchange = true;
+			m_pCamera->canchange = true;
+			m_pCamera->canTurn = false;
+			m_pCamera->canDolly = false;
+
+			b_BeforeCheckInside = false;
+		}
+		else {
+			m_pCamera = m_pPlayer[0]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());	
+			m_pCamera->fAnglenu = 0;
+			m_pCamera->canchange = true;
+			m_pInsideCamera->canchange = true;
+			m_pCamera->canTurn = false;
+			m_pCamera->canDolly = false;
+		}
+	}
+
+	if (curMissionType != MissionType::CS_BAD_ENDING && pastMissionType== MissionType::CS_BAD_ENDING)
+	{
+		pastMissionType = curMissionType;
+
+		if (b_BeforeCheckInside) {
+			b_Inside = true;
+			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
 			//m_pInsideCamera->canTurn = true;
 			//m_pCamera->canTurn = true;
 			m_pCamera->fAnglenu = 0;
 			m_pInsideCamera->canchange = true;
 			m_pCamera->canchange = true;
-
+			m_pCamera->canTurn = false;
+			m_pCamera->canDolly = false;
 			b_BeforeCheckInside = false;
 		}
 		else {
@@ -1072,8 +1099,11 @@ void CGameFramework::CameraUpdateChange()
 			m_pCamera->fAnglenu = 0;
 			m_pCamera->canchange = true;
 			m_pInsideCamera->canchange = true;
+			m_pCamera->canTurn = false;
+			m_pCamera->canDolly = false;
 		}
 	}
+
 
 }
 
@@ -2390,6 +2420,7 @@ void CGameFramework::ProcessPacket(char* p)
 			m_pPlayer[0]->hp = packet->data.hp;
 			if (packet->data.hp <= 0)
 			{
+				pastMissionType = curMissionType;
 				// 게임 오버 
 			}
 		}

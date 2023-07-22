@@ -648,12 +648,7 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		// 회전 속도 설정
 		float fRotationSpeed = 1.5f; // 초당 회전 속도
 
-		// 회전 각도 계산
-		float fAngle = fRotationSpeed * fTimeElapsed;
-
-		// 회전 각도 (도 단위)
-		float fAngleDegrees = XMConvertToDegrees(fAngle);
-		fAnglenu += fAngleDegrees; //이걸로 한바퀴 계산할거임
+		
 
 		// 회전 행렬 생성
 		XMFLOAT4X4 xmf4x4Rotate = Matrix4x4::Identity();
@@ -668,6 +663,13 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		}
 		else if (canDolly) 
 		{
+			// 회전 각도 계산
+			float fAngle = fRotationSpeed * fTimeElapsed;
+
+			// 회전 각도 (도 단위)
+			float fAngleDegrees = XMConvertToDegrees(fAngle);
+			fAnglenu += fAngleDegrees; //이걸로 한바퀴 계산할거임
+
 			// 이걸로 회전
 			xmmtxRotation = XMMatrixRotationY(0);
 			// 카메라의 원래 위치에서 tarPos로의 벡터를 얻음
@@ -682,8 +684,15 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 			xmf3Position = Vector3::Add(xmf3Position, tarPos); // 뒤로 이동시키기 위해 tarPos를 더하기
 			SetPosition(xmf3Position);
 		}
-		else
+		else if (canTurn)
 		{
+			// 회전 각도 계산
+			float fAngle = fRotationSpeed * fTimeElapsed;
+
+			// 회전 각도 (도 단위)
+			float fAngleDegrees = XMConvertToDegrees(fAngle);
+			fAnglenu += fAngleDegrees; //이걸로 한바퀴 계산할거임
+
 			// 이걸로 회전
 			xmmtxRotation = XMMatrixRotationY(fAngle);
 			// 기존 코드대로 회전
@@ -727,6 +736,7 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 			canchange = false;
 			canTurn = false;
 			canDolly = false;
+			endc = false;
 			fAnglenu = 0;
 			fendtime = 0;
 		}

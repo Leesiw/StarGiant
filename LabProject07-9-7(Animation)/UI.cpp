@@ -98,6 +98,8 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_jew);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_logo);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_clear_logo);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_died_logo);
+
 
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_nevi);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1BitmapSource, &m_pd2dfxBitmapSource_nevi2);
@@ -111,6 +113,8 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_jew);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_logo);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_clear_logo);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_died_logo);
+
 
 
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1GaussianBlur, &m_pd2dfxGaussianBlur_nevi);
@@ -126,6 +130,8 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_jew);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_logo);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_clear_logo);
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_died_logo);
+
 
 
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_nevi);
@@ -210,7 +216,7 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
 
 
     IWICBitmapDecoder* pwicBitmapDecoder_clear_logo;
-    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/clear1.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_clear_logo);
+    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/gameclear.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_clear_logo);
 
     IWICBitmapFrameDecode* pwicFrameDecode_clear_lo;
     pwicBitmapDecoder_clear_logo->GetFrame(0, &pwicFrameDecode_clear_lo);
@@ -230,6 +236,30 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
 
     if (pwicBitmapDecoder_clear_logo) pwicBitmapDecoder_clear_logo->Release();
     if (pwicFrameDecode_clear_lo) pwicFrameDecode_clear_lo->Release();
+
+    //==
+
+    IWICBitmapDecoder* pwicBitmapDecoder_died_logo;
+    m_pwicImagingFactory->CreateDecoderFromFilename(L"UI/died.png", NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pwicBitmapDecoder_died_logo);
+
+    IWICBitmapFrameDecode* pwicFrameDecode_died_lo;
+    pwicBitmapDecoder_died_logo->GetFrame(0, &pwicFrameDecode_died_lo);
+
+    m_pwicImagingFactory->CreateFormatConverter(&m_pwicFormatConverter[1]);
+    m_pwicFormatConverter[1]->Initialize(pwicFrameDecode_died_lo, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom);
+
+    m_pd2dfxBitmapSource_died_logo->SetValue(D2D1_BITMAPSOURCE_PROP_WIC_BITMAP_SOURCE, m_pwicFormatConverter[1]);
+
+    m_pd2dfxGaussianBlur_died_logo->SetInputEffect(0, m_pd2dfxBitmapSource_died_logo);
+    m_pd2dfxGaussianBlur_died_logo->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 0.0f);
+
+
+    m_pd2dfxSize_died_logo->SetInputEffect(0, m_pd2dfxBitmapSource_died_logo);
+    m_pd2dfxSize_died_logo->SetValue(D2D1_BITMAPSOURCE_PROP_SCALE, D2D1::Vector2F(0.1f, 0.1f));
+
+
+    if (pwicBitmapDecoder_died_logo) pwicBitmapDecoder_died_logo->Release();
+    if (pwicFrameDecode_died_lo) pwicFrameDecode_died_lo->Release();
 
     //==
 
@@ -597,6 +627,10 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
         actime2 += etime;
         if (actime2 < 5)
             m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_clear_logo, &d2dPoint_logo);
+    }
+
+    if (mty == MissionType::CS_BAD_ENDING) {
+         m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_died_logo, &d2dPoint_logo);
     }
 
     m_pd2dDeviceContext->SetTransform(matTM);

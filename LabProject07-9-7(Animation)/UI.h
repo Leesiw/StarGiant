@@ -130,6 +130,8 @@ private:
     ID2D1Effect* m_pd2dfxBitmapSource_jew = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource_logo = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource_clear_logo = NULL;
+    ID2D1Effect* m_pd2dfxBitmapSource_died_logo = NULL;
+
 
 
     ID2D1Effect* m_pd2dfxBitmapSource_nevi = NULL;
@@ -146,6 +148,8 @@ private:
     ID2D1Effect* m_pd2dfxGaussianBlur_jew = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_logo = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_clear_logo = NULL;
+    ID2D1Effect* m_pd2dfxGaussianBlur_died_logo = NULL;
+
 
 
     ID2D1Effect* m_pd2dfxGaussianBlur_nevi = NULL;
@@ -163,6 +167,8 @@ private:
     ID2D1Effect* m_pd2dfxSize_jew = NULL;
     ID2D1Effect* m_pd2dfxSize_logo = NULL;
     ID2D1Effect* m_pd2dfxSize_clear_logo = NULL;
+    ID2D1Effect* m_pd2dfxSize_died_logo = NULL;
+
 
 
 
