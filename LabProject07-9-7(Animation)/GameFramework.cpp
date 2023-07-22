@@ -976,6 +976,52 @@ void CGameFramework::CameraUpdateChange()
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 	}
+	
+
+	//CS_BAD_ENDING 내부일때,
+	if (curMissionType == MissionType::CS_BAD_ENDING && b_Inside && m_pInsidePlayer[g_myid] && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
+		b_BeforeCheckInside = true;
+		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+		m_pCamera->canDolly = true; //줌
+		m_pCamera->SetTarget(m_pPlayer[0]->GetPosition());
+		m_pCamera->SetDist(500.0f);
+		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+	}
+
+	//CS_BAD_ENDING 외부일때,
+	else if (curMissionType == MissionType::CS_BAD_ENDING && !b_Inside && m_pPlayer[0]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+		m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
+		m_pCamera->SetTarget(m_pPlayer[0]->GetPosition());
+		m_pCamera->SetDist(500.0f);
+		m_pCamera->canDolly = true; //줌
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+	}
+
+	//CS_ENDING 내부일때,
+	if (curMissionType == MissionType::CS_ENDING && b_Inside && m_pInsidePlayer[g_myid] && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
+		b_BeforeCheckInside = true;
+		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+		m_pCamera->canDolly = true; //줌
+		m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
+		m_pCamera->SetDist(2500.0f);
+		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+	}
+
+	//CS_ENDING 외부일때,
+	else if (curMissionType == MissionType::CS_ENDING && !b_Inside && m_pPlayer[0]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
+		m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
+		m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
+		m_pCamera->SetDist(2500.0f);
+		m_pCamera->canDolly = true; //줌
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+	}
+
 
 
 	//컷씬 끝나면 서버로 보내기
@@ -986,6 +1032,8 @@ void CGameFramework::CameraUpdateChange()
 		my_packet.type = CS_CUTSCENE_END;
 		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 
+		if(curMissionType == MissionType::CS_ENDING) 
+			_state = SCENE_LOBBY;
 	}
 
 	//미션 넘어가면 카메라 변경해주기
