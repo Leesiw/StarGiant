@@ -145,6 +145,8 @@ public:
 
 	float fAnglenu = 0;
 	bool endc = false;
+	float fendtime = 0;
+
 };
 
 class CSpaceShipCamera : public CCamera

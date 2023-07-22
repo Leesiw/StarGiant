@@ -1637,13 +1637,12 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	static int aaa = 0;
 
 	
-	if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD|| m_pPlayer[0]->curMissionType >= MissionType::KILL_GOD)
+	if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_GOD|| m_pPlayer[0]->curMissionType == MissionType::KILL_GOD)
 		if (m_ppGod) {
 			//m_fbosscutTime += m_fElapsedTime;
 			if (aaa == 0) {
 				//m_ppGod->SetPosition(m_pPlayer[0]->GetPosition());
 				m_ppGod->Rotate(0, 180, 0);
-				cout << "돌아";
 			}
 			aaa = 1;
 			m_ppGod->Animate(m_fElapsedTime);
@@ -1752,9 +1751,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 	if (m_pPlayer[0]->curMissionType == MissionType::CS_ENDING) {
-
+		m_fbosscutTime += m_fElapsedTime;
 		if (m_ppGod) {
-			m_fbosscutTime += m_fElapsedTime;
 			/*if (adfa==0)
 				m_ppGod->SetPosition(m_pPlayer[0]->GetPosition().x, m_pPlayer[0]->GetPosition().y, m_pPlayer[0]->GetPosition().z - 1300.0f);*/
 			if (!m_ppGod->m_pSkinnedAnimationController) m_ppGod->UpdateTransform(NULL);
@@ -1762,14 +1760,15 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppGod->ChangeAnimation(GodAnimation::DEATH);
 			m_ppGod->SetState(GodState::DEATH);
 			m_ppGod->Animate(m_fElapsedTime);
-			if (m_fbosscutTime < 3)
+			if (m_fbosscutTime <= 2) {
 				m_ppGod->Render(pd3dCommandList, pCamera);
+			}
 		}
 
 		if (m_ppJewel)
 		{
 			if (adfa == 0) {
-				m_ppJewel->SetPosition(m_ppGod->GetPosition().x, m_ppGod->GetPosition().y, m_ppGod->GetPosition().z + 300.0f);
+				m_ppJewel->SetPosition(m_ppGod->GetPosition().x, m_ppGod->GetPosition().y, m_ppGod->GetPosition().z);
 				m_ppJewel->Rotate(0.0f, 0, 90);
 			}
 			//m_ppJewel->SetPosition(xmf3Position);

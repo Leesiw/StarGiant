@@ -87,6 +87,8 @@ private:
     float GodBosshpBar = 0;
 
     float actime = 0;
+    float actime2 = 0;
+
 
 
     ID3D11DeviceContext* m_pd3d11DeviceContext = NULL;
@@ -127,6 +129,8 @@ private:
     ID2D1Effect* m_pd2dfxBitmapSource = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource_jew = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource_logo = NULL;
+    ID2D1Effect* m_pd2dfxBitmapSource_clear_logo = NULL;
+
 
     ID2D1Effect* m_pd2dfxBitmapSource_nevi = NULL;
     ID2D1Effect* m_pd2dfxBitmapSource_nevi2 = NULL;
@@ -141,6 +145,8 @@ private:
     ID2D1Effect* m_pd2dfxGaussianBlur = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_jew = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_logo = NULL;
+    ID2D1Effect* m_pd2dfxGaussianBlur_clear_logo = NULL;
+
 
     ID2D1Effect* m_pd2dfxGaussianBlur_nevi = NULL;
     ID2D1Effect* m_pd2dfxGaussianBlur_nevi2 = NULL;
@@ -156,6 +162,9 @@ private:
     ID2D1Effect* m_pd2dfxSize = NULL;
     ID2D1Effect* m_pd2dfxSize_jew = NULL;
     ID2D1Effect* m_pd2dfxSize_logo = NULL;
+    ID2D1Effect* m_pd2dfxSize_clear_logo = NULL;
+
+
 
     ID2D1Effect* m_pd2dfxSize_nevi = NULL;
     ID2D1Effect* m_pd2dfxSize_nevi2 = NULL;

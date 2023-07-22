@@ -663,7 +663,8 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 
 		if (endc)
 		{
-
+			fendtime += fTimeElapsed;
+			
 		}
 		else if (canDolly) 
 		{
@@ -720,13 +721,14 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 			canDolly = false;
 			fAnglenu = 0;
 		}
-		if (endc)
+		if (fendtime > 10 && endc)
 		{
 
 			canchange = false;
 			canTurn = false;
 			canDolly = false;
 			fAnglenu = 0;
+			fendtime = 0;
 		}
 	}
 }
