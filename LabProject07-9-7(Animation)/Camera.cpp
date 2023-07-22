@@ -643,7 +643,7 @@ void CCutSceneCamera::SetLookAt(XMFLOAT3& xmf3LookAt)
 
 void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 {
-	if (m_pPlayer && canTurn)
+	if (m_pPlayer && canchange)
 	{
 		// 회전 속도 설정
 		float fRotationSpeed = 1.5f; // 초당 회전 속도
@@ -660,7 +660,12 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		XMMATRIX xmmtxRotate = XMLoadFloat4x4(&xmf4x4Rotate);
 		XMMATRIX xmmtxRotation;
 
-		if (canDolly) 
+
+		if (endc)
+		{
+
+		}
+		else if (canDolly) 
 		{
 			// 이걸로 회전
 			xmmtxRotation = XMMatrixRotationY(0);
@@ -707,9 +712,18 @@ void CCutSceneCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		}
 
 		// 회전이 한 바퀴 돌았을 때 turn 변수를 false로 설정
-		if (fAnglenu >= 365.0f)
+		if (fAnglenu >= 365.0f&& !endc)
 		{
 			cout << "turn false\n";
+			canchange = false;
+			canTurn = false;
+			canDolly = false;
+			fAnglenu = 0;
+		}
+		if (endc)
+		{
+
+			canchange = false;
 			canTurn = false;
 			canDolly = false;
 			fAnglenu = 0;

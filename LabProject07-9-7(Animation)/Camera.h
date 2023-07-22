@@ -138,8 +138,13 @@ public:
 	bool m_bCameraShaking = false;
 	float maxShakingTime = 1.f;
 
+	bool canchange = true;
+	bool getcanchange() { return canchange; }
+
+
 
 	float fAnglenu = 0;
+	bool endc = false;
 };
 
 class CSpaceShipCamera : public CCamera

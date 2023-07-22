@@ -862,7 +862,9 @@ void CGameFramework::CameraUpdateChange()
 		m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
 		m_pInsideCamera->SetTarget({ 530.219f, 230.f, 593.263f });
 		m_pInsideCamera->SetDist(-25.0f);
+		m_pInsideCamera->canTurn = true;
 		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+
 		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 	}
 
@@ -1008,7 +1010,7 @@ void CGameFramework::CameraUpdateChange()
 		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
 		m_pCamera->canDolly = true; //줌
 		m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
-		m_pCamera->SetDist(3000.0f);
+		m_pCamera->SetDist(2500.0f);
 		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 	}
@@ -1017,7 +1019,7 @@ void CGameFramework::CameraUpdateChange()
 	else if (curMissionType == MissionType::CS_ENDING && !b_Inside && m_pPlayer[0]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) {
 		m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
 		m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
-		m_pCamera->SetDist(3000.0f);
+		m_pCamera->SetDist(2500.0f);
 		m_pCamera->canDolly = true; //줌
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
@@ -1026,8 +1028,8 @@ void CGameFramework::CameraUpdateChange()
 
 
 	//컷씬 끝나면 서버로 보내기
-	if (m_pInsideCamera->getTurn() == false|| m_pCamera->getTurn() == false) {
-		//cout << "보내기";
+	if (m_pInsideCamera->getcanchange() == false || m_pCamera->getcanchange() == false) {
+		cout << "보내기";
 		CS_CUTSCENE_END_PACKET my_packet;
 		my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
 		my_packet.type = CS_CUTSCENE_END;
@@ -1042,23 +1044,34 @@ void CGameFramework::CameraUpdateChange()
 	{
 		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
 		m_pInsideCamera->canTurn = true;
+		m_pInsideCamera->canchange = true;
+		m_pCamera->fAnglenu = 0;
+
+
 	}
 
 	if ((curMissionType == MissionType::DEFEAT_BOSS || curMissionType == MissionType::GO_PLANET 
 		|| curMissionType == MissionType::GO_CENTER || curMissionType == MissionType::ESCAPE_BLACK_HOLE || curMissionType == MissionType::KILL_GOD)
-		&& (m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA|| m_pPlayer[0]->GetCamera()->GetMode() == CUT_SCENE_CAMERA))
+		&& (m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA || m_pPlayer[0]->GetCamera()->GetMode() == CUT_SCENE_CAMERA))
 	{
 		if (b_BeforeCheckInside) {
 			b_Inside = true;
 			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
-			m_pInsideCamera->canTurn = true;
-			m_pCamera->canTurn = true;
+			//m_pInsideCamera->canTurn = true;
+			//m_pCamera->canTurn = true;
+			m_pCamera->fAnglenu = 0;
+			m_pInsideCamera->canchange = true;
+			m_pCamera->canchange = true;
+
 			b_BeforeCheckInside = false;
 		}
 		else {
 			m_pCamera = m_pPlayer[0]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
-			m_pCamera->canTurn = true;
-			m_pInsideCamera->canTurn = true;
+			//m_pCamera->canTurn = true;
+			//m_pInsideCamera->canTurn = true;		
+			m_pCamera->fAnglenu = 0;
+			m_pCamera->canchange = true;
+			m_pInsideCamera->canchange = true;
 		}
 	}
 
@@ -2413,12 +2426,14 @@ void CGameFramework::ProcessPacket(char* p)
 			break;
 		}
 		if (packet->data.id == BOSS_ID) {
+			if (curMissionType != MissionType::CS_SHOW_STARGIANT)
 			m_pScene->m_ppBoss->CurMotion = (BossAnimation)packet->data.animation;
 			// 보스 State 변경??
 			break;
 		}
 		if (packet->data.id == GOD_ID) {
-			m_pScene->m_ppGod->CurMotion = (GodAnimation)packet->data.animation;
+			if(curMissionType!= MissionType::CS_ENDING)
+				m_pScene->m_ppGod->CurMotion = (GodAnimation)packet->data.animation;
 			// 보스 State 변경??
 			break;
 		}

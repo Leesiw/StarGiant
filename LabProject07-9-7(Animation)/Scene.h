@@ -154,6 +154,8 @@ public:
 	float								m_fElapsedTime = 0.0f;
 
 	float								m_fbosscutTime = 0.0f;
+	float								m_fredbosscutTime = 0.0f;
+
 
 
 	float								m_eTime = 0.0f;
