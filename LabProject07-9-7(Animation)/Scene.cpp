@@ -1279,9 +1279,9 @@ void CScene::CheckObjectByBulletCollisions()
 		if (b_Inside)m_pPlayer[g_myid]->m_pChild->aabb = BoundingBox(m_pPlayer[0]->GetPosition(), XMFLOAT3(5.0f, 5.0f, 5.0f));
 		else m_pPlayer[0]->m_pChild->aabb = BoundingBox(m_pPlayer[0]->GetPosition(), XMFLOAT3(5.0f, 5.0f, 5.0f));
 
-		if (m_ppHierarchicalGameObjects[i]->m_pChild->aabb.Intersects(m_pPlayer[0]->m_pChild->aabb)) {
-			cout << i << " - �浹\n";
-		}
+		//if (m_ppHierarchicalGameObjects[i]->m_pChild->aabb.Intersects(m_pPlayer[0]->m_pChild->aabb)) {
+		//	cout << i << " - �浹\n";
+		//}
 
 	}
 
@@ -1632,33 +1632,36 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 
 	static int aaa = 0;
-	if (m_ppGod) {
-		m_fbosscutTime += m_fElapsedTime;
-		//if (aaa == 0) {
-		//	m_ppGod->SetPosition(m_pPlayer[0]->GetPosition());
-		//	m_ppBoss->Rotate(0, 180, 0);
-		//}
-		//aaa = 1;
-		m_ppGod->Animate(m_fElapsedTime);
-		if (!m_ppGod->m_pSkinnedAnimationController) m_ppGod->UpdateTransform(NULL);
-		m_ppGod->ChangeAnimation(m_ppGod->GetAnimation());
 
-		if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_GOD) {
-			m_ppGod->ChangeAnimation(GodAnimation::IDLE2);
+	
+	if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD|| m_pPlayer[0]->curMissionType >= MissionType::KILL_GOD)
+		if (m_ppGod) {
+			//m_fbosscutTime += m_fElapsedTime;
+			//if (aaa == 0) {
+			//	m_ppGod->SetPosition(m_pPlayer[0]->GetPosition());
+			//	m_ppBoss->Rotate(0, 180, 0);
+			//}
+			//aaa = 1;
+			m_ppGod->Animate(m_fElapsedTime);
+			if (!m_ppGod->m_pSkinnedAnimationController) m_ppGod->UpdateTransform(NULL);
+			m_ppGod->ChangeAnimation(m_ppGod->GetAnimation());
+
+			if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_GOD) {
+				m_ppGod->ChangeAnimation(GodAnimation::IDLE2);
+			}
+
+			if (m_ppGod->GetcurHp() <= 0)
+			{
+				m_ppGod->SetState(GodState::DEATH);
+			}
+
+			//if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD)
+			//{
+			//	m_ppGod->SetPosition(m_pPlayer[0]->GetPosition().x + 3300 - m_fbosscutTime * 10, m_pPlayer[0]->GetPosition().y, m_pPlayer[0]->GetPosition().z);
+			//}
+			if (!(m_ppGod->GetcurHp() <= 0) && m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD)
+				m_ppGod->Render(pd3dCommandList, pCamera);
 		}
-
-		if (m_ppGod->GetcurHp() <= 0)
-		{
-			m_ppGod->SetState(GodState::DEATH);
-		}
-
-		//if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD)
-		//{
-		//	m_ppGod->SetPosition(m_pPlayer[0]->GetPosition().x + 3300 - m_fbosscutTime * 10, m_pPlayer[0]->GetPosition().y, m_pPlayer[0]->GetPosition().z);
-		//}
-		if (!(m_ppGod->GetcurHp() <= 0) && m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD)
-			m_ppGod->Render(pd3dCommandList, pCamera);
-	}
 
 
 
@@ -1741,7 +1744,40 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	//	}
 	//}
 
+	static int adfa = 0;
+	m_pPlayer[0]->curMissionType = MissionType::CS_ENDING;
 
+	if (m_pPlayer[0]->curMissionType == MissionType::CS_ENDING) {
+
+		if (m_ppGod) {
+			m_fbosscutTime += m_fElapsedTime;
+			/*if (adfa==0)
+				m_ppGod->SetPosition(m_pPlayer[0]->GetPosition().x, m_pPlayer[0]->GetPosition().y, m_pPlayer[0]->GetPosition().z - 1300.0f);*/
+			if (!m_ppGod->m_pSkinnedAnimationController) m_ppGod->UpdateTransform(NULL);
+			m_ppGod->ChangeAnimation(GodAnimation::DEATH);
+			m_ppGod->SetState(GodState::DEATH);
+			m_ppGod->Animate(m_fElapsedTime);
+			if (m_fbosscutTime < 3)
+				m_ppGod->Render(pd3dCommandList, pCamera);
+		}
+
+		if (m_ppJewel)
+		{
+			if (adfa == 0) {
+				m_ppJewel->SetPosition(m_ppGod->GetPosition().x, m_ppGod->GetPosition().y, m_ppGod->GetPosition().z + 300.0f);
+				m_ppJewel->Rotate(0.0f, 0, 90);
+			}
+			//m_ppJewel->SetPosition(xmf3Position);
+			//m_ppJewel->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+
+			m_ppJewel->Rotate(m_fElapsedTime * 60.0, 0.0f, 0.0f);
+			m_ppJewel->endingMove(m_fElapsedTime, m_pPlayer[0]->GetPosition());
+			m_ppJewel->Render(pd3dCommandList, pCamera);
+
+		}
+
+	}
+	adfa = 1;
 }
 
 void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)

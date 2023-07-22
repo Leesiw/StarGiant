@@ -2381,6 +2381,36 @@ CJewelObject::CJewelObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pJewelModel);
 }
 
+void CJewelObject::endingMove(float fElapsedTime, XMFLOAT3 tarpos)
+{
+	anitime += fElapsedTime;
+	if (anitime < 5) {
+
+		m_xmf4x4ToParent._41 += fElapsedTime * 0;
+		m_xmf4x4ToParent._42 += fElapsedTime * 50;
+		m_xmf4x4ToParent._43 += fElapsedTime * 0;
+	}
+
+	if (tarpos.z - m_xmf4x4ToParent._43 > 0) {
+		if (anitime >= 5) {
+
+			m_xmf4x4ToParent._41 += fElapsedTime * 0;
+			m_xmf4x4ToParent._42 += fElapsedTime * 0;
+			m_xmf4x4ToParent._43 -= anitime * 10;
+		}
+	}
+	else {
+		if (anitime >= 5) {
+
+			m_xmf4x4ToParent._41 += fElapsedTime * 0;
+			m_xmf4x4ToParent._42 += fElapsedTime * 0;
+			m_xmf4x4ToParent._43 += anitime * 10;
+		}
+	}
+
+	Animate(fElapsedTime);
+}
+
 //================================
 CParticleObject::CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {

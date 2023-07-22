@@ -865,6 +865,12 @@ class CJewelObject : public CGameObject
 public:
 	CJewelObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks);
 	virtual ~CJewelObject() {};
+	virtual void endingMove(float fElapsedTime, XMFLOAT3 tarpos);
+	virtual void Animate(float fElapsedTime){ CGameObject::Animate(fElapsedTime); };
+
+
+	float anitime =0;
+
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

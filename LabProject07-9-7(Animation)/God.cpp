@@ -26,7 +26,7 @@ void God::GodObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCom
 	m_pSkinnedAnimationController->SetTrackEnable(0, true);
 }
 
-void God::ChangeAnimation(GodAnimation CurState)
+void God::ChangeAnimation(GodAnimation CurMotion)
 {
 	if (CurMotion != PastMotion) {
 		m_pSkinnedAnimationController->SetTrackEnable(static_cast<int>(PastMotion), false);

@@ -12,6 +12,9 @@
 #define ATTACT_CAMERA_R				0x07
 #define CUT_SCENE_CAMERA			0x09
 
+
+
+
 #include "3DDefinitions.h"
 class Frustrum;
 
