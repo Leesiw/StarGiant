@@ -2579,7 +2579,7 @@ void CFlameParticleObject::Animate(float fElapsedTime)
 	}
 
 	// velocity에 따라 파티클 이동
-	XMVECTOR velocityVector = XMVectorScale(targetDirection, velocity * fElapsedTime * 10);
+	XMVECTOR velocityVector = XMVectorScale(targetDirection, velocity * fElapsedTime * 50);
 	XMFLOAT3 velocityResult;
 	XMStoreFloat3(&velocityResult, velocityVector);
 

@@ -1484,6 +1484,8 @@ void CGameFramework::UpdateUI()
 
 	wstring uiText = L"UI 테스트";
 	wstring uiScripts = L"UI 테스트";
+	wstring uiBossScripts = L"boss 대사";
+
 	wstring uiJew = L"";
 
 
@@ -1502,12 +1504,14 @@ void CGameFramework::UpdateUI()
 	}
 
 	uiScripts = ChangeScripts(curMissionType);
+	uiBossScripts = ChangeBossScripts(curMissionType);
 
 
 	if (duration_cast<seconds>(steady_clock::now() - scriptsStartTime).count() >= 5)
 	{
-		uiScripts = L"...";
+		uiScripts = L" ";
 	}
+
 	
 
 	wstring JEWEL_ATT;
@@ -1535,6 +1539,9 @@ void CGameFramework::UpdateUI()
 
 	m_pUILayer->UpdateLabels(uiText);
 	m_pUILayer->UpdateLabels_Scripts(uiScripts);
+	m_pUILayer->UpdateLabels_BossScripts(uiBossScripts);
+
+	
 
 	m_pUILayer->UpdateLabels_Jew(uiJew);
 
@@ -1965,6 +1972,27 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	return uiScripts;
 }
 
+wstring CGameFramework::ChangeBossScripts(MissionType mType)
+{
+	wstring uiScripts = L" ";
+	switch (mType) {
+	case MissionType::CS_TURN:
+	{
+		uiScripts = L"어서와!";
+		if (firstSc == -2) {
+			firstSc = -1;
+			scriptsOn = true;
+		}
+
+		break;
+	}
+	default:
+		uiScripts = L" ";
+		break;
+	};
+
+	return uiScripts;
+}
 
 
 // 서버

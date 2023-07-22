@@ -13,6 +13,8 @@ UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_vd2dRenderTargets.resize(nFrame);
     m_vTextBlocks.resize(1);
     m_vScriptsBlocks.resize(1);
+    m_vBossScriptsBlocks.resize(1);
+
     m_vJewBlocks.resize(1);
     m_vLobbyBlocks.resize(1);
     m_vLobbyMatchingBlocks.resize(1);
@@ -291,6 +293,11 @@ void UILayer::UpdateLabels_Scripts(const std::wstring& strUIText)
     m_vScriptsBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT - 100, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwScriptsFormat };
 }
 
+void UILayer::UpdateLabels_BossScripts(const std::wstring& strUIText)
+{
+    m_vBossScriptsBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT - 100, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwBossScriptsFormat };
+}
+
 void UILayer::UpdateLabels_Jew(const std::wstring& strUIText)
 {
     m_vJewBlocks[0] = { strUIText, D2D1::RectF(15.0f, FRAME_BUFFER_HEIGHT / 9, FRAME_BUFFER_WIDTH / 16, FRAME_BUFFER_HEIGHT), m_pdwJewFormat };
@@ -505,6 +512,12 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
         m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBrush);
     }
 
+    for (auto textBlock : m_vBossScriptsBlocks)
+    {
+        m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, Redbrush);
+    }
+
+
     for (auto textBlock : m_vJewBlocks)
     {
         m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBrush);
@@ -663,6 +676,8 @@ void UILayer::ReleaseResources()
     m_pd2dDeviceContext->Release();
     m_pdwTextFormat->Release();
     m_pdwScriptsFormat->Release();
+    m_pdwBossScriptsFormat->Release();
+
     m_pdwLobbyFormat->Release();
     m_pdwLobbyMatchingFormat->Release();
     m_pdwSkipFormat->Release();
@@ -729,6 +744,14 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
 
     m_pdwScriptsFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     m_pdwScriptsFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
+
+
+    m_pd2dWriteFactory->CreateTextFormat(L"±¼¸²Ã¼", nullptr, DWRITE_FONT_WEIGHT_MEDIUM, DWRITE_FONT_STYLE_ITALIC, DWRITE_FONT_STRETCH_NORMAL, fFontSize_Scripts, L"en-us", &m_pdwBossScriptsFormat);
+
+    m_pdwBossScriptsFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+    m_pdwBossScriptsFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
 
 
     m_pd2dWriteFactory->CreateTextFormat(L"±¼¸²Ã¼", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize, L"en-us", &m_pdwJewFormat);

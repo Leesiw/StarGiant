@@ -44,6 +44,8 @@ public:
 	void UpdateUI();
 	wstring ChangeMission(MissionType mT);
 	wstring ChangeScripts(MissionType mT);
+	wstring ChangeBossScripts(MissionType mT);
+
 
 
 	chrono::steady_clock::time_point scriptsStartTime;
