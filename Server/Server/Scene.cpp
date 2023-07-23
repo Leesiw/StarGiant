@@ -584,6 +584,10 @@ void CScene::MissionClear()
 		cur_mission = levels[cur_mission].NextMission;
 
 		if (levels[cur_mission].cutscene) {
+			for (char i = 0; i < 3; ++i) {
+				if (_plist[i] == -1) { continue; }
+				m_ppPlayers[i]->cutscene_end = false;
+			}
 			TIMER_EVENT ev{ static_cast<char>(levels[cur_mission].NextMission), chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
 			timer_queue.push(ev);
 
@@ -630,8 +634,11 @@ void CScene::SetMission(MissionType mission)
 	if (cur_mission != mission)
 	{
 		cur_mission = mission;
-
-		if (levels[cur_mission].cutscene) {
+		if (levels[mission].cutscene) {
+			for (char i = 0; i < 3; ++i) {
+				if (_plist[i] == -1) { continue; }
+				m_ppPlayers[i]->cutscene_end = false;
+			}
 			TIMER_EVENT ev{ static_cast<char>(levels[mission].NextMission), chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
 			timer_queue.push(ev);
 
@@ -1268,10 +1275,6 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 	}
 
 	if (cutscene_end == true) {
-		for (char i = 0; i < 3; ++i) {
-			if (_plist[i] == -1) { continue; }
-			m_ppPlayers[i]->cutscene_end = false;
-		}
 
 		if (cur_mission == MissionType::CS_BAD_ENDING ) {
 			m_pSpaceship->SetPosition(levels[prev_mission].RestartPosition);
