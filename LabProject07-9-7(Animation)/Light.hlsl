@@ -243,3 +243,66 @@ float4 LightingLight(float3 vPosition, float3 vNormal, bool bShadow, float4 uvs[
 
 	return(cColor);
 }
+float4 shadowLighting(float3 vPosition, float3 vNormal, bool bShadow, float4 uvs[1])
+{
+	float3 vCameraPosition = float3(gvCameraPosition.x, gvCameraPosition.y, gvCameraPosition.z);
+	float3 vToCamera = normalize(vCameraPosition - vPosition);
+
+	float4 cColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	float fShadowFactor = 1.0f;
+	[unroll]
+
+
+	for (int i = 0; i < 1; i++)
+	{
+		if (gLights[i].m_bEnable)
+		{
+
+#ifdef _WITH_PCF_FILTERING
+			if (bShadow) fShadowFactor = Compute3x3ShadowFactor(uvs[i].xy / uvs[i].ww, uvs[i].z / uvs[i].w, i);
+#else
+			if (bShadow) fShadowFactor = gtxtDepthTextures[i].SampleCmpLevelZero(gssComparisonPCFShadow, uvs[i].xy / uvs[i].ww, uvs[i].z / uvs[i].w).r;
+#endif
+
+			float4 shadowColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+
+			if (gLights[i].m_nType == DIRECTIONAL_LIGHT)
+			{
+				if (fShadowFactor != 0.f)//그림자 영역
+				{
+					cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+					cColor += DirectionalLight(i, vNormal, vToCamera) * shadowColor * fShadowFactor;
+				}
+				else//그림자x
+					cColor = float4(0.15f, 0.15f, 0.15f, 1.0f);
+			}
+			else if (gLights[i].m_nType == POINT_LIGHT)
+			{
+				if (fShadowFactor != 0.f)
+				{
+					cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+					cColor += PointLight(i, vPosition, vNormal, vToCamera) * shadowColor * fShadowFactor;
+				}
+				else
+					cColor = float4(0.15f, 0.15f, 0.15f, 1.0f);
+			}
+			else if (gLights[i].m_nType == SPOT_LIGHT)
+			{
+				if (fShadowFactor != 0.f)
+				{
+					cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+					cColor += SpotLight(i, vPosition, vNormal, vToCamera) * shadowColor * fShadowFactor;
+				}
+				else
+					cColor = float4(0.15f, 0.15f, 0.15f, 1.0f);
+			}
+			cColor += gLights[i].m_cAmbient * gMaterial.m_cAmbient;
+		}
+	}
+
+	cColor += (gcGlobalAmbientLight * gMaterial.m_cAmbient);
+	cColor.a = gMaterial.m_cDiffuse.a;
+
+	return(cColor);
+}
+

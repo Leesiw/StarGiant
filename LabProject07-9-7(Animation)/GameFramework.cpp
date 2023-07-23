@@ -497,8 +497,9 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			}*/
 		}
 		case VK_TAB: {
-			b_Inside = !b_Inside;
-			std::cout << "¾À ÀüÈ¯";
+			//b_Inside = !b_Inside;
+			m_pInsideScene->m_pShadowMapToViewport->b_RTV1 = !m_pInsideScene->m_pShadowMapToViewport->b_RTV1;
+			std::cout << "";
 			break;
 		}
 		case 'I':
@@ -1609,8 +1610,7 @@ void CGameFramework::FrameAdvance()
 	ProcessInput();
 	CameraUpdateChange();
 
-	m_pScene->OnPrepareRender(m_pd3dCommandList);
-	m_pScene->OnPreRender(m_pd3dCommandList);
+	
 
 
 	AnimateObjects();
@@ -1690,6 +1690,9 @@ void CGameFramework::FrameAdvance()
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+
+	m_pScene->OnPrepareRender(m_pd3dCommandList);
+	m_pScene->OnPreRender(m_pd3dCommandList);
 
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
 	::ZeroMemory(&d3dResourceBarrier, sizeof(D3D12_RESOURCE_BARRIER));

@@ -282,11 +282,14 @@ void CShader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, int nResources
 void CShader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList, int nPipelineState)
 {
 	if (m_pd3dPipelineState) pd3dCommandList->SetPipelineState(m_pd3dPipelineState);
+	if (m_pd3dCbvSrvDescriptorHeap)
+		pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 }
 
 void CShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
 	OnPrepareRender(pd3dCommandList);
+	UpdateShaderVariables(pd3dCommandList);
 }
 
 
@@ -1386,6 +1389,7 @@ D3D12_SHADER_BYTECODE CParticleShader::CreatePixelShader()
 }
 
 
+
 //=============================================================
 
 D3D12_INPUT_LAYOUT_DESC CFireShader::CreateInputLayout()
@@ -1718,7 +1722,7 @@ void CDepthRenderShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCo
 	::memcpy(m_pcbMappedToLightSpaces, m_pToLightSpaces, sizeof(TOLIGHTSPACES));
 
 	D3D12_GPU_VIRTUAL_ADDRESS d3dcbToLightGpuVirtualAddress = m_pd3dcbToLightSpaces->GetGPUVirtualAddress();
-	pd3dCommandList->SetGraphicsRootConstantBufferView(6, d3dcbToLightGpuVirtualAddress); //ToLight
+	pd3dCommandList->SetGraphicsRootConstantBufferView(25, d3dcbToLightGpuVirtualAddress); //ToLight
 }
 
 void CDepthRenderShader::ReleaseShaderVariables()
@@ -1730,71 +1734,84 @@ void CDepthRenderShader::ReleaseShaderVariables()
 	}
 }
 
-void CDepthRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList) // ?          ?  ? ? 
+void CDepthRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** Map, CPlayer** Player) // ?          ?  ? ? 
 {
 	for (int j = 0; j < MAX_GODRAY_LIGHTS; j++)
 	{
-		if (m_pLights[j].m_bEnable)
-		{
-			XMFLOAT3 xmf3Position = m_pLights[j].m_xmf3Position;
-			XMFLOAT3 xmf3Look = m_pLights[j].m_xmf3Direction;
-			XMFLOAT3 xmf3Up = XMFLOAT3(0.0f, +1.0f, 0.0f);
+		//if (!m_pLights[j].m_bEnable)
+		//{
+		//	XMFLOAT3 xmf3Position = XMFLOAT3(-14.66f, 224.0f, 694.f);//m_pLights[j].m_xmf3Position;
+		//	XMFLOAT3 xmf3Look = m_pLights[j].m_xmf3Direction;
+		//	XMFLOAT3 xmf3Up = XMFLOAT3(+1.0f, 0.0f, 1.0f);
 
-			XMMATRIX xmmtxView = XMMatrixLookToLH(XMLoadFloat3(&xmf3Position), XMLoadFloat3(&xmf3Look), XMLoadFloat3(&xmf3Up));
+		//	XMMATRIX xmmtxView = XMMatrixLookToLH(XMLoadFloat3(&xmf3Position), XMLoadFloat3(&xmf3Look), XMLoadFloat3(&xmf3Up));
 
-			float fNearPlaneDistance = 10.0f, fFarPlaneDistance = m_pLights[j].m_fRange;
+		//	float fNearPlaneDistance = 10.0f, fFarPlaneDistance = m_pLights[j].m_fRange;
 
-			XMMATRIX xmmtxProjection;
-			if (m_pLights[j].m_nType == DIRECTIONAL_LIGHT)
-			{
-				float fWidth = 1024, fHeight = 1024;
-				xmmtxProjection = XMMatrixOrthographicLH(fWidth, fHeight, fNearPlaneDistance, fFarPlaneDistance);
-				//float fLeft = -(_PLANE_WIDTH * 0.5f), fRight = +(_PLANE_WIDTH * 0.5f), fTop = +(_PLANE_HEIGHT * 0.5f), fBottom = -(_PLANE_HEIGHT * 0.5f);
-				//xmmtxProjection = XMMatrixOrthographicOffCenterLH(fLeft * 6.0f, fRight * 6.0f, fBottom * 6.0f, fTop * 6.0f, fBack, fFront);
-			}
-			else if (m_pLights[j].m_nType == SPOT_LIGHT)
-			{
-				float fFovAngle = 60.0f; // m_pLights->m_pLights[j].m_fPhi = cos(60.0f);
-				float fAspectRatio = float(_DEPTH_BUFFER_WIDTH) / float(_DEPTH_BUFFER_HEIGHT);
-				xmmtxProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(fFovAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
-			}
-			else if (m_pLights[j].m_nType == POINT_LIGHT)
-			{
-				//ShadowMap[6]
-			}
+		//	XMMATRIX xmmtxProjection;
+		//	if (m_pLights[j].m_nType == DIRECTIONAL_LIGHT)
+		//	{
+		//		float fWidth = 1024, fHeight = 1024;
+		//		xmmtxProjection = XMMatrixOrthographicLH(fWidth, fHeight, fNearPlaneDistance, fFarPlaneDistance);
+		//		//float fLeft = -(_PLANE_WIDTH * 0.5f), fRight = +(_PLANE_WIDTH * 0.5f), fTop = +(_PLANE_HEIGHT * 0.5f), fBottom = -(_PLANE_HEIGHT * 0.5f);
+		//		//xmmtxProjection = XMMatrixOrthographicOffCenterLH(fLeft * 6.0f, fRight * 6.0f, fBottom * 6.0f, fTop * 6.0f, fBack, fFront);
+		//	}
+		//	else if (m_pLights[j].m_nType == SPOT_LIGHT)
+		//	{
+		//		float fFovAngle = 60.0f; // m_pLights->m_pLights[j].m_fPhi = cos(60.0f);
+		//		float fAspectRatio = float(_DEPTH_BUFFER_WIDTH) / float(_DEPTH_BUFFER_HEIGHT);
+		//		xmmtxProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(fFovAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
+		//	}
+		//	else if (m_pLights[j].m_nType == POINT_LIGHT)
+		//	{
+		//		//ShadowMap[6]
+		//	}
 
-			m_ppDepthRenderCameras[j]->SetPosition(xmf3Position);
-			XMStoreFloat4x4(&m_ppDepthRenderCameras[j]->m_xmf4x4View, xmmtxView);//m_ppDepthRenderCameras                 ?  ??    
-			XMStoreFloat4x4(&m_ppDepthRenderCameras[j]->m_xmf4x4Projection, xmmtxProjection);
+		//	m_ppDepthRenderCameras[j]->SetPosition(xmf3Position);
+		//	XMStoreFloat4x4(&m_ppDepthRenderCameras[j]->m_xmf4x4View, xmmtxView);//m_ppDepthRenderCameras                 ?  ??    
+		//	XMStoreFloat4x4(&m_ppDepthRenderCameras[j]->m_xmf4x4Projection, xmmtxProjection);
 
-			XMMATRIX xmmtxToTexture = XMMatrixTranspose(xmmtxView * xmmtxProjection * m_xmProjectionToTexture);
-			XMStoreFloat4x4(&m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4x4ToTexture, xmmtxToTexture);
+		//	XMMATRIX xmmtxToTexture = XMMatrixTranspose(xmmtxView * xmmtxProjection * m_xmProjectionToTexture);
+		//	XMStoreFloat4x4(&m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4x4ToTexture, xmmtxToTexture);
 
-			m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(xmf3Position.x, xmf3Position.y, xmf3Position.z, 1.0f);
+		//	//m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(xmf3Position.x, xmf3Position.y, xmf3Position.z, 1.0f);
+		//	//임시 조명 위치 
+		//	m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(-14.66f, 224.0f, 694.f, 1.0f);
+		//	::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(j), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-			::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(j), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		//	FLOAT pfClearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		//	pd3dCommandList->ClearRenderTargetView(m_pd3dRtvCPUDescriptorHandles[j], pfClearColor, 0, NULL);
 
-			FLOAT pfClearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-			pd3dCommandList->ClearRenderTargetView(m_pd3dRtvCPUDescriptorHandles[j], pfClearColor, 0, NULL);
+		//	pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
 
-			pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
+		//	pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandles[j], TRUE, &m_d3dDsvDescriptorCPUHandle);
 
-			pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandles[j], TRUE, &m_d3dDsvDescriptorCPUHandle);
+		//	Render(pd3dCommandList, m_ppDepthRenderCameras[j], Map, Player);
 
-			Render(pd3dCommandList, m_ppDepthRenderCameras[j]);
-
-			::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(j), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON);
-		}
-		else
-		{
-			m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position.w = 0.0f;
-		}
+		//	::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(j), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON);
+		//}
+		//else
+		//{
+		//	m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position.w = 0.0f;
+		//}
 	}
 }
 
-void CDepthRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CDepthRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player)
 {
-	//      ?    ?      ?      .    ?            ?                 ?   н  ? . 
+	CShader::Render(pd3dCommandList, pCamera);
+
+	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+	pCamera->UpdateShaderVariables(pd3dCommandList);
+
+	/*for (int i = 0; i < 2; i++){
+		Map[i]->Render(pd3dCommandList, pCamera);
+
+	}*/
+	for (int i = 0; i < 2; i++) {
+		Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
+
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1902,8 +1919,8 @@ void CShadowMapShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 	m_pDepthTexture = (CTexture*)pContext;
 	m_pDepthTexture->AddRef();
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, m_pDepthTexture->GetTextures());
-	//CreateShaderResourceViews(pd3dDevice, m_pDepthTexture, 0, 5); //   ?      ?          ?  
+	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, m_pDepthTexture->GetTextures());
+	CScene::CreateShaderResourceViews(pd3dDevice, m_pDepthTexture, 20, false); //Depth buffer
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -1913,20 +1930,19 @@ void CShadowMapShader::ReleaseObjects()
 	if (m_pDepthTexture) m_pDepthTexture->Release();
 }
 
-void CShadowMapShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CShadowMapShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player)
 {
-	/*CShader::Render(pd3dCommandList, pCamera);
+	CShader::Render(pd3dCommandList, pCamera);
 
 	UpdateShaderVariables(pd3dCommandList);
 
-	for (int i = 0; i < m_pObjectsShader->m_nObjects; i++)
-	{
-		if (m_pObjectsShader->m_ppObjects[i])
-		{
-			m_pObjectsShader->m_ppObjects[i]->UpdateShaderVariables(pd3dCommandList);
-			m_pObjectsShader->m_ppObjects[i]->Render(pd3dCommandList, pCamera);
-		}
+	/*for (int i = 0; i < 2; i++) {
+		Map[i]->Render(pd3dCommandList, pCamera);
+
 	}*/
+	for (int i = 0; i < 2; i++) {
+		Player[i]->Render(pd3dCommandList, pCamera);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2024,16 +2040,29 @@ D3D12_SHADER_BYTECODE CTextureToViewportShader::CreateGeometryShader(ID3DBlob** 
 
 void CTextureToViewportShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
-	D3D12_VIEWPORT d3dViewport = { 0.0f, 0.0f, FRAME_BUFFER_WIDTH * 0.25f, FRAME_BUFFER_HEIGHT * 0.25f, 0.0f, 1.0f };
-	D3D12_RECT d3dScissorRect = { 0, 0, FRAME_BUFFER_WIDTH / 4, FRAME_BUFFER_HEIGHT / 4 };
-	pd3dCommandList->RSSetViewports(1, &d3dViewport);
-	pd3dCommandList->RSSetScissorRects(1, &d3dScissorRect);
+	if (!b_RTV1)
+	{
+		D3D12_RECT d3dScissorRect = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT };
+		pd3dCommandList->RSSetScissorRects(1, &d3dScissorRect);
+	}
+
+	else {
+		D3D12_VIEWPORT d3dViewport = { 0.0f, 0.0f, FRAME_BUFFER_WIDTH * 0.25, FRAME_BUFFER_HEIGHT * 0.25, 0.0f, 1.0f };
+		D3D12_RECT d3dScissorRect = { 0, 0, FRAME_BUFFER_WIDTH / 4, FRAME_BUFFER_HEIGHT / 4 };
+		pd3dCommandList->RSSetViewports(1, &d3dViewport);
+		pd3dCommandList->RSSetScissorRects(1, &d3dScissorRect);
+	}
+
 
 	CShader::Render(pd3dCommandList, pCamera);
 
 	pd3dCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	pd3dCommandList->DrawInstanced(6, 1, 0, 0);
 }
+
+
+
+
 
 
 

@@ -230,6 +230,8 @@ public:
 
 
 	LIGHT								*m_pLights = NULL;
+	LIGHT* m_pInsideLights = NULL;
+
 	int									m_nLights = 0;
 
 	XMFLOAT4							m_xmf4GlobalAmbient;

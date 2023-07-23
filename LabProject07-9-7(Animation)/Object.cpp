@@ -827,8 +827,11 @@ void CGameObject::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12Graphics
 {
 }
 
-void CGameObject::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
+void CGameObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	XMFLOAT4X4 xmf4x4World;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 16, &xmf4x4World, 0);
 }
 
 void CGameObject::UpdateShaderVariable(ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT4X4 *pxmf4x4World)
@@ -2131,7 +2134,7 @@ void CSpriteObject::SetfollowPosition(XMFLOAT3 Target, XMFLOAT3 Distance,XMFLOAT
 
 void CSpriteObject::SetNewTexture(ID3D12Device* pd3dDevice,CTexture* pSpriteTexture)
 {
-	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 20, false); //PS를 UI  18
+	//CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 20, false); //PS를 UI  18
 }
 
 
@@ -2437,7 +2440,7 @@ void CParticleObject::setPos(XMFLOAT3 pos)
 CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
 	//CFireMesh* pFireMesh = new CFireMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
-	CTexturedRectMesh* pFireMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
+	CTexturedRectMesh* pFireMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 10.0f, 10.0f, 0.0f);
 	pFireMesh->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	SetMesh(pFireMesh);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -2461,10 +2464,11 @@ CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 
 
 
-	CMaterial* pFireMaterial = new CMaterial(3);
-	pFireMaterial->SetTexture(pfireTexture, 0);
-	pFireMaterial->SetTexture(palphaTexture, 1);
-	pFireMaterial->SetTexture(pnoiseTexture, 2);
+	CMaterial* pFireMaterial = new CMaterial(1);
+	/*pFireMaterial->SetTexture(pfireTexture);
+	pFireMaterial->SetTexture(palphaTexture);*/
+	pFireMaterial->SetTexture(pnoiseTexture);
+
 
 	pFireMaterial->SetShader(pFireShader);
 

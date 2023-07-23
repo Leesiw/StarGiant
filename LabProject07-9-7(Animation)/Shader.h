@@ -387,9 +387,9 @@ public:
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
 	virtual void ReleaseObjects();
 
-	void PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList);
+	void PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** Map, CPlayer** Player);
 
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player);
 
 protected:
 	CTexture* m_pDepthTexture = NULL;
@@ -446,7 +446,7 @@ public:
 
 	virtual void ReleaseUploadBuffers();
 
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player);
 
 public:
 	CShader* m_pObjectsShader = NULL;
@@ -477,8 +477,10 @@ public:
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 
+	bool b_RTV1 = true; 
 protected:
 	CTexture* m_pDepthTexture = NULL;
+	
 };
 
 

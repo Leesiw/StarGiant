@@ -28,16 +28,16 @@ cbuffer cbPlusInfo : register(b9)//b2
 
 };
 
-//struct CB_TOOBJECTSPACE
-//{
-//	matrix		mtxToTexture;
-//	float4		f4Position;
-//};
-//
-//cbuffer cbToLightSpace : register(b6) // ?    
-//{
-//	CB_TOOBJECTSPACE gcbToLightSpaces[MAX_GODRAY_LIGHTS];
-//};
+struct CB_TOOBJECTSPACE
+{
+	matrix		mtxToTexture;
+	float4		f4Position;
+};
+
+cbuffer cbToLightSpace : register(b6) // ?    
+{
+	CB_TOOBJECTSPACE gcbToLightSpaces[1];
+};
 
 
 #include "Light.hlsl"
@@ -340,7 +340,7 @@ float4 PS_SPRITE(VS_SPRITE_OUTPUT input) : SV_TARGET
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Texture2D gtxtSPRITETexture2 : register(t18);
+
 
 VS_SPRITE_OUTPUT VS_SPRITE2(VS_SPRITE_INPUT input)
 {
@@ -356,7 +356,7 @@ VS_SPRITE_OUTPUT VS_SPRITE2(VS_SPRITE_INPUT input)
 
 float4 PS_SPRITE2(VS_SPRITE_OUTPUT input) : SV_TARGET
 {
-	float4 cColor = gtxtSPRITETexture2.Sample(gssWrap, input.uv);
+	float4 cColor = gtxtSPRITETexture.Sample(gssWrap, input.uv);
 	//cColor = float4(1.0,1.0,1.0,1.0);
 	return (cColor);
 }
@@ -681,8 +681,8 @@ float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
 
 	fireColor.a = alphaColor;
 
-	//return fireColor;
-	return float4(1.0f,1.0f,0.0f,1.0f);
+	return fireColor;
+	//return float4(1.0f,1.0f,0.0f,1.0f);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -759,7 +759,7 @@ VS_SHADOW_MAP_OUTPUT VSShadowMapShadow(VS_LIGHTING_INPUT input)
 
 	for (int i = 0; i < 1; i++)
 	{
-		//if (gcbToLightSpaces[i].f4Position.w != 0.0f) output.uvs[i] = mul(positionW, gcbToLightSpaces[i].mtxToTexture);
+		if (gcbToLightSpaces[i].f4Position.w != 0.0f) output.uvs[i] = mul(positionW, gcbToLightSpaces[i].mtxToTexture);
 	}
 
 	return(output);
@@ -771,6 +771,26 @@ float4 PSShadowMapShadow(VS_SHADOW_MAP_OUTPUT input) : SV_TARGET
 
 	return(cIllumination);
 }
+//
+//float4 PSShadowMapShadow(VS_SHADOW_MAP_OUTPUT input) : SV_TARGET
+//{
+//	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+//	if (gnTexturesMask & MATERIAL_ALBEDO_MAP) cAlbedoColor = gtxtAlbedoTexture.Sample(gssWrap, input.uvs[0].xy);
+//	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+//	if (gnTexturesMask & MATERIAL_SPECULAR_MAP) cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uvs[0].xy);
+//	float4 cNormalColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+//	if (gnTexturesMask & MATERIAL_NORMAL_MAP) cNormalColor = gtxtNormalTexture.Sample(gssWrap, input.uvs[0].xy);
+//	float4 cMetallicColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+//	if (gnTexturesMask & MATERIAL_METALLIC_MAP) cMetallicColor = gtxtMetallicTexture.Sample(gssWrap, input.uvs[0].xy);
+//	float4 cEmissionColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+//	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxtEmissionTexture.Sample(gssWrap, input.uvs[0].xy);
+//
+//	float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
+//
+//	float4 cIllumination = shadowLighting(input.positionW, normalize(input.normalW), true, input.uvs);
+//
+//	return(lerp(cColor, cIllumination, 0.5f));
+//}
 
 ///////////////////////////////////////////////////////////////////////////////
 
