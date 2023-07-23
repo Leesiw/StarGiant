@@ -127,8 +127,6 @@ void ProcessPacket(int ci, unsigned char packet[])
 
 	case SC_LOGIN_INFO:
 	{
-		//로그인 처리 : 아이디 0이면 move로 change 패킷 전송
-		//	1, 2면 일단 attack1, 2로 change 패킷 전송
 		SC_LOGIN_INFO_PACKET* login_packet = reinterpret_cast<SC_LOGIN_INFO_PACKET*>(packet);
 		active_clients++;
 		g_clients[ci].connected = true;
@@ -149,16 +147,8 @@ void ProcessPacket(int ci, unsigned char packet[])
 	case SC_METEO: break;
 	case SC_MOVE_SPACESHIP:
 	{
-		//위치 set + time_delay 측정
 		SC_MOVE_SPACESHIP_PACKET* move_packet = reinterpret_cast<SC_MOVE_SPACESHIP_PACKET*>(packet);
 		g_clients[ci].pos = move_packet->data.pos;
-
-		if (0 != move_packet->move_time) {
-			auto d_ms = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count() - move_packet->move_time;
-
-			if (global_delay < d_ms) global_delay++;
-			else if (global_delay > d_ms) global_delay--;
-		}
 	}
 	case SC_MOVE_INSIDEPLAYER: break;
 	case SC_SPAWN_ENEMY: break;
@@ -170,7 +160,6 @@ void ProcessPacket(int ci, unsigned char packet[])
 		
 		if (0 != bullet_packet->attack_time) {
 			auto d_ms = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count() - bullet_packet->attack_time;
-
 			if (global_delay < d_ms) global_delay++;
 			else if (global_delay > d_ms) global_delay--;
 		}
@@ -194,13 +183,13 @@ void ProcessPacket(int ci, unsigned char packet[])
 		change_packet.size = sizeof(change_packet);
 		change_packet.type = CS_CHANGE;
 		if (g_clients[ci].id == 0) {
-			change_packet.player_type = PlayerType::MOVE;
-		}
-		else if (g_clients[ci].id == 1) {
 			change_packet.player_type = PlayerType::ATTACK1;
 		}
-		else {
+		else if (g_clients[ci].id == 1) {
 			change_packet.player_type = PlayerType::ATTACK2;
+		}
+		else {
+			change_packet.player_type = PlayerType::ATTACK3;
 		}
 		SendPacket(ci, &change_packet);
 		break; }
@@ -388,27 +377,15 @@ void Test_Thread()
 
 		for (int i = 0; i < num_connections; ++i) {
 			if (false == g_clients[i].connected) continue;
-			if (g_clients[i].id != 0 && g_clients[i].last_move_time + 1s > high_resolution_clock::now()) continue;
-			if (g_clients[i].id == 0 && g_clients[i].last_move_time + 33ms > high_resolution_clock::now()) continue;
+			if (g_clients[i].last_move_time + 1s > high_resolution_clock::now()) continue;
 			g_clients[i].last_move_time = high_resolution_clock::now();
-			if (g_clients[i].id == 0) {
-				CS_SPACESHIP_PACKET my_packet;
-				my_packet.size = sizeof(my_packet);
-				my_packet.type = CS_SPACESHIP_MOVE;
-				my_packet.data.dwDirection = 0;
-				my_packet.data.Quaternion = { 1.0, 0.0, 0.0, 0.0 };
-				my_packet.move_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
-				SendPacket(i, &my_packet);
-			}
-			else {
-				CS_ATTACK_PACKET my_packet;
-				my_packet.size = sizeof(my_packet);
-				my_packet.type = CS_ATTACK;
-				my_packet.data.pos = { urdRandom(dree),  urdRandom(dree),  urdRandom(dree) };
-				my_packet.data.direction = { 0.f,  1.f,  0.f };
-				my_packet.attack_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
-				SendPacket(i, &my_packet);
-			}
+			CS_ATTACK_PACKET my_packet;
+			my_packet.size = sizeof(my_packet);
+			my_packet.type = CS_ATTACK;
+			my_packet.data.pos = { urdRandom(dree),  urdRandom(dree),  urdRandom(dree) };
+			my_packet.data.direction = { 0.f,  1.f,  0.f };
+			my_packet.attack_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
+			SendPacket(i, &my_packet);
 		}
 	}
 }

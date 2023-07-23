@@ -1126,10 +1126,10 @@ void CScene::SendSceneInfo()
 		return;
 	}
 
-	char send_buf[10000];
+	char send_buf[10000]{};
 	short send_num = 0;
 
-	SC_ALL_METEOR_PACKET m_packet;
+	SC_ALL_METEOR_PACKET m_packet{};
 	m_packet.type = SC_ALL_METEOR;
 	m_packet.size = sizeof(SC_ALL_METEOR_PACKET);
 	for (char i = 0; i < METEOS; ++i) {
@@ -1138,10 +1138,9 @@ void CScene::SendSceneInfo()
 	memcpy(&send_buf[0], &m_packet, m_packet.size);
 	send_num += m_packet.size;
 
-	SC_MOVE_SPACESHIP_PACKET s_packet;
+	SC_MOVE_SPACESHIP_PACKET s_packet{};
 	s_packet.size = sizeof(s_packet);
 	s_packet.type = SC_MOVE_SPACESHIP;
-	s_packet.move_time = m_pSpaceship->move_time;
 	s_packet.data.pos = m_pSpaceship->GetPosition();
 	s_packet.data.Quaternion = m_pSpaceship->input_info.Quaternion;
 	memcpy(&send_buf[send_num], &s_packet, s_packet.size);
@@ -1149,7 +1148,7 @@ void CScene::SendSceneInfo()
 
 	for (char i = 0; i < ENEMIES; ++i) {
 		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
-		SC_MOVE_ENEMY_PACKET e_packet;
+		SC_MOVE_ENEMY_PACKET e_packet{};
 		e_packet.size = sizeof(e_packet);
 		e_packet.type = SC_MOVE_ENEMY;
 		e_packet.data.id = i;
@@ -1161,7 +1160,7 @@ void CScene::SendSceneInfo()
 
 	for (char i = 0; i < MISSILES; ++i) {
 		if (!m_ppMissiles[i]->GetisActive()) { continue; }
-		SC_MISSILE_PACKET e_packet;
+		SC_MISSILE_PACKET e_packet{};
 		e_packet.size = sizeof(e_packet);
 		e_packet.type = SC_MISSILE;
 		e_packet.data.id = i;
@@ -1488,8 +1487,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		if (clients[pl_id]._state != ST_INGAME) continue;
 		clients[pl_id].send_spaceship_packet(m_pSpaceship);
 	}
-
-	m_pSpaceship->move_time = 0;
 
 //	if (send_time % 30 == 0) {
 		for (int i = 0; i < ENEMIES; ++i) {

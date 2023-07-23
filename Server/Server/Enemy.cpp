@@ -134,6 +134,7 @@ void CEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 
 			p.data.direction = xmfToPlayer;
 			p.data.pos = xmf3Pos;
+			p.attack_time = 0;
 
 			scene_manager.Send(scene_num, (char*)&p);
 		}

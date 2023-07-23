@@ -385,7 +385,6 @@ struct CS_SPACESHIP_PACKET {
 	char	type;
 
 	SPACESHIP_INPUT_INFO	data;
-	unsigned int move_time;
 };
 
 struct SC_MOVE_SPACESHIP_PACKET {
@@ -393,7 +392,6 @@ struct SC_MOVE_SPACESHIP_PACKET {
 	char	type;
 
 	SPACESHIP_INFO data;
-	unsigned int move_time;
 };
 
 // inside

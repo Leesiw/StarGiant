@@ -617,7 +617,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		CS_SPACESHIP_PACKET* p = reinterpret_cast<CS_SPACESHIP_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::MOVE) {
 			if (clients[c_id].room_id == -1) { break; }
-			scene_manager.GetScene(clients[c_id].room_id)->m_pSpaceship->SetInputInfo(p->data, p->move_time);
+			scene_manager.GetScene(clients[c_id].room_id)->m_pSpaceship->SetInputInfo(p->data);
 		}
 		break;
 	}
