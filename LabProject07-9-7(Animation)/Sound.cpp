@@ -15,6 +15,8 @@ CSound::CSound(const char* path, bool loop, float volume)
 
     m_channel = nullptr;
     m_volume = volume;
+
+    FMOD_Channel_SetVolume(m_channel, m_volume);
 }
 
 CSound::~CSound()

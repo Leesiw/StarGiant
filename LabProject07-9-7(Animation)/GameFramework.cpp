@@ -81,10 +81,11 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	CoInitialize(NULL);
 
+	CSound::Init();
+
 	BuildObjects();
 	isConnect = ConnectServer();
 
-	CSound::Init();
 	BuildSounds();
 	m_lobbybgm->play();
 
@@ -1332,6 +1333,10 @@ void CGameFramework::BuildSounds()
 	m_effectSound[static_cast<int>(Sounds::CLEAR)] = new CSound("Sound/clear.mp3", false, 0.2f);
 	m_effectSound[static_cast<int>(Sounds::CLICK)] = new CSound("Sound/click.mp3", false, 0.2f);
 	m_effectSound[static_cast<int>(Sounds::DARK)] = new CSound("Sound/dark.mp3", false, 0.2f);
+	m_effectSound[static_cast<int>(Sounds::ROAR)] = new CSound("Sound/roar.mp3", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::FIRE)] = new CSound("Sound/firebreath.mp3", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::GROWL)] = new CSound("Sound/growl.mp3", false, 1.0f);
+
 
 
 
@@ -1353,9 +1358,17 @@ void CGameFramework::ReleaseObjects()
 	if (m_pInsideScene) m_pInsideScene->ReleaseObjects();
 	if (m_pInsideScene) delete m_pInsideScene;
 	if (m_bgm) delete m_bgm;
+	if (m_bgm) m_bgm->Release();
+
 	if (m_lobbybgm) delete m_lobbybgm;
+	if (m_lobbybgm) m_lobbybgm->Release();
+
 
 	if (m_effectSound)for (int i = 0; i < static_cast<int>(Sounds::COUNT); ++i) delete m_effectSound;
+	if (m_effectSound)for (int i = 0; i < static_cast<int>(Sounds::COUNT); ++i) m_effectSound[i]->Release();
+
+	if (m_pScene->m_ppBoss->b_effectSound)for (int i = 0; i < static_cast<int>(DragonSounds::COUNT); ++i) delete m_pScene->m_ppBoss->b_effectSound;
+	
 
 }
 
@@ -1543,7 +1556,7 @@ void CGameFramework::MoveToNextFrame()
 //#define _WITH_PLAYER_TOP
 
 void CGameFramework::FrameAdvance()
-{    
+{
 	m_GameTimer.Tick(30.0f);
 	ProcessInput();
 	CameraUpdateChange();
@@ -1552,14 +1565,15 @@ void CGameFramework::FrameAdvance()
 	m_pScene->OnPreRender(m_pd3dCommandList);
 
 
-    AnimateObjects();
+	AnimateObjects();
 
 	UpdateUI();
 
 
 	if (_state == SCENE_LOBBY) { m_lobbybgm->Update(); m_bgm->stop(); }
 	else { m_lobbybgm->stop(); m_bgm->Update(); };
-	for (int i = 0; i < static_cast<int>(Sounds::COUNT); ++i)if(m_effectSound[i] || i != static_cast<int>(Sounds::WALK))m_effectSound[i]->Update();
+	for (int i = 0; i < static_cast<int>(Sounds::COUNT); ++i)if (m_effectSound[i] || i != static_cast<int>(Sounds::WALK))m_effectSound[i]->Update();
+
 
 
 	//if (std::isnan(m_pCamera->GetPosition().x))cout << "x nan!!\n";
@@ -1597,7 +1611,7 @@ void CGameFramework::FrameAdvance()
 	//	m_pCamera->SetPosition(a);
 	//	b = 1;
 	//	cout << "s난으로 한번감\n";
-	
+
 
 	if (std::isnan(m_pCamera->GetPosition().x)) {
 		m_pCamera->SetPosition(m_pPlayer[0]->GetPosition());
@@ -1621,8 +1635,8 @@ void CGameFramework::FrameAdvance()
 		m_pInsideCamera->SetPosition(m_pPlayer[0]->GetPosition());
 		cout << "m_pInsideCamera 돌아와\n";
 	}
-	
-	
+
+
 
 
 	m_pPlayer[0]->curMissionType = curMissionType;
@@ -1664,9 +1678,14 @@ void CGameFramework::FrameAdvance()
 	m_pScene->Render(m_pd3dCommandList, m_pCamera);
 	*/
 
-	if(b_CameraScene)b_Inside = b_CameraScene = m_pInsideCamera->CameraSence1(b_CameraScene);
-	if (m_pScene&&!b_Inside) m_pScene->Render(m_pd3dCommandList, m_pCamera);
-	if (m_pInsideScene&&b_Inside) m_pInsideScene->Render(m_pd3dCommandList, m_pInsideCamera);
+	if (b_CameraScene)b_Inside = b_CameraScene = m_pInsideCamera->CameraSence1(b_CameraScene);
+	if (m_pScene && !b_Inside) m_pScene->Render(m_pd3dCommandList, m_pCamera);
+	if (m_pInsideScene && b_Inside) m_pInsideScene->Render(m_pd3dCommandList, m_pInsideCamera);
+
+	//for (int i = 0; i < static_cast<int>(DragonSounds::COUNT); ++i)if (m_pScene->m_ppBoss->b_effectSound[i]) {
+	//	m_pScene->m_ppBoss->b_effectSound[i]->Update();
+	//}
+
 
 #ifdef _WITH_PLAYER_TOP
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);

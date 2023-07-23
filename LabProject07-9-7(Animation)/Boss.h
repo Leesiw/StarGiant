@@ -2,6 +2,8 @@
 
 #include "Object.h"
 #include "Camera.h"
+#include "Sound.h"
+
 
 
 
@@ -43,6 +45,8 @@ public:
 	int GetHP() { return BossHP; };
 	int SetHP(int hp) { return BossHP = hp; }
 
+
+	CSound* b_effectSound[static_cast<int>(DragonSounds::COUNT)] = {};
 	
 protected:
 	/*XMFLOAT3					m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -56,6 +60,8 @@ protected:
 
 	float           			m_fMaxVelocityXZ = 0.0f;
 	float           			m_fMaxVelocityY = 0.0f;
+
+	bool onceScream = true;
 
 public:
 	void BossObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel);

@@ -11,6 +11,12 @@ Boss::Boss()
 
 	stateStartTime = steady_clock::now();
 
+	CSound::Init();
+
+	b_effectSound[static_cast<int>(DragonSounds::ROAR)] = new CSound("Sound/roar.mp3", false, 1.0f);
+	b_effectSound[static_cast<int>(DragonSounds::FIRE)] = new CSound("Sound/firebreath.mp3", false, 1.0f);
+	b_effectSound[static_cast<int>(DragonSounds::GROWL)] = new CSound("Sound/growl.mp3", false, 1.0f);
+
 }
 
 void Boss::BossObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel)
@@ -28,6 +34,8 @@ void Boss::BossObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 
 	//m_pSkinnedAnimationController->SetTrackAllUnable(static_cast<int>(BossAnimation::COUNT));
 	m_pSkinnedAnimationController->SetTrackEnable(0, true);
+
+
 
 }
 
@@ -320,10 +328,22 @@ void Boss::BossAi()
 
 void Boss::ChangeAnimation(BossAnimation CurMotion)
 {
+
 	//cout << "curmotion - " << static_cast<int>(CurMotion) << endl;
 	//모션 받음 n모션 -> p모션으로 저장함 -> p모션 false -> n모션 true
 	//다르면 먼저 모션 바꿔주고, c를 p에 저장
 	if (CurMotion != PastMotion) {
+
+		if (CurMotion == BossAnimation::SCREAM && onceScream) {
+			b_effectSound[static_cast<int>(DragonSounds::ROAR)]->play();
+			onceScream = false;
+		}
+
+		else if (CurMotion == BossAnimation::IDLE) {
+			b_effectSound[static_cast<int>(DragonSounds::GROWL)]->play();
+		}
+
+
 		m_pSkinnedAnimationController->SetTrackEnable(static_cast<int>(PastMotion), false);
 		m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(CurMotion), 0.0f);
 		m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(PastMotion), 0.0f);
@@ -354,6 +374,10 @@ void Boss::ChangeAnimation(BossAnimation CurMotion)
 			SetTrackAnimationPosition(static_cast<int>(CurMotion), 1.0f);
 			m_pSkinnedAnimationController->SetTrackSpeed(static_cast<int>(CurMotion), 0.0f);
 		}
+	}
+
+	for (int i = 0; i < static_cast<int>(DragonSounds::COUNT); ++i)if (b_effectSound[i]) {
+		b_effectSound[i]->Update();
 	}
 
 }

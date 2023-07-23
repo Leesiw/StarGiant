@@ -1836,7 +1836,7 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 
 	CCamera a = m_pPlayer[0]->GetCamera();
 	
-	if (m_ppUI[0]&& !(a.GetMode()== DRIVE_CAMERA))
+	if (m_ppUI[0]&& !(a.GetMode()== DRIVE_CAMERA || a.GetMode() == CUT_SCENE_CAMERA))
 	{
 		m_ppUI[0]->Render(pd3dCommandList, pCamera);
 
