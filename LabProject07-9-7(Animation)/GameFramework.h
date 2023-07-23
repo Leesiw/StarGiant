@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include "Player.h"
 #include "Scene.h"
+#include "Sound.h"
 
 
 extern int g_myid;
@@ -35,6 +36,8 @@ public:
 	void ChangeSwapChainState();
 
     void BuildObjects();
+	void BuildSounds();
+
     void ReleaseObjects();
 
     void ProcessInput();
@@ -125,6 +128,15 @@ private:
 
 	UILayer* m_pUILayer = NULL;
 	CUI* m_pUI = NULL;
+
+
+
+	CSound* m_bgm;
+	CSound* m_lobbybgm;
+
+	CSound* m_effectSound[static_cast<int>(Sounds::COUNT)] = {};
+
+
 
 
 	//

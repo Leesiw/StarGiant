@@ -82,18 +82,9 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	BuildObjects();
 	isConnect = ConnectServer();
 
-	FMOD_RESULT       result;
-	FMOD::System* system(nullptr);
-	FMOD::Sound* sound(nullptr);
-	FMOD::Channel* channel(nullptr);
-	void* extradriverdata(nullptr);
-
-	result = FMOD::System_Create(&system);
-	if (result != FMOD_OK) return -1;
-
-	result = system->init(32, FMOD_INIT_NORMAL, extradriverdata);  
-	system->createSound("Sound/background.wav", FMOD_LOOP_OFF, 0, &sound);
-	//result = system->playSound(sound, 0, false, &channel);
+	CSound::Init();
+	BuildSounds();
+	m_lobbybgm->play();
 
 	return(true);
 }
@@ -696,41 +687,42 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 			int screenAreaRight2 = 450;
 			int screenAreaBottom2 = 650;
 
-			if (mouseX >= screenAreaLeft1 && mouseX <= screenAreaRight1 && mouseY >= screenAreaTop1 && mouseY <= screenAreaBottom1 && !roomNum.empty()) { 
-				room_num = static_cast<short>(std::stoi(roomNum));
-				CS_LOGIN_PACKET packet;
-				packet.size = sizeof(packet);
-				packet.type = CS_LOGIN;
-				packet.room_id = room_num;
-				if (_state == SCENE_LOBBY) {
-					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+			if (_state == SCENE_LOBBY) {
+				if (mouseX >= screenAreaLeft1 && mouseX <= screenAreaRight1 && mouseY >= screenAreaTop1 && mouseY <= screenAreaBottom1 && !roomNum.empty()) {
+					room_num = static_cast<short>(std::stoi(roomNum));
+					CS_LOGIN_PACKET packet;
+					packet.size = sizeof(packet);
+					packet.type = CS_LOGIN;
+					packet.room_id = room_num;
+					if (_state == SCENE_LOBBY) {
+						send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+					}
+					cout << "매칭";
 				}
-				cout << "매칭";
-			}
 
-			if (mouseX >= screenAreaLeft2 && mouseX <= screenAreaRight2 && mouseY >= screenAreaTop2 && mouseY <= screenAreaBottom2) {
-				cout << "오토매칭";
-				CS_LOGIN_PACKET packet;
-				packet.size = sizeof(packet);
-				packet.type = CS_LOGIN;
-				packet.room_id = -1;
-				if (_state == SCENE_LOBBY) {
-					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+				if (mouseX >= screenAreaLeft2 && mouseX <= screenAreaRight2 && mouseY >= screenAreaTop2 && mouseY <= screenAreaBottom2) {
+					cout << "오토매칭";
+					CS_LOGIN_PACKET packet;
+					packet.size = sizeof(packet);
+					packet.type = CS_LOGIN;
+					packet.room_id = -1;
+					if (_state == SCENE_LOBBY) {
+						send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+					}
+
 				}
-				
-			}
 
-			// 나중에 수정해야됨
-			if (mouseX >= screenAreaLeft && mouseX <= screenAreaRight && mouseY >= screenAreaTop && mouseY <= screenAreaBottom && !roomNum.empty()) {
-				CS_NEXT_MISSION_PACKET packet;
-				packet.size = sizeof(packet);
-				packet.type = CS_START;
-				if (_state == SCENE_LOBBY) {
-					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+				// 나중에 수정해야됨
+				if (mouseX >= screenAreaLeft && mouseX <= screenAreaRight && mouseY >= screenAreaTop && mouseY <= screenAreaBottom && !roomNum.empty()) {
+					CS_NEXT_MISSION_PACKET packet;
+					packet.size = sizeof(packet);
+					packet.type = CS_START;
+					if (_state == SCENE_LOBBY) {
+						send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
+					}
+					cout << "플레이";
 				}
-				cout << "플레이";
 			}
-
 
 
 			if (player_type >= PlayerType::ATTACK1 && player_type <= PlayerType::ATTACK3) {
@@ -745,6 +737,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 				if (_state == SCENE_INGAME) {
 					send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
 				}
+				m_effectSound[static_cast<int>(Sounds::GUN)]->play();
 			}
 			else if (player_type == PlayerType::INSIDE && AroundSculpture()) {
 				CS_HEAL_PACKET my_packet;
@@ -1051,7 +1044,7 @@ void CGameFramework::CameraUpdateChange()
 		iscut = true;
 		isending = false;
 
-
+		m_effectSound[static_cast<int>(Sounds::BAD)]->play();
 	}
 
 	//CS_BAD_ENDING 외부일때,
@@ -1065,6 +1058,7 @@ void CGameFramework::CameraUpdateChange()
 		iscut = true;
 		isending = false;
 
+		m_effectSound[static_cast<int>(Sounds::BAD)]->play();
 
 	}
 
@@ -1228,6 +1222,7 @@ void CGameFramework::OnDestroy()
     if (m_pd3dDevice) m_pd3dDevice->Release();
 	if (m_pdxgiFactory) m_pdxgiFactory->Release();
 
+	CSound::Release();
 #if defined(_DEBUG)
 	IDXGIDebug1	*pdxgiDebug = NULL;
 	DXGIGetDebugInterface1(0, __uuidof(IDXGIDebug1), (void **)&pdxgiDebug);
@@ -1299,6 +1294,20 @@ void CGameFramework::BuildObjects()
 	m_GameTimer.Reset();
 }
 
+void CGameFramework::BuildSounds()
+{
+	m_bgm = new CSound("Sound/background.wav", true, 0.3f);
+	m_lobbybgm = new CSound("Sound/lobby.mp3", true, 0.3f);
+
+	m_effectSound[static_cast<int>(Sounds::GUN)] = new CSound("Sound/gun.mp3", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::EXP)] = new CSound("Sound/explosion.mp3", false, 0.5f);
+	m_effectSound[static_cast<int>(Sounds::WALK)] = new CSound("Sound/walk.wav", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::BAD)] = new CSound("Sound/bad.mp3", false, 1.0f);
+
+
+
+}
+
 void CGameFramework::ReleaseObjects()
 {
 	if (m_pUILayer) m_pUILayer->ReleaseResources();
@@ -1311,6 +1320,11 @@ void CGameFramework::ReleaseObjects()
 	if (m_pScene) delete m_pScene;
 	if (m_pInsideScene) m_pInsideScene->ReleaseObjects();
 	if (m_pInsideScene) delete m_pInsideScene;
+	if (m_bgm) delete m_bgm;
+	if (m_lobbybgm) delete m_lobbybgm;
+
+	if (m_effectSound)for (int i = 0; i < static_cast<int>(Sounds::COUNT); ++i) delete m_effectSound;
+
 }
 
 void CGameFramework::ProcessInput()
@@ -1392,6 +1406,7 @@ void CGameFramework::ProcessInput()
 					if (_state == SCENE_INGAME && (dwDirection != 0 || cxDelta != 0.0f)) {
 						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 					}
+
 				}
 				else if(player_type == PlayerType::MOVE) {
 					CS_SPACESHIP_PACKET my_packet;
@@ -1409,8 +1424,18 @@ void CGameFramework::ProcessInput()
 			else {
 				//이동 부분 분할할지 모르겠어서 우선 여따 같이넣어둠 
 				if (dwDirection&&!b_Inside) m_pPlayer[0]->Move(dwDirection, 20.25f, true);
-				if (dwDirection&& b_Inside) m_pInsidePlayer[g_myid]->Move(dwDirection, 10.25f, true);
+				if (dwDirection && b_Inside) {
+					m_pInsidePlayer[g_myid]->Move(dwDirection, 10.25f, true);
+				}
 			}
+
+			//if (m_pInsidePlayer[g_myid]->motion == AnimationState::WALK) {
+			//	cout << "walk";
+			//	m_effectSound[static_cast<int>(Sounds::WALK)]->play();
+			//}
+			//if (m_pInsidePlayer[g_myid]->motion != AnimationState::WALK) {
+			//	m_effectSound[static_cast<int>(Sounds::WALK)]->stop();
+			//}
 		}
 
 	}
@@ -1482,9 +1507,6 @@ void CGameFramework::MoveToNextFrame()
 void CGameFramework::FrameAdvance()
 {    
 	m_GameTimer.Tick(30.0f);
-
-
-	
 	ProcessInput();
 	CameraUpdateChange();
 
@@ -1495,6 +1517,12 @@ void CGameFramework::FrameAdvance()
     AnimateObjects();
 
 	UpdateUI();
+
+
+	if (_state == SCENE_LOBBY) { m_lobbybgm->Update(); m_bgm->stop(); }
+	else { m_lobbybgm->stop(); m_bgm->Update(); };
+	for (int i = 0; i < static_cast<int>(Sounds::COUNT); ++i)if(m_effectSound[i] || i != static_cast<int>(Sounds::WALK))m_effectSound[i]->Update();
+
 
 	//if (std::isnan(m_pCamera->GetPosition().x))cout << "x nan!!\n";
 	//if (std::isnan(m_pCamera->GetPosition().y))cout << "y nan!!\n";
@@ -2292,6 +2320,7 @@ void CGameFramework::ProcessPacket(char* p)
 			m_pInsidePlayer[packet->data.id]->is_update = true;
 			m_pInsidePlayer[packet->data.id]->Rotate(0.f, 90.f - m_pInsidePlayer[packet->data.id]->GetYaw(), 0.f);
 			m_pInsidePlayer[packet->data.id]->SetSitState(true);
+
 		}
 		else {	// Attack
 			int i = (int)packet->data.player_type - 2;
@@ -2389,6 +2418,7 @@ void CGameFramework::ProcessPacket(char* p)
 	{
 		SC_MOVE_INSIDE_PACKET* packet = reinterpret_cast<SC_MOVE_INSIDE_PACKET*>(p);
 		m_pInsidePlayer[packet->data.id]->SetPlayerInfo(packet->data);
+		
 		//if (int(m_pInsidePlayer[packet->data.id]->motion) != (int)packet->data.animation) {
 		//	((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = (AnimationState)packet->data.animation;
 		//}
@@ -2488,6 +2518,7 @@ void CGameFramework::ProcessPacket(char* p)
 				//m_pScene->AddDieSprite(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
 				m_pScene->AddDieSprite(m_pScene->m_ppEnemies[packet->data.id]->GetPosition(), packet->data.id);
 				m_pScene->setParticleStart(10, m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
+				m_effectSound[static_cast<int>(Sounds::EXP)]->play();
 
 			}
 			else {
@@ -2596,6 +2627,7 @@ void CGameFramework::ProcessPacket(char* p)
 	case SC_START:
 	{
 		_state = SCENE_INGAME;
+		m_bgm->play();
 		break;
 	}
 	case SC_BLACK_HOLE:
