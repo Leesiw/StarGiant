@@ -670,7 +670,7 @@ public:
 	virtual void Rotate(XMFLOAT3* pxmf3Axis, float fAngle);
 	virtual void Rotate(XMFLOAT4* pxmf4Quaternion);
 
-	virtual void AI(float fTimeElapsed, XMFLOAT3& pl_look, XMFLOAT3& pl_pos);
+	virtual void AI(float fTimeElapsed, XMFLOAT3& pl_pos);
 	virtual void MoveAI(float fTimeElapsed, XMFLOAT3& pl_pos);
 	virtual void AimingAI(float fTimeElapsed, XMFLOAT3& pl_pos);
 	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);

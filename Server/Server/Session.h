@@ -133,5 +133,6 @@ public:
 	void send_animation_packet(char id, char animation);
 	void send_mission_start_packet(MissionType mission);
 	void send_kill_num_packet(char num);
+	void send_enemy_state_packet(char id, EnemyState state);
 };
 

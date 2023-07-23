@@ -838,6 +838,12 @@ void CScene::MoveEnemy(char obj_id)
 			TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(num) };
 			timer_queue.push(ev);
 		}
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_enemy_state_packet(obj_id, EnemyState::AIMING);
+		}
+
 		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_AIMING_ENEMY, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
@@ -898,6 +904,12 @@ void CScene::AimingEnemy(char obj_id)
 
 	if (m_ppEnemies[obj_id]->state == EnemyState::MOVE)
 	{
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_enemy_state_packet(obj_id, EnemyState::MOVE);
+		}
+
 		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_MOVE_ENEMY, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
@@ -1219,7 +1231,7 @@ void CScene::SendSceneInfo()
 		e_packet.type = SC_MOVE_ENEMY;
 		e_packet.data.id = i;
 		e_packet.data.pos = m_ppEnemies[i]->GetPosition();
-		e_packet.data.Quaternion = m_ppEnemies[i]->GetQuaternion();
+		//e_packet.data.Quaternion = m_ppEnemies[i]->GetQuaternion();
 		memcpy(&send_buf[send_num], &e_packet, e_packet.size);
 		send_num += e_packet.size;
 	}
