@@ -47,12 +47,18 @@ public:
 	void UpdateUI();
 	wstring ChangeMission(MissionType mT);
 	wstring ChangeScripts(MissionType mT);
-	wstring ChangeBossScripts(MissionType mT);
+	wstring ChangeBossScripts(MissionType mT, short hp);
+
+	MissionType pM = MissionType::CS_TURN;
+	MissionType cM = MissionType::CS_TURN;
 
 
 
 	chrono::steady_clock::time_point scriptsStartTime;
 	bool scriptsOn = false;
+
+	float bossScriptsTime;
+	bool bossScriptsOn = false;
 
 	short matcnt = 0;
 	float blackholetime = 0.0f;
@@ -116,7 +122,7 @@ private:
 	CScene						*m_pScene = NULL;
 	CAirplanePlayer						*m_pPlayer[3] = {};
 	CCamera						*m_pCamera = NULL;
-	bool iscut =false;
+	bool iscut = false;
 	bool isending = false;
 
 	DWORD m_pBeforeCamera = NULL;
@@ -152,6 +158,8 @@ private:
 	int  bossdie = 0;
 
 	short firstSc = -2;
+	short firstbSc = 0;
+
 	MissionType curMissionType = MissionType::TU_SIT;
 	MissionType pastMissionType = MissionType::TU_END;
 

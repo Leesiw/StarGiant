@@ -355,7 +355,7 @@ void UILayer::UpdateLabels_Scripts(const std::wstring& strUIText)
 
 void UILayer::UpdateLabels_BossScripts(const std::wstring& strUIText)
 {
-    m_vBossScriptsBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT - 100, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwBossScriptsFormat };
+    m_vBossScriptsBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT / 7 * 5, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwBossScriptsFormat };
 }
 
 void UILayer::UpdateLabels_Jew(const std::wstring& strUIText)
