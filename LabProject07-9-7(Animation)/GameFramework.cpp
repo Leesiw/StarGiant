@@ -697,6 +697,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 					if (_state == SCENE_LOBBY) {
 						send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
 					}
+					m_effectSound[static_cast<int>(Sounds::CLICK)]->play();
 					cout << "매칭";
 				}
 
@@ -709,6 +710,8 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 					if (_state == SCENE_LOBBY) {
 						send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
 					}
+					m_effectSound[static_cast<int>(Sounds::CLICK)]->play();
+
 
 				}
 
@@ -720,6 +723,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 					if (_state == SCENE_LOBBY) {
 						send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
 					}
+					m_effectSound[static_cast<int>(Sounds::CLICK)]->play();
 					cout << "플레이";
 				}
 			}
@@ -982,7 +986,7 @@ void CGameFramework::CameraUpdateChange()
 		iscut = true;
 		isending = false;
 
-
+		m_effectSound[static_cast<int>(Sounds::DARK)]->play();
 	}
 
 	//CS_SHOW_BLACK_HOLE 외부일때,
@@ -996,6 +1000,7 @@ void CGameFramework::CameraUpdateChange()
 		iscut = true;
 		isending = false;
 
+		m_effectSound[static_cast<int>(Sounds::DARK)]->play();
 
 	}
 
@@ -1114,6 +1119,7 @@ void CGameFramework::CameraUpdateChange()
 		m_pCamera->fAnglenu = 0;
 		iscut = false;
 
+		m_effectSound[static_cast<int>(Sounds::DARK)]->stop();
 
 	}
 
@@ -1303,6 +1309,12 @@ void CGameFramework::BuildSounds()
 	m_effectSound[static_cast<int>(Sounds::EXP)] = new CSound("Sound/explosion.mp3", false, 0.5f);
 	m_effectSound[static_cast<int>(Sounds::WALK)] = new CSound("Sound/walk.wav", false, 1.0f);
 	m_effectSound[static_cast<int>(Sounds::BAD)] = new CSound("Sound/bad.mp3", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::CLEAR)] = new CSound("Sound/clear.mp3", false, 0.2f);
+	m_effectSound[static_cast<int>(Sounds::CLICK)] = new CSound("Sound/click.mp3", false, 0.2f);
+	m_effectSound[static_cast<int>(Sounds::DARK)] = new CSound("Sound/dark.mp3", false, 0.2f);
+
+
+
 
 
 
@@ -2624,7 +2636,9 @@ void CGameFramework::ProcessPacket(char* p)
 				m_pScene->m_ppEnemies[i]->isAlive = false;
 			}
 		}
-
+		if (curMissionType != MissionType::CS_BAD_ENDING) {
+			m_effectSound[static_cast<int>(Sounds::CLEAR)]->play();
+		}
 		break;
 	}
 	case SC_KILL_NUM:
