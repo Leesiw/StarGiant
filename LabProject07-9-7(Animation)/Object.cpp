@@ -1757,26 +1757,13 @@ void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	else {
 		Rotate(pitch, yaw, 0.f);
 	}
+
+	UpdateTransform(NULL);
 }
 
 
-void CEnemyObject::AI(float fTimeElapsed, XMFLOAT3& pl_look, XMFLOAT3& pl_pos)
+void CEnemyObject::AI(float fTimeElapsed, XMFLOAT3& pl_pos)
 {
-	VelocityUpdate(fTimeElapsed, pl_look);
-	XMFLOAT3 player_pos = pl_pos;
-
-	XMFLOAT3 pos = GetPosition();
-	float dist;
-	dist = Vector3::Length(Vector3::Subtract(pos, player_pos));
-
-	if (dist < 100.f)
-	{
-		XMFLOAT3 ToGo = Vector3::Subtract(pos, player_pos);
-		ToGo = Vector3::ScalarProduct(ToGo, 100.f);
-		ToGo = Vector3::Add(player_pos, ToGo);
-		SetPosition(ToGo);
-	}
-
 	switch (state)
 	{
 	case EnemyState::AIMING:	// 플레이어 방향을 바라보도록 한다
@@ -1794,36 +1781,14 @@ void CEnemyObject::MoveAI(float fTimeElapsed, XMFLOAT3& pl_pos)
 	XMFLOAT3 player_pos = pl_pos;
 	XMFLOAT3 destination = Vector3::Add(m_xmf3Destination, player_pos);
 
-	XMFLOAT3 vec = Vector3::Subtract(destination, xmf3Position);
-	float dist = Vector3::Length(vec);
-
-	if (dist > 50.f)
-	{
-		LookAtPosition(fTimeElapsed, destination);
-
-		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), fTimeElapsed * 200.f);
-		UpdateTransform();
-	}
-	else {
-		state = EnemyState::AIMING;
-	}
+	LookAtPosition(fTimeElapsed, destination);
 }
 
 void CEnemyObject::AimingAI(float fTimeElapsed, XMFLOAT3& pl_pos)
 {
 	XMFLOAT3 player_pos = pl_pos;
 	LookAtPosition(fTimeElapsed, player_pos);	// 플레이어를 보도록 회전
-
-	XMFLOAT3 destination = Vector3::Add(m_xmf3Destination, player_pos);
-	XMFLOAT3 xmf3Position = GetPosition();
-	XMFLOAT3 vec = Vector3::Subtract(destination, xmf3Position);
-	float dist = Vector3::Length(vec);
-
-	if (dist > 30.f)
-	{
-		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, vec, fTimeElapsed * 10.f);
-		UpdateTransform();
-	}
+	UpdateTransform();
 }
 
 

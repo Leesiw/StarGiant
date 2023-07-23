@@ -85,13 +85,13 @@ constexpr char SC_BLACK_HOLE = 29;	// 블랙홀 위치 전송
 constexpr char SC_BLACK_HOLE_TIME = 30;
 
 constexpr char SC_ENEMY_STATE = 31;
-constexpr char SC_MOVE_BOSS = 31;
-constexpr char SC_MOVE_GOD = 32;
+constexpr char SC_MOVE_BOSS = 32;
+constexpr char SC_MOVE_GOD = 33;
 
 // cheat
-constexpr char CS_NEXT_MISSION = 33;
-constexpr char CS_START = 34;
-constexpr char CS_INVINCIBLE_MODE = 35;
+constexpr char CS_NEXT_MISSION = 34;
+constexpr char CS_START = 35;
+constexpr char CS_INVINCIBLE_MODE = 36;
 
 
 
@@ -277,7 +277,12 @@ struct ENEMY_INFO {
 	char id;
 
 	XMFLOAT3 pos;
-	XMFLOAT4 Quaternion;
+	//XMFLOAT4 Quaternion;
+};
+
+struct ENEMY_STATE {
+	char id;
+	EnemyState state;
 };
 
 struct BOSS_INFO {
@@ -470,6 +475,13 @@ struct SC_MOVE_ENEMY_PACKET {
 	char	type;
 
 	ENEMY_INFO data;
+};
+
+struct  SC_ENEMY_STATE_PACKET {
+	unsigned char size;
+	char	type;
+
+	ENEMY_STATE data;
 };
 
 struct SC_MOVE_BOSS_PACKET {

@@ -277,4 +277,15 @@ void SESSION::send_kill_num_packet(char num)
 	do_send(&p);
 }
 
+void SESSION::send_enemy_state_packet(char id, EnemyState state)
+{
+	SC_ENEMY_STATE_PACKET p;
+	p.size = sizeof(SC_ENEMY_STATE_PACKET);
+	p.type = SC_ENEMY_STATE;
+	p.data.id = id;
+	p.data.state = state;
+
+	do_send(&p);
+}
+
 

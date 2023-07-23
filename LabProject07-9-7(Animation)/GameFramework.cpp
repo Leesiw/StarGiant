@@ -1495,9 +1495,15 @@ void CGameFramework::AnimateObjects()
 {
 	RecvServer();
 
-
-
 	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
+
+	for (int i = 0; i < ENEMIES; i++)
+	{
+		if (m_pScene->m_ppEnemies[i] && m_pScene->m_ppEnemies[i]->isAlive)
+		{
+			m_pScene->m_ppEnemies[i]->AI(fTimeElapsed, m_pPlayer[0]->GetPosition());
+		}
+	}
 
 	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
 	if (m_pInsideScene) m_pInsideScene->AnimateObjects(fTimeElapsed);
@@ -2604,10 +2610,17 @@ void CGameFramework::ProcessPacket(char* p)
 		//}
 		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);
 
-		m_pScene->m_ppEnemies[packet->data.id]->ResetRotate();
-		m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
+		//m_pScene->m_ppEnemies[packet->data.id]->ResetRotate();
+		// m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
 
 		m_pScene->m_ppEnemies[packet->data.id]->isUpdate = true;
+		break;
+	}
+	case SC_ENEMY_STATE:
+	{
+		SC_ENEMY_STATE_PACKET* packet = reinterpret_cast<SC_ENEMY_STATE_PACKET*>(p);
+
+		m_pScene->m_ppEnemies[packet->data.id]->state = packet->data.state;
 		break;
 	}
 	case SC_MOVE_BOSS:
