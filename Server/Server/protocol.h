@@ -14,7 +14,7 @@ const unsigned char option6 = 0x40; // hex for 0100 0000
 const unsigned char option7 = 0x80; // hex for 1000 0000
 
 constexpr char BULLETS = 50;
-constexpr char METEOS = 20;
+constexpr char METEOS = 10;
 constexpr char BOSSMETEOS = 5;
 constexpr char MISSILES = 8;
 
@@ -274,7 +274,6 @@ struct ENEMY_INFO {
 
 	XMFLOAT3 pos;
 	XMFLOAT4 Quaternion;
-	XMFLOAT3 velocity;
 };
 
 // animation

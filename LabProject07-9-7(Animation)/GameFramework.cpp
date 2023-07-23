@@ -2479,7 +2479,6 @@ void CGameFramework::ProcessPacket(char* p)
 		m_pScene->m_ppEnemies[packet->data.id]->ResetRotate();
 		m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
 
-		m_pScene->m_ppEnemies[packet->data.id]->m_xmf3Velocity = packet->data.velocity;
 		m_pScene->m_ppEnemies[packet->data.id]->isUpdate = true;
 		break;
 	}

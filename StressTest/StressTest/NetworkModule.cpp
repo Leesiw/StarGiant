@@ -170,7 +170,16 @@ void ProcessPacket(int ci, unsigned char packet[])
 	case SC_ITEM: break;
 	case SC_ANIMATION_CHANGE: break;
 	case SC_HEAL: break;
-	case SC_MISSION_START: break;
+	case SC_MISSION_START: {
+		SC_MISSION_START_PACKET* m_packet = reinterpret_cast<SC_MISSION_START_PACKET*>(packet);
+		if (m_packet->next_mission == MissionType::CS_BAD_ENDING) {
+			CS_NEXT_MISSION_PACKET cutscene_packet;
+
+			cutscene_packet.size = sizeof(cutscene_packet);
+			cutscene_packet.type = CS_CUTSCENE_END;
+			SendPacket(ci, &cutscene_packet);
+		}
+		break; }
 	case SC_KILL_NUM: break;
 	case SC_START: {
 		CS_NEXT_MISSION_PACKET cutscene_packet;

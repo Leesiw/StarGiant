@@ -55,7 +55,7 @@ struct Level {
 
 static std::random_device rdd;
 static std::default_random_engine dree(rdd());
-static std::uniform_real_distribution<float> urdPos(300, 1000);
+static std::uniform_real_distribution<float> urdPos(300, 650);
 static std::uniform_real_distribution<float> urdPos2(100, 200);
 static std::uniform_real_distribution<float> urdPos3(-100, 100);
 static std::uniform_real_distribution<float> urdDir(-100, -30);

@@ -584,6 +584,10 @@ void CScene::MissionClear()
 		cur_mission = levels[cur_mission].NextMission;
 
 		if (levels[cur_mission].cutscene) {
+			for (char i = 0; i < 3; ++i) {
+				if (_plist[i] == -1) { continue; }
+				m_ppPlayers[i]->cutscene_end = false;
+			}
 			TIMER_EVENT ev{ static_cast<char>(levels[cur_mission].NextMission), chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
 			timer_queue.push(ev);
 
@@ -630,8 +634,11 @@ void CScene::SetMission(MissionType mission)
 	if (cur_mission != mission)
 	{
 		cur_mission = mission;
-
-		if (levels[cur_mission].cutscene) {
+		if (levels[mission].cutscene) {
+			for (char i = 0; i < 3; ++i) {
+				if (_plist[i] == -1) { continue; }
+				m_ppPlayers[i]->cutscene_end = false;
+			}
 			TIMER_EVENT ev{ static_cast<char>(levels[mission].NextMission), chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
 			timer_queue.push(ev);
 
@@ -858,7 +865,7 @@ void CScene::UpdateMeteo(char obj_id)
 	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
 	XMFLOAT3 m_pos = m_ppMeteoObjects[obj_id]->GetPosition();
 	float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
-	if (dist > 1500.0f) {
+	if (dist > 1200.0f) {
 		SpawnMeteo(obj_id);
 	}
 	BoundingOrientedBox meteor_bbox = m_ppMeteoObjects[obj_id]->UpdateBoundingBox();
@@ -1268,10 +1275,6 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 	}
 
 	if (cutscene_end == true) {
-		for (char i = 0; i < 3; ++i) {
-			if (_plist[i] == -1) { continue; }
-			m_ppPlayers[i]->cutscene_end = false;
-		}
 
 		if (cur_mission == MissionType::CS_BAD_ENDING ) {
 			m_pSpaceship->SetPosition(levels[prev_mission].RestartPosition);
@@ -1493,7 +1496,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				info.id = m_ppEnemies[i]->GetID();
 				info.Quaternion = m_ppEnemies[i]->GetQuaternion();
 				info.pos = m_ppEnemies[i]->GetPosition();
-				info.velocity = m_ppEnemies[i]->GetVelocity();
 
 				for (short pl_id : _plist) {
 					if (pl_id == -1) continue;
