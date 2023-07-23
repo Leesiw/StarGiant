@@ -331,28 +331,24 @@ void Boss::ChangeAnimation(BossAnimation CurMotion)
 
 		if (CurMotion == BossAnimation::SCREAM && onceScream) {
 			soundon = static_cast<int>(Sounds::ROAR);
-			onceScream = false;
-			cout << "½ºÅ©¸² \n";
 		}
 
 		else if (CurMotion == BossAnimation::BASIC_ATTACT) {
 			soundon = static_cast<int>(Sounds::BASIC_ATTACT);
-			cout << "BASIC_ATTACT \n";
+
 
 		}
 		else if (CurMotion == BossAnimation::CLAW_ATTACT) {
 			soundon = static_cast<int>(Sounds::CLAW);
-			cout << "CLAW_ATTACT \n";
+
 
 		}
 		else if (CurMotion == BossAnimation::FLAME_ATTACK) {
 			soundon = static_cast<int>(Sounds::ROAR);
-			cout << "FLAME_ATTACK \n";
+
 
 		}
 		else {
-			cout << "IDLE \n";
-
 			soundon = -1;
 		}
 

@@ -1341,6 +1341,8 @@ void CGameFramework::BuildSounds()
 	m_effectSound[static_cast<int>(Sounds::GROWL)] = new CSound("Sound/roaring.mp3", false, 1.0f);
 	m_effectSound[static_cast<int>(Sounds::CLAW)] = new CSound("Sound/claw.mp3", false, 1.0f);
 	m_effectSound[static_cast<int>(Sounds::BASIC_ATTACT)] = new CSound("Sound/claw.mp3", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::GOD1)] = new CSound("Sound/god1.mp3", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::GOD2)] = new CSound("Sound/god2.mp3", false, 1.0f);
 
 }
 
@@ -1368,15 +1370,27 @@ void CGameFramework::UpdateSounds()
 
 	if (m_pScene->m_ppBoss->soundon != -1)
 	{
-		cout << "play";
 		if (m_pScene->m_ppBoss->soundo0nPAST != m_pScene->m_ppBoss->soundon)
 			m_effectSound[m_pScene->m_ppBoss->soundon]->play();
 		m_effectSound[m_pScene->m_ppBoss->soundon]->Update();
 		m_pScene->m_ppBoss->soundo0nPAST = m_pScene->m_ppBoss->soundon;
 	}
+
 	m_pScene->m_ppBoss->soundo0nPAST = m_pScene->m_ppBoss->soundon;
+
+	if (m_pScene->m_ppGod->soundon != -1)
+	{
+		if (m_pScene->m_ppGod->soundo0nPAST != m_pScene->m_ppGod->soundon)
+			m_effectSound[m_pScene->m_ppGod->soundon]->play();
+		m_effectSound[m_pScene->m_ppGod->soundon]->Update();
+		m_pScene->m_ppGod->soundo0nPAST = m_pScene->m_ppGod->soundon;
+	}
+
+	m_pScene->m_ppGod->soundo0nPAST = m_pScene->m_ppGod->soundon;
+
+
 	for (int i = 0; i < static_cast<int>(Sounds::COUNT); ++i)
-		if (m_effectSound[i] || i != static_cast<int>(Sounds::WALK) || (i >= static_cast<int>(Sounds::ROAR) && i <= static_cast<int>(Sounds::CLAW)))
+		if (m_effectSound[i] || i != static_cast<int>(Sounds::WALK) || (i >= static_cast<int>(Sounds::ROAR) && i <= static_cast<int>(Sounds::GOD2)))
 			m_effectSound[i]->Update();
 
 

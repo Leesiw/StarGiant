@@ -2,6 +2,7 @@
 
 #include "Object.h"
 #include "Camera.h"
+#include "Sound.h"
 
 class God : public CGameObject
 {
@@ -29,4 +30,8 @@ public:
 	int GetcurHp() { return GodHP; }
 
 	void ChangeAnimation(GodAnimation CurState);
+
+
+	char soundon = -1;
+	char soundo0nPAST = -1;
 };

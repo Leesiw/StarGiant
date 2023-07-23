@@ -28,6 +28,23 @@ void God::GodObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCom
 
 void God::ChangeAnimation(GodAnimation CurMotion)
 {
+	if (CurMotion == GodAnimation::MELEE1) {
+		soundon = static_cast<int>(Sounds::GOD1);
+
+	}
+	else if (CurMotion == GodAnimation::MELEE2) {
+		soundon = static_cast<int>(Sounds::GOD1);
+
+
+	}
+	else if (CurMotion == GodAnimation::SHOT) {
+		soundon = static_cast<int>(Sounds::GOD2);
+
+	}
+	else {
+		soundon = -1;
+	}
+
 	if (CurMotion != PastMotion) {
 		m_pSkinnedAnimationController->SetTrackEnable(static_cast<int>(PastMotion), false);
 		m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(CurMotion), 0.0f);
