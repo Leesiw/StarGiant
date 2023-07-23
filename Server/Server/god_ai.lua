@@ -17,6 +17,9 @@ MELEE1_COOL_TIME = 4
 
 ATTACK_COOL_TIME = 4
 
+MOVE_COOL_TIME = 4
+
+
 
 -- 보스의 초기 상태
 state = GodState.IDLE2
@@ -38,6 +41,8 @@ attackState = false
 attackCooldown = ATTACK_COOL_TIME
 shotCooldown = SHOT_COOL_TIME
 melee1Cooldown = MELEE1_COOL_TIME
+moveCooldown = MOVE_COOL_TIME
+
 
 
 
@@ -78,10 +83,24 @@ function idle(frameTime)
    -- print(frameTime)
    if not attackState and frameTime >= attackCooldown then
         local randomIndex = math.random(2)
+        local randomIndexs = math.random(201) - 101
+        local randomc1 = math.random(5)
+        local randomc2 = math.random(5)
+        local randomc3 = math.random(5)
+
+
+
         local attackType = randomIndex * 2  --2,4 중 랜덤
 
         if curHp <= (MaxHp / 2) then
             SHOT_COOL_TIME = 4
+            if frameTime >= moveCooldown then
+                god_x = god_x + randomIndexs * randomc1
+                god_y = god_y + randomIndexs * randomc2
+                god_z = god_z + randomIndexs * randomc3
+                print("move")
+            end
+
         else
             SHOT_COOL_TIME = 8
         end
