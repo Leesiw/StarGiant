@@ -111,7 +111,6 @@ void SceneManager::ResetScene(short num)
 	if (m_pScenes[num]->_state == SCENE_INGAME) {
 		m_pScenes[num]->_state = SCENE_RESET;
 		m_pScenes[num]->_s_lock.unlock();
-		m_pScenes[num]->_plist_lock.unlock();
 		m_pScenes[num]->Reset();
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 60s, EV_RESET_SCENE, num };
 		timer_queue.push(ev);

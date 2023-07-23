@@ -177,7 +177,6 @@ void CScene::Reset()
 	items[ItemType::JEWEL_HEAL] = 0;
 	items[ItemType::JEWEL_HP] = 0;
 
-	_plist_lock.lock();
 	for (auto& pl : _plist) {
 		if (pl == -1) { continue; }
 		clients[pl]._s_lock.lock();
@@ -187,7 +186,6 @@ void CScene::Reset()
 		clients[pl]._s_lock.unlock();
 		pl = -1;
 	}
-	_plist_lock.unlock();
 
 	cur_mission = MissionType::CS_TURN;
 	for (char i = 0; i < 3; ++i) {

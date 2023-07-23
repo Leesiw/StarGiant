@@ -495,7 +495,6 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			scene_manager._scene_lock.lock();
 			short scene_num = scene_manager.FindScene(c_id);
 			scene_manager._scene_lock.unlock();
-
 			if(scene_num == -1) {
 				disconnect(c_id);	return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
 			}
@@ -924,9 +923,8 @@ void CGameFramework::disconnect(int c_id)
 		if (std::all_of(scene->_plist.begin(), scene->_plist.end(), [](short i) {return i == -1; })) {
 			scene_manager.ResetScene(clients[c_id].room_id);
 		}
-		else {
-			scene->_plist_lock.unlock();
-		}
+		scene->_plist_lock.unlock();
+		
 	}
 
 	clients[c_id]._state = ST_FREE;
