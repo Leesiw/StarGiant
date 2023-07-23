@@ -858,7 +858,7 @@ void CScene::UpdateMeteo(char obj_id)
 	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
 	XMFLOAT3 m_pos = m_ppMeteoObjects[obj_id]->GetPosition();
 	float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
-	if (dist > 1500.0f) {
+	if (dist > 1200.0f) {
 		SpawnMeteo(obj_id);
 	}
 	BoundingOrientedBox meteor_bbox = m_ppMeteoObjects[obj_id]->UpdateBoundingBox();
