@@ -113,6 +113,9 @@ private:
 	CScene						*m_pScene = NULL;
 	CAirplanePlayer						*m_pPlayer[3] = {};
 	CCamera						*m_pCamera = NULL;
+	bool iscut =false;
+	bool isending = false;
+
 	DWORD m_pBeforeCamera = NULL;
 
 

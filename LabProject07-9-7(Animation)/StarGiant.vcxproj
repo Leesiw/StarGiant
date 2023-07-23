@@ -164,6 +164,7 @@
     <ClInclude Include="Frustrum.h" />
     <ClInclude Include="GameFramework.h" />
     <ClInclude Include="God.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="StarGiant.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Object.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="Frustrum.cpp" />
     <ClCompile Include="GameFramework.cpp" />
     <ClCompile Include="God.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="StarGiant.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Object.cpp" />
