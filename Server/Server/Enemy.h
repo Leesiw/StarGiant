@@ -66,6 +66,8 @@ public:
 
 	virtual void VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player);
 
+	void SetIsMoveFalse();
+
 	void Rotate(float x, float y, float z);
 	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
 

@@ -1225,7 +1225,7 @@ void CScene::SendSceneInfo()
 	send_num += s_packet.size;
 	
 	for (char i = 0; i < ENEMIES; ++i) {
-		if (!m_ppEnemies[i]->GetisAlive()) { continue; } //|| !m_ppEnemies[i]->GetisMove()) { continue; }
+		if (!m_ppEnemies[i]->GetisAlive() || !m_ppEnemies[i]->GetisMove()) { continue; }
 		SC_MOVE_ENEMY_PACKET e_packet{};
 		e_packet.size = sizeof(e_packet);
 		e_packet.type = SC_MOVE_ENEMY;
@@ -1234,6 +1234,7 @@ void CScene::SendSceneInfo()
 		//e_packet.data.Quaternion = m_ppEnemies[i]->GetQuaternion();
 		memcpy(&send_buf[send_num], &e_packet, e_packet.size);
 		send_num += e_packet.size;
+		m_ppEnemies[i]->SetIsMoveFalse();
 	}
 
 	for (char i = 0; i < MISSILES; ++i) {
