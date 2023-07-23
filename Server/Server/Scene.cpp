@@ -1328,7 +1328,7 @@ void CScene::SpawnEnemy(char id)
 
 	m_ppEnemies[id]->SetStatus(cur_mission);
 	m_ppEnemies[id]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
-	m_ppEnemies[id]->state = EnemyState::IDLE;
+	m_ppEnemies[id]->state = EnemyState::MOVE;
 	m_ppEnemies[id]->SetDestination();
 	m_ppEnemies[id]->SetisAlive(true);
 
@@ -1338,7 +1338,7 @@ void CScene::SpawnEnemy(char id)
 	e_info.pos = m_ppEnemies[id]->GetPosition();
 	e_info.destination = m_ppEnemies[id]->GetDestination();
 	e_info.max_hp = m_ppEnemies[id]->GetHP();
-	e_info.state = EnemyState::IDLE;
+	e_info.state = EnemyState::MOVE;
 
 	for (short pl_id : _plist) {
 		if (pl_id == -1) continue;

@@ -1779,16 +1779,6 @@ void CEnemyObject::AI(float fTimeElapsed, XMFLOAT3& pl_look, XMFLOAT3& pl_pos)
 
 	switch (state)
 	{
-	case EnemyState::IDLE:
-		if (dist > m_fAttackRange)	// 사거리 충족 안되면 이동
-		{
-			state = EnemyState::MOVE;
-		}
-		else
-		{
-			state = EnemyState::AIMING;
-		}
-		break;
 	case EnemyState::AIMING:	// 플레이어 방향을 바라보도록 한다
 		AimingAI(fTimeElapsed, pl_pos);
 		break;

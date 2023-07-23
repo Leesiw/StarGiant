@@ -101,7 +101,7 @@ enum class PlayerType : char
 
 enum class EnemyState : char
 {
-	IDLE, MOVE, AIMING
+	MOVE, AIMING
 };
 
 enum class BossState : char

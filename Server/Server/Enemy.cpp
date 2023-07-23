@@ -12,7 +12,7 @@ CEnemy::CEnemy()
 	enemy_flags &= ~option2;
 
 	hp = 10;
-	state = EnemyState::IDLE;
+	state = EnemyState::MOVE;
 }
 
 CEnemy::~CEnemy()
@@ -43,16 +43,6 @@ void CEnemy::AI(float fTimeElapsed, CAirplanePlayer* player)
 	
 	switch (state)
 	{
-	case EnemyState::IDLE:
-		if (dist > m_fAttackRange)	// 사거리 충족 안되면 이동
-		{
-			state = EnemyState::MOVE;
-		}
-		else
-		{
-			state = EnemyState::AIMING;
-		}
-		break;
 	case EnemyState::AIMING:	// 플레이어 방향을 바라보도록 한다
 		AimingAI(fTimeElapsed, player);
 		break;
