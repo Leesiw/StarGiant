@@ -44,7 +44,8 @@ public:
 	void GetJewels();
 
 	void SpawnEnemy();
-	void UpdateEnemy(char obj_id);
+	void MoveEnemy(char obj_id);
+	void AimingEnemy(char obj_id);
 	void UpdateMeteo(char obj_id);
 	void SpawnMissile(char obj_id);
 	void UpdateMissile(char obj_id);

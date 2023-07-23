@@ -84,6 +84,7 @@ constexpr char SC_CUTSCENE_END_NUM = 28;
 constexpr char SC_BLACK_HOLE = 29;	// 블랙홀 위치 전송
 constexpr char SC_BLACK_HOLE_TIME = 30;
 
+constexpr char SC_ENEMY_STATE = 31;
 constexpr char SC_MOVE_BOSS = 31;
 constexpr char SC_MOVE_GOD = 32;
 

@@ -29,7 +29,7 @@ protected:
 	char						m_fAvoidReductionRate = 20;
 
 	unsigned char enemy_flags = 0;	// 0 : 살아있는지 1 : 플레이어를 보고 있는지
-	// 2 : 공격 타이머가 켜져 있는지
+	// 2 : 공격 타이머가 켜져 있는지	// 3 : 움직였는지
 public:
 	short scene_num;
 
@@ -43,6 +43,8 @@ public:
 	bool GetisAlive() { return enemy_flags & option0; }
 	void SetisAlive(bool i_a);
 	void SetAttackTimerFalse();
+
+	bool GetisMove() { return enemy_flags & option3; }
 
 	void SetAttackTimerTrue();
 
