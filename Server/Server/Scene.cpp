@@ -699,28 +699,28 @@ void CScene::GetJewels()
 
 	short num = urdEnemyAI(dree);
 	ItemType item_type;
-	if (num < 15) {
+	if (num < 10) {
 		item_type = ItemType::JEWEL_ATT;
 		if (items[item_type] < MAX_ITEM) {
 			m_pSpaceship->damage = 4 + items[item_type];
 		}
 		else { return; }
 	}
-	else if (num < 30) {
+	else if (num < 20) {
 		item_type = ItemType::JEWEL_DEF;
 		if (items[item_type] < MAX_ITEM) {
 			m_pSpaceship->def = 1 + items[item_type];
 		}
 		else { return; }
 	}
-	else if (num < 45) {
+	else if (num < 30) {
 		item_type = ItemType::JEWEL_HEAL;
 		if (items[item_type] < MAX_ITEM) {
 			m_pSpaceship->heal = 11 + items[item_type];
 		}
 		else { return; }
 	}
-	else if (num < 60) {
+	else if (num < 40) {
 		item_type = ItemType::JEWEL_HP;
 		if (items[item_type] < MAX_ITEM) {
 			m_pSpaceship->max_hp = 110 + 10 * items[item_type];
@@ -1278,6 +1278,19 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 
 		if (cur_mission == MissionType::CS_BAD_ENDING ) {
 			m_pSpaceship->SetPosition(levels[prev_mission].RestartPosition);
+			for (char i = (char)ItemType::JEWEL_ATT; i < (char)ItemType::JEWEL_HP; ++i) {
+				if (items[(ItemType)i] > 0) { 
+					--items[(ItemType)i];
+					ITEM_INFO i_info{};
+					i_info.num = items[(ItemType)i];
+					i_info.type = (ItemType)i;
+					for (short pl_id : _plist) {
+						if (pl_id == -1) continue;
+						if (clients[pl_id]._state != ST_INGAME) continue;
+						clients[pl_id].send_item_packet(i_info);
+					}
+				}
+			}
 			m_pSpaceship->hp = m_pSpaceship->max_hp;
 			kill_monster_num = 0;
 			for (short pl_id : _plist) {
