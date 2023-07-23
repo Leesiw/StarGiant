@@ -58,12 +58,11 @@ God::~God()
 
 void God::SendPosition()
 {
-	SC_MOVE_ENEMY_PACKET p;
+	SC_MOVE_BOSS_PACKET p;
 
-	p.size = sizeof(SC_MOVE_ENEMY_PACKET);
-	p.type = SC_MOVE_ENEMY;
+	p.size = sizeof(SC_MOVE_BOSS_PACKET);
+	p.type = SC_MOVE_GOD;
 
-	p.data.id = GOD_ID;
 	p.data.Quaternion = GetQuaternion();
 	p.data.pos = GetPosition();
 

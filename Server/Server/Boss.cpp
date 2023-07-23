@@ -123,12 +123,11 @@ Boss::~Boss() {
 
 void Boss::SendPosition()	// 위치/각도 변화할 때 사용. 
 {
-	SC_MOVE_ENEMY_PACKET p;
+	SC_MOVE_BOSS_PACKET p;
 
-	p.size = sizeof(SC_MOVE_ENEMY_PACKET);
-	p.type = SC_MOVE_ENEMY;
+	p.size = sizeof(SC_MOVE_BOSS_PACKET);
+	p.type = SC_MOVE_BOSS;
 
-	p.data.id = BOSS_ID;
 	p.data.Quaternion = GetQuaternion();
 	p.data.pos = GetPosition();
 

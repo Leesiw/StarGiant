@@ -84,10 +84,13 @@ constexpr char SC_CUTSCENE_END_NUM = 28;
 constexpr char SC_BLACK_HOLE = 29;	// 블랙홀 위치 전송
 constexpr char SC_BLACK_HOLE_TIME = 30;
 
+constexpr char SC_MOVE_BOSS = 31;
+constexpr char SC_MOVE_GOD = 32;
+
 // cheat
-constexpr char CS_NEXT_MISSION = 31;
-constexpr char CS_START = 32;
-constexpr char CS_INVINCIBLE_MODE = 33;
+constexpr char CS_NEXT_MISSION = 33;
+constexpr char CS_START = 34;
+constexpr char CS_INVINCIBLE_MODE = 35;
 
 
 
@@ -272,6 +275,11 @@ struct SPAWN_ENEMY_INFO {
 struct ENEMY_INFO {
 	char id;
 
+	XMFLOAT3 pos;
+	XMFLOAT4 Quaternion;
+};
+
+struct BOSS_INFO {
 	XMFLOAT3 pos;
 	XMFLOAT4 Quaternion;
 };
@@ -462,6 +470,14 @@ struct SC_MOVE_ENEMY_PACKET {
 
 	ENEMY_INFO data;
 };
+
+struct SC_MOVE_BOSS_PACKET {
+	unsigned char size;
+	char	type;
+
+	BOSS_INFO data;
+};
+
 
 // animation
 struct SC_ANIMATION_CHANGE_PACKET {

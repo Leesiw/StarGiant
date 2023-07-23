@@ -2492,17 +2492,6 @@ void CGameFramework::ProcessPacket(char* p)
 	{
 		SC_MOVE_ENEMY_PACKET* packet = reinterpret_cast<SC_MOVE_ENEMY_PACKET*>(p);
 
-		if (packet->data.id == BOSS_ID) {
-			m_pScene->m_ppBoss->SetQuaternion(packet->data.Quaternion);
-			m_pScene->m_ppBoss->SetPosition(packet->data.pos);
-			break;
-		}
-		if (packet->data.id == GOD_ID) {
-			m_pScene->m_ppGod->SetQuaternion(packet->data.Quaternion);
-			m_pScene->m_ppGod->SetPosition(packet->data.pos);
-			break;
-		}
-
 		//if (!m_pScene->m_ppEnemies[packet->data.id]->isAlive) {
 			//m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
 		//}
@@ -2512,6 +2501,22 @@ void CGameFramework::ProcessPacket(char* p)
 		m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
 
 		m_pScene->m_ppEnemies[packet->data.id]->isUpdate = true;
+		break;
+	}
+	case SC_MOVE_BOSS:
+	{
+		SC_MOVE_BOSS_PACKET* packet = reinterpret_cast<SC_MOVE_BOSS_PACKET*>(p);
+
+		m_pScene->m_ppBoss->SetQuaternion(packet->data.Quaternion);
+		m_pScene->m_ppBoss->SetPosition(packet->data.pos);
+		break;
+	}
+	case SC_MOVE_GOD:
+	{
+		SC_MOVE_BOSS_PACKET* packet = reinterpret_cast<SC_MOVE_BOSS_PACKET*>(p);
+
+		m_pScene->m_ppGod->SetQuaternion(packet->data.Quaternion);
+		m_pScene->m_ppGod->SetPosition(packet->data.pos);
 		break;
 	}
 	case SC_BULLET:

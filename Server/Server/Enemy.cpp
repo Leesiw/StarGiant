@@ -320,7 +320,7 @@ void CEnemy::SendPos()
 	if (enemy_flags & option0) {
 		ENEMY_INFO info{};
 		info.id = id;
-		info.Quaternion = GetQuaternion();
+		//info.Quaternion = GetQuaternion();
 		info.pos = GetPosition();
 
 		for (auto& pl : clients)

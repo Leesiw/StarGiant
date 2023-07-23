@@ -1275,7 +1275,6 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 	}
 
 	if (cutscene_end == true) {
-
 		if (cur_mission == MissionType::CS_BAD_ENDING ) {
 			m_pSpaceship->SetPosition(levels[prev_mission].RestartPosition);
 			for (char i = (char)ItemType::JEWEL_ATT; i < (char)ItemType::JEWEL_HP; ++i) {
@@ -1507,7 +1506,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			if (m_ppEnemies[i]->GetisAlive()) {
 				ENEMY_INFO info{};
 				info.id = m_ppEnemies[i]->GetID();
-				info.Quaternion = m_ppEnemies[i]->GetQuaternion();
+		//		info.Quaternion = m_ppEnemies[i]->GetQuaternion();
 				info.pos = m_ppEnemies[i]->GetPosition();
 
 				for (short pl_id : _plist) {
