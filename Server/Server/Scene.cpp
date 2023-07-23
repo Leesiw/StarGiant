@@ -1297,7 +1297,7 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 		return;
 	}
 
-	TIMER_EVENT ev{ static_cast<char>(next_mission), chrono::system_clock::now() + 1s, EV_CHECK_CUTSCENE_END, static_cast<short>(num)};
+	TIMER_EVENT ev{ static_cast<char>(next_mission), chrono::system_clock::now() + 500ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num)};
 	timer_queue.push(ev);
 }
 
