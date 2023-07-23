@@ -1744,8 +1744,13 @@ void CGameFramework::UpdateUI()
 		scriptsOn = false;
 	}
 
+
+
+
 	uiScripts = ChangeScripts(curMissionType);
-	uiBossScripts = ChangeBossScripts(curMissionType);
+	if(curMissionType<MissionType::CS_SHOW_GOD)
+	uiBossScripts = ChangeBossScripts(curMissionType, m_pScene->m_ppBoss->GetcurHp());
+	else{ uiBossScripts = ChangeBossScripts(curMissionType, m_pScene->m_ppGod->GetcurHp()); }
 
 
 	if (duration_cast<seconds>(steady_clock::now() - scriptsStartTime).count() >= 5)
@@ -1753,7 +1758,14 @@ void CGameFramework::UpdateUI()
 		uiScripts = L" ";
 	}
 
-	
+	if (bossScriptsOn) {
+		bossScriptsTime += m_GameTimer.GetTimeElapsed();
+
+	}
+	if (bossScriptsTime>=3) {
+		uiBossScripts = L" ";
+		bossScriptsOn = false;
+	}
 
 	wstring JEWEL_ATT;
 	JEWEL_ATT = to_wstring(items[ItemType::JEWEL_ATT]);
@@ -1989,7 +2001,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	}
 	
 	default:
-		uiText = L"미션 검색중";
+		uiText = L" ";
 		break;
 	};
 
@@ -2207,7 +2219,7 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	}
 
 	default:
-		uiScripts = L"파이팅! 파이팅!";
+		uiScripts = L" ";
 		break;
 	};
 
@@ -2215,18 +2227,113 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	return uiScripts;
 }
 
-wstring CGameFramework::ChangeBossScripts(MissionType mType)
+wstring CGameFramework::ChangeBossScripts(MissionType mType, short hp)
 {
 	wstring uiScripts = L" ";
+
 	switch (mType) {
-	case MissionType::CS_TURN:
+	case MissionType::CS_BOSS_SCREAM:
+	{	
+		uiScripts = L"스타 자이언트는 내 것이다...";
+		if (firstbSc == 0) {
+			firstbSc = 1;
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+
+		}
+		break;
+	}
+	case MissionType::DEFEAT_BOSS:
 	{
-		uiScripts = L"어서와!";
-		if (firstSc == -2) {
-			firstSc = -1;
-			scriptsOn = true;
+		uiScripts = L"너가 이길 수 있을까?";
+		if (firstbSc == 1) {
+			firstbSc = 2;
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+
+		}
+		if (hp < 50) {
+			uiScripts = L"봐주지 않겠다...";
+			if (firstbSc == 2) {
+				firstbSc = 3;
+				bossScriptsOn = true;
+				bossScriptsTime = 0;
+
+			}
 		}
 
+		if (hp < 20) {
+			uiScripts = L"안 돼...";
+			if (firstbSc == 3) {
+				firstbSc = 4;
+				bossScriptsOn = true;
+				bossScriptsTime = 0;
+			}
+		}
+
+		break;
+	}
+	case MissionType::CS_SHOW_STARGIANT:
+	{
+		uiScripts = L"내 보물......";
+		if (firstbSc == 4 || firstbSc == 2 || firstbSc == 3) {
+			firstbSc = 5;
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+		}
+		break;
+	}
+	case MissionType::CS_SHOW_GOD:
+	{
+		uiScripts = L"스타 자이언트를 내놓아라...";
+		if (firstbSc == 5) {
+			firstbSc = 6;
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+
+		}
+		break;
+	}
+	case MissionType::KILL_GOD:
+	{
+		uiScripts = L"감히...";
+		if (firstbSc ==6) {
+			firstbSc = 7;
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+
+		}
+
+		if (hp < 50) {
+			uiScripts = L"봐주지 않겠다...";
+			if (firstbSc == 7) {
+				firstbSc = 8;
+				bossScriptsOn = true;
+				bossScriptsTime = 0;
+
+			}
+		}
+
+		if (hp < 20) {
+			uiScripts = L"안 돼...";
+			if (firstbSc == 8) {
+				firstbSc = 9;
+				bossScriptsOn = true;
+				bossScriptsTime = 0;
+			}
+		}
+
+		break;
+	}
+	case MissionType::CS_ENDING:
+	{
+		uiScripts = L"......";
+		if (firstbSc == 9 || firstbSc == 8 || firstbSc == 7) {
+			firstbSc = 0;
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+
+		}
 		break;
 	}
 	default:
