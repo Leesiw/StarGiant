@@ -9,6 +9,18 @@ enum class Sounds : char
     ,COUNT
 };
 
+enum class DragonSounds : char
+{
+    ROAR, FIRE, GROWL
+    , COUNT
+};
+
+enum class PlayerSounds : char
+{
+    WALK
+    , COUNT
+};
+
 class CSound {
 private:
     static FMOD_SYSTEM* SoundSystem;
@@ -28,6 +40,7 @@ public:
     static int Release();
     int play();
     int pause();
+    int resume();
     int stop();
     int Update();
 };

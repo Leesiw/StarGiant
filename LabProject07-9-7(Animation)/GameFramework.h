@@ -137,7 +137,8 @@ private:
 	CSound* m_effectSound[static_cast<int>(Sounds::COUNT)] = {};
 
 
-
+	int a = 0;
+	int b = 0;
 
 	//
 	wstring roomNum;

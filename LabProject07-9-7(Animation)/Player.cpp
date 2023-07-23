@@ -850,6 +850,8 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	m_pSkinnedAnimationController->SetCallbackKeys(1, 2);
 
 
+	p_effectSound[0] = new CSound("Sound/walk.mp3", false, 1.0f);
+
 
 #ifdef _WITH_SOUND_RESOURCE
 	m_pSkinnedAnimationController->SetCallbackKey(0, 0.1f, _T("Footstep01"));
@@ -1033,6 +1035,7 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 
 			}
 			else if(motion == AnimationState::IDLE) {
+				p_effectSound[0]->pause();
 				m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				m_pSkinnedAnimationController->SetTrackEnable(1, false);
 				m_pSkinnedAnimationController->SetTrackEnable(2, false);
@@ -1043,6 +1046,9 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 
 			}
 			else {
+				p_effectSound[0]->resume();
+				p_effectSound[0]->play();
+			
 				m_pSkinnedAnimationController->SetTrackEnable(0, false);
 				m_pSkinnedAnimationController->SetTrackEnable(1, true);
 				m_pSkinnedAnimationController->SetTrackEnable(2, false);

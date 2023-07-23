@@ -46,6 +46,8 @@ CGameFramework::CGameFramework()
 	_state = SCENE_LOBBY;
 	//_state = SCENE_INGAME;
 
+	a = 0;
+	b = 0;
 	
 	scriptsStartTime = steady_clock::now();
 	_tcscpy_s(m_pszFrameRate, _T("StarGiant ("));
@@ -825,8 +827,7 @@ void CGameFramework::CameraUpdateChange()
 {
 
 
-	static int a = 0;
-	static int b = 0;
+
 	if (a==0 &&m_pPlayer[0]->getHp() < 90 && m_pCamera->m_bCameraShaking ==false) { 
 		m_pCamera->maxShakingTime = 1.f;
 		m_pCamera->m_bCameraShaking = true;
@@ -868,7 +869,7 @@ void CGameFramework::CameraUpdateChange()
 	}
 
 	//CS_TURN은 어차피 플레이어 전부 내부에서 시작함
-	if (curMissionType == MissionType::CS_TURN && b_Inside && m_pInsidePlayer[g_myid] && !iscut) {
+	if (curMissionType == MissionType::CS_TURN && !iscut) {
 		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 		cout << "CS_TURN\n";
 		if (!isending) m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
@@ -876,6 +877,8 @@ void CGameFramework::CameraUpdateChange()
 		m_pInsideCamera->SetDist(-25.0f);
 		m_pInsideCamera->canTurn = true;
 		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		m_pInsideCamera->endc = false;
+
 		iscut = true;
 		isending = false;
 
@@ -892,6 +895,7 @@ void CGameFramework::CameraUpdateChange()
 		m_pCamera->canDolly = true; //줌
 		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+
 		iscut = true;
 		isending = false;
 
@@ -1093,33 +1097,47 @@ void CGameFramework::CameraUpdateChange()
 		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 		iscut = true;
 		isending = false;
-
-
 	}
 	
 
 
 	//컷씬 끝나면 서버로 보내기
 	if (m_pInsideCamera->getcanchange() == false || m_pCamera->getcanchange() == false) {
-		cout << "보내기";
+		//cout << "보내기";
 		CS_CUTSCENE_END_PACKET my_packet;
 		my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
 		my_packet.type = CS_CUTSCENE_END;
 		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 
-		if(curMissionType == MissionType::CS_ENDING) 
+		if (curMissionType == MissionType::CS_ENDING) {
+			b_Inside = true;
 			_state = SCENE_LOBBY;
+
+			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
+			m_pCamera = m_pPlayer[0]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
+			m_pCamera->fAnglenu = 0;
+			m_pCamera->canchange = true;
+			m_pInsideCamera->canchange = true;
+			m_pCamera->canTurn = false;
+			m_pCamera->canDolly = false;
+			iscut = false;
+
+
+			//m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
+		}
 	}
 
 	//미션 넘어가면 카메라 변경해주기
 	if (curMissionType == MissionType::TU_SIT  && m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA)
 	{
+		cout<<"change sit\n";
 		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
-		m_pInsideCamera->canchange = true;
 		m_pCamera->fAnglenu = 0;
+		m_pInsideCamera->canchange = true;
+		m_pCamera->canchange = true;
+		m_pCamera->canTurn = false;
+		m_pCamera->canDolly = false;
 		iscut = false;
-
-		m_effectSound[static_cast<int>(Sounds::DARK)]->stop();
 
 	}
 
@@ -1150,6 +1168,8 @@ void CGameFramework::CameraUpdateChange()
 			iscut = false;
 
 		}
+		m_effectSound[static_cast<int>(Sounds::DARK)]->stop();
+
 	}
 
 	if (curMissionType != MissionType::CS_BAD_ENDING && pastMissionType== MissionType::CS_BAD_ENDING)
@@ -2027,7 +2047,8 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	}
 	case MissionType::GET_JEWELS:
 	{
-		uiScripts = L"기본 조작은 설명해 줬으니 이제 본격적으로 들어가야겠지?\n드래곤을 물리치기 위해선우리 우주선을 강화해야 해.\n특별한 에너지를 가진 보석을 모아서 능력치를 올려보자!";
+		//\n드래곤을 물리치기 위해선우리 우주선을 강화해야 해
+		uiScripts = L"기본 조작은 설명해 줬으니 이제 본격적으로 들어가야겠지?\n특별한 에너지를 가진 보석을 모아서 능력치를 올려보자!";
 		if (firstSc == 2) {
 			firstSc = 3;
 			scriptsOn = true;

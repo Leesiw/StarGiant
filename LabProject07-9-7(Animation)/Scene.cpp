@@ -1512,7 +1512,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	for (int i = 0; i < BOSSMETEOS; i++)
 	{
-		if (m_ppBossMeteorObjects[i])
+		if (m_ppBossMeteorObjects[i]&& m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT)
 		{
 			m_ppBossMeteorObjects[i]->Animate(m_fElapsedTime);
 			if (!m_ppBossMeteorObjects[i]->m_pSkinnedAnimationController) m_ppBossMeteorObjects[i]->UpdateTransform(NULL);
@@ -1627,7 +1627,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 
 	if (landob) {
-		if (m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT)
+		if (m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT)
 			landob->Render(pd3dCommandList, pCamera);
 		if (m_ppBoss) {
 			landob->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y - 827.0f, m_ppBoss->GetPosition().z);

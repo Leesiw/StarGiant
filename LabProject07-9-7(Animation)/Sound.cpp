@@ -44,7 +44,11 @@ int CSound::play()
 
 int CSound::pause() {
     FMOD_Channel_SetPaused(m_channel, true);
+    return 0;
+}
 
+int CSound::resume() {
+    FMOD_Channel_SetPaused(m_channel, false);
     return 0;
 }
 
