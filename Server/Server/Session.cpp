@@ -30,7 +30,6 @@ void SESSION::send_spaceship_packet(CAirplanePlayer* m_pPlayer)	// 플레이어 좌표
 	p.type = SC_MOVE_SPACESHIP;
 	p.data.pos = m_pPlayer->GetPosition();
 	p.data.Quaternion = m_pPlayer->input_info.Quaternion;
-	p.move_time = m_pPlayer->move_time;
 
 	//p.data.velocity = m_pPlayer->GetVelocity();
 	//p.data.shift = m_pPlayer->GetShift();
