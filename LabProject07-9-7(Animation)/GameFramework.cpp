@@ -718,7 +718,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 				}
 
 				// 나중에 수정해야됨
-				if (mouseX >= screenAreaLeft && mouseX <= screenAreaRight && mouseY >= screenAreaTop && mouseY <= screenAreaBottom && !roomNum.empty()) {
+				if (mouseX >= screenAreaLeft && mouseX <= screenAreaRight && mouseY >= screenAreaTop && mouseY <= screenAreaBottom && matcnt > 0) {
 					CS_NEXT_MISSION_PACKET packet;
 					packet.size = sizeof(packet);
 					packet.type = CS_START;
@@ -1786,9 +1786,10 @@ void CGameFramework::UpdateUI()
 
 	m_pUILayer->UpdateLabels_Jew(uiJew);
 
-	if (roomNum.empty()) {
+	if (matcnt <= 0) {
 		m_pUILayer->UpdateLabels_Lobby(L"room number");
 		m_pUILayer->UpdateLabels_LobbyMatching(L"룸 넘버를 입력하세요");
+		m_pUILayer->UpdateLabels_Lobby(roomNum);
 
 	}
 	else {
