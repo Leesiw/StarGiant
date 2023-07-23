@@ -322,7 +322,6 @@ void CEnemy::SendPos()
 		info.id = id;
 		info.Quaternion = GetQuaternion();
 		info.pos = GetPosition();
-		info.velocity = GetVelocity();
 
 		for (auto& pl : clients)
 		{

@@ -274,7 +274,6 @@ struct ENEMY_INFO {
 
 	XMFLOAT3 pos;
 	XMFLOAT4 Quaternion;
-	XMFLOAT3 velocity;
 };
 
 // animation

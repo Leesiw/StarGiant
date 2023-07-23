@@ -1493,7 +1493,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				info.id = m_ppEnemies[i]->GetID();
 				info.Quaternion = m_ppEnemies[i]->GetQuaternion();
 				info.pos = m_ppEnemies[i]->GetPosition();
-				info.velocity = m_ppEnemies[i]->GetVelocity();
 
 				for (short pl_id : _plist) {
 					if (pl_id == -1) continue;
