@@ -2672,13 +2672,13 @@ void CGameFramework::ProcessPacket(char* p)
 				m_pScene->m_ppEnemies[packet->data.id]->isAlive = false;
 				//m_pScene->AddDieSprite(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
 				m_pScene->AddDieSprite(m_pScene->m_ppEnemies[packet->data.id]->GetPosition(), packet->data.id);
-				m_pScene->setParticleStart(10, m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
+				m_pScene->setParticleStart(20, m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
 				m_effectSound[static_cast<int>(Sounds::EXP)]->play();
 
 			}
 			else {
 				m_pScene->m_ppEnemies[packet->data.id]->hp = packet->data.hp;
-				m_pScene->setParticleStart(10, m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
+				m_pScene->setParticleStart(20, m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
 				cout << "att\n";
 			}
 		}
