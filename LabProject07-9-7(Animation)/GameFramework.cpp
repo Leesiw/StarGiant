@@ -1899,9 +1899,9 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	}
 	case MissionType::GET_JEWELS:
 	{
-		uiText = L"미션 - 보석 4종류 1개 이상씩 얻어라 ( ";
-		uiText += jewelCntStr;
-		uiText += L" / 4 )";
+		uiText = L"미션 - 보석을 1개 얻어라";
+	//	uiText += jewelCntStr;
+	//	uiText += L" / 4 )";
 
 		break;
 	}
@@ -2403,16 +2403,26 @@ void CGameFramework::ProcessPacket(char* p)
 		info.pos.z = packet->data.z;
 		info.m_fYaw = packet->data.yaw;
 		m_pInsidePlayer[packet->data.id]->SetPlayerInfo(info);
-
-		matcnt++;
+		int player_cnt = 0;
+		for (int i = 0; i < 3; ++i) {
+			if (m_pInsidePlayer[i]->isAlive) {
+				++player_cnt;
+			}
+		}
+		matcnt = player_cnt;
 		break;
 	}
 	case SC_REMOVE_PLAYER:
 	{
-
 		SC_REMOVE_PLAYER_PACKET* packet = reinterpret_cast<SC_REMOVE_PLAYER_PACKET*>(p);
 		m_pInsidePlayer[packet->id]->isAlive = false;
-		matcnt--;
+		int player_cnt = 0;
+		for (int i = 0; i < 3; ++i) {
+			if (m_pInsidePlayer[i]->isAlive) {
+				++player_cnt;
+			}
+		}
+		matcnt = player_cnt;
 		break;
 	}
 	case SC_SPAWN_METEO:
