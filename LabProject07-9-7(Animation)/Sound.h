@@ -5,7 +5,7 @@
 enum class Sounds : char
 {
     GUN, EXP, WALK, BAD, CLEAR
-    ,CLICK, DARK, ROAR, FIRE, GROWL
+    ,CLICK, DARK, ROAR, FIRE, GROWL, CLAW, BASIC_ATTACT
     ,COUNT
 };
 

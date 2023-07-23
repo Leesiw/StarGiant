@@ -46,7 +46,9 @@ public:
 	int SetHP(int hp) { return BossHP = hp; }
 
 
-	CSound* b_effectSound[static_cast<int>(DragonSounds::COUNT)] = {};
+	char soundon = -1;
+	char soundo0nPAST = -1;
+
 	
 protected:
 	/*XMFLOAT3					m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);

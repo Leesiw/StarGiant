@@ -11,11 +11,6 @@ Boss::Boss()
 
 	stateStartTime = steady_clock::now();
 
-	CSound::Init();
-
-	b_effectSound[static_cast<int>(DragonSounds::ROAR)] = new CSound("Sound/roar.mp3", false, 1.0f);
-	b_effectSound[static_cast<int>(DragonSounds::FIRE)] = new CSound("Sound/firebreath.mp3", false, 1.0f);
-	b_effectSound[static_cast<int>(DragonSounds::GROWL)] = new CSound("Sound/growl.mp3", false, 1.0f);
 
 }
 
@@ -335,12 +330,30 @@ void Boss::ChangeAnimation(BossAnimation CurMotion)
 	if (CurMotion != PastMotion) {
 
 		if (CurMotion == BossAnimation::SCREAM && onceScream) {
-			b_effectSound[static_cast<int>(DragonSounds::ROAR)]->play();
+			soundon = static_cast<int>(Sounds::ROAR);
 			onceScream = false;
+			cout << "½ºÅ©¸² \n";
 		}
 
-		else if (CurMotion == BossAnimation::IDLE) {
-			b_effectSound[static_cast<int>(DragonSounds::GROWL)]->play();
+		else if (CurMotion == BossAnimation::BASIC_ATTACT) {
+			soundon = static_cast<int>(Sounds::BASIC_ATTACT);
+			cout << "BASIC_ATTACT \n";
+
+		}
+		else if (CurMotion == BossAnimation::CLAW_ATTACT) {
+			soundon = static_cast<int>(Sounds::CLAW);
+			cout << "CLAW_ATTACT \n";
+
+		}
+		else if (CurMotion == BossAnimation::FLAME_ATTACK) {
+			soundon = static_cast<int>(Sounds::ROAR);
+			cout << "FLAME_ATTACK \n";
+
+		}
+		else {
+			cout << "IDLE \n";
+
+			soundon = -1;
 		}
 
 
@@ -374,10 +387,6 @@ void Boss::ChangeAnimation(BossAnimation CurMotion)
 			SetTrackAnimationPosition(static_cast<int>(CurMotion), 1.0f);
 			m_pSkinnedAnimationController->SetTrackSpeed(static_cast<int>(CurMotion), 0.0f);
 		}
-	}
-
-	for (int i = 0; i < static_cast<int>(DragonSounds::COUNT); ++i)if (b_effectSound[i]) {
-		b_effectSound[i]->Update();
 	}
 
 }

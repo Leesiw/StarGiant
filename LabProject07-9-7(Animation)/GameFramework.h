@@ -37,6 +37,8 @@ public:
 
     void BuildObjects();
 	void BuildSounds();
+	void UpdateSounds();
+
 
     void ReleaseObjects();
 

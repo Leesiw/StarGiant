@@ -1333,14 +1333,31 @@ void CGameFramework::BuildSounds()
 	m_effectSound[static_cast<int>(Sounds::CLEAR)] = new CSound("Sound/clear.mp3", false, 0.2f);
 	m_effectSound[static_cast<int>(Sounds::CLICK)] = new CSound("Sound/click.mp3", false, 0.2f);
 	m_effectSound[static_cast<int>(Sounds::DARK)] = new CSound("Sound/dark.mp3", false, 0.2f);
-	m_effectSound[static_cast<int>(Sounds::ROAR)] = new CSound("Sound/roar.mp3", false, 1.0f);
-	m_effectSound[static_cast<int>(Sounds::FIRE)] = new CSound("Sound/firebreath.mp3", false, 1.0f);
-	m_effectSound[static_cast<int>(Sounds::GROWL)] = new CSound("Sound/growl.mp3", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::ROAR)] = new CSound("Sound/roaring.mp3", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::FIRE)] = new CSound("Sound/roaring.mp3", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::GROWL)] = new CSound("Sound/roaring.mp3", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::CLAW)] = new CSound("Sound/claw.mp3", false, 1.0f);
+	m_effectSound[static_cast<int>(Sounds::BASIC_ATTACT)] = new CSound("Sound/claw.mp3", false, 1.0f);
 
+}
 
+void CGameFramework::UpdateSounds()
+{
+	if (_state == SCENE_LOBBY) { m_lobbybgm->Update(); m_bgm->stop(); }
+	else { m_lobbybgm->stop(); m_bgm->Update(); };
 
-
-
+	if (m_pScene->m_ppBoss->soundon != -1)
+	{
+		cout << "play";
+		if (m_pScene->m_ppBoss->soundo0nPAST != m_pScene->m_ppBoss->soundon)
+			m_effectSound[m_pScene->m_ppBoss->soundon]->play();
+		m_effectSound[m_pScene->m_ppBoss->soundon]->Update();
+		m_pScene->m_ppBoss->soundo0nPAST = m_pScene->m_ppBoss->soundon;
+	}
+	m_pScene->m_ppBoss->soundo0nPAST = m_pScene->m_ppBoss->soundon;
+	for (int i = 0; i < static_cast<int>(Sounds::COUNT); ++i)
+		if (m_effectSound[i] || i != static_cast<int>(Sounds::WALK) || (i >= static_cast<int>(Sounds::ROAR) && i <= static_cast<int>(Sounds::CLAW)))
+			m_effectSound[i]->Update();
 
 
 }
@@ -1366,9 +1383,6 @@ void CGameFramework::ReleaseObjects()
 
 	if (m_effectSound)for (int i = 0; i < static_cast<int>(Sounds::COUNT); ++i) delete m_effectSound;
 	if (m_effectSound)for (int i = 0; i < static_cast<int>(Sounds::COUNT); ++i) m_effectSound[i]->Release();
-
-	if (m_pScene->m_ppBoss->b_effectSound)for (int i = 0; i < static_cast<int>(DragonSounds::COUNT); ++i) delete m_pScene->m_ppBoss->b_effectSound;
-	
 
 }
 
@@ -1569,11 +1583,7 @@ void CGameFramework::FrameAdvance()
 
 	UpdateUI();
 
-
-	if (_state == SCENE_LOBBY) { m_lobbybgm->Update(); m_bgm->stop(); }
-	else { m_lobbybgm->stop(); m_bgm->Update(); };
-	for (int i = 0; i < static_cast<int>(Sounds::COUNT); ++i)if (m_effectSound[i] || i != static_cast<int>(Sounds::WALK))m_effectSound[i]->Update();
-
+	UpdateSounds();
 
 
 	//if (std::isnan(m_pCamera->GetPosition().x))cout << "x nan!!\n";
