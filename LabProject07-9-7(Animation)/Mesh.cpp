@@ -1093,8 +1093,11 @@ CParticleMesh::CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 
 	float red = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
-	float green = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
+	float green = 0.0f;
 	float blue = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
+	
+	//float green = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
+	//float blue = (((float)rand() - (float)rand()) / RAND_MAX) + 0.5f;
 
 
 	color[0] = XMFLOAT4(red, green, blue, 1.0f);
