@@ -73,6 +73,7 @@ void CEnemy::MoveAI(float fTimeElapsed, CAirplanePlayer* player)
 		ToGo = Vector3::ScalarProduct(ToGo, 100.f);
 		ToGo = Vector3::Add(player_pos, ToGo);
 		SetPosition(ToGo);
+		enemy_flags |= option3;
 	}
 
 
@@ -113,6 +114,7 @@ void CEnemy::AimingAI(float fTimeElapsed, CAirplanePlayer* player)
 		ToGo = Vector3::ScalarProduct(ToGo, 100.f);
 		ToGo = Vector3::Add(player_pos, ToGo);
 		SetPosition(ToGo);
+		enemy_flags |= option3;
 	}
 	else if (dist > 400.f)
 	{
@@ -313,7 +315,7 @@ void CEnemy::Animate(float fTimeElapsed, CAirplanePlayer* player)
 void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 {
 	float fLength = Vector3::Length(m_xmf3Velocity);
-	if (IsZero(fLength)) { enemy_flags &= ~option3; return; }
+	if (IsZero(fLength)) { return; }
 
 	if (fLength > 200.f)
 	{
@@ -337,6 +339,10 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 	else {
 		m_xmf3Velocity.x = 0; m_xmf3Velocity.y = 0; m_xmf3Velocity.z = 0;
 	}
+}
+
+void CEnemy::SetIsMoveFalse() {
+	enemy_flags &= ~option3;
 }
 
 void CEnemy::SendPos()

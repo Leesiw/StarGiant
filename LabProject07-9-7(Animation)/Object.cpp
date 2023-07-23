@@ -1781,7 +1781,7 @@ void CEnemyObject::MoveAI(float fTimeElapsed, XMFLOAT3& pl_pos)
 	XMFLOAT3 player_pos = pl_pos;
 	XMFLOAT3 destination = Vector3::Add(m_xmf3Destination, player_pos);
 
-	LookAtPosition(fTimeElapsed, destination);
+	//LookAtPosition(fTimeElapsed, destination);
 }
 
 void CEnemyObject::AimingAI(float fTimeElapsed, XMFLOAT3& pl_pos)

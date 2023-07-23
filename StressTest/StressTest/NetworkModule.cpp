@@ -180,6 +180,9 @@ void ProcessPacket(int ci, unsigned char packet[])
 			SendPacket(ci, &cutscene_packet);
 		}
 		break; }
+	case SC_ENEMY_STATE: break;
+	case SC_MOVE_GOD: break;
+	case SC_MOVE_BOSS: break;
 	case SC_KILL_NUM: break;
 	case SC_START: {
 		CS_NEXT_MISSION_PACKET cutscene_packet;
