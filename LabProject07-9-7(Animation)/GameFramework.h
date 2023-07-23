@@ -139,7 +139,7 @@ private:
 
 
 
-	CSound* m_bgm;
+	CSound* m_bgm[static_cast<int>(BGMSounds::COUNT)] = {};
 	CSound* m_lobbybgm;
 
 	CSound* m_effectSound[static_cast<int>(Sounds::COUNT)] = {};

@@ -1323,7 +1323,10 @@ void CGameFramework::BuildObjects()
 
 void CGameFramework::BuildSounds()
 {
-	m_bgm = new CSound("Sound/background.wav", true, 0.3f);
+	m_bgm[static_cast<int>(BGMSounds::MAIN)] = new CSound("Sound/background.wav", true, 0.3f);
+	m_bgm[static_cast<int>(BGMSounds::BOSS)] = new CSound("Sound/boss_stage1.mp3", true, 0.3f);
+	m_bgm[static_cast<int>(BGMSounds::GOD)] = new CSound("Sound/boss_stage2.mp3", true, 0.3f);
+
 	m_lobbybgm = new CSound("Sound/lobby.mp3", true, 0.3f);
 
 	m_effectSound[static_cast<int>(Sounds::GUN)] = new CSound("Sound/gun.mp3", false, 1.0f);
@@ -1343,8 +1346,25 @@ void CGameFramework::BuildSounds()
 
 void CGameFramework::UpdateSounds()
 {
-	if (_state == SCENE_LOBBY) { m_lobbybgm->Update(); m_bgm->stop(); }
-	else { m_lobbybgm->stop(); m_bgm->Update(); };
+	if (_state == SCENE_LOBBY) {
+		m_lobbybgm->Update(); 
+		m_bgm[2]->stop(); 
+	}
+	else {
+		m_lobbybgm->stop();
+
+		if (curMissionType < MissionType::CS_BOSS_SCREAM) {
+			m_bgm[0]->Update();
+		}
+		else if (curMissionType >= MissionType::CS_BOSS_SCREAM) {
+			m_bgm[1]->Update();
+		}
+		else if (curMissionType >= MissionType::CS_SHOW_GOD) {
+			m_bgm[2]->Update();
+		}
+	}
+
+
 
 	if (m_pScene->m_ppBoss->soundon != -1)
 	{
@@ -1374,8 +1394,8 @@ void CGameFramework::ReleaseObjects()
 	if (m_pScene) delete m_pScene;
 	if (m_pInsideScene) m_pInsideScene->ReleaseObjects();
 	if (m_pInsideScene) delete m_pInsideScene;
-	if (m_bgm) delete m_bgm;
-	if (m_bgm) m_bgm->Release();
+	if (m_bgm)for (int i = 0; i < static_cast<int>(BGMSounds::COUNT); ++i) delete m_bgm;
+	if (m_bgm)for (int i = 0; i < static_cast<int>(BGMSounds::COUNT); ++i) m_bgm[i]->Release();
 
 	if (m_lobbybgm) delete m_lobbybgm;
 	if (m_lobbybgm) m_lobbybgm->Release();
@@ -2275,6 +2295,8 @@ wstring CGameFramework::ChangeBossScripts(MissionType mType, short hp)
 			bossScriptsOn = true;
 			bossScriptsTime = 0;
 
+			m_bgm[1]->play();
+			m_bgm[0]->stop();
 		}
 		break;
 	}
@@ -2325,6 +2347,8 @@ wstring CGameFramework::ChangeBossScripts(MissionType mType, short hp)
 			firstbSc = 6;
 			bossScriptsOn = true;
 			bossScriptsTime = 0;
+			m_bgm[2]->play();
+			m_bgm[1]->stop();
 
 		}
 		break;
@@ -2368,6 +2392,8 @@ wstring CGameFramework::ChangeBossScripts(MissionType mType, short hp)
 			bossScriptsOn = true;
 			bossScriptsTime = 0;
 
+			m_bgm[0]->play();
+			m_bgm[1]->stop();
 		}
 		break;
 	}
@@ -2830,7 +2856,7 @@ void CGameFramework::ProcessPacket(char* p)
 	case SC_START:
 	{
 		_state = SCENE_INGAME;
-		m_bgm->play();
+		m_bgm[0]->play();
 		break;
 	}
 	case SC_BLACK_HOLE:

@@ -9,6 +9,13 @@ enum class Sounds : char
     ,COUNT
 };
 
+
+enum class BGMSounds : char
+{
+    MAIN, BOSS, GOD
+    , COUNT
+};
+
 enum class DragonSounds : char
 {
     ROAR, FIRE, GROWL
