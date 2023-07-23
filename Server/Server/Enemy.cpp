@@ -56,41 +56,72 @@ void CEnemy::AI(float fTimeElapsed, CAirplanePlayer* player)
 
 void CEnemy::MoveAI(float fTimeElapsed, CAirplanePlayer* player)
 {	
-	XMFLOAT3 xmf3Position = GetPosition();
+	VelocityUpdate(fTimeElapsed, player);
 	XMFLOAT3 player_pos = player->GetPosition();
+
+	if (m_fCoolTimeRemaining > 0.0f) {
+		m_fCoolTimeRemaining -= fTimeElapsed;
+	}
+
+	XMFLOAT3 pos = GetPosition();
+	float dist;
+	dist = Vector3::Length(Vector3::Subtract(pos, player_pos));
+
+	if (dist < 100.f)
+	{
+		XMFLOAT3 ToGo = Vector3::Subtract(pos, player_pos);
+		ToGo = Vector3::ScalarProduct(ToGo, 100.f);
+		ToGo = Vector3::Add(player_pos, ToGo);
+		SetPosition(ToGo);
+	}
+
+
+	XMFLOAT3 xmf3Position = GetPosition();
 	XMFLOAT3 destination = Vector3::Add(m_xmf3Destination, player_pos);
 
 	XMFLOAT3 vec = Vector3::Subtract(destination, xmf3Position);
-	float dist = Vector3::Length(vec);
+	dist = Vector3::Length(vec);
 
-	if (dist > 50.f)
+	if (dist < 50.f)
 	{
-		LookAtPosition(fTimeElapsed, destination);
-
-		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook() , fTimeElapsed * 200.f);
-		UpdateTransform();
-	}
-	else {
 		state = EnemyState::AIMING;
+		return;
 	}
+
+	LookAtPosition(fTimeElapsed, destination);
+
+	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, GetLook(), fTimeElapsed * 200.f);
+	UpdateTransform();
 }
 
 void CEnemy::AimingAI(float fTimeElapsed, CAirplanePlayer* player)
 {
+	VelocityUpdate(fTimeElapsed, player);
 	XMFLOAT3 player_pos = player->GetPosition();
-	LookAtPosition(fTimeElapsed, player_pos);	// 플레이어를 보도록 회전
 
-	XMFLOAT3 destination = Vector3::Add(m_xmf3Destination, player_pos);
-	XMFLOAT3 xmf3Position = GetPosition();
-	XMFLOAT3 vec = Vector3::Subtract(destination, xmf3Position);
-	float dist = Vector3::Length(vec);
+	if (m_fCoolTimeRemaining > 0.0f) {
+		m_fCoolTimeRemaining -= fTimeElapsed;
+	}
 
-	if (dist > 300.f)
+	XMFLOAT3 pos = GetPosition();
+	float dist;
+	dist = Vector3::Length(Vector3::Subtract(pos, player_pos));
+
+	if (dist < 100.f)
+	{
+		XMFLOAT3 ToGo = Vector3::Subtract(pos, player_pos);
+		ToGo = Vector3::ScalarProduct(ToGo, 100.f);
+		ToGo = Vector3::Add(player_pos, ToGo);
+		SetPosition(ToGo);
+	}
+	else if (dist > 400.f)
 	{
 		state = EnemyState::MOVE;
-		//m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, vec, fTimeElapsed * 10.f);
-		//UpdateTransform();
+		return;
 	}
+
+	LookAtPosition(fTimeElapsed, player_pos);	// 플레이어를 보도록 회전
+	UpdateTransform();
 
 	if (m_fCoolTimeRemaining <= 0.0f)
 	{
@@ -282,10 +313,11 @@ void CEnemy::Animate(float fTimeElapsed, CAirplanePlayer* player)
 void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 {
 	float fLength = Vector3::Length(m_xmf3Velocity);
-	float fMaxVelocity = 200.f;
-	if (fLength > fMaxVelocity)
+	if (IsZero(fLength)) { enemy_flags &= ~option3; return; }
+
+	if (fLength > 200.f)
 	{
-		m_xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fMaxVelocity, true);
+		m_xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, 200.f, true);
 	}
 
 	XMFLOAT3 xmf3Velocity = Vector3::ScalarProduct(m_xmf3Velocity, fTimeElapsed, false);
@@ -294,6 +326,8 @@ void CEnemy::VelocityUpdate(float fTimeElapsed, CAirplanePlayer* player)
 //	xmf3Velocity = Vector3::Add(LookVelocity, xmf3Velocity);
 	XMFLOAT3 xmf3Position = Vector3::Add(GetPosition(), xmf3Velocity);
 	SetPosition(xmf3Position);
+
+	enemy_flags |= option3;
 
 	float fDeceleration = (100.0f * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
@@ -351,11 +385,12 @@ CMissileEnemy::~CMissileEnemy()
 
 void CMissileEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 {
+	/*
 	ResetCoolTime();
 	enemy_flags |= option2;
 	info.StartPos = GetPosition();
 	info.Quaternion = GetQuaternion();
-	info.damage = missile_damage;
+	info.damage = missile_damage;*/
 }
 
 void CMissileEnemy::SetStatus(MissionType cur_mission)

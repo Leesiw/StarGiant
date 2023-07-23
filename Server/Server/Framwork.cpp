@@ -94,9 +94,15 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			delete ex_over;
 			break;
 		}
-		case OP_UPDATE_ENEMY: {
+		case OP_MOVE_ENEMY: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			scene->UpdateEnemy(ex_over->obj_id);
+			scene->MoveEnemy(ex_over->obj_id);
+			delete ex_over;
+			break;
+		}
+		case OP_AIMING_ENEMY: {
+			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
+			scene->AimingEnemy(ex_over->obj_id);
 			delete ex_over;
 			break;
 		}
@@ -773,9 +779,16 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
-			case EV_UPDATE_ENEMY: {
+			case EV_MOVE_ENEMY: {
 				OVER_EXP* ov = new OVER_EXP;
-				ov->_comp_type = OP_UPDATE_ENEMY;
+				ov->_comp_type = OP_MOVE_ENEMY;
+				ov->obj_id = ev.obj_id;
+				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
+				break;
+			}
+			case EV_AIMING_ENEMY: {
+				OVER_EXP* ov = new OVER_EXP;
+				ov->_comp_type = OP_AIMING_ENEMY;
 				ov->obj_id = ev.obj_id;
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;

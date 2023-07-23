@@ -773,7 +773,7 @@ void CScene::SpawnEnemy()
 		if (!ppEnemies[i]->GetisAlive()) {
 			SpawnEnemy(ppEnemies[i]->GetID());
 			m_ppEnemies[ppEnemies[i]->GetID()]->prev_time = chrono::steady_clock::now();
-			TIMER_EVENT ev_u{ ppEnemies[i]->GetID(), chrono::system_clock::now() + 33ms, EV_UPDATE_ENEMY, static_cast<short>(num) };
+			TIMER_EVENT ev_u{ ppEnemies[i]->GetID(), chrono::system_clock::now() + 33ms, EV_MOVE_ENEMY, static_cast<short>(num) };
 			timer_queue.push(ev_u);
 			++cur_enemy_num;
 			--spawn_num;
@@ -783,7 +783,7 @@ void CScene::SpawnEnemy()
 	timer_queue.push(ev);
 }
 
-void CScene::UpdateEnemy(char obj_id)
+void CScene::MoveEnemy(char obj_id)
 {
 	if (_state != ST_INGAME) { return; }
 	if (m_ppEnemies[obj_id]->hp <= 0) {
@@ -796,7 +796,7 @@ void CScene::UpdateEnemy(char obj_id)
 			return;
 		}
 		m_ppEnemies[obj_id]->prev_time = chrono::steady_clock::now();
-		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_ENEMY, static_cast<short>(num) };
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 1s, EV_MOVE_ENEMY, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
 	}
@@ -805,7 +805,7 @@ void CScene::UpdateEnemy(char obj_id)
 	std::chrono::duration<float> elapsed_time = (time_now - m_ppEnemies[obj_id]->prev_time);
 	m_ppEnemies[obj_id]->prev_time = time_now;
 
-	m_ppEnemies[obj_id]->AI(elapsed_time.count(), m_pSpaceship);
+	m_ppEnemies[obj_id]->MoveAI(elapsed_time.count(), m_pSpaceship);
 	//scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
 
 	// 款籍苞 面倒贸府
@@ -832,17 +832,78 @@ void CScene::UpdateEnemy(char obj_id)
 		}
 	}
 
-	if (obj_id >= 23
-		&& m_ppEnemies[obj_id]->state == EnemyState::AIMING &&
-		!m_ppEnemies[obj_id]->GetAttackTimer()) {
-		m_ppEnemies[obj_id]->SetAttackTimerTrue();
-		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(num) };
+	if ( m_ppEnemies[obj_id]->state == EnemyState::AIMING) {
+		if (obj_id >= 23 && !m_ppEnemies[obj_id]->GetAttackTimer()) {
+			m_ppEnemies[obj_id]->SetAttackTimerTrue();
+			TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(num) };
+			timer_queue.push(ev);
+		}
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_AIMING_ENEMY, static_cast<short>(num) };
 		timer_queue.push(ev);
+		return;
 	}
 
+	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_MOVE_ENEMY, static_cast<short>(num) };
+	timer_queue.push(ev);
+}
 
+void CScene::AimingEnemy(char obj_id)
+{
+	if (_state != ST_INGAME) { return; }
+	if (m_ppEnemies[obj_id]->hp <= 0) {
+		m_ppEnemies[obj_id]->SetisAlive(false);
+		return;
+	}
+	if (levels[cur_mission].cutscene) {
+		if (cur_mission == MissionType::CS_BAD_ENDING) {
+			m_ppEnemies[obj_id]->SetisAlive(false);
+			return;
+		}
+		m_ppEnemies[obj_id]->prev_time = chrono::steady_clock::now();
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 1s, EV_MOVE_ENEMY, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
 
-	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_ENEMY, static_cast<short>(num) };
+	auto time_now = chrono::steady_clock::now();
+	std::chrono::duration<float> elapsed_time = (time_now - m_ppEnemies[obj_id]->prev_time);
+	m_ppEnemies[obj_id]->prev_time = time_now;
+
+	m_ppEnemies[obj_id]->AimingAI(elapsed_time.count(), m_pSpaceship);
+	//scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
+
+	// 款籍苞 面倒贸府
+
+	for (int i = 0; i < ENEMIES; ++i)
+	{
+		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
+		if (i == obj_id) { continue; }
+		//if (scene->m_ppEnemies[ex_over->obj_id]->HierarchyIntersects(scene->m_ppEnemies[i]))
+		if (Vector3::Length(Vector3::Subtract(m_ppEnemies[obj_id]->GetPosition(), m_ppEnemies[i]->GetPosition())) < 30.f)
+		{
+			XMFLOAT3 xmf3Sub = m_ppEnemies[i]->GetPosition();
+			xmf3Sub = Vector3::Subtract(m_ppEnemies[obj_id]->GetPosition(), xmf3Sub);
+			if (Vector3::Length(xmf3Sub) > 0.0001f) {
+				xmf3Sub = Vector3::Normalize(xmf3Sub);
+			}
+			XMFLOAT3 vel = m_ppEnemies[obj_id]->GetVelocity();
+			float fLen = Vector3::Length(vel) / 10.f;
+			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+			XMFLOAT3 vel2 = m_ppEnemies[i]->GetVelocity();
+
+			m_ppEnemies[obj_id]->SetVelocity(Vector3::Add(vel, xmf3Sub));
+			m_ppEnemies[i]->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+		}
+	}
+
+	if (m_ppEnemies[obj_id]->state == EnemyState::MOVE)
+	{
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_MOVE_ENEMY, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
+
+	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_AIMING_ENEMY, static_cast<short>(num) };
 	timer_queue.push(ev);
 
 }
@@ -1150,9 +1211,9 @@ void CScene::SendSceneInfo()
 	s_packet.data.Quaternion = m_pSpaceship->input_info.Quaternion;
 	memcpy(&send_buf[send_num], &s_packet, s_packet.size);
 	send_num += s_packet.size;
-
+	
 	for (char i = 0; i < ENEMIES; ++i) {
-		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
+		if (!m_ppEnemies[i]->GetisAlive()) { continue; } //|| !m_ppEnemies[i]->GetisMove()) { continue; }
 		SC_MOVE_ENEMY_PACKET e_packet{};
 		e_packet.size = sizeof(e_packet);
 		e_packet.type = SC_MOVE_ENEMY;
