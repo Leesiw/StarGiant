@@ -139,7 +139,22 @@ void God::God_Ai(float fTimeElapsed, CAirplanePlayer* player, int godHp)
 	lua_pop(m_L, 2);
 
 	SendPosition();
-	SendAnimation();
+
+	if (PastMotion != CurMotion) {
+		SendAnimation();
+
+		if (CurMotion == GodAnimation::SHOT) player->GetAttack(2);
+		if (CurMotion == GodAnimation::MELEE1) player->GetAttack(4);
+
+
+		PastMotion = CurMotion;
+		SC_BULLET_HIT_PACKET p;
+		p.size = sizeof(SC_BULLET_HIT_PACKET);
+		p.type = SC_BULLET_HIT;
+		p.data.id = -1;
+		p.data.hp = player->GetHP();
+		scene_manager.Send(scene_num, (char*)&p);
+	}
 
 	if (CurState != GodState::IDLE2)
 	{

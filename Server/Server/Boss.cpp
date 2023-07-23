@@ -283,9 +283,24 @@ void Boss::Boss_Ai(float fTimeElapsed, CAirplanePlayer* player, int bossHP)
 	//cout << " CurMotion -" << int(CurMotion) << endl;
 
 
-
 	SendPosition();
-	SendAnimation();
+	if (PastMotion != CurMotion) {
+		SendAnimation();
+
+		if (CurMotion == BossAnimation::BASIC_ATTACT) player->GetAttack(2);
+		if (CurMotion == BossAnimation::CLAW_ATTACT) player->GetAttack(4);
+		if (CurMotion == BossAnimation::FLAME_ATTACK) player->GetAttack(6);
+
+
+		PastMotion = CurMotion;
+		SC_BULLET_HIT_PACKET p;
+		p.size = sizeof(SC_BULLET_HIT_PACKET);
+		p.type = SC_BULLET_HIT;
+		p.data.id = -1;
+		p.data.hp = player->GetHP();
+		scene_manager.Send(scene_num, (char*)&p);
+	}
+
 
 
 	if (CurState != BossState::SLEEP)
