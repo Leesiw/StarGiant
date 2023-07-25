@@ -361,6 +361,67 @@ private:
 
 };/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class ChealParticleMesh : public CMesh
+{
+private:
+	struct ParticleType
+	{
+		float positionX, positionY, positionZ;
+		float red, green, blue;
+		float velocity;
+		bool active;
+	};
+
+	struct VertexType
+	{
+		XMFLOAT3 position;
+		XMFLOAT2 texture;
+		XMFLOAT4 color;
+	};
+
+	XMFLOAT2* texture = NULL;
+	XMFLOAT4* color = NULL;
+
+	ID3D12Resource* m_pd3dTextureBuffer = NULL;
+	ID3D12Resource* m_pd3dColorBuffer = NULL;
+
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureBufferView;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dColorBufferView;
+
+	ID3D12Resource* m_pd3dTextureUploadBuffer = NULL;
+	ID3D12Resource* m_pd3dColoUploadBuffer = NULL;
+
+
+
+public:
+	ChealParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth = 20.0f, float fHeight = 20.0f, float fDepth = 20.0f);
+	virtual ~ChealParticleMesh();
+	virtual void ReleaseUploadBuffers();
+	virtual void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+
+
+private:
+	float m_particleDeviationX = 0;
+	float m_particleDeviationY = 0;
+	float m_particleDeviationZ = 0;
+	float m_particleVelocity = 0;
+	float m_particleVelocityVariation = 0;
+	float m_particleSize = 0;
+	float m_particlesPerSecond = 0;
+	int m_maxParticles = 0;
+
+	int m_currentParticleCount = 0;
+	float m_accumulatedTime = 0;
+
+	ParticleType* m_particleList = nullptr;
+	int m_vertexCount = 0;
+	int m_indexCount = 0;
+	VertexType* m_vertices = nullptr;
+};
+
 struct NoiseBufferType
 {
 	float frameTime;

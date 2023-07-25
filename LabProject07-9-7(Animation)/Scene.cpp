@@ -132,7 +132,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 362); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 562); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
 
 	CMaterial::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -332,6 +332,10 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	for (int i = 0; i < MAX_PARTICLES; ++i) {
 		m_pParticle[i] = new CParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+	}
+
+	for (int i = 0; i < MAX_HEAL_PARTICLES; ++i) {
+		m_phealParticle[i] = new ChealParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 	}
 
 	for (int i = 0; i < MAX_PARTICLES; ++i) {
@@ -591,8 +595,10 @@ void CScene::ReleaseObjects()
 
 	if (m_pTerrain) delete m_pTerrain;
 	if (m_pSkyBox) delete m_pSkyBox;
-	if (m_pParticle) delete m_pParticle;
-	if (m_pFlameParticle) delete m_pFlameParticle;
+	if (m_pParticle) delete[] m_pParticle;
+	if (m_phealParticle) delete[] m_phealParticle;
+
+	if (m_pFlameParticle) delete[] m_pFlameParticle;
 
 
 	for (int i = 0; i < MAX_FIRE; i++)
@@ -1141,6 +1147,8 @@ void CScene::ReleaseUploadBuffers()
 	if (m_pSkyBox) m_pSkyBox->ReleaseUploadBuffers();
 		
 	for (int i = 0; i < MAX_PARTICLES; ++i)if (m_pParticle[i] != NULL) { m_pParticle[i]->ReleaseUploadBuffers(); };
+	for (int i = 0; i < MAX_HEAL_PARTICLES; ++i)if (m_phealParticle[i] != NULL) { m_phealParticle[i]->ReleaseUploadBuffers(); };
+
 	for (int i = 0; i < MAX_PARTICLES; ++i)if (m_pFlameParticle[i] != NULL) { m_pFlameParticle[i]->ReleaseUploadBuffers(); };
 
 	for (int i = 0; i < MAX_FIRE; ++i)if (m_pFire[i] != NULL) { 
@@ -1750,6 +1758,28 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 	}
 
+
+
+	if (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_ppGod->CurMotion == GodAnimation::HIT1) {
+		if (m_ppGod->heal) {
+			sethealParticleStart(10, m_ppGod->GetPosition());
+			cout << "heal";
+			m_ppGod->heal = false;
+
+		}
+		for (int i = 0; i < MAX_HEAL_PARTICLES; ++i) {
+			if (!b_Inside) {
+				if (m_phealParticle[i]->isLive) {
+
+					m_phealParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+					m_phealParticle[i]->Animate(m_fElapsedTime);
+					m_phealParticle[i]->Render(pd3dCommandList, pCamera);
+				}
+			}
+		}
+	}
+
+
 	for (int i = 0; i < MAX_PARTICLES; ++i) {
 		if (!b_Inside) {
 			//if (m_pFlameParticle[i]->isLive) {
@@ -2013,6 +2043,16 @@ void CScene::setParticleStart(int cnt, XMFLOAT3 tarPos)
 		m_pParticle[i]->isLive = true;
 		m_pParticle[i]->setPos(tarPos);
 			
+	}
+}
+
+void CScene::sethealParticleStart(int cnt, XMFLOAT3 tarPos)
+{
+	for (int i = 0; i < cnt; i++)
+	{
+		m_phealParticle[i]->isLive = true;
+		m_phealParticle[i]->setPos(tarPos);
+
 	}
 }
 

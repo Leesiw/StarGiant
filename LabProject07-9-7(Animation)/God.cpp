@@ -36,13 +36,19 @@ void God::ChangeAnimation(GodAnimation CurMotion)
 	}
 	else if (CurMotion == GodAnimation::SHOT) {
 		soundon = static_cast<int>(Sounds::GOD2);
-
 	}
+
 	else {
 		soundon = -1;
 	}
 
 	if (CurMotion != PastMotion) {
+
+		if (CurMotion == GodAnimation::HIT1) {
+		heal = true;
+		soundon = -1;
+		}
+
 		m_pSkinnedAnimationController->SetTrackEnable(static_cast<int>(PastMotion), false);
 		m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(CurMotion), 0.0f);
 		m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(PastMotion), 0.0f);

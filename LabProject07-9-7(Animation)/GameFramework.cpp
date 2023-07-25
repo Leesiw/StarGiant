@@ -2762,6 +2762,8 @@ void CGameFramework::ProcessPacket(char* p)
 			else {
 				m_pScene->m_ppEnemies[packet->data.id]->hp = packet->data.hp;
 				m_pScene->setParticleStart(20, m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
+				
+
 				cout << "att\n";
 			}
 		}

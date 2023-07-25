@@ -18,6 +18,8 @@
 #define DIRECTIONAL_LIGHT				3
 
 #define MAX_PARTICLES					100
+#define MAX_HEAL_PARTICLES				100
+
 
 #define MAX_FIRE				2
 
@@ -119,6 +121,8 @@ public:
 	virtual void AddDieSprite(XMFLOAT3 Position, int Target);
 
 	void setParticleStart(int cnt, XMFLOAT3 tarPos);
+	void sethealParticleStart(int cnt, XMFLOAT3 tarPos);
+
 
 protected:
 	ID3D12RootSignature					*m_pd3dGraphicsRootSignature = NULL;
@@ -178,7 +182,6 @@ public:
 
 
 
-
 	CMeteorObject						*m_ppMeteorObjects[METEOS];
 	CMeteorObject						*m_ppBossMeteorObjects[BOSSMETEOS];
 
@@ -223,6 +226,8 @@ public:
 	CFireObject* m_pFire[MAX_FIRE] = {};
 
 	CParticleObject* m_pParticle[MAX_PARTICLES] = {};
+	ChealParticleObject* m_phealParticle[MAX_HEAL_PARTICLES] = {};
+
 	CFlameParticleObject* m_pFlameParticle[MAX_PARTICLES] = {};
 	CDepthRenderShader* m_pDepthRenderShader = NULL;
 
