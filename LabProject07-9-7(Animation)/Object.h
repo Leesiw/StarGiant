@@ -966,7 +966,45 @@ private:
 	float lifeTime = 20.0f;
 	float ffTimeElapsed = 0.0f;
 };
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CSkullObject : public CGameObject
+{
+public:
+	CSkullObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	virtual ~CSkullObject() {};
 
+	virtual void Animate(float fElapsedTime);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	int getMaxParticle() { return m_maxParticles; };
+	void setTarpos(XMFLOAT3 tarpos) { TargetPos = tarpos; }
+	bool isLive = false;
+
+
+	XMVECTOR direction;
+	XMVECTOR targetDirection = { 0,0,0,0 };
+	int count = 0;
+
+private:
+	float velocity = 1;
+	float m_particleVelocity = 0;
+	int m_maxParticles = 0;
+
+	XMFLOAT3 position;
+
+	XMFLOAT3 TargetPos;
+
+
+	float angleX = 0;
+	float angleY = 0;
+	float angleZ = 0;
+
+	float intervalX = 0;
+	float intervalY = 0;
+	float intervalZ = 0;
+
+	float lifeTime = 20.0f;
+	float ffTimeElapsed = 0.0f;
+};
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ChealParticleObject : public CGameObject
 {
@@ -996,7 +1034,7 @@ private:
 	float intervalY = 0;
 	float intervalZ = 0;
 
-	float lifeTime = 2.0f;
+	float lifeTime = 4.0f;
 	float ffTimeElapsed = 0.0f;
 };
 

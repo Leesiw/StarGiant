@@ -2619,7 +2619,7 @@ void CFlameParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CC
 
 ChealParticleObject::ChealParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
-	ChealParticleMesh* pParticleMesh = new ChealParticleMesh(pd3dDevice, pd3dCommandList, 100.0f, 100.0f, 0.0f);
+	ChealParticleMesh* pParticleMesh = new ChealParticleMesh(pd3dDevice, pd3dCommandList, 150.0f, 150.0f, 0.0f);
 	SetMesh(pParticleMesh);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
@@ -2681,4 +2681,84 @@ void ChealParticleObject::setPos(XMFLOAT3 pos)
 	position.x = pos.x;
 	position.y = pos.y;
 	position.z = pos.z;
+}
+
+
+//===============================
+CSkullObject::CSkullObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
+{
+	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 200.0f, 200.0f, 0.0f);
+	SetMesh(pParticleMesh);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CTexture* pParticleTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/skull.dds", 0); //star
+
+
+	CParticleShader* pParticleShader = new CParticleShader(); //CParticleShader CUIShader
+	pParticleShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pParticleShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CScene::CreateShaderResourceViews(pd3dDevice, pParticleTexture, 21, false);
+
+	CMaterial* pParticleMaterial = new CMaterial(1);
+	pParticleMaterial->SetTexture(pParticleTexture, 0);
+	pParticleMaterial->SetShader(pParticleShader);
+
+	SetMaterial(0, pParticleMaterial);
+
+
+	velocity = 10;
+	//velocity = (float)(rand() % 5);
+
+	angleX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+	angleY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+	angleZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+
+	//intervalX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
+	//intervalY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
+	intervalZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 150.0f;
+
+
+	position.x = GetPosition().x + intervalX;
+	position.y = GetPosition().y + intervalY;
+	position.z = GetPosition().z + intervalZ;
+
+	direction = XMVectorSubtract(XMLoadFloat3(&TargetPos), XMLoadFloat3(&position));
+	direction = XMVector3Normalize(direction);
+}
+
+void CSkullObject::Animate(float fElapsedTime)
+{
+	ffTimeElapsed += fElapsedTime;
+	if (ffTimeElapsed > lifeTime) {
+		isLive = false;
+		ffTimeElapsed = 0.f;
+	}
+
+	 
+	//타겟을 향해 계속
+	targetDirection = XMVectorSubtract(XMLoadFloat3(&TargetPos), XMLoadFloat3(&position));
+	targetDirection = XMVector3Normalize(targetDirection);
+	
+	// velocity에 따라 파티클 이동
+	XMVECTOR velocityVector = XMVectorScale(targetDirection, velocity * fElapsedTime * 10);
+	XMFLOAT3 velocityResult;
+	XMStoreFloat3(&velocityResult, velocityVector);
+
+	position.x += velocityResult.x;
+	position.y += velocityResult.y;
+	position.z += velocityResult.z;
+
+
+
+
+	SetPosition(position);
+
+	CGameObject::Animate(fElapsedTime);
+}
+
+void CSkullObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	CGameObject::Render(pd3dCommandList, pCamera);
 }

@@ -338,9 +338,14 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_phealParticle[i] = new ChealParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 	}
 
-	for (int i = 0; i < MAX_PARTICLES; ++i) {
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
 		m_pFlameParticle[i] = new CFlameParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 		m_pFlameParticle[i]->count = i;
+	}
+
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+		m_pSkull[i] = new CSkullObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+		m_pSkull[i]->count = i;
 	}
 
 
@@ -599,6 +604,8 @@ void CScene::ReleaseObjects()
 	if (m_phealParticle) delete[] m_phealParticle;
 
 	if (m_pFlameParticle) delete[] m_pFlameParticle;
+	if (m_pSkull) delete[] m_pSkull;
+
 
 
 	for (int i = 0; i < MAX_FIRE; i++)
@@ -1149,7 +1156,9 @@ void CScene::ReleaseUploadBuffers()
 	for (int i = 0; i < MAX_PARTICLES; ++i)if (m_pParticle[i] != NULL) { m_pParticle[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_HEAL_PARTICLES; ++i)if (m_phealParticle[i] != NULL) { m_phealParticle[i]->ReleaseUploadBuffers(); };
 
-	for (int i = 0; i < MAX_PARTICLES; ++i)if (m_pFlameParticle[i] != NULL) { m_pFlameParticle[i]->ReleaseUploadBuffers(); };
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pFlameParticle[i] != NULL) { m_pFlameParticle[i]->ReleaseUploadBuffers(); };
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pSkull[i] != NULL) { m_pSkull[i]->ReleaseUploadBuffers(); };
+
 
 	for (int i = 0; i < MAX_FIRE; ++i)if (m_pFire[i] != NULL) { 
 		m_pFire[i]->ReleaseUploadBuffers(); 
@@ -1794,7 +1803,25 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 				//}
 			}
 		}
+		m_ppGod->m2 = false;
 	}
+
+	if (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_ppGod->shot) {
+		for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+			if (!b_Inside) {
+				m_pSkull[i]->SetPosition(m_ppGod->GetPosition());
+				m_pSkull[i]->setTarpos(m_pPlayer[0]->GetPosition());
+				m_pSkull[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				//m_pSkull[i]->Rotate(0, 0, m_eTime * 100);
+				m_pSkull[i]->Animate(m_fElapsedTime);
+				m_pSkull[i]->Render(pd3dCommandList, pCamera);
+
+			}
+		}
+		m_ppGod->shot = false;
+
+	}
+
 
 	for (int i = 0; i < MAX_FIRE; ++i) {
 		if (!b_Inside) {

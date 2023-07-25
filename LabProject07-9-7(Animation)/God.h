@@ -20,6 +20,8 @@ public:
 	int GodHP = 100.0f;
 	bool heal = false;
 	bool m2 = false;
+	bool shot = false;
+
 
 
 public:

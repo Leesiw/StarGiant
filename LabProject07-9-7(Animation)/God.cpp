@@ -53,6 +53,10 @@ void God::ChangeAnimation(GodAnimation CurMotion)
 			m2 = true;
 			soundon = -1;
 		}
+		if (CurMotion == GodAnimation::SHOT) {
+			shot = true;
+			soundon = -1;
+		}
 
 		m_pSkinnedAnimationController->SetTrackEnable(static_cast<int>(PastMotion), false);
 		m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(CurMotion), 0.0f);

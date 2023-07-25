@@ -231,6 +231,9 @@ public:
 	ChealParticleObject* m_phealParticle[MAX_HEAL_PARTICLES] = {};
 
 	CFlameParticleObject* m_pFlameParticle[MAX_PARTICLES] = {};
+	CSkullObject* m_pSkull[MAX_CIRCLE_PARTICLES] = {};
+
+
 	CDepthRenderShader* m_pDepthRenderShader = NULL;
 
 	CShadowMapShader* m_pShadowShader = NULL;
