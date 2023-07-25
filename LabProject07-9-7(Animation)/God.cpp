@@ -30,12 +30,9 @@ void God::ChangeAnimation(GodAnimation CurMotion)
 {
 	if (CurMotion == GodAnimation::MELEE1) {
 		soundon = static_cast<int>(Sounds::GOD1);
-
 	}
 	else if (CurMotion == GodAnimation::MELEE2) {
 		soundon = static_cast<int>(Sounds::GOD1);
-
-
 	}
 	else if (CurMotion == GodAnimation::SHOT) {
 		soundon = static_cast<int>(Sounds::GOD2);

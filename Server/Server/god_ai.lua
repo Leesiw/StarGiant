@@ -7,16 +7,21 @@ GodState = {
     MELEE2 = 3,
     SHOT = 4,
     HIT1 = 5,
-    DEATH = 6,
-    ATTACK = 7
+    HIT2 = 6,
+    DEATH = 7,
+    ATTACK = 8
 
 }
 
 SHOT_COOL_TIME = 4
 MELEE1_COOL_TIME = 4
+MELEE2_COOL_TIME = 4
+HIT1_COOL_TIME = 4
+HIT2_COOL_TIME = 4
+
+
 
 ATTACK_COOL_TIME = 4
-
 MOVE_COOL_TIME = 4
 
 
@@ -41,6 +46,11 @@ attackState = false
 attackCooldown = ATTACK_COOL_TIME
 shotCooldown = SHOT_COOL_TIME
 melee1Cooldown = MELEE1_COOL_TIME
+melee2Cooldown = MELEE2_COOL_TIME
+hit1Cooldown = HIT1_COOL_TIME
+hit2Cooldown = HIT2_COOL_TIME
+
+
 moveCooldown = MOVE_COOL_TIME
 
 
@@ -56,6 +66,8 @@ function updateGodAI(hp, bpx, bpy, bpz, elapsedTime)
     frameTime = frameTime + elapsedTime
     shotCooldown = shotCooldown - elapsedTime
     melee1Cooldown = melee1Cooldown - elapsedTime
+    melee2Cooldown = melee2Cooldown - elapsedTime
+    hit1Cooldown = hit1Cooldown - elapsedTime
 
     if state == GodState.IDLE2 then        -- 보스가 나타날 때
         if onappear then
@@ -82,7 +94,7 @@ function idle(frameTime)
     --print("idle 상태")
    -- print(frameTime)
    if not attackState and frameTime >= attackCooldown then
-        local randomIndex = math.random(2)
+        local randomIndex = math.random(2,5)
         local randomIndexs = math.random(201) - 101
         local randomc1 = math.random(5)
         local randomc2 = math.random(5)
@@ -90,7 +102,7 @@ function idle(frameTime)
 
 
 
-        local attackType = randomIndex * 2  --2,4 중 랜덤
+        local attackType = randomIndex --2,4 중 랜덤
 
         if curHp <= (MaxHp / 2) then
             SHOT_COOL_TIME = 4
@@ -115,7 +127,18 @@ function idle(frameTime)
             melee1Attack()
             attackCooldown = frameTime + MELEE1_COOL_TIME
             attackCooldown = frameTime + ATTACK_COOL_TIME
+            attackState = true
 
+        elseif attackType == tonumber(GodState.MELEE2) then
+            melee2Attack()
+            attackCooldown = frameTime + MELEE2_COOL_TIME
+            attackCooldown = frameTime + ATTACK_COOL_TIME
+            attackState = true
+
+        elseif attackType == tonumber(GodState.HIT1) then
+            heal(curHp)
+            attackCooldown = frameTime + HIT1_COOL_TIME
+            attackCooldown = frameTime + ATTACK_COOL_TIME
             attackState = true
         end
 
@@ -138,6 +161,12 @@ function attack(frameTime)
         motion = GodState.SHOT
     elseif attackType == tonumber(GodState.MELEE1) then
         motion = GodState.MELEE1
+    elseif attackType == tonumber(GodState.MELEE2) then
+        motion = GodState.MELEE2
+    elseif attackType == tonumber(GodState.HIT1) then
+        motion = GodState.HIT1
+    elseif attackType == tonumber(GodState.HIT2) then
+        motion = GodState.HIT2
     end
 
     attackCooldown = ATTACK_COOL_TIME
@@ -158,6 +187,16 @@ function melee1Attack()
     frameTime = 0
 end
 
+function melee2Attack()
+    motion = GodState.MELEE2
+    frameTime = 0
+end
+
+function heal(curHp)
+    motion = GodState.HIT1
+    curHp = curHp + 10
+    frameTime = 0
+end
 
 
 -- 죽음 상태 처리 함수

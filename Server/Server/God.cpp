@@ -166,7 +166,7 @@ void God::God_Ai(float fTimeElapsed, CAirplanePlayer* player, int godHp)
 		scene_manager.Send(scene_num, (char*)&p);
 	}
 
-	if (CurState != GodState::IDLE2)
+	if (CurMotion != GodAnimation::IDLE2)
 	{
 		LookAtPosition(fTimeElapsed, player->GetPosition());
 	}

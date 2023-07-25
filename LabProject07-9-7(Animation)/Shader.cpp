@@ -1808,7 +1808,7 @@ void CDepthRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCam
 		Map[i]->Render(pd3dCommandList, pCamera);
 
 	}*/
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 3; i++) {
 		Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
 
 	}
@@ -1940,7 +1940,7 @@ void CShadowMapShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 		Map[i]->Render(pd3dCommandList, pCamera);
 
 	}*/
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 3; i++) {
 		Player[i]->Render(pd3dCommandList, pCamera);
 	}
 }
