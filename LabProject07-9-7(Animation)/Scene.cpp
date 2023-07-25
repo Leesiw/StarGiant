@@ -1747,7 +1747,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 	}
 
-	static int aaaaaaa = 0;
 	for (int i = 0; i < MAX_PARTICLES; ++i) {
 		if (!b_Inside) {
 			if (m_pParticle[i]->isLive) {
@@ -1780,23 +1779,22 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 
 
-	for (int i = 0; i < MAX_PARTICLES; ++i) {
-		if (!b_Inside) {
-			//if (m_pFlameParticle[i]->isLive) {
-			if (aaaaaaa == 0)
-				m_pFlameParticle[i]->SetPosition({ 0,0,0 });
-
-			m_pFlameParticle[i]->setTarpos(m_pPlayer[0]->GetPosition());
-			m_pFlameParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-			m_pFlameParticle[i]->Rotate(0, 0, m_eTime * 100);
-
-			m_pFlameParticle[i]->Animate(m_fElapsedTime);
-
-			m_pFlameParticle[i]->Render(pd3dCommandList, pCamera);
-			//}
+	if (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_ppGod->m2) {
+		for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+			if (!b_Inside) {
+				//if (m_pFlameParticle[i]->isLive) {
+				//if (aaaaaaa == 0)
+				//	m_pFlameParticle[i]->SetPosition({ 0,0,0 });
+				m_pFlameParticle[i]->SetPosition(m_ppGod->GetPosition());
+				m_pFlameParticle[i]->setTarpos(m_pPlayer[0]->GetPosition());
+				m_pFlameParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				m_pFlameParticle[i]->Rotate(0, 0, m_eTime * 100);
+				m_pFlameParticle[i]->Animate(m_fElapsedTime);
+				m_pFlameParticle[i]->Render(pd3dCommandList, pCamera);
+				//}
+			}
 		}
 	}
-	aaaaaaa = 1;
 
 	for (int i = 0; i < MAX_FIRE; ++i) {
 		if (!b_Inside) {

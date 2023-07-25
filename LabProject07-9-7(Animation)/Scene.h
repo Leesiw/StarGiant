@@ -17,8 +17,10 @@
 #define SPOT_LIGHT						2
 #define DIRECTIONAL_LIGHT				3
 
-#define MAX_PARTICLES					100
-#define MAX_HEAL_PARTICLES				100
+#define MAX_PARTICLES					50
+#define MAX_CIRCLE_PARTICLES			4
+
+#define MAX_HEAL_PARTICLES				10
 
 
 #define MAX_FIRE				2

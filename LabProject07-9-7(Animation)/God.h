@@ -19,6 +19,8 @@ public:
 	int MAXGodHP = 100.0f;
 	int GodHP = 100.0f;
 	bool heal = false;
+	bool m2 = false;
+
 
 public:
 	void GodObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel);

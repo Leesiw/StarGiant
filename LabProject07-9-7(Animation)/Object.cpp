@@ -2539,12 +2539,12 @@ void CFireObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandLi
 
 CFlameParticleObject::CFlameParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
-	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 50.0f, 50.0f, 0.0f);
+	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 200.0f, 200.0f, 0.0f);
 	SetMesh(pParticleMesh);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	CTexture* pParticleTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/circle.dds", 0); //star
+	pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/bluecircle.dds", 0); //star
 
 
 	CParticleShader* pParticleShader = new CParticleShader(); //CParticleShader CUIShader
@@ -2560,15 +2560,15 @@ CFlameParticleObject::CFlameParticleObject(ID3D12Device* pd3dDevice, ID3D12Graph
 	SetMaterial(0, pParticleMaterial);
 
 	
-	velocity = 5;
+	velocity = 10;
 	//velocity = (float)(rand() % 5);
 
 	angleX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
 	angleY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
 	angleZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
 
-	intervalX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
-	intervalY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
+	//intervalX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
+	//intervalY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
 	intervalZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 150.0f;
 
 
@@ -2596,7 +2596,7 @@ void CFlameParticleObject::Animate(float fElapsedTime)
 	}
 
 	// velocity에 따라 파티클 이동
-	XMVECTOR velocityVector = XMVectorScale(targetDirection, velocity * fElapsedTime * 50);
+	XMVECTOR velocityVector = XMVectorScale(targetDirection, velocity * fElapsedTime * 10);
 	XMFLOAT3 velocityResult;
 	XMStoreFloat3(&velocityResult, velocityVector);
 

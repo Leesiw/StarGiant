@@ -49,6 +49,11 @@ void God::ChangeAnimation(GodAnimation CurMotion)
 		soundon = -1;
 		}
 
+		if (CurMotion == GodAnimation::MELEE2) {
+			m2 = true;
+			soundon = -1;
+		}
+
 		m_pSkinnedAnimationController->SetTrackEnable(static_cast<int>(PastMotion), false);
 		m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(CurMotion), 0.0f);
 		m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(PastMotion), 0.0f);
