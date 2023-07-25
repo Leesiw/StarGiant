@@ -27,6 +27,8 @@ public:
 	short scene_num;
 
 public:
+	void Reset();
+
 	GodState GetState() { return CurState; };
 	GodState SetState(GodState GState) { return CurState = GState; };
 	GodAnimation GetAnimation() { return CurMotion; };

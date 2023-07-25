@@ -8,19 +8,12 @@ public:
 	virtual ~CGameObject();
 
 public:
-	char							m_pstrFrameName[64];
-
 	XMFLOAT4X4						m_xmf4x4ToParent;
 	XMFLOAT4X4						m_xmf4x4World;
 
-	bool						mesh = false;
-
-	bool coll = false;
 	BoundingOrientedBox				boundingbox;	// 직접 크기 지정
 //	BoundingOrientedBox				m_xmOOBB;		// 위의 것에 위치 행렬 이용해 이동 시킨 것. 충돌체크를 이것으로 한다
-	BoundingBox			aabb;
 
-	virtual void OnInitialize() { }
 	virtual void Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent = NULL) {};
 	XMFLOAT3 GetPosition();
 	XMFLOAT3 GetLook();

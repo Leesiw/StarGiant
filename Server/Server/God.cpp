@@ -56,6 +56,16 @@ God::~God()
 	lua_close(m_L);
 }
 
+void God::Reset()
+{
+	GodHP = MAXGodHP;
+
+	CurState = GodState::IDLE1;
+	PastState = CurState;
+	CurMotion = GodAnimation::IDLE1;
+	PastMotion = CurMotion;
+}
+
 void God::SendPosition()
 {
 	SC_MOVE_BOSS_PACKET p;

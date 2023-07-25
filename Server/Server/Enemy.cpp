@@ -11,6 +11,8 @@ CEnemy::CEnemy()
 
 	enemy_flags &= ~option2;
 
+	ZeroMemory(&enemy_flags, 1);
+
 	hp = 10;
 	state = EnemyState::MOVE;
 }
@@ -237,6 +239,19 @@ void CEnemy::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	}
 }
 
+
+void CEnemy::Reset()
+{
+	m_xmf4x4ToParent = Matrix4x4::Identity();
+	m_xmf4x4World = Matrix4x4::Identity();
+
+	//enemy_flags &= ~option2;
+
+	ZeroMemory(&enemy_flags, 1);
+
+	hp = 10;
+	state = EnemyState::MOVE;
+}
 
 void CEnemy::SetisAlive(bool i_a)
 {

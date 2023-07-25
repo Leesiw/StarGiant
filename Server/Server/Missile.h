@@ -14,11 +14,6 @@ private:
 	float m_fTrackingTime = 5.f;
 	float m_fTrackingTimeRemaining;
 
-	float m_fMovingDistance; 
-	float m_fBulletEffectiveRange = 1000.f;
-
-	XMFLOAT3 m_xmf3MovingDirection;
-
 	char damage;
 public:
 	CMissile();

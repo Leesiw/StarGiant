@@ -63,6 +63,8 @@ protected:
 	float           			m_fMaxVelocityY = 0.0f;
 
 public:
+	void Reset();
+
 	void MeteoAttack(float fTimeElapsed, const XMFLOAT3& TargetPos); // 공격 시작 시 한 번 실행
 	void MoveMeteo(float fTimeElapsed); // 메테오 움직여야 할때 계속 실행. send까지 포함됨
 

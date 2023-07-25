@@ -71,7 +71,6 @@ XMFLOAT4 CMissile::GetQuaternion()
 
 void CMissile::SetNewMissile(const MissileInfo& info)
 {
-	m_fMovingDistance = 0.f;
 	isActive = true;
 	m_fTrackingTimeRemaining = m_fTrackingTime;
 
@@ -84,5 +83,8 @@ void CMissile::SetNewMissile(const MissileInfo& info)
 
 void CMissile::Reset()
 {
+	m_xmf4x4ToParent = Matrix4x4::Identity();
+	m_xmf4x4World = Matrix4x4::Identity();
+
 	isActive = false;
 }

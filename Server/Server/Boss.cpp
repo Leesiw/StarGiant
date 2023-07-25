@@ -154,6 +154,26 @@ XMFLOAT4 Boss::GetQuaternion()
 	return xmf4;
 }
 
+void Boss::Reset()
+{
+	//m_xmf4x4ToParent = Matrix4x4::Identity();
+	//m_xmf4x4World = Matrix4x4::Identity();
+
+	CurState = BossState::SLEEP;
+	PastState = CurState;
+	NextState = CurState;
+
+	CurMotion = BossAnimation::SLEEP;
+	PastMotion = CurMotion;
+
+	condition = false;
+
+	MAXBossHP = 100.0f;
+	BossHP = MAXBossHP;
+	CurMotion = BossAnimation::SLEEP;
+	CurState = BossState::SLEEP;
+}
+
 void Boss::MeteoAttack(float fTimeElapsed, const XMFLOAT3& TargetPos) // 공격 시작 시 한 번 실행
 {
 	XMFLOAT3 xmf3Pos = GetPosition();

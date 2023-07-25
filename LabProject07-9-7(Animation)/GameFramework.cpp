@@ -1510,6 +1510,7 @@ void CGameFramework::ProcessInput()
 					XMFLOAT4 a;
 					XMStoreFloat4(&a, m_pPlayer[0]->GetQuaternion());
 					my_packet.data.Quaternion = a;
+
 					if (_state == SCENE_INGAME) {
 						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
 					}
@@ -2674,7 +2675,7 @@ void CGameFramework::ProcessPacket(char* p)
 			//m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
 		//}
 		if (m_pScene->m_ppEnemies[packet->data.id]->state == EnemyState::MOVE) {
-			m_pScene->m_ppEnemies[packet->data.id]->LookAtPosition(0.1f, packet->data.pos);
+			m_pScene->m_ppEnemies[packet->data.id]->LookAtPosition(0.3f, packet->data.pos);
 		}
 
 		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);

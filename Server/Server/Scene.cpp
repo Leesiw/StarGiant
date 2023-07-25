@@ -49,7 +49,6 @@ void CScene::BuildObjects()
 	// player
 	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
 	pAirplanePlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 100.0f));
-	pAirplanePlayer->mesh = true;
 	pAirplanePlayer->boundingbox = BoundingOrientedBox{ XMFLOAT3(-0.000000f, -0.000000f, -0.000096f), XMFLOAT3(15.5f, 15.5f, 3.90426f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	m_pSpaceship = pAirplanePlayer;
 
@@ -166,11 +165,13 @@ void CScene::ResetScene()
 void CScene::Reset()
 {
 	_id = -1;
-	m_pSpaceship->SetPosition(XMFLOAT3(0.f, 0.f, 100.f));
 	m_pSpaceship->Reset();
+	m_pSpaceship->SetPosition(XMFLOAT3(0.f, 0.f, 100.f));
 
 	black_hole_time = 30.f;
 	invincible_mode = false;
+
+	heal_player = -1;
 
 	items[ItemType::JEWEL_ATT] = 0;
 	items[ItemType::JEWEL_DEF] = 0;
@@ -188,6 +189,8 @@ void CScene::Reset()
 	}
 
 	cur_mission = MissionType::CS_TURN;
+	prev_mission = MissionType::CS_TURN;
+	
 	for (char i = 0; i < 3; ++i) {
 		m_ppPlayers[i]->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 10.0f, 740.0f));
 		m_ppPlayers[i]->cutscene_end = false;
@@ -196,28 +199,30 @@ void CScene::Reset()
 	for (int i = 0; i < METEOS; ++i) {
 		XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
 		m_ppMeteoObjects[i]->m_xmf4x4ToParent = Matrix4x4::Identity();
+		m_ppMeteoObjects[i]->m_xmf4x4World = Matrix4x4::Identity();
 		XMFLOAT3 random_pos{ urdPos(dree) , urdPos(dree), urdPos(dree) };
 		XMFLOAT3 random_dir{ urdDir(dree) , urdDir(dree), urdDir(dree) };
 		if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x;  random_dir.x = -random_dir.x; }
 		if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; random_dir.y = -random_dir.y; }
 		if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; random_dir.z = -random_dir.z; }
 		m_ppMeteoObjects[i]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
-
+		/*
 		if (i < METEOS / 2) {
 			m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
 		}
 		else {
 			m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
-		}
+		}*/
 		m_ppMeteoObjects[i]->SetMovingDirection(random_dir);
 	}
 
 	for (int i = 0; i < ENEMIES; ++i) {
-		m_ppEnemies[i]->SetisAlive(false);
+		m_ppEnemies[i]->Reset();
+	//	m_ppEnemies[i]->SetisAlive(false);
 	}
 
 	for (int i = 0; i < ENEMY_BULLETS; ++i) {
-		m_ppMissiles[i]->SetisActive(false);
+		m_ppMissiles[i]->Reset();
 	}
 
 	kill_monster_num = 0;
@@ -227,7 +232,9 @@ void CScene::Reset()
 	can_sit[2] = true;
 	can_sit[3] = true;
 
+	m_pBoss->Reset();
 	m_pBoss->SetPosition(3000.f, 3000.f, 3000.f);
+	m_pGod->Reset();
 	m_pGod->SetPosition(-3000.f, -3000.f, -3000.f);
 
 }
@@ -833,7 +840,7 @@ void CScene::MoveEnemy(char obj_id)
 	}
 
 	if ( m_ppEnemies[obj_id]->state == EnemyState::AIMING) {
-		if (obj_id >= 23 && !m_ppEnemies[obj_id]->GetAttackTimer()) {
+		if (m_ppEnemies[obj_id]->type == EnemyType::MISSILE && !m_ppEnemies[obj_id]->GetAttackTimer()) {
 			m_ppEnemies[obj_id]->SetAttackTimerTrue();
 			TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10s, EV_SPAWN_MISSILE, static_cast<short>(num) };
 			timer_queue.push(ev);
@@ -1387,6 +1394,7 @@ void CScene::ChangeInvincibleMode()
 
 void CScene::SpawnEnemy(char id)
 {
+	m_ppEnemies[id]->Reset();
 	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
 	XMFLOAT3 random_pos{ urdPos(dree), urdPos(dree), urdPos(dree) / 5.f };
 	if (urdEnemyAI(dree) > 50) { random_pos.x = -random_pos.x; }

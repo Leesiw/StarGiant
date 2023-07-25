@@ -12,10 +12,6 @@ public:
 	CEnemy();
 	virtual ~CEnemy();
 protected:
-	float           			m_fPitch = 0;
-	float           			m_fYaw = 0;
-	float           			m_fRoll = 0;
-
 	float						m_fCoolTime = 2.0f;
 	float						m_fCoolTimeRemaining = 0.0f;
 
@@ -40,6 +36,8 @@ public:
 	EnemyState state;
 
 public:
+	void Reset();
+
 	bool GetisAlive() { return enemy_flags & option0; }
 	void SetisAlive(bool i_a);
 	void SetAttackTimerFalse();
@@ -73,10 +71,6 @@ public:
 
 	virtual void Animate(float fElapsedTime);
 	virtual void Animate(float fTimeElapsed, CAirplanePlayer* player);
-
-	float GetPitch() { return m_fPitch; }
-	float GetYaw() { return m_fYaw; }
-	float GetRoll() { return m_fRoll; }
 
 	EnemyState GetState() { return state; }
 

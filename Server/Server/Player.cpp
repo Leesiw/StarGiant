@@ -234,6 +234,26 @@ bool CAirplanePlayer::GetHeal()
 
 void CAirplanePlayer::Reset()
 {
+	is_update = false;
+
+	m_xmf4x4ToParent = Matrix4x4::Identity();
+	m_xmf4x4World = Matrix4x4::Identity();
+
+	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
+
+	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_fMaxVelocityXZ = 0.0f;
+	m_fMaxVelocityY = 0.0f;
+	m_fFriction = 0.0f;
+
+	m_fPitch = 0.0f;
+	m_fRoll = 0.0f;
+	m_fYaw = 0.0f;
+
 	max_hp = 100;
 	hp = 100;
 
@@ -251,6 +271,13 @@ void CAirplanePlayer::Update(float fTimeElapsed)
 	
 
 	if (!is_update) {
+		if (isnan(input_info.Quaternion.w) || isnan(input_info.Quaternion.x)
+			|| isnan(input_info.Quaternion.y) || isnan(input_info.Quaternion.z)) {
+			printf("쿼터니언이 nan\n");
+			CPlayer::Update(fTimeElapsed);
+			OnPrepareRender();
+			return;
+		}
 		XMVECTOR a = XMLoadFloat4(&input_info.Quaternion);
 		XMMATRIX mat = XMMatrixRotationQuaternion(a);
 		XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(Matrix4x4::Identity(), mat);
