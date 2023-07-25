@@ -32,7 +32,7 @@ constexpr char SPRITE_CNT = 6;
 
 constexpr char MAX_ITEM = 15;	// 보석 최대 레벨?
 
-constexpr int MAX_ROOM = 1000;
+constexpr int MAX_ROOM = 200;
 constexpr int MAX_USER = MAX_ROOM * 3;
 
 constexpr int PORT_NUM = 4000;

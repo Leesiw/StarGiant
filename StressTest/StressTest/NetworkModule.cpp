@@ -24,7 +24,7 @@ static std::random_device rdd;
 static std::default_random_engine dree(rdd());
 static std::uniform_real_distribution<float> urdRandom(-1000, 1000);
 
-const static int MAX_TEST = 3000;
+const static int MAX_TEST = 500;
 const static int MAX_CLIENTS = MAX_TEST * 2;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
@@ -142,7 +142,7 @@ void ProcessPacket(int ci, unsigned char packet[])
 	case SC_CHANGE: break;
 	case SC_ADD_PLAYER: break;
 	case SC_REMOVE_PLAYER: break;
-	case SC_SPAWN_METEO: break;
+	case SC_SPAWN_MISSILE: break;
 	case SC_ALL_METEOR: break;
 	case SC_METEO: break;
 	case SC_MOVE_SPACESHIP:
