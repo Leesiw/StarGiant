@@ -2611,13 +2611,6 @@ void CGameFramework::ProcessPacket(char* p)
 		matcnt = player_cnt;
 		break;
 	}
-	case SC_SPAWN_METEO:
-	{
-		SC_SPAWN_METEO_PACKET* packet = reinterpret_cast<SC_SPAWN_METEO_PACKET*>(p);
-		m_pScene->RespawnMeteor(m_pd3dDevice, m_pd3dCommandList, packet->data);
-		m_pScene->RespawnBossMeteor(m_pd3dDevice, m_pd3dCommandList, packet->data);
-		break;
-	}
 	case SC_METEO:
 	{
 		SC_METEO_PACKET* packet = reinterpret_cast<SC_METEO_PACKET*>(p);
@@ -2681,7 +2674,7 @@ void CGameFramework::ProcessPacket(char* p)
 			//m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
 		//}
 		if (m_pScene->m_ppEnemies[packet->data.id]->state == EnemyState::MOVE) {
-			m_pScene->m_ppEnemies[packet->data.id]->LookAtPosition(0.3f, packet->data.pos);
+			m_pScene->m_ppEnemies[packet->data.id]->LookAtPosition(0.1f, packet->data.pos);
 		}
 
 		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);
@@ -2781,9 +2774,9 @@ void CGameFramework::ProcessPacket(char* p)
 		}
 		break;
 	}
-	case SC_MISSILE:
+	case SC_SPAWN_MISSILE:
 	{
-		SC_MISSILE_PACKET* packet = reinterpret_cast<SC_MISSILE_PACKET*>(p);
+		SC_SPAWN_MISSILE_PACKET* packet = reinterpret_cast<SC_SPAWN_MISSILE_PACKET*>(p);
 
 		m_pScene->m_ppEnemyMissiles[packet->data.id]->SetPosition(packet->data.pos);
 
@@ -2793,6 +2786,20 @@ void CGameFramework::ProcessPacket(char* p)
 		m_pScene->m_ppEnemyMissiles[packet->data.id]->SetPosition(packet->data.pos);
 		m_pScene->m_ppEnemyMissiles[packet->data.id]->ResetRotate();
 		m_pScene->m_ppEnemyMissiles[packet->data.id]->Rotate(&packet->data.Quaternion);
+		break;
+	}
+	case SC_MISSILE:
+	{
+		SC_MISSILE_PACKET* packet = reinterpret_cast<SC_MISSILE_PACKET*>(p);
+		/*
+		if (!m_pScene->m_ppEnemyMissiles[packet->data.id]->m_bActive) {
+			m_pScene->m_ppEnemyMissiles[packet->data.id]->m_bActive = true;
+		}*/
+		m_pScene->m_ppEnemyMissiles[packet->data.id]->LookAtPosition(0.1f, packet->data.pos);
+		m_pScene->m_ppEnemyMissiles[packet->data.id]->SetPosition(packet->data.pos);
+		
+		//m_pScene->m_ppEnemyMissiles[packet->data.id]->ResetRotate();
+		//m_pScene->m_ppEnemyMissiles[packet->data.id]->Rotate(&packet->data.Quaternion);
 		break;
 	}
 	case SC_REMOVE_MISSILE:

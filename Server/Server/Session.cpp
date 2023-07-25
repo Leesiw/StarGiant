@@ -91,15 +91,27 @@ void SESSION::send_bullet_packet(XMFLOAT3& pos, XMFLOAT3& direction, unsigned in
 	do_send(&p);
 }
 
-void SESSION::send_missile_packet(MISSILE_INFO& info)
+void SESSION::send_spawn_missile_packet(SPAWN_MISSILE_INFO& info)
+{
+	SC_SPAWN_MISSILE_PACKET p;
+	p.size = sizeof(SC_SPAWN_MISSILE_PACKET);
+	p.type = SC_SPAWN_MISSILE;
+
+	p.data.id = info.id;
+	p.data.pos = info.pos;
+	p.data.Quaternion = info.Quaternion;
+
+	do_send(&p);
+}
+
+void SESSION::send_missile_packet(char id, XMFLOAT3& pos)
 {
 	SC_MISSILE_PACKET p;
 	p.size = sizeof(SC_MISSILE_PACKET);
 	p.type = SC_MISSILE;
 
-	p.data.id = info.id;
-	p.data.pos = info.pos;
-	p.data.Quaternion = info.Quaternion;
+	p.data.id = id;
+	p.data.pos = pos;
 
 	do_send(&p);
 }
@@ -167,7 +179,7 @@ void SESSION::send_bullet_packet(int c_id, CEnemyObject* m_pEnemy, XMFLOAT3 play
 	WSASend(_socket, &wsabuf, 1, &sent_byte, 0, nullptr, 0);
 }
 */
-
+/*
 void SESSION::send_spawn_meteo_packet(char id, CMeteoObject* meteo)
 {
 	SC_SPAWN_METEO_PACKET p;
@@ -187,7 +199,7 @@ void SESSION::send_spawn_all_meteo_packet(std::array<CMeteoObject*,METEOS> meteo
 	for (int i = 0; i < METEOS; ++i) {
 		send_spawn_meteo_packet(i, meteo[i]);
 	}
-}
+}*/
 
 void SESSION::send_all_enemy_packet(ENEMY_INFO e_info[], bool alive[])
 {

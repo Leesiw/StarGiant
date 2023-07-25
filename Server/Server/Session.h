@@ -120,7 +120,8 @@ public:
 	void send_enemy_packet(ENEMY_INFO& enemy_info);
 	void send_spawn_enemy_packet(SPAWN_ENEMY_INFO& enemy_info);
 	void send_bullet_packet(XMFLOAT3& pos, XMFLOAT3& direction, unsigned int time);
-	void send_missile_packet(MISSILE_INFO& info);
+	void send_spawn_missile_packet(SPAWN_MISSILE_INFO& info);
+	void send_missile_packet(char id, XMFLOAT3& pos);
 	void send_remove_missile_packet(char id);
 	void send_heal_packet();
 	void send_spawn_meteo_packet(char id, CMeteoObject* meteo);

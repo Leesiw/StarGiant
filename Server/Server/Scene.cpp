@@ -999,7 +999,7 @@ void CScene::SpawnMissile(char obj_id)
 		if (!m_ppMissiles[i]->GetisActive()) {
 			m_ppMissiles[i]->SetNewMissile(info);
 
-			MISSILE_INFO m_info{};
+			SPAWN_MISSILE_INFO m_info{};
 			m_info.id = i;
 			m_info.pos = info.StartPos;
 			m_info.Quaternion = info.Quaternion;
@@ -1007,7 +1007,7 @@ void CScene::SpawnMissile(char obj_id)
 			for (short pl_id : _plist) {
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].send_missile_packet(m_info);
+				clients[pl_id].send_spawn_missile_packet(m_info);
 			}
 			m_ppMissiles[i]->prev_time = chrono::steady_clock::now();
 			TIMER_EVENT ev{ i, chrono::system_clock::now() + 30ms, EV_UPDATE_MISSILE, static_cast<short>(num) };
@@ -1040,12 +1040,6 @@ void CScene::UpdateMissile(char obj_id)
 	std::chrono::duration<float> elapsed_time = (time_now - m_ppMissiles[obj_id]->prev_time);
 	m_ppMissiles[obj_id]->prev_time = time_now;
 	m_ppMissiles[obj_id]->Animate(elapsed_time.count(), m_pSpaceship);
-
-	MISSILE_INFO m_info{};
-	m_info.id = obj_id;
-	m_info.pos = m_ppMissiles[obj_id]->GetPosition();
-	//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
-	m_info.Quaternion = m_ppMissiles[obj_id]->GetQuaternion();
 
 	BoundingOrientedBox missile_bbox = m_ppMissiles[obj_id]->UpdateBoundingBox();
 	BoundingOrientedBox spaceship_bbox = m_pSpaceship->UpdateBoundingBox();
@@ -1239,14 +1233,13 @@ void CScene::SendSceneInfo()
 
 	for (char i = 0; i < MISSILES; ++i) {
 		if (!m_ppMissiles[i]->GetisActive()) { continue; }
-		SC_MISSILE_PACKET e_packet{};
-		e_packet.size = sizeof(e_packet);
-		e_packet.type = SC_MISSILE;
-		e_packet.data.id = i;
-		e_packet.data.pos = m_ppMissiles[i]->GetPosition();
-		e_packet.data.Quaternion = m_ppMissiles[i]->GetQuaternion();
-		memcpy(&send_buf[send_num], &e_packet, e_packet.size);
-		send_num += e_packet.size;
+		SC_MISSILE_PACKET m_packet{};
+		m_packet.size = sizeof(m_packet);
+		m_packet.type = SC_MISSILE;
+		m_packet.data.id = i;
+		m_packet.data.pos = m_ppMissiles[i]->GetPosition();
+		memcpy(&send_buf[send_num], &m_packet, m_packet.size);
+		send_num += m_packet.size;
 	}
 
 	for (short pl_id : _plist) {
@@ -1504,7 +1497,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			}*/
 		}
 	}
-
+	/*
 	for (int i = 0; i < ENEMY_BULLETS; ++i) {
 		if (m_ppMissiles[i]->GetisActive()) {
 			m_ppMissiles[i]->Animate(fTimeElapsed, m_pSpaceship);
@@ -1512,8 +1505,6 @@ void CScene::AnimateObjects(float fTimeElapsed)
 			m_info.id = i;
 			m_info.pos = m_ppMissiles[i]->GetPosition();
 			//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
-			m_info.Quaternion = m_ppMissiles[i]->GetQuaternion();
-
 			for (short pl_id : _plist) {
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
@@ -1525,7 +1516,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 				}
 			}
 		}
-	}
+	}*/
 	if (m_pBoss) {
 		m_pBoss->Animate(fTimeElapsed);
 		if(cur_mission == MissionType::FIND_BOSS || cur_mission == MissionType::DEFEAT_BOSS)

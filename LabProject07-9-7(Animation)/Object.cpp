@@ -1950,6 +1950,34 @@ CMissileObject::CMissileObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pBulletModel);
 }
 
+void CMissileObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
+{
+	XMFLOAT3 new_pos = pos;
+
+	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// 역행렬
+
+	new_pos = Vector3::TransformCoord(new_pos, inv_mat); // 타겟의 위치를 적 자체의 좌표계로 변환
+	if (Vector3::Length(new_pos) > 0.0001f) {
+		new_pos = Vector3::Normalize(new_pos);
+	}
+
+	float pitch = XMConvertToDegrees(asin(-new_pos.y));
+	float yaw = XMConvertToDegrees(atan2(new_pos.x, new_pos.z));
+
+	float rotate_angle = fTimeElapsed * 360.f;
+
+	XMFLOAT3 p_y_r{ pitch, yaw, 0.f };
+	if (Vector3::Length(p_y_r) > rotate_angle) {
+		p_y_r = Vector3::Normalize(p_y_r);
+		Rotate(p_y_r.x * rotate_angle, p_y_r.y * rotate_angle, 0.f);
+	}
+	else {
+		Rotate(pitch, yaw, 0.f);
+	}
+
+	UpdateTransform(NULL);
+}
+
 void CMissileObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 {
 	if (pxmf4x4Parent) {

@@ -758,6 +758,8 @@ public:
 public:
 	//virtual void Animate(float fElapsedTime);
 
+	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
+
 	XMFLOAT4X4 m_xmf4x4Rotate;
 
 	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);

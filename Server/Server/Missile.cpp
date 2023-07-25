@@ -43,7 +43,7 @@ void CMissile::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	float pitch = XMConvertToDegrees(asin(-new_pos.y));
 	float yaw = XMConvertToDegrees(atan2(new_pos.x, new_pos.z));
 
-	float rotate_angle = fTimeElapsed * 360.f;
+	float rotate_angle = fTimeElapsed * 100.f;
 
 	XMFLOAT3 p_y_r{ pitch, yaw, 0.f };
 	if (Vector3::Length(p_y_r) > rotate_angle) {

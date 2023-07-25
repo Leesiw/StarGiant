@@ -58,16 +58,17 @@ constexpr char SC_CHANGE = 7;
 constexpr char SC_ADD_PLAYER = 8;
 constexpr char SC_REMOVE_PLAYER = 9;
 
-constexpr char SC_SPAWN_METEO = 10;
-constexpr char SC_ALL_METEOR = 11;
-constexpr char SC_METEO = 12;
 
-constexpr char SC_MOVE_SPACESHIP = 13;
-constexpr char SC_MOVE_INSIDEPLAYER = 14;
-constexpr char SC_SPAWN_ENEMY = 15;
-constexpr char SC_MOVE_ENEMY = 16;
-constexpr char SC_BULLET = 17;
-constexpr char SC_BULLET_HIT = 18;
+constexpr char SC_ALL_METEOR = 10;
+constexpr char SC_METEO = 11;
+
+constexpr char SC_MOVE_SPACESHIP = 12;
+constexpr char SC_MOVE_INSIDEPLAYER = 13;
+constexpr char SC_SPAWN_ENEMY = 14;
+constexpr char SC_MOVE_ENEMY = 15;
+constexpr char SC_BULLET = 16;
+constexpr char SC_BULLET_HIT = 17;
+constexpr char SC_SPAWN_MISSILE = 18;
 constexpr char SC_MISSILE = 19;
 constexpr char SC_REMOVE_MISSILE = 20;
 constexpr char SC_ITEM = 21;
@@ -231,6 +232,11 @@ struct BULLET_HIT_INFO {
 
 // missile
 struct MISSILE_INFO {
+	char id;
+	XMFLOAT3 pos;
+};
+
+struct SPAWN_MISSILE_INFO {
 	char id;
 	XMFLOAT3 pos;
 	XMFLOAT4 Quaternion;
@@ -447,6 +453,13 @@ struct SC_BULLET_HIT_PACKET {
 };
 
 // missile
+
+struct SC_SPAWN_MISSILE_PACKET {
+	unsigned char size;
+	char	type;
+
+	SPAWN_MISSILE_INFO data;
+};
 
 struct SC_MISSILE_PACKET {
 	unsigned char size;
