@@ -157,6 +157,10 @@ public:
 	float								m_fredbosscutTime = 0.0f;
 
 
+	float								m_biteTime = 0.0f;
+
+
+
 
 	float								m_eTime = 0.0f;
 

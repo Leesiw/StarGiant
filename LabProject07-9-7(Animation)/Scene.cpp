@@ -398,13 +398,16 @@ void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	m_ppUI[1] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::SCRATCH), 1, 1, 0);
 	m_ppUI[1]->SetPosition(fx + 10.0f, fy, 10.0f);
 
-	for (int i = 2; i < ENEMIES + 2; ++i) { //  UI_CNT
+	m_ppUI[2] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::BITE), 1, 1, 0);
+	m_ppUI[2]->SetPosition(fx + 10.0f, fy, 10.0f);
+
+	for (int i = 3; i < ENEMIES + 3; ++i) { //  UI_CNT
 		m_ppUI[i] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::HP), 15, 2, 0);
 		m_ppUI[i]->SetPosition(fx + 10.0f + 20.0f * i, fy, 10.0f);
 		m_ppUI[i]->SetScale(0, 0, 0);
 	}
-	m_ppUI[ENEMIES + 2] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::HP), 30, 4, 0);
-	m_ppUI[ENEMIES + 2]->SetPosition(0.0f, 0.0f, 0.0f);
+	m_ppUI[ENEMIES + 3] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::HP), 30, 4, 0);
+	m_ppUI[ENEMIES + 3]->SetPosition(0.0f, 0.0f, 0.0f);
 
 }
 
@@ -1841,7 +1844,23 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 	m_ppUI[1]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 	m_ppUI[1]->SetScale(80.0f, 80.0f, 80.0f);
 
-	for (int i = 2; i < ENEMIES + 2; i++) // hp bar
+
+
+	if (m_ppUI[1] && m_ppGod->CurMotion == GodAnimation::MELEE1 && m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_biteTime < 2)
+	{
+		m_biteTime += m_fElapsedTime;
+		m_ppUI[2]->SetPosition(xmf3Position);
+		m_ppUI[2]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+		m_ppUI[2]->SetScale(10.0f + m_biteTime * 10, 10.0f + m_biteTime * 10, 10.0f + m_biteTime * 10);
+		m_ppUI[2]->Render(pd3dCommandList, pCamera);
+	}
+	if (m_ppGod->CurMotion != GodAnimation::MELEE1 && m_biteTime > 2) {
+		m_biteTime = 0;
+	}
+	
+
+
+	for (int i = 3; i < ENEMIES + 3; i++) // hp bar
 	{
 		if (m_ppEnemies[i- 2]&& m_ppEnemies[i - 2]->isAlive == true) {
 			m_ppUI[i]->SetPosition(m_ppEnemies[i - 2]->GetPosition().x, m_ppEnemies[i - 2]->GetPosition().y + 10.0f, m_ppEnemies[i - 2]->GetPosition().z);
@@ -1855,9 +1874,9 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 		}
 	}
 
-	m_ppUI[ENEMIES + 2]->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y + 10.0f, m_ppBoss->GetPosition().z);
-	m_ppUI[ENEMIES + 2]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
-	m_ppUI[ENEMIES + 2]->HpbarUpdate(m_ppBoss->GetPosition(), m_ppBoss->GetMaxHp(), m_ppBoss->GetcurHp());
+	m_ppUI[ENEMIES + 3]->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y + 10.0f, m_ppBoss->GetPosition().z);
+	m_ppUI[ENEMIES + 3]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
+	m_ppUI[ENEMIES + 3]->HpbarUpdate(m_ppBoss->GetPosition(), m_ppBoss->GetMaxHp(), m_ppBoss->GetcurHp());
 
 	////hp테스트
 	//m_ppUI[3]->SetPosition(m_ppEnemies[0]->GetPosition());
@@ -1882,7 +1901,7 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 		m_ppUI[1]->Render(pd3dCommandList, pCamera);
 	}
 
-	for (int i = 2; i < UI_CNT; i++)
+	for (int i = 3; i < UI_CNT; i++)
 	{
 		if (m_ppUI[i])
 		{

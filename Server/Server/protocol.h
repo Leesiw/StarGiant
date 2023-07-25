@@ -147,7 +147,7 @@ enum class EnemyType : char
 
 enum class UIType : char
 {
-	CROSSHAIR, SCRATCH, HP
+	CROSSHAIR, SCRATCH, HP, BITE
 
 	,COUNT
 };

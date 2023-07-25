@@ -881,6 +881,11 @@ CUI::CUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, I
         m_ppUITexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
         m_ppUITexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/scratch.dds", 0);
     }
+    if (num == static_cast<int>(UIType::BITE)) {
+        m_ppUITexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+        m_ppUITexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/tooth.dds", 0);
+    }
+
 
     if (num == static_cast<int>(UIType::HP)) {
         m_ppUITexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
