@@ -954,18 +954,18 @@ void CScene::UpdateMeteo(char obj_id)
 	if (spaceship_bbox.Intersects(meteor_bbox))
 	{
 		XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
-		xmf3Sub = Vector3::Subtract(m_ppMeteoObjects[obj_id]->GetPosition(), xmf3Sub);
+		xmf3Sub = Vector3::Subtract( xmf3Sub, m_ppMeteoObjects[obj_id]->GetPosition());
 		if (Vector3::Length(xmf3Sub) > 0.0001f) {
 			xmf3Sub = Vector3::Normalize(xmf3Sub);
 		}
 		XMFLOAT3 vel = m_pSpaceship->GetVelocity();
 		float fLen = Vector3::Length(vel);
-		xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+		xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen * 2, false);
 
 		m_pSpaceship->SetVelocity(Vector3::Add(vel, xmf3Sub));
-		m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 2);
+		m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 5);
 
-		SpawnMeteo(obj_id);
+		m_ppMeteoObjects[obj_id]->SetMovingDirection(Vector3::ScalarProduct(xmf3Sub, -1.f, false));
 
 		for (short pl_id : _plist) {
 			if (pl_id == -1) continue;
@@ -1055,17 +1055,6 @@ void CScene::UpdateMissile(char obj_id)
 	{
 		m_ppMissiles[obj_id]->SetisActive(false);
 		// 충돌처리
-
-		XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
-		xmf3Sub = Vector3::Subtract(m_ppMissiles[obj_id]->GetPosition(), xmf3Sub);
-		if (Vector3::Length(xmf3Sub) > 0.0001f) {
-			xmf3Sub = Vector3::Normalize(xmf3Sub);
-		}
-		float fLen = 100.f;
-		xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
-
-		XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
-		m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
 
 		if (m_pSpaceship->GetHP() > 0) {
 			m_pSpaceship->GetAttack(m_ppMissiles[obj_id]->GetDamage());
