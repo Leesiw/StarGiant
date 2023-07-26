@@ -234,6 +234,8 @@ public:
 
 	CFlameParticleObject* m_pFlameParticle[MAX_PARTICLES] = {};
 	CSkullObject* m_pSkull[MAX_CIRCLE_PARTICLES] = {};
+	CLineObject* m_pline[MAX_CIRCLE_PARTICLES] = {};
+
 
 
 	CDepthRenderShader* m_pDepthRenderShader = NULL;

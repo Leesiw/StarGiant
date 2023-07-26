@@ -348,6 +348,10 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pSkull[i]->count = i;
 	}
 
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+		m_pline[i] = new CLineObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+		m_pline[i]->count = i;
+	}
 
 	//=====================================
 	CLoadedModelInfo* pJewelModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/SoftStar.bin", NULL);
@@ -461,7 +465,7 @@ void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	m_ppGod = new God();
 	m_ppGod->GodObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pGodModel);
 	m_ppGod->SetPosition(5000.0f, 5000.0f, 5000.0f);
-	m_ppGod->Rotate(0, 0, 0);
+	m_ppGod->Rotate(0.f, 0.f, 0.f);
 	m_ppGod->SetScale(20.0f, 20.0f, 20.0f);
 	if (pGodModel) delete pGodModel;
 }
@@ -605,6 +609,8 @@ void CScene::ReleaseObjects()
 
 	if (m_pFlameParticle) delete[] m_pFlameParticle;
 	if (m_pSkull) delete[] m_pSkull;
+	if (m_pline) delete[] m_pline;
+
 
 
 
@@ -1158,6 +1164,8 @@ void CScene::ReleaseUploadBuffers()
 
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pFlameParticle[i] != NULL) { m_pFlameParticle[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pSkull[i] != NULL) { m_pSkull[i]->ReleaseUploadBuffers(); };
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pline[i] != NULL) { m_pline[i]->ReleaseUploadBuffers(); };
+
 
 
 	for (int i = 0; i < MAX_FIRE; ++i)if (m_pFire[i] != NULL) { 
@@ -1531,7 +1539,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	if (m_pPlayer[0]->curMissionType == MissionType::GO_PLANET) {
 		m_ppHierarchicalGameObjects[9]->SetPosition(xmf3Position2);
 		m_ppHierarchicalGameObjects[9]->SetLookAt(tar, XMFLOAT3(0.0f, 1.0f, 0.0f));
-		m_ppHierarchicalGameObjects[9]->Rotate(180, 0, 0);
+		m_ppHierarchicalGameObjects[9]->Rotate(180.f, 0.f, 0.f);
 		m_ppHierarchicalGameObjects[9]->SetScale(10, 5, 10);
 		m_ppHierarchicalGameObjects[9]->Render(pd3dCommandList, pCamera);
 	}
@@ -1539,7 +1547,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	if (m_pPlayer[0]->curMissionType == MissionType::FIND_BOSS) {
 		m_ppHierarchicalGameObjects[9]->SetPosition(xmf3Position2);
 		m_ppHierarchicalGameObjects[9]->SetLookAt(m_ppBoss->GetPosition(), XMFLOAT3(0.0f, 1.0f, 0.0f));
-		m_ppHierarchicalGameObjects[9]->Rotate(180, 0, 0);
+		m_ppHierarchicalGameObjects[9]->Rotate(180.f, 0.f, 0.f);
 		m_ppHierarchicalGameObjects[9]->SetScale(10, 5, 10);
 		m_ppHierarchicalGameObjects[9]->Render(pd3dCommandList, pCamera);
 
@@ -1632,7 +1640,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppJewel->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y + 300.0f + m_eTime, m_ppBoss->GetPosition().z);
 			//m_ppJewel->SetPosition(xmf3Position);
 			//m_ppJewel->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-			m_ppJewel->Rotate(0.0f, m_fElapsedTime * 30.0, 0.0f);
+			m_ppJewel->Rotate(0.0f, m_fElapsedTime * 30.f, 0.0f);
 			m_ppJewel->Render(pd3dCommandList, pCamera);
 		}
 	}
@@ -1641,7 +1649,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	{
 		//m_ppBlackhole->SetPosition(xmf3Position);
 		m_ppBlackhole->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-		m_ppBlackhole->Rotate(0.0f, 0.0f, m_eTime * 10);
+		m_ppBlackhole->Rotate(0.0f, 0.0f, m_eTime * 10.f);
 		if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_BLACK_HOLE || m_pPlayer[0]->curMissionType == MissionType::ESCAPE_BLACK_HOLE)
 			m_ppBlackhole->Render(pd3dCommandList, pCamera);
 	}
@@ -1677,7 +1685,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
 			if (aaaa == 0) {
-				m_ppBoss->Rotate(0, 180, 0);
+				m_ppBoss->Rotate(0.f, 180.f, 0.f);
 				aaaa = 1;
 			}
 			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
@@ -1719,7 +1727,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			//m_fbosscutTime += m_fElapsedTime;
 			if (aaa == 0) {
 				//m_ppGod->SetPosition(m_pPlayer[0]->GetPosition());
-				m_ppGod->Rotate(0, 180, 0);
+				m_ppGod->Rotate(0.f, 180.f, 0.f);
 			}
 			aaa = 1;
 			m_ppGod->Animate(m_fElapsedTime);
@@ -1861,7 +1869,23 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	//}
 	//aafsdaa = 1;
 
+	//static int aafsdaa = 0;
 
+	//if(aafsdaa==0)
+	//	setParticleStarts(MAX_CIRCLE_PARTICLES, m_pPlayer[0]->GetPosition(), 2);
+	//for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+	//	if (!b_Inside) {
+	//		if(i%2==0)
+	//			m_pline[i]->setTarpos(m_pPlayer[0]->getSpritePos(0));
+	//		else
+	//			m_pline[i]->setTarpos(m_pPlayer[0]->getSpritePos(1));
+
+	//		m_pline[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+	//		//m_pline[i]->Animate(m_fElapsedTime);
+	//		m_pline[i]->Render(pd3dCommandList, pCamera);
+	//	}
+	//}
+	//aafsdaa = 1;
 
 	for (int i = 0; i < MAX_FIRE; ++i) {
 		if (!b_Inside) {
@@ -1896,7 +1920,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		{
 			if (adfa == 0) {
 				m_ppJewel->SetPosition(m_ppGod->GetPosition().x, m_ppGod->GetPosition().y, m_ppGod->GetPosition().z);
-				m_ppJewel->Rotate(0.0f, 0, 90);
+				m_ppJewel->Rotate(0.0f, 0.f, 90.f);
 			}
 			//m_ppJewel->SetPosition(xmf3Position);
 			//m_ppJewel->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
@@ -2130,11 +2154,18 @@ void CScene::setParticleStarts(int cnt, XMFLOAT3 tarPos, int num)
 			m_pFlameParticle[i]->setPos(tarPos);
 
 		}
-	if(num==1)
+	if (num == 1)
 		for (int i = 0; i < cnt; i++)
 		{
 			m_pSkull[i]->isLive = true;
 			m_pSkull[i]->setPos(tarPos);
+
+		}
+	if (num == 2)
+		for (int i = 0; i < cnt; i++)
+		{
+			m_pline[i]->isLive = true;
+			m_pline[i]->setPos(tarPos);
 
 		}
 }
