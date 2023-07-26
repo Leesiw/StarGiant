@@ -73,6 +73,7 @@ void SESSION::send_spawn_enemy_packet(SPAWN_ENEMY_INFO& enemy_info)
 	p.data.pos = enemy_info.pos;
 	p.data.max_hp = enemy_info.max_hp;
 	p.data.destination = enemy_info.destination;
+	p.data.state = enemy_info.state;
 
 	do_send(&p);
 }
