@@ -876,22 +876,6 @@ void CScene::MoveEnemy(char obj_id)
 		}
 	}
 
-	if (cur_mission == MissionType::KILL_GOD) {
-		if (Vector3::Length(Vector3::Subtract(m_ppEnemies[obj_id]->GetPosition(), m_pGod->GetPosition())) < 1500.f)
-		{
-			XMFLOAT3 xmf3Sub = m_pGod->GetPosition();
-			xmf3Sub = Vector3::Subtract(m_pGod->GetPosition(), xmf3Sub);
-			if (Vector3::Length(xmf3Sub) > 0.0001f) {
-				xmf3Sub = Vector3::Normalize(xmf3Sub);
-			}
-			XMFLOAT3 vel = m_ppEnemies[obj_id]->GetVelocity();
-			float fLen = Vector3::Length(vel) / 10.f;
-			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
-
-			m_ppEnemies[obj_id]->SetVelocity(Vector3::Add(vel, xmf3Sub));
-		}
-	}
-
 	if ( m_ppEnemies[obj_id]->state == EnemyState::AIMING) {
 		if (m_ppEnemies[obj_id]->type == EnemyType::MISSILE && !m_ppEnemies[obj_id]->GetAttackTimer()) {
 			m_ppEnemies[obj_id]->SetAttackTimerTrue();
