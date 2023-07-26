@@ -1139,7 +1139,7 @@ void CGameFramework::CameraUpdateChange()
 		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
 		m_pCamera->endc = true;
 		m_pCamera->SetTarget({ m_pScene->m_ppGod->GetPosition().x, m_pScene->m_ppGod->GetPosition().y, m_pScene->m_ppGod->GetPosition().z });
-		m_pCamera->SetDist(1500.f);
+		m_pCamera->SetDist(1500.f); 
 		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		iscut = true;

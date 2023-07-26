@@ -2600,13 +2600,11 @@ void CFlameParticleObject::Animate(float fElapsedTime)
 	XMFLOAT3 velocityResult;
 	XMStoreFloat3(&velocityResult, velocityVector);
 
-	position.x += velocityResult.x;
-	position.y += velocityResult.y;
-	position.z += velocityResult.z;
+	position.x += velocityResult.x * 10;
+	position.y += velocityResult.y * 10;
+	position.z += velocityResult.z * 10;
 
 
-
-	
 	SetPosition(position);
 
 	CGameObject::Animate(fElapsedTime);
@@ -2743,6 +2741,13 @@ void CSkullObject::Animate(float fElapsedTime)
 		ffTimeElapsed = 0.f;
 	}
 
+
+
+	//if (XMVector3Equal(targetDirection, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f)))
+	//{
+	//	targetDirection = XMVectorSubtract(XMLoadFloat3(&TargetPos), XMLoadFloat3(&position));
+	//	targetDirection = XMVector3Normalize(targetDirection);
+	//}
 	 
 	//타겟을 향해 계속
 	targetDirection = XMVectorSubtract(XMLoadFloat3(&TargetPos), XMLoadFloat3(&position));
@@ -2753,11 +2758,9 @@ void CSkullObject::Animate(float fElapsedTime)
 	XMFLOAT3 velocityResult;
 	XMStoreFloat3(&velocityResult, velocityVector);
 
-	position.x += velocityResult.x;
-	position.y += velocityResult.y;
-	position.z += velocityResult.z;
-
-
+	position.x += velocityResult.x * 10;
+	position.y += velocityResult.y * 10;
+	position.z += velocityResult.z * 10;
 
 
 	SetPosition(position);

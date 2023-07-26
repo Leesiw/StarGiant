@@ -1006,7 +1006,7 @@ private:
 	float intervalY = 0;
 	float intervalZ = 0;
 
-	float lifeTime = 4.0f;
+	float lifeTime = 1.5f;
 	float ffTimeElapsed = 0.0f;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1038,7 +1038,7 @@ private:
 	float intervalY = 0;
 	float intervalZ = 0;
 
-	float lifeTime = 4.0f;
+	float lifeTime = 2.0f;
 	float ffTimeElapsed = 0.0f;
 };
 

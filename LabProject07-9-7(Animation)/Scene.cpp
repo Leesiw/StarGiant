@@ -1780,7 +1780,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	if (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_ppGod->CurMotion == GodAnimation::HIT1) {
 		if (m_ppGod->heal) {
-			sethealParticleStart(10, m_ppGod->GetPosition());
+			sethealParticleStart(MAX_HEAL_PARTICLES, m_ppGod->GetPosition());
 			cout << "heal";
 			m_ppGod->heal = false;
 
@@ -1798,8 +1798,12 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 
 
-	if (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_ppGod->m2) {
-		setParticleStarts(MAX_CIRCLE_PARTICLES, m_ppGod->GetPosition(), 0);
+	if (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_ppGod->CurMotion == GodAnimation::MELEE2) {
+		if (m_ppGod->m2) {
+			setParticleStarts(MAX_CIRCLE_PARTICLES, m_ppGod->GetPosition(), 0);
+			m_ppGod->m2 = false;
+
+		}
 		for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
 			if (!b_Inside) {
 				m_pFlameParticle[i]->setTarpos(m_pPlayer[0]->GetPosition());
@@ -1810,10 +1814,29 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			}
 		}
 		cout << "m2";
-		m_ppGod->m2 = false;
+	}
+	if (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_ppGod->CurMotion == GodAnimation::SHOT) {
+		if (m_ppGod->shot) {
+			setParticleStarts(MAX_CIRCLE_PARTICLES, m_ppGod->GetPosition(), 0);
+			m_ppGod->shot = false;
+
+		}
+		for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+			if (!b_Inside) {
+				m_pSkull[i]->setTarpos(m_pPlayer[0]->GetPosition());
+				m_pSkull[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				m_pSkull[i]->Animate(m_fElapsedTime);
+				if(m_pSkull[i] ->isLive)
+					m_pSkull[i]->Render(pd3dCommandList, pCamera);
+			}
+		}
+		cout << "shot";
 	}
 
-	//setParticleStarts(MAX_CIRCLE_PARTICLES,m_pPlayer[0]->GetPosition(), 0);
+
+	//static int aafsdaa = 0;
+	//if(aafsdaa ==0)
+	//setParticleStarts(MAX_CIRCLE_PARTICLES, { 0,0,0 }, 0);
 	//for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
 	//	if (!b_Inside) {
 	//		m_pFlameParticle[i]->setTarpos(m_pPlayer[0]->GetPosition());
@@ -1823,8 +1846,10 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	//		m_pFlameParticle[i]->Render(pd3dCommandList, pCamera);
 	//	}
 	//}
+	////{ 0,0,0 }  m_pPlayer[0]->GetPosition()
+	//if (aafsdaa == 0)
 
-	//setParticleStarts(MAX_CIRCLE_PARTICLES, m_pPlayer[0]->GetPosition(), 1);
+	//setParticleStarts(MAX_CIRCLE_PARTICLES, { 0,0,0 }, 1);
 	//for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
 	//	if (!b_Inside) {
 	//		m_pSkull[i]->setTarpos(m_pPlayer[0]->GetPosition());
@@ -1834,21 +1859,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	//		m_pSkull[i]->Render(pd3dCommandList, pCamera);
 	//	}
 	//}
+	//aafsdaa = 1;
 
-	if (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_ppGod->shot) {
-		setParticleStarts(MAX_CIRCLE_PARTICLES, m_ppGod->GetPosition(), 1);
-		for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
-			if (!b_Inside) {
-				m_pSkull[i]->setTarpos(m_pPlayer[0]->GetPosition());
-				m_pSkull[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-				//m_pSkull[i]->Rotate(0, 0, m_eTime * 100);
-				m_pSkull[i]->Animate(m_fElapsedTime);
-				m_pSkull[i]->Render(pd3dCommandList, pCamera);
-			}
-		}
-		cout << "shot";
-		m_ppGod->shot = false;
-	}
 
 
 	for (int i = 0; i < MAX_FIRE; ++i) {
