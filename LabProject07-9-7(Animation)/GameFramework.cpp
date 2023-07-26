@@ -2675,7 +2675,7 @@ void CGameFramework::ProcessPacket(char* p)
 			//m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
 		//}
 		if (m_pScene->m_ppEnemies[packet->data.id]->state == EnemyState::MOVE) {
-			m_pScene->m_ppEnemies[packet->data.id]->LookAtPosition(0.3f, packet->data.pos);
+			m_pScene->m_ppEnemies[packet->data.id]->LookAtPosition(0.05f, packet->data.pos);
 		}
 
 		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);

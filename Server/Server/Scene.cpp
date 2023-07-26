@@ -886,6 +886,22 @@ void CScene::AimingEnemy(char obj_id)
 	//scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
 
 	// 款籍苞 面倒贸府
+	for (int i = 0; i < METEOS; ++i)
+	{
+		if (Vector3::Length(Vector3::Subtract(m_ppEnemies[obj_id]->GetPosition(), m_ppMeteoObjects[i]->GetPosition())) < 30.f)
+		{
+			XMFLOAT3 xmf3Sub = m_ppMeteoObjects[i]->GetPosition();
+			xmf3Sub = Vector3::Subtract(m_ppEnemies[obj_id]->GetPosition(), xmf3Sub);
+			if (Vector3::Length(xmf3Sub) > 0.0001f) {
+				xmf3Sub = Vector3::Normalize(xmf3Sub);
+			}
+			XMFLOAT3 vel = m_ppEnemies[obj_id]->GetVelocity();
+			float fLen = Vector3::Length(vel) / 10.f;
+			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+
+			m_ppEnemies[obj_id]->SetVelocity(Vector3::Add(vel, xmf3Sub));
+		}
+	}
 
 	for (int i = 0; i < ENEMIES; ++i)
 	{
@@ -1105,7 +1121,7 @@ void CScene::UpdateBoss()
 		m_pSpaceship->SetPosition(ToGo);
 	}
 
-	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_BOSS, static_cast<short>(num) };
+	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 25ms, EV_UPDATE_BOSS, static_cast<short>(num) };
 	timer_queue.push(ev);
 }
 
@@ -1134,7 +1150,7 @@ void CScene::UpdateGod()
 		m_pSpaceship->SetPosition(ToGo);
 	}
 
-	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_GOD, static_cast<short>(num) };
+	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 25ms, EV_UPDATE_GOD, static_cast<short>(num) };
 	timer_queue.push(ev);
 }
 
