@@ -148,7 +148,7 @@ end
 
 -- 보스의 appear 상태 동작
 function appear(bpx, bpy, bpz) -- 우선 플레이어의 위치 + 2300 했음
-    god_x = bpx + 2300
+    god_x = bpx + 1300
     god_y = bpy + 0
     god_z = bpz + 0
 end

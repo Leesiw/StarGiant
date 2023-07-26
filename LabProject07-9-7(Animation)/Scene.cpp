@@ -462,7 +462,7 @@ void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	m_ppGod->GodObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pGodModel);
 	m_ppGod->SetPosition(5000.0f, 5000.0f, 5000.0f);
 	m_ppGod->Rotate(0, 0, 0);
-	m_ppGod->SetScale(10.0f, 10.0f, 10.0f);
+	m_ppGod->SetScale(20.0f, 20.0f, 20.0f);
 	if (pGodModel) delete pGodModel;
 }
 
