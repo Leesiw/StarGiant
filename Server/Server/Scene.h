@@ -108,4 +108,7 @@ public:
 	float black_hole_time;
 
 	bool invincible_mode = false;
+
+	bool boss_timer_on = false;
+	bool god_timer_on = false;
 };

@@ -42,6 +42,9 @@ void CScene::Init()
 
 void CScene::BuildObjects()
 {
+	boss_timer_on = false;
+	god_timer_on = false;
+
 	cur_mission = MissionType::CS_TURN;
 	black_hole_time = 30.f;
 
@@ -599,13 +602,19 @@ void CScene::MissionClear()
 			timer_queue.push(ev);
 
 			if (cur_mission == MissionType::CS_SHOW_GOD) {
-				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
-				timer_queue.push(ev);
+				if (!god_timer_on) {
+					god_timer_on = true;
+					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
+					timer_queue.push(ev);
+				}
 			}
 		}
 		else if (cur_mission == MissionType::FIND_BOSS) {
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
-			timer_queue.push(ev);
+			if (!boss_timer_on) {
+				boss_timer_on = true;
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
+				timer_queue.push(ev);
+			}
 		}
 		else if (cur_mission == MissionType::GO_CENTER) {
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
@@ -650,13 +659,19 @@ void CScene::SetMission(MissionType mission)
 			timer_queue.push(ev);
 
 			if (cur_mission == MissionType::CS_SHOW_GOD) {
-				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
-				timer_queue.push(ev);
+				if (!god_timer_on) {
+					god_timer_on = true;
+					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
+					timer_queue.push(ev);
+				}
 			}
 		}
-		else if (cur_mission == MissionType::FIND_BOSS) {
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
-			timer_queue.push(ev);
+		else if (cur_mission == MissionType::FIND_BOSS || cur_mission == MissionType::CS_ANGRY_BOSS || cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::DEFEAT_BOSS) {
+			if (!boss_timer_on) {
+				boss_timer_on = true;
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
+				timer_queue.push(ev);
+			}
 		}
 		else if (cur_mission == MissionType::GO_CENTER) {
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
@@ -687,6 +702,7 @@ void CScene::SetMission(MissionType mission)
 void CScene::SetMissionFindBoss()
 {
 	if (cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME) {
+		boss_timer_on = true;
 		cur_mission = MissionType::FIND_BOSS;
 
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, num };
@@ -1108,8 +1124,11 @@ void CScene::UpdateMissile(char obj_id)
 
 void CScene::UpdateBoss()
 {
-	if (_state != ST_INGAME) { return; }
+	if (_state != ST_INGAME) { boss_timer_on = false;  return; }
+	if (cur_mission != MissionType::DEFEAT_BOSS && cur_mission != MissionType::CS_BOSS_SCREAM && cur_mission != MissionType::CS_ANGRY_BOSS 
+		&& cur_mission != MissionType::FIND_BOSS) { boss_timer_on = false; return; }
 	if (m_pBoss->BossHP <= 0) {
+		boss_timer_on = false;
 		SetMission(MissionType::CS_SHOW_STARGIANT);
 		return;
 	}
@@ -1120,7 +1139,6 @@ void CScene::UpdateBoss()
 	}
 
 	m_pBoss->Boss_Ai(0.01f, m_pSpaceship, m_pBoss->GetHP());
-
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));
 	if (dist < 1000.f) // boss ¸·±â
@@ -1137,12 +1155,13 @@ void CScene::UpdateBoss()
 
 void CScene::UpdateGod()
 {
-	if (_state != ST_INGAME) { return; }
+	if (_state != ST_INGAME) { god_timer_on = false; return; }
 	if (m_pGod->GetcurHp() <= 0) {
+		god_timer_on = false;
 		SetMission(MissionType::CS_ENDING);
 		return;
 	}
-	if (cur_mission != MissionType::KILL_GOD && cur_mission != MissionType::CS_SHOW_GOD && cur_mission != MissionType::CS_ANGRY_GOD) { return; }
+	if (cur_mission != MissionType::KILL_GOD && cur_mission != MissionType::CS_SHOW_GOD && cur_mission != MissionType::CS_ANGRY_GOD) { god_timer_on = false; return; }
 	if (levels[cur_mission].cutscene) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_GOD, static_cast<short>(num) };
 		timer_queue.push(ev);
