@@ -1051,7 +1051,7 @@ void CScene::UpdateMissile(char obj_id)
 	BoundingOrientedBox missile_bbox = m_ppMissiles[obj_id]->UpdateBoundingBox();
 	BoundingOrientedBox spaceship_bbox = m_pSpaceship->UpdateBoundingBox();
 
-	if (missile_bbox.Intersects(spaceship_bbox))
+	if (spaceship_bbox.Intersects(missile_bbox))
 	{
 		m_ppMissiles[obj_id]->SetisActive(false);
 		// 충돌처리
