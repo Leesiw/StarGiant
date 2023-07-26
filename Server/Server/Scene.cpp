@@ -1142,6 +1142,7 @@ void CScene::UpdateGod()
 		SetMission(MissionType::CS_ENDING);
 		return;
 	}
+	if (cur_mission != MissionType::KILL_GOD && cur_mission != MissionType::CS_SHOW_GOD && cur_mission != MissionType::CS_ANGRY_GOD) { return; }
 	if (levels[cur_mission].cutscene) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_GOD, static_cast<short>(num) };
 		timer_queue.push(ev);
@@ -1155,7 +1156,7 @@ void CScene::UpdateGod()
 	if (dist < 2000.f) // boss ¸·±â
 	{
 		XMFLOAT3 ToGo = Vector3::Subtract(m_pSpaceship->GetPosition(), m_pGod->GetPosition());
-		ToGo = Vector3::ScalarProduct(ToGo, 800.f);
+		ToGo = Vector3::ScalarProduct(ToGo, 2000.f);
 		ToGo = Vector3::Add(m_pGod->GetPosition(), ToGo);
 		m_pSpaceship->SetPosition(ToGo);
 	}
