@@ -1796,7 +1796,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		for (int i = 0; i < MAX_HEAL_PARTICLES; ++i) {
 			if (!b_Inside) {
 				if (m_phealParticle[i]->isLive) {
-
 					m_phealParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 					m_phealParticle[i]->Animate(m_fElapsedTime);
 					m_phealParticle[i]->Render(pd3dCommandList, pCamera);
@@ -1810,7 +1809,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (m_ppGod->m2) {
 			setParticleStarts(MAX_CIRCLE_PARTICLES, m_ppGod->GetPosition(), 0);
 			m_ppGod->m2 = false;
-
 		}
 		for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
 			if (!b_Inside) {
@@ -1827,15 +1825,15 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (m_ppGod->shot) {
 			setParticleStarts(MAX_CIRCLE_PARTICLES, m_ppGod->GetPosition(), 0);
 			m_ppGod->shot = false;
-
 		}
 		for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
 			if (!b_Inside) {
-				m_pSkull[i]->setTarpos(m_pPlayer[0]->GetPosition());
-				m_pSkull[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-				m_pSkull[i]->Animate(m_fElapsedTime);
-				if(m_pSkull[i] ->isLive)
+				
+					m_pSkull[i]->setTarpos(m_pPlayer[0]->GetPosition());
+					m_pSkull[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+					m_pSkull[i]->Animate(m_fElapsedTime);
 					m_pSkull[i]->Render(pd3dCommandList, pCamera);
+				
 			}
 		}
 		cout << "shot";

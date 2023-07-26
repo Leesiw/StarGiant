@@ -101,11 +101,9 @@ function idle(frameTime)
         local randomc3 = math.random(5)
 
 
-
-        local attackType = randomIndex --2,4 Áß ·£´ý
-
         if curHp <= (MaxHp / 2) then
             SHOT_COOL_TIME = 4
+            randomIndex = math.random(2,5)
             if frameTime >= moveCooldown then
                 god_x = god_x + randomIndexs * randomc1
                 god_y = god_y + randomIndexs * randomc2
@@ -114,8 +112,11 @@ function idle(frameTime)
             end
 
         else
+            randomIndex = math.random(2,4)
             SHOT_COOL_TIME = 4
         end
+
+        local attackType = randomIndex --2,4 Áß ·£´ý
 
         if attackType == tonumber(GodState.SHOT) then
             shotAttack()

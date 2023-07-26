@@ -1040,7 +1040,7 @@ private:
 	float intervalY = 0;
 	float intervalZ = 0;
 
-	float lifeTime = 1.5f;
+	float lifeTime = 3.f;
 	float ffTimeElapsed = 0.0f;
 };
 
