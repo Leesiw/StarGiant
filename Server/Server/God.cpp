@@ -122,7 +122,7 @@ void God::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	}
 }
 
-void God::God_Ai(float fTimeElapsed, CAirplanePlayer* player, int godHp)
+bool God::God_Ai(float fTimeElapsed, CAirplanePlayer* player, int godHp)
 {
 	float x, y, z;
 	x = float(player->GetPosition().x);
@@ -170,4 +170,7 @@ void God::God_Ai(float fTimeElapsed, CAirplanePlayer* player, int godHp)
 	{
 		LookAtPosition(fTimeElapsed, player->GetPosition());
 	}
+
+	// 적 스폰 시작할때에만 true 반환
+	return false;
 }

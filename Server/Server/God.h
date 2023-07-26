@@ -43,5 +43,5 @@ public:
 	XMFLOAT4 GetQuaternion();
 	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
 
-	void God_Ai(float fTimeElapsed, CAirplanePlayer* player, int godHp);
+	bool God_Ai(float fTimeElapsed, CAirplanePlayer* player, int godHp);
 };

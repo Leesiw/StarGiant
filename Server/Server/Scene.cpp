@@ -837,6 +837,22 @@ void CScene::MoveEnemy(char obj_id)
 	//scene->m_ppEnemies[ex_over->obj_id]->UpdateBoundingBox();
 
 	// 운석과 충돌처리
+	for (int i = 0; i < METEOS; ++i)
+	{
+		if (Vector3::Length(Vector3::Subtract(m_ppEnemies[obj_id]->GetPosition(), m_ppMeteoObjects[i]->GetPosition())) < 30.f)
+		{
+			XMFLOAT3 xmf3Sub = m_ppMeteoObjects[i]->GetPosition();
+			xmf3Sub = Vector3::Subtract(m_ppEnemies[obj_id]->GetPosition(), xmf3Sub);
+			if (Vector3::Length(xmf3Sub) > 0.0001f) {
+				xmf3Sub = Vector3::Normalize(xmf3Sub);
+			}
+			XMFLOAT3 vel = m_ppEnemies[obj_id]->GetVelocity();
+			float fLen = Vector3::Length(vel) / 10.f;
+			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+
+			m_ppEnemies[obj_id]->SetVelocity(Vector3::Add(vel, xmf3Sub));
+		}
+	}
 
 	for (int i = 0; i < ENEMIES; ++i)
 	{
@@ -857,6 +873,22 @@ void CScene::MoveEnemy(char obj_id)
 
 			m_ppEnemies[obj_id]->SetVelocity(Vector3::Add(vel, xmf3Sub));
 			m_ppEnemies[i]->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
+		}
+	}
+
+	if (cur_mission == MissionType::KILL_GOD) {
+		if (Vector3::Length(Vector3::Subtract(m_ppEnemies[obj_id]->GetPosition(), m_pGod->GetPosition())) < 1500.f)
+		{
+			XMFLOAT3 xmf3Sub = m_pGod->GetPosition();
+			xmf3Sub = Vector3::Subtract(m_pGod->GetPosition(), xmf3Sub);
+			if (Vector3::Length(xmf3Sub) > 0.0001f) {
+				xmf3Sub = Vector3::Normalize(xmf3Sub);
+			}
+			XMFLOAT3 vel = m_ppEnemies[obj_id]->GetVelocity();
+			float fLen = Vector3::Length(vel) / 10.f;
+			xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
+
+			m_ppEnemies[obj_id]->SetVelocity(Vector3::Add(vel, xmf3Sub));
 		}
 	}
 
@@ -1138,7 +1170,7 @@ void CScene::UpdateBoss()
 		return;
 	}
 
-	m_pBoss->Boss_Ai(0.01f, m_pSpaceship, m_pBoss->GetHP());
+	m_pBoss->Boss_Ai(0.025f, m_pSpaceship, m_pBoss->GetHP());
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));
 	if (dist < 1000.f) // boss 막기
@@ -1168,7 +1200,9 @@ void CScene::UpdateGod()
 		return;
 	}
 
-	m_pGod->God_Ai(0.01f, m_pSpaceship, m_pGod->GetcurHp());
+	if (m_pGod->God_Ai(0.025f, m_pSpaceship, m_pGod->GetcurHp())) {
+		SpawnEnemyFromGod();
+	}
 
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pGod->GetPosition()));
@@ -1367,7 +1401,7 @@ void CScene::BlackHole()
 		m_ppEnemies[i]->SetPosition(Vector3::Add(pos, ToBlackHole));
 	}
 
-	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_BLACK_HOLE, static_cast<short>(num) };
+	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 15ms, EV_BLACK_HOLE, static_cast<short>(num) };
 	timer_queue.push(ev);
 
 }
@@ -1420,6 +1454,63 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 
 	TIMER_EVENT ev{ static_cast<char>(next_mission), chrono::system_clock::now() + 500ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num)};
 	timer_queue.push(ev);
+}
+
+void CScene::SpawnEnemyFromGod()
+{
+	std::array<CEnemy*, ENEMIES> ppEnemies{ m_ppEnemies };
+	std::random_shuffle(ppEnemies.begin(), ppEnemies.end());
+
+	char spawn_num = 3;
+
+	for (int i = 0; i < ENEMIES; ++i)
+	{
+		if (spawn_num <= 0) { break; }
+		if (!ppEnemies[i]->GetisAlive()) {
+			SpawnEnemyFromGod(ppEnemies[i]->GetID(), spawn_num);
+			m_ppEnemies[ppEnemies[i]->GetID()]->prev_time = chrono::steady_clock::now();
+			TIMER_EVENT ev_u{ ppEnemies[i]->GetID(), chrono::system_clock::now() + 33ms, EV_MOVE_ENEMY, static_cast<short>(num) };
+			timer_queue.push(ev_u);
+			--spawn_num;
+		}
+	}
+}
+
+void CScene::SpawnEnemyFromGod(char id, char enemy_num)
+{
+	m_ppEnemies[id]->Reset();
+	XMFLOAT3 g_pos = m_pGod->GetPosition();
+	XMFLOAT3 random_pos{ urdPos(dree), urdPos(dree), urdPos(dree) / 5.f };
+
+	m_ppEnemies[id]->SetStatus(cur_mission);
+	switch (enemy_num) {
+	case 1:
+		m_ppEnemies[id]->SetPosition(g_pos.x + 50.f, g_pos.y, g_pos.z);
+		break;
+	case 2:
+		m_ppEnemies[id]->SetPosition(g_pos.x, g_pos.y + 50.f, g_pos.z);
+		break;
+	case 3:
+		m_ppEnemies[id]->SetPosition(g_pos.x, g_pos.y, g_pos.z + 50.f);
+		break;
+	}
+	m_ppEnemies[id]->state = EnemyState::MOVE;
+	m_ppEnemies[id]->SetDestination();
+	m_ppEnemies[id]->SetisAlive(true);
+
+	SPAWN_ENEMY_INFO e_info{};
+	e_info.id = m_ppEnemies[id]->GetID();
+	e_info.Quaternion = m_ppEnemies[id]->GetQuaternion();
+	e_info.pos = m_ppEnemies[id]->GetPosition();
+	e_info.destination = m_ppEnemies[id]->GetDestination();
+	e_info.max_hp = m_ppEnemies[id]->GetHP();
+	e_info.state = EnemyState::MOVE;
+
+	for (short pl_id : _plist) {
+		if (pl_id == -1) continue;
+		if (clients[pl_id]._state != ST_INGAME) continue;
+		clients[pl_id].send_spawn_enemy_packet(e_info);
+	}
 }
 
 void CScene::ChangeInvincibleMode()

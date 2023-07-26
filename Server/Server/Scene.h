@@ -57,6 +57,9 @@ public:
 	void BlackHole();
 	void CheckCutsceneEnd(MissionType next_mission);
 
+	void SpawnEnemyFromGod();
+	void SpawnEnemyFromGod(char id, char num);
+
 	void ChangeInvincibleMode();
 
 	void SpawnEnemy(char id);
