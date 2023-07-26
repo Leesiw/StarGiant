@@ -1471,6 +1471,31 @@ void CGameFramework::ProcessInput()
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 
+		if (isConnect) {
+			if (player_type == PlayerType::INSIDE) {
+				if (m_pInsidePlayer[g_myid]->motion == AnimationState::IDLE) {
+					if (dwDirection != 0) {
+						CS_ANIMATION_CHANGE_PACKET my_packet;
+						my_packet.size = sizeof(CS_ANIMATION_CHANGE_PACKET);
+						my_packet.type = CS_ANIMATION_CHANGE;
+						my_packet.state = static_cast<char>(AnimationState::WALK);
+						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+						m_pInsidePlayer[g_myid]->motion = AnimationState::WALK;
+					}
+				}
+				else if (m_pInsidePlayer[g_myid]->motion == AnimationState::WALK) {
+					if (dwDirection == 0) {
+						CS_ANIMATION_CHANGE_PACKET my_packet;
+						my_packet.size = sizeof(CS_ANIMATION_CHANGE_PACKET);
+						my_packet.type = CS_ANIMATION_CHANGE;
+						my_packet.state = static_cast<char>(AnimationState::IDLE);
+						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+						m_pInsidePlayer[g_myid]->motion = AnimationState::IDLE;
+					}
+				}
+			}
+		}
+
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 		{
 			if (cxDelta || cyDelta)
@@ -2814,7 +2839,7 @@ void CGameFramework::ProcessPacket(char* p)
 	case SC_ANIMATION_CHANGE:
 	{
 		SC_ANIMATION_CHANGE_PACKET* packet = reinterpret_cast<SC_ANIMATION_CHANGE_PACKET*>(p);
-
+		if (packet->data.id == g_myid) { break; }
 		if (packet->data.id < 3) {	// 내부 플레이어
 			if (int(m_pInsidePlayer[packet->data.id]->motion) != packet->data.animation) {
 				m_pInsidePlayer[packet->data.id]->motion = (AnimationState)packet->data.animation;

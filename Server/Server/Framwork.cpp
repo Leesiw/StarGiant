@@ -734,6 +734,20 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		break;
 	}
+	case CS_ANIMATION_CHANGE: {
+		if (clients[c_id].room_id == -1) { break; }
+		CScene* m_pScene = scene_manager.GetScene(clients[c_id].room_id);
+		CS_ANIMATION_CHANGE_PACKET* p = reinterpret_cast<CS_ANIMATION_CHANGE_PACKET*>(packet);
+		printf("animation change\n");
+		for (auto pl : m_pScene->_plist) {
+			if (pl == -1) { break; }
+			if (pl == c_id) { break; }
+			clients[pl].send_animation_packet(clients[c_id].room_pid, p->state);
+		}
+		
+
+		break;
+	}
 	case CS_CUTSCENE_END: {
 		if (clients[c_id].room_id != -1) {
 			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);

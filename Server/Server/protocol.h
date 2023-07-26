@@ -52,47 +52,47 @@ constexpr char CS_INSIDE_MOVE = 2;
 constexpr char CS_SPACESHIP_MOVE = 3;
 constexpr char CS_ATTACK = 4;
 constexpr char CS_HEAL = 5;
+constexpr char CS_ANIMATION_CHANGE = 6;
 
-constexpr char SC_LOGIN_INFO = 6;
-constexpr char SC_CHANGE = 7;
-constexpr char SC_ADD_PLAYER = 8;
-constexpr char SC_REMOVE_PLAYER = 9;
+constexpr char SC_LOGIN_INFO = 10;
+constexpr char SC_CHANGE = 11;
+constexpr char SC_ADD_PLAYER = 12;
+constexpr char SC_REMOVE_PLAYER = 13;
 
+constexpr char SC_METEO = 14;
+constexpr char SC_ALL_METEOR = 15;
 
-constexpr char SC_ALL_METEOR = 10;
-constexpr char SC_METEO = 11;
+constexpr char SC_MOVE_SPACESHIP = 16;
+constexpr char SC_MOVE_INSIDEPLAYER = 17;
+constexpr char SC_SPAWN_ENEMY = 18;
+constexpr char SC_MOVE_ENEMY = 19;
+constexpr char SC_BULLET = 20;
+constexpr char SC_BULLET_HIT = 21;
+constexpr char SC_SPAWN_MISSILE = 22;
+constexpr char SC_MISSILE = 23;
+constexpr char SC_REMOVE_MISSILE = 24;
+constexpr char SC_ITEM = 25;
+constexpr char SC_ANIMATION_CHANGE = 26;
+constexpr char SC_HEAL = 27;
+constexpr char SC_MISSION_START = 28;
+constexpr char SC_KILL_NUM = 29;
 
-constexpr char SC_MOVE_SPACESHIP = 12;
-constexpr char SC_MOVE_INSIDEPLAYER = 13;
-constexpr char SC_SPAWN_ENEMY = 14;
-constexpr char SC_MOVE_ENEMY = 15;
-constexpr char SC_BULLET = 16;
-constexpr char SC_BULLET_HIT = 17;
-constexpr char SC_SPAWN_MISSILE = 18;
-constexpr char SC_MISSILE = 19;
-constexpr char SC_REMOVE_MISSILE = 20;
-constexpr char SC_ITEM = 21;
-constexpr char SC_ANIMATION_CHANGE = 22;
-constexpr char SC_HEAL = 23;
-constexpr char SC_MISSION_START = 24;
-constexpr char SC_KILL_NUM = 25;
+constexpr char SC_START = 30;
 
-constexpr char SC_START = 26;
+constexpr char CS_CUTSCENE_END = 31;
+constexpr char SC_CUTSCENE_END_NUM = 32;
 
-constexpr char CS_CUTSCENE_END = 27;
-constexpr char SC_CUTSCENE_END_NUM = 28;
+constexpr char SC_BLACK_HOLE = 33;	// 블랙홀 위치 전송
+constexpr char SC_BLACK_HOLE_TIME = 34;
 
-constexpr char SC_BLACK_HOLE = 29;	// 블랙홀 위치 전송
-constexpr char SC_BLACK_HOLE_TIME = 30;
-
-constexpr char SC_ENEMY_STATE = 31;
-constexpr char SC_MOVE_BOSS = 32;
-constexpr char SC_MOVE_GOD = 33;
+constexpr char SC_ENEMY_STATE = 35;
+constexpr char SC_MOVE_BOSS = 36;
+constexpr char SC_MOVE_GOD = 37;
 
 // cheat
-constexpr char CS_NEXT_MISSION = 34;
-constexpr char CS_START = 35;
-constexpr char CS_INVINCIBLE_MODE = 36;
+constexpr char CS_NEXT_MISSION = 50;
+constexpr char CS_START = 51;
+constexpr char CS_INVINCIBLE_MODE = 52;
 
 
 
@@ -509,6 +509,14 @@ struct SC_MOVE_BOSS_PACKET {
 
 
 // animation
+struct CS_ANIMATION_CHANGE_PACKET {
+	unsigned char size;
+	char	type;
+
+	char state;
+};
+
+
 struct SC_ANIMATION_CHANGE_PACKET {
 	unsigned char size;
 	char	type;

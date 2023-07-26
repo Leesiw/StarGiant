@@ -1395,6 +1395,8 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 void CScene::ChangeInvincibleMode()
 {
 	invincible_mode = !invincible_mode;
+	if (invincible_mode) { printf("公利 葛靛 on\n"); }
+	else { printf("公利 葛靛 off"); }
 }
 
 void CScene::SpawnEnemy(char id)

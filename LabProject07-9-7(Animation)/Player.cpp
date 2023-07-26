@@ -29,6 +29,7 @@ CPlayer::CPlayer()
 	m_fRoll = 0.0f;
 	m_fYaw = 0.0f;
 
+	motion = AnimationState::IDLE;
 
 	m_pPlayerUpdatedContext = NULL;
 	m_pCameraUpdatedContext = NULL;
@@ -887,10 +888,10 @@ void CTerrainPlayer::UpdateOnServer(bool rotate_update)
 {
 	if (type != PlayerType::INSIDE) { return; }
 	if (pow(player_info.pos.x - m_xmf3Position.x, 2) + pow(player_info.pos.z - m_xmf3Position.z, 2) < EPSILON) {
-		motion = AnimationState::IDLE;
+		//motion = AnimationState::IDLE;
 	}
 	else {
-		motion = AnimationState::WALK;
+		//motion = AnimationState::WALK;
 	}
 
 	if (!is_update) {
