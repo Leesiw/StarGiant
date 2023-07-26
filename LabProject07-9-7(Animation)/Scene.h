@@ -124,6 +124,8 @@ public:
 
 	void setParticleStart(int cnt, XMFLOAT3 tarPos);
 	void sethealParticleStart(int cnt, XMFLOAT3 tarPos);
+	void setParticleStarts(int cnt, XMFLOAT3 tarPos, int num);
+
 
 
 protected:

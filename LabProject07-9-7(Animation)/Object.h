@@ -938,6 +938,8 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	int getMaxParticle() { return m_maxParticles; };
 	void setTarpos(XMFLOAT3 tarpos) { TargetPos = tarpos; }
+	void setPos(XMFLOAT3 pos);
+
 	bool isLive = false;
 
 
@@ -963,7 +965,7 @@ private:
 	float intervalY = 0;
 	float intervalZ = 0;
 
-	float lifeTime = 20.0f;
+	float lifeTime = 4.0f;
 	float ffTimeElapsed = 0.0f;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -977,6 +979,8 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	int getMaxParticle() { return m_maxParticles; };
 	void setTarpos(XMFLOAT3 tarpos) { TargetPos = tarpos; }
+	void setPos(XMFLOAT3 pos);
+
 	bool isLive = false;
 
 
@@ -1002,7 +1006,7 @@ private:
 	float intervalY = 0;
 	float intervalZ = 0;
 
-	float lifeTime = 20.0f;
+	float lifeTime = 4.0f;
 	float ffTimeElapsed = 0.0f;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

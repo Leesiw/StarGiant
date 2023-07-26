@@ -2539,7 +2539,7 @@ void CFireObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandLi
 
 CFlameParticleObject::CFlameParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
-	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 200.0f, 200.0f, 0.0f);
+	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 150.0f, 150.0f, 0.0f);
 	SetMesh(pParticleMesh);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
@@ -2617,6 +2617,13 @@ void CFlameParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CC
 	CGameObject::Render(pd3dCommandList, pCamera);
 }
 
+void CFlameParticleObject::setPos(XMFLOAT3 pos)
+{
+	position.x = pos.x + intervalX;
+	position.y = pos.y + intervalY;
+	position.z = pos.z + intervalZ;
+}
+
 ChealParticleObject::ChealParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
 	ChealParticleMesh* pParticleMesh = new ChealParticleMesh(pd3dDevice, pd3dCommandList, 150.0f, 150.0f, 0.0f);
@@ -2687,7 +2694,7 @@ void ChealParticleObject::setPos(XMFLOAT3 pos)
 //===============================
 CSkullObject::CSkullObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
-	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 200.0f, 200.0f, 0.0f);
+	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 150.0f, 150.0f, 0.0f);
 	SetMesh(pParticleMesh);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
@@ -2756,6 +2763,12 @@ void CSkullObject::Animate(float fElapsedTime)
 	SetPosition(position);
 
 	CGameObject::Animate(fElapsedTime);
+}
+void CSkullObject::setPos(XMFLOAT3 pos)
+{
+	position.x = pos.x + intervalX;
+	position.y = pos.y + intervalY;
+	position.z = pos.z + intervalZ;
 }
 
 void CSkullObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
