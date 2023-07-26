@@ -1742,8 +1742,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			//{
 			//	m_ppGod->SetPosition(m_pPlayer[0]->GetPosition().x + 3300 - m_fbosscutTime * 10, m_pPlayer[0]->GetPosition().y, m_pPlayer[0]->GetPosition().z);
 			//}
-			/*if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD )
-				m_ppGod->Render(pd3dCommandList, pCamera);*/
+			if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD )
+				m_ppGod->Render(pd3dCommandList, pCamera);
 		}
 
 
