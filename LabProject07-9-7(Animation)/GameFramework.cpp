@@ -948,6 +948,35 @@ void CGameFramework::CameraUpdateChange()
 
 
 	}
+	//CS_ANGRY_BOSS 내부일때,
+	if (curMissionType == MissionType::CS_ANGRY_BOSS && b_Inside && m_pInsidePlayer[g_myid] && !iscut) {
+		if (!isending) m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
+		b_BeforeCheckInside = true;
+		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+		m_pCamera->canDolly = true; //줌
+		m_pCamera->SetTarget(m_pScene->m_ppBoss->GetPosition());
+		m_pCamera->SetDist(1500.0f);
+		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		iscut = true;
+		isending = false;
+
+
+	}
+
+	//CS_ANGRY_BOSS 외부일때,
+	else if (curMissionType == MissionType::CS_ANGRY_BOSS && !b_Inside && !iscut) {
+		if (!isending) m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
+		m_pCamera->SetTarget(m_pScene->m_ppBoss->GetPosition());
+		m_pCamera->SetDist(1500.0f);
+		m_pCamera->canDolly = true; //줌
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+		iscut = true;
+		isending = false;
+
+
+	}
 
 	//CS_SHOW_STARGIANT 내부일때,
 	if (curMissionType == MissionType::CS_SHOW_STARGIANT && b_Inside && m_pInsidePlayer[g_myid] && !iscut) {
@@ -1029,6 +1058,36 @@ void CGameFramework::CameraUpdateChange()
 
 	//CS_SHOW_GOD 외부일때,
 	else if (curMissionType == MissionType::CS_SHOW_GOD && !b_Inside && !iscut) {
+		if (!isending) m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
+		m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
+		m_pCamera->SetDist(2500.0f);
+		m_pCamera->canDolly = true; //줌
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+		iscut = true;
+		isending = false;
+
+
+	}
+
+	//CS_ANGRY_GOD 내부일때,
+	if (curMissionType == MissionType::CS_ANGRY_GOD && b_Inside && m_pInsidePlayer[g_myid] && !iscut) {
+		if (!isending) m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
+		b_BeforeCheckInside = true;
+		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+		m_pCamera->canDolly = true; //줌
+		m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
+		m_pCamera->SetDist(2500.0f);
+		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
+		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		iscut = true;
+		isending = false;
+
+
+	}
+
+	//CS_SHOW_GOD 외부일때,
+	else if (curMissionType == MissionType::CS_ANGRY_GOD && !b_Inside && !iscut) {
 		if (!isending) m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
 		m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
 		m_pCamera->SetDist(2500.0f);
@@ -2847,13 +2906,13 @@ void CGameFramework::ProcessPacket(char* p)
 			break;
 		}
 		if (packet->data.id == BOSS_ID) {
-			if (curMissionType != MissionType::CS_SHOW_STARGIANT)
-			m_pScene->m_ppBoss->CurMotion = (BossAnimation)packet->data.animation;
+			if (curMissionType == MissionType::KILL_GOD)
+				m_pScene->m_ppBoss->CurMotion = (BossAnimation)packet->data.animation;
 			// 보스 State 변경??
 			break;
 		}
 		if (packet->data.id == GOD_ID) {
-			if(curMissionType!= MissionType::CS_ENDING)
+			if(curMissionType == MissionType::KILL_GOD)
 				m_pScene->m_ppGod->CurMotion = (GodAnimation)packet->data.animation;
 			// 보스 State 변경??
 			break;

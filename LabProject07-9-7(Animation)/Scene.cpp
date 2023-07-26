@@ -1683,6 +1683,12 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
 		}
 
+		if (m_ppBoss->BossHP <= 0 || m_pPlayer[0]->curMissionType == MissionType::CS_ANGRY_BOSS)
+		{
+			m_fredbosscutTime += m_fElapsedTime;
+			m_ppBoss->CurState = BossState::SCREAM;
+			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
+		}
 
 		if (m_ppBoss->BossHP <= 0 || m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_STARGIANT)
 		{
@@ -1690,6 +1696,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppBoss->CurState = BossState::DIE;
 			m_ppBoss->ChangeAnimation(BossAnimation::DIE);
 		}
+
 
 		if(m_fredbosscutTime < 2 && m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT)
 			
@@ -1707,7 +1714,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	static int aaa = 0;
 
 	
-	if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_GOD|| m_pPlayer[0]->curMissionType == MissionType::KILL_GOD)
+	if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD && m_pPlayer[0]->curMissionType <= MissionType::KILL_GOD)
 		if (m_ppGod) {
 			//m_fbosscutTime += m_fElapsedTime;
 			if (aaa == 0) {
@@ -1720,6 +1727,9 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppGod->ChangeAnimation(m_ppGod->GetAnimation());
 
 			if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_GOD) {
+				m_ppGod->ChangeAnimation(GodAnimation::IDLE2);
+			}
+			if (m_pPlayer[0]->curMissionType == MissionType::CS_ANGRY_GOD) {
 				m_ppGod->ChangeAnimation(GodAnimation::IDLE2);
 			}
 
