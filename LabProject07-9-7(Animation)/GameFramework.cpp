@@ -2889,11 +2889,12 @@ void CGameFramework::ProcessPacket(char* p)
 		if (curMissionType == MissionType::KILL_MONSTER_ONE_MORE_TIME) {
 			killCnt = 0;
 		}
-		else if (curMissionType == MissionType::CS_BAD_ENDING) {
-			for (int i = 0; i < ENEMIES; ++i) {
-				m_pScene->m_ppEnemies[i]->isAlive = false;
+		if (curMissionType == MissionType::CS_BAD_ENDING) {
+			for (int i = 0; i < MISSILES; ++i) {
+				m_pScene->m_ppEnemyMissiles[i]->m_bActive = false;
 			}
 		}
+		
 		if (curMissionType != MissionType::CS_BAD_ENDING) {
 			m_effectSound[static_cast<int>(Sounds::CLEAR)]->play();
 		}

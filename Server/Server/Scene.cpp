@@ -798,8 +798,13 @@ void CScene::MoveEnemy(char obj_id)
 		return;
 	}
 	if (levels[cur_mission].cutscene) {
-		if (cur_mission == MissionType::CS_BAD_ENDING) {
+		if (cur_mission == MissionType::CS_BAD_ENDING || 
+			cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::CS_SHOW_GOD) {
 			m_ppEnemies[obj_id]->SetisAlive(false);
+			for (auto& pl : _plist) {
+				if (pl == -1) { break; }
+				clients[pl].send_bullet_hit_packet(obj_id, -1);
+			}
 			return;
 		}
 		m_ppEnemies[obj_id]->prev_time = chrono::steady_clock::now();
@@ -868,8 +873,13 @@ void CScene::AimingEnemy(char obj_id)
 		return;
 	}
 	if (levels[cur_mission].cutscene) {
-		if (cur_mission == MissionType::CS_BAD_ENDING) {
+		if (cur_mission == MissionType::CS_BAD_ENDING ||
+			cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::CS_SHOW_GOD) {
 			m_ppEnemies[obj_id]->SetisAlive(false);
+			for (auto& pl : _plist) {
+				if (pl == -1) { break; }
+				clients[pl].send_bullet_hit_packet(obj_id, -1);
+			}
 			return;
 		}
 		m_ppEnemies[obj_id]->prev_time = chrono::steady_clock::now();
