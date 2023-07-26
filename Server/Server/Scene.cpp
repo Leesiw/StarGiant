@@ -1021,7 +1021,7 @@ void CScene::UpdateMeteo(char obj_id)
 		xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen * 2, false);
 
 		m_pSpaceship->SetVelocity(Vector3::Add(vel, xmf3Sub));
-		m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 5);
+		m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 3);
 
 		m_ppMeteoObjects[obj_id]->SetMovingDirection(Vector3::ScalarProduct(xmf3Sub, -1.f, false));
 
