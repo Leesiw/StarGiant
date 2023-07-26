@@ -268,25 +268,24 @@ void CAirplanePlayer::Animate(float fTimeElapsed)
 
 void CAirplanePlayer::Update(float fTimeElapsed)
 {
-	
-
 	if (!is_update) {
-		if (isnan(input_info.Quaternion.w) || isnan(input_info.Quaternion.x)
-			|| isnan(input_info.Quaternion.y) || isnan(input_info.Quaternion.z)) {
+		SPACESHIP_INPUT_INFO info{ input_info };
+		if (isnan(info.Quaternion.w) || isnan(info.Quaternion.x)
+			|| isnan(info.Quaternion.y) || isnan(info.Quaternion.z)) {
 			printf("ÄõÅÍ´Ï¾ðÀÌ nan\n");
 			CPlayer::Update(fTimeElapsed);
 			OnPrepareRender();
 			return;
 		}
-		XMVECTOR a = XMLoadFloat4(&input_info.Quaternion);
+		XMVECTOR a = XMLoadFloat4(&info.Quaternion);
 		XMMATRIX mat = XMMatrixRotationQuaternion(a);
 		XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(Matrix4x4::Identity(), mat);
 		m_xmf3Right.x = xmf4x4._11; m_xmf3Right.y = xmf4x4._12; m_xmf3Right.z = xmf4x4._13;
 		m_xmf3Up.x = xmf4x4._21; m_xmf3Up.y = xmf4x4._22; m_xmf3Up.z = xmf4x4._23;
 		m_xmf3Look.x = xmf4x4._31; m_xmf3Look.y = xmf4x4._32; m_xmf3Look.z = xmf4x4._33;
 
-		if (input_info.dwDirection) {
-			Move(input_info.dwDirection, 800.0f * fTimeElapsed, true);
+		if (info.dwDirection) {
+			Move(info.dwDirection, 800.0f * fTimeElapsed, true);
 			input_info.dwDirection = NULL;
 		}
 		is_update = true;
