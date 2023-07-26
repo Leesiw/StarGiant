@@ -184,6 +184,8 @@ private:
 	// 서버
 	PlayerType player_type;
 
+	char cDirection = 0;
+
 	// 보석 개수 > ItemType : 무슨 보석인지 / char : 해당 보석 개수
 	std::unordered_map<ItemType, char> items;
 

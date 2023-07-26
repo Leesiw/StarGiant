@@ -115,7 +115,7 @@ public:
 	void send_add_player_packet(LOGIN_INFO& info);
 
 	void send_change_packet(int c_id, PlayerType p_type);
-	void send_spaceship_packet(CAirplanePlayer* m_pPlayer);
+	void send_spaceship_quaternion_packet(XMFLOAT4& Quaternion);
 	void send_inside_packet(int c_id, CTerrainPlayer* m_pPlayer);
 	void send_enemy_packet(ENEMY_INFO& enemy_info);
 	void send_spawn_enemy_packet(SPAWN_ENEMY_INFO& enemy_info);
@@ -124,8 +124,6 @@ public:
 	void send_missile_packet(char id, XMFLOAT3& pos);
 	void send_remove_missile_packet(char id);
 	void send_heal_packet();
-	void send_spawn_meteo_packet(char id, CMeteoObject* meteo);
-	void send_spawn_all_meteo_packet(std::array<CMeteoObject*, METEOS> meteo);
 	void send_all_enemy_packet(ENEMY_INFO[], bool[]);
 	void send_meteo_packet(std::array<CMeteoObject*, METEOS> meteo);
 	void send_boss_meteo_packet(std::array<CMeteoObject*, BOSSMETEOS> meteo);

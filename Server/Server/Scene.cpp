@@ -181,7 +181,7 @@ void CScene::Reset()
 	items[ItemType::JEWEL_HEAL] = 0;
 	items[ItemType::JEWEL_HP] = 0;
 
-	for (auto& pl : _plist) {
+	for (auto pl : _plist) {
 		if (pl == -1) { continue; }
 		clients[pl]._s_lock.lock();
 		clients[pl].room_id = -1;
@@ -817,7 +817,7 @@ void CScene::MoveEnemy(char obj_id)
 		if (cur_mission == MissionType::CS_BAD_ENDING || 
 			cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::CS_SHOW_GOD) {
 			m_ppEnemies[obj_id]->SetisAlive(false);
-			for (auto& pl : _plist) {
+			for (auto pl : _plist) {
 				if (pl == -1) { break; }
 				clients[pl].send_bullet_hit_packet(obj_id, -1);
 			}
@@ -908,7 +908,7 @@ void CScene::AimingEnemy(char obj_id)
 		if (cur_mission == MissionType::CS_BAD_ENDING ||
 			cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::CS_SHOW_GOD) {
 			m_ppEnemies[obj_id]->SetisAlive(false);
-			for (auto& pl : _plist) {
+			for (auto pl : _plist) {
 				if (pl == -1) { break; }
 				clients[pl].send_bullet_hit_packet(obj_id, -1);
 			}
@@ -1273,8 +1273,7 @@ void CScene::SendSceneInfo()
 	SC_MOVE_SPACESHIP_PACKET s_packet{};
 	s_packet.size = sizeof(s_packet);
 	s_packet.type = SC_MOVE_SPACESHIP;
-	s_packet.data.pos = m_pSpaceship->GetPosition();
-	s_packet.data.Quaternion = m_pSpaceship->input_info.Quaternion;
+	s_packet.pos = m_pSpaceship->GetPosition();
 	memcpy(&send_buf[send_num], &s_packet, s_packet.size);
 	send_num += s_packet.size;
 	
@@ -1683,7 +1682,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (short pl_id : _plist) {
 		if (pl_id == -1) continue;
 		if (clients[pl_id]._state != ST_INGAME) continue;
-		clients[pl_id].send_spaceship_packet(m_pSpaceship);
+		//clients[pl_id].send_spaceship_packet(m_pSpaceship);
 	}
 
 //	if (send_time % 30 == 0) {

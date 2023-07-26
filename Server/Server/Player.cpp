@@ -30,20 +30,15 @@ CPlayer::~CPlayer()
 {
 }
 
-void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
+void CPlayer::Move(char cDirection, float fDistance, bool bUpdateVelocity)
 {
-	if (dwDirection)
-	{
-		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
-		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
-		if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
-		if (dwDirection & DIR_RIGHT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
-		if (dwDirection & DIR_LEFT) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
-		if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
-		if (dwDirection & DIR_DOWN) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
+	XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
+	if (cDirection & option0) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
+	if (cDirection & option1) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
+	if (cDirection & option3) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, fDistance);
+	if (cDirection & option2) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Right, -fDistance);
 
-		Move(xmf3Shift, bUpdateVelocity);
-	}
+	Move(xmf3Shift, bUpdateVelocity);
 }
 
 void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
@@ -234,6 +229,7 @@ bool CAirplanePlayer::GetHeal()
 
 void CAirplanePlayer::Reset()
 {
+	cDirection = 0;
 	is_update = false;
 
 	m_xmf4x4ToParent = Matrix4x4::Identity();
@@ -262,6 +258,11 @@ void CAirplanePlayer::Reset()
 	def = 0;
 }
 
+void CAirplanePlayer::SetKeyInput(char key_input)
+{
+	cDirection = key_input;
+}
+
 void CAirplanePlayer::Animate(float fTimeElapsed)
 {
 }
@@ -269,26 +270,17 @@ void CAirplanePlayer::Animate(float fTimeElapsed)
 void CAirplanePlayer::Update(float fTimeElapsed)
 {
 	if (!is_update) {
-		SPACESHIP_INPUT_INFO info{ input_info };
-		if (isnan(info.Quaternion.w) || isnan(info.Quaternion.x)
-			|| isnan(info.Quaternion.y) || isnan(info.Quaternion.z)) {
-			printf("ÄõÅÍ´Ï¾ðÀÌ nan\n");
-			CPlayer::Update(fTimeElapsed);
-			OnPrepareRender();
-			return;
-		}
-		XMVECTOR a = XMLoadFloat4(&info.Quaternion);
+		XMVECTOR a = XMLoadFloat4(&Quaternion);
 		XMMATRIX mat = XMMatrixRotationQuaternion(a);
 		XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(Matrix4x4::Identity(), mat);
 		m_xmf3Right.x = xmf4x4._11; m_xmf3Right.y = xmf4x4._12; m_xmf3Right.z = xmf4x4._13;
 		m_xmf3Up.x = xmf4x4._21; m_xmf3Up.y = xmf4x4._22; m_xmf3Up.z = xmf4x4._23;
 		m_xmf3Look.x = xmf4x4._31; m_xmf3Look.y = xmf4x4._32; m_xmf3Look.z = xmf4x4._33;
-
-		if (info.dwDirection) {
-			Move(info.dwDirection, 800.0f * fTimeElapsed, true);
-			input_info.dwDirection = NULL;
-		}
 		is_update = true;
+
+		if (cDirection != 0) {
+			Move(cDirection, 800.0f * fTimeElapsed, true);
+		}
 	}
 
 	CPlayer::Update(fTimeElapsed);
@@ -422,20 +414,15 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, const XMFLOAT3 pos
 
 void CTerrainPlayer::Update(float fTimeElapsed, const XMFLOAT3 pos[])
 {
-	if (is_update) { m_cAnimation = 0; return; }
 	if (input_info.yaw != m_fYaw) {
 		Rotate(0, input_info.yaw - m_fYaw, 0);
 	}
 	if (input_info.dwDirection) {
-		
 		//OnPrepareRender();
 		//UpdateTransform();
 		Move(input_info.dwDirection, 80.0f * fTimeElapsed, pos, false);
 		input_info.dwDirection = NULL;
-		m_cAnimation = 1;
 	}
-	else {
-		m_cAnimation = 0;
-	}
+
 	is_update = true;
 }

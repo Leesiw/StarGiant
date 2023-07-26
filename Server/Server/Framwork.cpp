@@ -243,7 +243,7 @@ void CGameFramework::SetMission()
 	for (int i = static_cast<int>(MissionType::TU_SIT);
 		i <= static_cast<int>(MissionType::TU_END); ++i) {
 		MissionType m = static_cast<MissionType>(i);
-		levels[m].MaxMonsterNum = 5;
+		levels[m].MaxMonsterNum = 6;
 		levels[m].SpawnMonsterNum = 3;
 		levels[m].Laser.MAX_HP = 3;
 		levels[m].Laser.ATK = 2;
@@ -571,6 +571,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			if (clients[c_id].type >= PlayerType::MOVE) {
 				char sit_num = (char)clients[c_id].type - (char)PlayerType::MOVE;
 				scene->can_sit[sit_num] = true;
+				scene->m_pSpaceship->cDirection = 0;
 			};
 			clients[c_id].type = PlayerType::INSIDE;
 
@@ -618,12 +619,29 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		break;
 	}
-	case CS_SPACESHIP_MOVE: {
-		CS_SPACESHIP_PACKET* p = reinterpret_cast<CS_SPACESHIP_PACKET*>(packet);
+	case CS_SPACESHIP_QUATERNION: {
+		CS_SPACESHIP_QUATERNION_PACKET* p = reinterpret_cast<CS_SPACESHIP_QUATERNION_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::MOVE) {
 			if (clients[c_id].room_id == -1) { break; }
-			scene_manager.GetScene(clients[c_id].room_id)->m_pSpaceship->SetInputInfo(p->data);
+			if (isnan(p->Quaternion.w) || isnan(p->Quaternion.x) || isnan(p->Quaternion.y) || isnan(p->Quaternion.z)) { break; }
+			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+			scene->m_pSpaceship->SetInputInfo(p->Quaternion);
+			
+			for (auto pl : scene->_plist) {
+				if (pl == -1) { break; }
+				if (pl == c_id) { break; }
+				if (clients[pl]._state != ST_INGAME) { break; }
+				clients[pl].send_spaceship_quaternion_packet(p->Quaternion);
+			}
 		}
+		break;
+	}
+	case CS_KEY_INPUT: {
+		CS_KEY_INPUT_PACKET* p = reinterpret_cast<CS_KEY_INPUT_PACKET*>(packet);
+		if (clients[c_id].type != PlayerType::MOVE) { break; }
+		if (clients[c_id].room_id == -1) { break; }
+		CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+		scene->m_pSpaceship->SetKeyInput(p->key);
 		break;
 	}
 	case CS_INSIDE_MOVE: {
@@ -943,6 +961,9 @@ void CGameFramework::disconnect(int c_id)
 		if (clients[c_id].type >= PlayerType::MOVE) {
 			char sit_num = (char)clients[c_id].type - (char)PlayerType::MOVE;
 			scene->can_sit[sit_num] = true;
+			if (clients[c_id].type == PlayerType::MOVE) {
+				scene->m_pSpaceship->cDirection = 0;
+			}
 		};
 		scene->_plist_lock.lock();
 		scene->_plist[clients[c_id].room_pid] = -1;

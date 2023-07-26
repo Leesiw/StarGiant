@@ -367,12 +367,12 @@ void CEnemy::SendPos()
 		info.id = id;
 		//info.Quaternion = GetQuaternion();
 		info.pos = GetPosition();
-
-		for (auto& pl : clients)
+		/*
+		for (auto pl : clients)
 		{
 			//if (false == pl.in_use) continue;
 			pl.send_enemy_packet(info);
-		}
+		}*/
 	}
 }
 

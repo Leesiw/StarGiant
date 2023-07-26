@@ -37,8 +37,6 @@ protected:
 	float           			m_fMaxVelocityY = 0.0f;
 	float           			m_fFriction = 0.0f;
 
-	char						m_cAnimation = 0;
-
 	//¼­¹ö
 	volatile bool is_update = true;
 
@@ -50,8 +48,6 @@ public:
 	XMFLOAT3 GetLookVector() { return(m_xmf3Look); }
 	XMFLOAT3 GetUpVector() { return(m_xmf3Up); }
 	XMFLOAT3 GetRightVector() { return(m_xmf3Right); }
-
-	char GetAnimation() { return(m_cAnimation); }
 
 	void SetFriction(float fFriction) { m_fFriction = fFriction; }
 	void SetGravity(const XMFLOAT3& xmf3Gravity) { m_xmf3Gravity = xmf3Gravity; }
@@ -67,9 +63,8 @@ public:
 	float GetPitch() const { return(m_fPitch); }
 	float GetRoll() const { return(m_fRoll); }
 
-	virtual void Move(ULONG nDirection, float fDistance, bool bVelocity = false);
+	virtual void Move(char nDirection, float fDistance, bool bVelocity = false);
 	void Move(const XMFLOAT3& xmf3Shift, bool bVelocity = false);
-	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f);
 	void Rotate(float x, float y, float z);
 
 	virtual void Update(float fTimeElapsed);
@@ -92,7 +87,8 @@ public:
 
 	float						m_fBulletEffectiveRange = 150.0f;
 
-	SPACESHIP_INPUT_INFO input_info;
+	XMFLOAT4 Quaternion;
+	char cDirection = 0;	// option1 : forward(w) option2 : left(a) option3 : backward(s) option4 : right(d)
 public:
 	void SetHP(short s) { hp = s; }
 	short GetHP() { return hp; }
@@ -102,7 +98,8 @@ public:
 
 	void Reset();
 
-	void SetInputInfo(SPACESHIP_INPUT_INFO i_info) { input_info = i_info; is_update = false; }
+	void SetInputInfo(XMFLOAT4& quaternion) { Quaternion = quaternion; is_update = false; }
+	void SetKeyInput(char key_input);
 	virtual void Animate(float fTimeElapsed);
 	virtual void Update(float fTimeElapsed);
 	virtual void OnPrepareRender();

@@ -41,6 +41,8 @@ CGameFramework::CGameFramework()
 	items[ItemType::JEWEL_HEAL] = 0;
 	items[ItemType::JEWEL_HP] = 0;
 	
+	cDirection = 0;
+
 	planetPos = { 10000.0f,10000.0f,10000.0f };
 
 	_state = SCENE_LOBBY;
@@ -778,9 +780,8 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 			OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
             break;
         case WM_KEYDOWN:
-			switch (nMessageID)
+			switch (wParam)
 			{
-			case 'F':
 				break;
 			}
         case WM_KEYUP:
@@ -1587,13 +1588,27 @@ void CGameFramework::ProcessInput()
 
 				}
 				else if(player_type == PlayerType::MOVE) {
-					CS_SPACESHIP_PACKET my_packet;
-					my_packet.size = sizeof(CS_SPACESHIP_PACKET);
-					my_packet.type = CS_SPACESHIP_MOVE;
-					my_packet.data.dwDirection = dwDirection;
+					char cDrt = 0;
+					if (pKeysBuffer['W'] & 0xF0) cDrt |= option0;
+					if (pKeysBuffer['S'] & 0xF0) cDrt |= option1;
+					if (pKeysBuffer['A'] & 0xF0) cDrt |= option2;
+					if (pKeysBuffer['D'] & 0xF0) cDrt |= option3;
+
+					if (cDrt != cDirection) {
+						cDirection = cDrt;
+						CS_KEY_INPUT_PACKET my_packet;
+						my_packet.size = sizeof(CS_KEY_INPUT_PACKET);
+						my_packet.type = CS_KEY_INPUT;
+						my_packet.key = cDrt;
+						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+					}
+
+					CS_SPACESHIP_QUATERNION_PACKET my_packet;
+					my_packet.size = sizeof(CS_SPACESHIP_QUATERNION_PACKET);
+					my_packet.type = CS_SPACESHIP_QUATERNION;
 					XMFLOAT4 a;
 					XMStoreFloat4(&a, m_pPlayer[0]->GetQuaternion());
-					my_packet.data.Quaternion = a;
+					my_packet.Quaternion = a;
 
 					if (_state == SCENE_INGAME) {
 						send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
@@ -2711,26 +2726,24 @@ void CGameFramework::ProcessPacket(char* p)
 	case SC_MOVE_SPACESHIP:
 	{
 		SC_MOVE_SPACESHIP_PACKET* packet = reinterpret_cast<SC_MOVE_SPACESHIP_PACKET*>(p);
-		m_pPlayer[0]->SetPlayerInfo(packet->data);
-		//m_pPlayer[0]->SetPosition(playerInfo.pos);
-		//m_pPlayer[0]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[0]->GetYaw(), 0.0f);
-		//m_pCamera->Update(playerInfo.pos, m_GameTimer.GetTimeElapsed());
-		//m_pPlayer->SetVelocity(playerInfo[3].velocity);
-		//m_pPlayer->SetShift(playerInfo.shift);
-		//m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
-		//m_pPlayer[g_myid]->SetPlayerInfo(playerInfo[3]);
+		m_pPlayer[0]->SetPosition(packet->pos);
+		m_pCamera->Update(packet->pos, m_GameTimer.GetTimeElapsed());
+		m_pPlayer[0]->Update(m_GameTimer.GetTimeElapsed());
+		break;
+	}
+	case SC_SPACESHIP_QUATERNION:
+	{
+		CS_SPACESHIP_QUATERNION_PACKET* packet = reinterpret_cast<CS_SPACESHIP_QUATERNION_PACKET*>(p);
+		if (player_type == PlayerType::MOVE) { break; }
+		m_pPlayer[0]->SetQuaternion(packet->Quaternion);
+		m_pCamera->Update(m_pPlayer[0]->GetPosition(), m_GameTimer.GetTimeElapsed());
+		m_pPlayer[0]->Update(m_GameTimer.GetTimeElapsed());
 		break;
 	}
 	case SC_MOVE_INSIDEPLAYER:
 	{
 		SC_MOVE_INSIDE_PACKET* packet = reinterpret_cast<SC_MOVE_INSIDE_PACKET*>(p);
 		m_pInsidePlayer[packet->data.id]->SetPlayerInfo(packet->data);
-		
-		//if (int(m_pInsidePlayer[packet->data.id]->motion) != (int)packet->data.animation) {
-		//	((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = (AnimationState)packet->data.animation;
-		//}
-		//m_pInsidePlayer[playerInfo.id]->SetPosition(playerInfo.pos);
-		//m_pInsidePlayer[playerInfo.id]->Rotate(0.0f, playerInfo.m_fYaw - m_pPlayer[playerInfo.id]->GetYaw(), 0.0f);
 		break;
 	}
 	case SC_SPAWN_ENEMY:

@@ -643,6 +643,7 @@ void CAirplanePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 
 void CAirplanePlayer::UpdateOnServer(bool rotate_update)
 {
+	/*
 	if (!is_update) {
 		SetPosition(player_info.pos);
 		if (rotate_update) {
@@ -655,7 +656,7 @@ void CAirplanePlayer::UpdateOnServer(bool rotate_update)
 		}
 		//m_pCamera->Update(player_info.pos, 0);
 		is_update = true;
-	}
+	}*/
 }
 
 XMVECTOR CAirplanePlayer::GetQuaternion()

@@ -23,16 +23,12 @@ void SESSION::send_change_packet(int c_id, PlayerType p_type)
 	do_send(&p);
 }
 
-void SESSION::send_spaceship_packet(CAirplanePlayer* m_pPlayer)	// 플레이어 좌표 각도 전송
+void SESSION::send_spaceship_quaternion_packet(XMFLOAT4& Quaternion)
 {
-	SC_MOVE_SPACESHIP_PACKET p;
-	p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
-	p.type = SC_MOVE_SPACESHIP;
-	p.data.pos = m_pPlayer->GetPosition();
-	p.data.Quaternion = m_pPlayer->input_info.Quaternion;
-
-	//p.data.velocity = m_pPlayer->GetVelocity();
-	//p.data.shift = m_pPlayer->GetShift();
+	CS_SPACESHIP_QUATERNION_PACKET p{};
+	p.size = sizeof(CS_SPACESHIP_QUATERNION_PACKET);
+	p.type = SC_SPACESHIP_QUATERNION;
+	p.Quaternion = Quaternion;
 	do_send(&p);
 }
 
@@ -44,7 +40,6 @@ void SESSION::send_inside_packet(int c_id, CTerrainPlayer* m_pPlayer)
 	p.data.id = c_id;
 	p.data.pos = m_pPlayer->GetPosition();
 	p.data.m_fYaw = m_pPlayer->GetYaw();
-	p.data.animation = m_pPlayer->GetAnimation();
 
 	do_send(&p);
 }

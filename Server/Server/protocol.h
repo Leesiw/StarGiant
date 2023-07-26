@@ -49,20 +49,22 @@ constexpr char GOD_ID = BOSS_ID + 1;
 constexpr char CS_LOGIN = 0;
 constexpr char CS_CHANGE = 1;
 constexpr char CS_INSIDE_MOVE = 2;
-constexpr char CS_SPACESHIP_MOVE = 3;
-constexpr char CS_ATTACK = 4;
-constexpr char CS_HEAL = 5;
-constexpr char CS_ANIMATION_CHANGE = 6;
+constexpr char CS_SPACESHIP_QUATERNION = 3;
+constexpr char CS_KEY_INPUT = 4;
+constexpr char CS_ATTACK = 5;
+constexpr char CS_HEAL = 6;
+constexpr char CS_ANIMATION_CHANGE = 7;
 
-constexpr char SC_LOGIN_INFO = 10;
-constexpr char SC_CHANGE = 11;
-constexpr char SC_ADD_PLAYER = 12;
-constexpr char SC_REMOVE_PLAYER = 13;
+constexpr char SC_LOGIN_INFO = 9;
+constexpr char SC_CHANGE = 10;
+constexpr char SC_ADD_PLAYER = 11;
+constexpr char SC_REMOVE_PLAYER = 12;
 
-constexpr char SC_METEO = 14;
-constexpr char SC_ALL_METEOR = 15;
+constexpr char SC_METEO = 13;
+constexpr char SC_ALL_METEOR = 14;
 
-constexpr char SC_MOVE_SPACESHIP = 16;
+constexpr char SC_MOVE_SPACESHIP = 15;
+constexpr char SC_SPACESHIP_QUATERNION = 16;
 constexpr char SC_MOVE_INSIDEPLAYER = 17;
 constexpr char SC_SPAWN_ENEMY = 18;
 constexpr char SC_MOVE_ENEMY = 19;
@@ -257,18 +259,12 @@ struct INSIDE_PLAYER_INFO {
 
 	XMFLOAT3					pos;
 	float           			m_fYaw;
-	char						animation;
 };
 
 // spaceship
-struct SPACESHIP_INPUT_INFO {
-	DWORD dwDirection;
-	XMFLOAT4 Quaternion;
-};
 
 struct SPACESHIP_INFO {
 	XMFLOAT3					pos;
-	XMFLOAT4					Quaternion;
 };
 
 // enemy
@@ -402,18 +398,26 @@ struct SC_ALL_METEOR_PACKET {
 
 
 // spaceship
-struct CS_SPACESHIP_PACKET {
+struct CS_SPACESHIP_QUATERNION_PACKET {
 	unsigned char size;
 	char	type;
 
-	SPACESHIP_INPUT_INFO	data;
+	XMFLOAT4 Quaternion;;
+};
+
+struct CS_KEY_INPUT_PACKET {
+	unsigned char size;
+	char	type;
+
+	char key;	// 0: w 입력 1: a 입력 2: s 입력 3: d 입력
+				// 4: w 해제 5: a 해제 6: s 해제 7: d 해제
 };
 
 struct SC_MOVE_SPACESHIP_PACKET {
 	unsigned char size;
 	char	type;
 
-	SPACESHIP_INFO data;
+	XMFLOAT3 pos;
 };
 
 // inside
