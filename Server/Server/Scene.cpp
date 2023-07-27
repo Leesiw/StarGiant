@@ -1012,14 +1012,14 @@ void CScene::UpdateMeteo(char obj_id)
 			xmf3Sub = Vector3::Normalize(xmf3Sub);
 		}
 		XMFLOAT3 vel = m_pSpaceship->GetVelocity();
-		float fLen = Vector3::Length(vel);
-		xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen * 2, false);
+		float fLen = (Vector3::Length(vel) + 10.f) * 2;
+		xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
 
 		m_pSpaceship->SetVelocity(Vector3::Add(vel, xmf3Sub));
-		m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 3);
+		m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 5);
 
 		m_ppMeteoObjects[obj_id]->SetMovingDirection(Vector3::ScalarProduct(xmf3Sub, -1.f, false));
-		m_ppMeteoObjects[obj_id]->SetMovingSpeed(Vector3::Length(xmf3Sub));
+		m_ppMeteoObjects[obj_id]->SetMovingSpeed(fLen);
 
 		for (short pl_id : _plist) {
 			if (pl_id == -1) continue;

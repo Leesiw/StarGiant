@@ -6,10 +6,7 @@ extern SceneManager scene_manager;
 
 CEnemy::CEnemy()
 {
-	m_xmf4x4ToParent = Matrix4x4::Identity();
-	m_xmf4x4World = Matrix4x4::Identity();
-
-	enemy_flags &= ~option2;
+	CGameObject::CGameObject();
 
 	ZeroMemory(&enemy_flags, 1);
 

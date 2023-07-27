@@ -151,46 +151,6 @@ CAirplanePlayer::CAirplanePlayer()
 CAirplanePlayer::~CAirplanePlayer()
 {
 }
-/*
-bool CAirplanePlayer::FireBullet(short attack_num)
-{
-	return false;
-	/*
-	if (m_fFireWaitingTime[attack_num] > 0.0f)
-		return false;
-
-	CBulletObject* pBulletObject = NULL;
-	for (int i = 0; i < BULLETS; i++)
-	{
-		if (!m_ppBullets[i]->m_bActive)
-		{
-			pBulletObject = m_ppBullets[i];
-			break;
-		}
-	}
-
-	if (pBulletObject)
-	{
-		XMFLOAT3 xmf3Position = GetPosition();
-		XMFLOAT3 xmf3Direction = GetLook();
-		XMFLOAT3 xmf3Right = GetRight();
-		XMFLOAT3 xmf3Up = GetUp();
-		XMFLOAT3 xmf3FirePosition;
-		xmf3FirePosition.x = xmf3Position.x;
-		xmf3FirePosition.y = xmf3Position.y;
-		xmf3FirePosition.z = xmf3Position.z;
-
-		pBulletObject->Rotate(m_fPitch, m_fYaw, m_fRoll);
-		pBulletObject->m_fPitch = m_fPitch; pBulletObject->m_fYaw = m_fYaw; pBulletObject->m_fRoll = m_fRoll;
-		pBulletObject->SetFirePosition(xmf3FirePosition);
-		pBulletObject->SetMovingDirection(xmf3Direction);
-		pBulletObject->SetActive(true);
-
-		m_fFireWaitingTime[attack_num] = m_fFireDelayTime * 1.0f;
-
-		return true;
-	}
-}*/
 
 void CAirplanePlayer::GetAttack(char damage)
 {
