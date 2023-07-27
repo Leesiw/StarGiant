@@ -16,9 +16,8 @@ CPlayer::CPlayer()
 	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
 	m_fMaxVelocityXZ = 0.0f;
-	m_fMaxVelocityY = 0.0f;
 	m_fFriction = 0.0f;
 
 	m_fPitch = 0.0f;
@@ -144,20 +143,9 @@ void CPlayer::OnPrepareRender()
 // 
 CAirplanePlayer::CAirplanePlayer()
 {
+	CGameObject::CGameObject();
 	SetFriction(250.0f);
-	SetGravity(XMFLOAT3(0.0f, -0.0f, 0.0f));
 	SetMaxVelocityXZ(100.0f);
-	SetMaxVelocityY(400.0f);
-	/*
-	for (int i = 0; i < BULLETS; i++)
-	{
-		m_ppBullets[i] = new CBulletObject(m_fBulletEffectiveRange);
-		m_ppBullets[i]->SetScale(2.0f, 2.0f, 2.0f);
-
-		m_ppBullets[i]->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
-		m_ppBullets[i]->SetMovingSpeed(300.0f);
-		m_ppBullets[i]->SetActive(false);
-	}*/
 }
 
 CAirplanePlayer::~CAirplanePlayer()
@@ -241,10 +229,6 @@ void CAirplanePlayer::Reset()
 	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_fMaxVelocityXZ = 0.0f;
-	m_fMaxVelocityY = 0.0f;
-	m_fFriction = 0.0f;
 
 	m_fPitch = 0.0f;
 	m_fRoll = 0.0f;
@@ -302,9 +286,8 @@ CTerrainPlayer::CTerrainPlayer()
 	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
 	m_fMaxVelocityXZ = 0.0f;
-	m_fMaxVelocityY = 0.0f;
 	m_fFriction = 0.0f;
 
 	m_fPitch = 0.0f;
