@@ -74,9 +74,12 @@ public:
 	{
 		_id = -1;
 		_socket = 0;
-		//_name[0] = 0;
 		_state = ST_FREE;
 		_prev_remain = 0;
+
+		type = PlayerType::INSIDE;
+		room_id = -1;
+		room_pid = -1;
 	}
 
 	~SESSION() {}
@@ -112,8 +115,8 @@ public:
 		p.data.player_type = type;
 		do_send(&p);
 	}
-	void send_add_player_packet(LOGIN_INFO& info);
 
+	void send_add_player_packet(LOGIN_INFO& info);
 	void send_change_packet(int c_id, PlayerType p_type);
 	void send_spaceship_quaternion_packet(XMFLOAT4& Quaternion);
 	void send_inside_packet(int c_id, CTerrainPlayer* m_pPlayer);
@@ -124,8 +127,6 @@ public:
 	void send_missile_packet(char id, XMFLOAT3& pos);
 	void send_remove_missile_packet(char id);
 	void send_heal_packet();
-	void send_all_enemy_packet(ENEMY_INFO[], bool[]);
-	void send_meteo_packet(std::array<CMeteoObject*, METEOS> meteo);
 	void send_boss_meteo_packet(std::array<CMeteoObject*, BOSSMETEOS> meteo);
 	void send_bullet_hit_packet(char id, short hp);
 	void send_item_packet(ITEM_INFO& item);

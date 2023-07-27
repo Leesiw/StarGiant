@@ -124,15 +124,6 @@ char SceneManager::InsertPlayer(short num, short pl_id)
 	return m_pScenes[num]->InsertPlayer(pl_id);
 }
 
-void SceneManager::SceneAnimate(float fTimeElapsed)
-{
-	for (auto& scene : m_pScenes) {
-		if (scene->_state == ST_INGAME) {
-			scene->AnimateObjects(fTimeElapsed);
-		}
-	}
-}
-
 void SceneManager::Send(short num, char* p)
 {
 	m_pScenes[num]->Send(p);

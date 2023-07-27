@@ -192,7 +192,6 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 void CGameFramework::Init() {
 
 	SetMission();
-	BuildObjects();
 
 	HANDLE h_iocp;
 
@@ -438,18 +437,8 @@ void CGameFramework::SetMission()
 
 }
 
-void CGameFramework::BuildObjects()
-{
-}
-
 void CGameFramework::ReleaseObjects()
 {
-}
-
-void CGameFramework::AnimateObjects(float fTimeElapsed)
-{
-
-	scene_manager.SceneAnimate(fTimeElapsed);
 }
 
 
@@ -910,26 +899,6 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 		}
 		this_thread::sleep_for(1ms);   // timer_queue가 비어 있으니 잠시 기다렸다가 다시 시작
 	}
-}
-
-void CGameFramework::ClientProcess()
-{
-	/*
-	auto StartTime = chrono::system_clock::now();
-	auto EndTime = chrono::system_clock::now();
-
-	while (true) {
-		EndTime = chrono::system_clock::now();
-		fps = EndTime - StartTime;
-		if (fps.count() > 0.0333333) {
-			StartTime = chrono::system_clock::now();
-			AnimateObjects(fps.count());
-		//	printf("fps.count = %f\n", fps.count());
-			
-		}
-	}*/
-
-
 }
 
 int CGameFramework::get_new_client_id()

@@ -1704,7 +1704,7 @@ void CScene::AnimateObjects(float fTimeElapsed)
 		for (short pl_id : _plist) {
 			if (pl_id == -1) continue;
 			if (clients[pl_id]._state != ST_INGAME) continue;
-			clients[pl_id].send_meteo_packet(m_ppMeteoObjects);
+			//clients[pl_id].send_meteo_packet(m_ppMeteoObjects);
 			//for (int i = 0; i < 3; ++i) {
 			//	if (_plist[i] == -1) continue;
 			//	if (clients[_plist[i]]._state == !ST_INGAME) { continue; }
