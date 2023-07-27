@@ -1526,9 +1526,9 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 
-	if (m_pPlayer[0]->curMissionType == MissionType::CS_TURN) {
+	/*if (m_pPlayer[0]->curMissionType == MissionType::CS_TURN) {
 		m_pPlayer[g_myid]->SetPosition({ 520.219f + g_myid * 10, 230.f, 593.263f });
-	}
+	}*/
 
 
 
