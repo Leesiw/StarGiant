@@ -8,6 +8,14 @@ CEnemy::CEnemy()
 {
 	CGameObject::CGameObject();
 
+	m_fCoolTime = 2.0f;
+	m_fCoolTimeRemaining = 0.0f;
+
+	m_xmf3Velocity = XMFLOAT3(0.f, 0.f, 0.f);
+	m_xmf3Destination = XMFLOAT3(0.f, 0.f, 100.f);
+
+	damage = 3;
+
 	ZeroMemory(&enemy_flags, 1);
 
 	hp = 10;
@@ -141,8 +149,8 @@ void CEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 	xmfToPlayer = Vector3::TransformCoord(xmfToPlayer, Matrix4x4::RotationAxis(GetUp(), urdAngle(dree)));
 
 	XMFLOAT3 player_vel = player->GetVelocity();
-	float h_probability = hit_probability;
-	if (Vector3::Length(player_vel) > 0.f) { h_probability -= m_fAvoidReductionRate; }
+	float h_probability = 50;
+	if (Vector3::Length(player_vel) > 0.f) { h_probability -= 20; }
 
 	if (urdEnemyAI(dree) < h_probability) {	// 플레이어에게 공격 명중
 		if (player->GetHP() <= 0) { return; }
@@ -250,19 +258,16 @@ void CEnemy::Reset()
 	state = EnemyState::MOVE;
 }
 
-void CEnemy::SetisAlive(bool i_a)
+void CEnemy::SetisAliveTrue()
 {
-	if (i_a) {
-		if (!(enemy_flags & option0)) {
-			enemy_flags |= option0;
-		}
-	}
-	else {
-		if (enemy_flags & option0) {
-			enemy_flags &= ~option0;
-		}
-	}
+	enemy_flags |= option0;
 }
+
+void CEnemy::SetisAliveFalse()
+{
+	enemy_flags &= ~option0;
+}
+
 
 void CEnemy::SetAttackTimerFalse()
 {
@@ -370,10 +375,11 @@ XMFLOAT4 CEnemy::GetQuaternion()
 
 CMissileEnemy::CMissileEnemy()
 {
+	CEnemy::CEnemy();
+
 	type = EnemyType::MISSILE;
 	hp = 5;			
 	m_fCoolTime = 15.0f;		// 공격 간격
-	m_fAttackRange = 300.0f;	// 사거리
 	damage = 6;
 
 	enemy_flags &= ~option2;
@@ -387,12 +393,6 @@ CMissileEnemy::~CMissileEnemy()
 
 void CMissileEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 {
-	/*
-	ResetCoolTime();
-	enemy_flags |= option2;
-	info.StartPos = GetPosition();
-	info.Quaternion = GetQuaternion();
-	info.damage = missile_damage;*/
 }
 
 void CMissileEnemy::SetStatus(MissionType cur_mission)
@@ -414,10 +414,11 @@ void CMissileEnemy::Animate(float fTimeElapsed, CAirplanePlayer* player)
 
 CLaserEnemy::CLaserEnemy()
 {
+	CEnemy::CEnemy();
+
 	type = EnemyType::LASER;
 	hp = 3;
 	m_fCoolTime = 5.0f;		// 공격 간격
-	m_fAttackRange = 300.0f;	// 사거리
 	damage = 2;
 
 	enemy_flags &= ~option2;
@@ -448,13 +449,12 @@ void CLaserEnemy::Animate(float fTimeElapsed, CAirplanePlayer* player)
 
 CPlasmaCannonEnemy::CPlasmaCannonEnemy()
 {
+	CEnemy::CEnemy();
+
 	type = EnemyType::PLASMACANNON;
 	hp = 10;
-	m_fCoolTime = 10.0f;		// 공격 간격
-	m_fAttackRange = 300.0f;	// 사거리
+	m_fCoolTime = 8.0f;		// 공격 간격
 	damage = 4;
-
-	enemy_flags &= ~option2;
 
 	boundingbox = BoundingOrientedBox{ XMFLOAT3(0.f, 3.99769f, 7.3113f), XMFLOAT3(17.6804f, 11.0108f, 47.4969f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 }

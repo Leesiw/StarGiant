@@ -317,7 +317,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 
 
 		if (m_ppEnemies[num]->hp <= 0) {
-			m_ppEnemies[num]->SetisAlive(false);
+			m_ppEnemies[num]->SetisAliveFalse();
 
 			// ¹Ì¼Ç
 			if (cur_mission == MissionType::TU_KILL)
@@ -805,13 +805,13 @@ void CScene::MoveEnemy(char obj_id)
 {
 	if (_state != ST_INGAME) { return; }
 	if (m_ppEnemies[obj_id]->hp <= 0) {
-		m_ppEnemies[obj_id]->SetisAlive(false);
+		m_ppEnemies[obj_id]->SetisAliveFalse();
 		return;
 	}
 	if (levels[cur_mission].cutscene) {
 		if (cur_mission == MissionType::CS_BAD_ENDING || 
 			cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::CS_SHOW_GOD) {
-			m_ppEnemies[obj_id]->SetisAlive(false);
+			m_ppEnemies[obj_id]->SetisAliveFalse();
 			for (auto pl : _plist) {
 				if (pl == -1) { break; }
 				clients[pl].send_bullet_hit_packet(obj_id, -1);
@@ -896,13 +896,13 @@ void CScene::AimingEnemy(char obj_id)
 {
 	if (_state != ST_INGAME) { return; }
 	if (m_ppEnemies[obj_id]->hp <= 0) {
-		m_ppEnemies[obj_id]->SetisAlive(false);
+		m_ppEnemies[obj_id]->SetisAliveFalse();
 		return;
 	}
 	if (levels[cur_mission].cutscene) {
 		if (cur_mission == MissionType::CS_BAD_ENDING ||
 			cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::CS_SHOW_GOD) {
-			m_ppEnemies[obj_id]->SetisAlive(false);
+			m_ppEnemies[obj_id]->SetisAliveFalse();
 			for (auto pl : _plist) {
 				if (pl == -1) { break; }
 				clients[pl].send_bullet_hit_packet(obj_id, -1);
@@ -1475,7 +1475,7 @@ void CScene::SpawnEnemyFromGod(char id, char enemy_num)
 	}
 	m_ppEnemies[id]->state = EnemyState::MOVE;
 	m_ppEnemies[id]->SetDestination();
-	m_ppEnemies[id]->SetisAlive(true);
+	m_ppEnemies[id]->SetisAliveTrue();
 
 	SPAWN_ENEMY_INFO e_info{};
 	e_info.id = m_ppEnemies[id]->GetID();
@@ -1512,7 +1512,7 @@ void CScene::SpawnEnemy(char id)
 	m_ppEnemies[id]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
 	m_ppEnemies[id]->state = EnemyState::MOVE;
 	m_ppEnemies[id]->SetDestination();
-	m_ppEnemies[id]->SetisAlive(true);
+	m_ppEnemies[id]->SetisAliveTrue();
 
 	SPAWN_ENEMY_INFO e_info{};
 	e_info.id = m_ppEnemies[id]->GetID();

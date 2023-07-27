@@ -15,14 +15,10 @@ protected:
 	float						m_fCoolTime = 2.0f;
 	float						m_fCoolTimeRemaining = 0.0f;
 
-	float						m_fAttackRange = 300.0f;
-
 	XMFLOAT3					m_xmf3Velocity;
 	XMFLOAT3					m_xmf3Destination;
 
 	char						damage = 3;
-	char						hit_probability = 50;
-	char						m_fAvoidReductionRate = 20;
 
 	unsigned char enemy_flags = 0;	// 0 : 살아있는지 1 : 플레이어를 보고 있는지
 	// 2 : 공격 타이머가 켜져 있는지	// 3 : 움직였는지
@@ -39,7 +35,8 @@ public:
 	void Reset();
 
 	bool GetisAlive() { return enemy_flags & option0; }
-	void SetisAlive(bool i_a);
+	void SetisAliveTrue();
+	void SetisAliveFalse();
 	void SetAttackTimerFalse();
 
 	bool GetisMove() { return enemy_flags & option3; }
@@ -89,10 +86,6 @@ class CMissileEnemy : public CEnemy
 public:
 	CMissileEnemy();
 	virtual ~CMissileEnemy();
-
-	char missile_damage = 4;
-
-	MissileInfo info;
 public:
 	//virtual MissileInfo GetMissileInfo() { enemy_flags &= ~option2; return info; }
 	virtual void Attack(float fTimeElapsed, CAirplanePlayer* player);
@@ -108,9 +101,6 @@ class CLaserEnemy : public CEnemy
 public:
 	CLaserEnemy();
 	virtual ~CLaserEnemy();
-
-	float m_fHitProbability;		// 명중 확률
-	float m_fAvoidReductionRate;	// 상대 가속/방향 전환 시 명중률 떨어지는 정도
 public:
 	virtual void SetStatus(MissionType cur_mission);
 
