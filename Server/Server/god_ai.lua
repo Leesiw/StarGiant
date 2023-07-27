@@ -105,9 +105,7 @@ function idle(frameTime,bpx, bpy, bpz)
             SHOT_COOL_TIME = 4
             randomIndex = math.random(2,5)
             if frameTime >= moveCooldown then
-                god_x = god_x + randomIndexs * randomc1
-                god_y = god_y + randomIndexs * randomc2
-                god_z = god_z + randomIndexs * randomc3
+                moveBoss(bpx, bpy, bpz)
                 print("move")
             end
 
