@@ -11,6 +11,8 @@ CGameObject::CGameObject()
 {
 	m_xmf4x4ToParent = Matrix4x4::Identity();
 	m_xmf4x4World = Matrix4x4::Identity();
+
+	boundingbox = BoundingOrientedBox{ XMFLOAT3{  0.f, 0.f,  0.f }, XMFLOAT3{ 0.f, 0.f, 0.f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 }
 
 CGameObject::~CGameObject()
@@ -29,17 +31,7 @@ BoundingOrientedBox CGameObject::UpdateBoundingBox()
 	XMStoreFloat4(&m_xmOOBB.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBB.Orientation)));
 	return m_xmOOBB;
 }
-/*
-bool CGameObject::HierarchyIntersects(CGameObject* pCollisionGameObject, bool isSecond)
-{
-	//if (m_xmOOBB.Intersects(pCollisionGameObject->m_xmOOBB)) return true;
 
-	if (isSecond)
-		return false;
-
-	return pCollisionGameObject->HierarchyIntersects(this, true);
-}
-*/
 void CGameObject::SetPosition(float x, float y, float z)
 {
 	m_xmf4x4ToParent._41 = x;
@@ -82,30 +74,6 @@ XMFLOAT3 CGameObject::GetRight()
 	return(Vector3::Normalize(XMFLOAT3(m_xmf4x4World._11, m_xmf4x4World._12, m_xmf4x4World._13)));
 }
 
-void CGameObject::MoveStrafe(float fDistance)
-{
-	XMFLOAT3 xmf3Position = GetPosition();
-	XMFLOAT3 xmf3Right = GetRight();
-	xmf3Position = Vector3::Add(xmf3Position, xmf3Right, fDistance);
-	CGameObject::SetPosition(xmf3Position);
-}
-
-void CGameObject::MoveUp(float fDistance)
-{
-	XMFLOAT3 xmf3Position = GetPosition();
-	XMFLOAT3 xmf3Up = GetUp();
-	xmf3Position = Vector3::Add(xmf3Position, xmf3Up, fDistance);
-	CGameObject::SetPosition(xmf3Position);
-}
-
-void CGameObject::MoveForward(float fDistance)
-{
-	XMFLOAT3 xmf3Position = GetPosition();
-	XMFLOAT3 xmf3Look = GetLook();
-	xmf3Position = Vector3::Add(xmf3Position, xmf3Look, fDistance);
-	CGameObject::SetPosition(xmf3Position);
-}
-
 void CGameObject::Rotate(float fPitch, float fYaw, float fRoll)
 {
 	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
@@ -134,10 +102,18 @@ void CGameObject::Rotate(XMFLOAT4* pxmf4Quaternion)
 //
 CMeteoObject::CMeteoObject()
 {
+	CGameObject::CGameObject();
+	m_xmf3MovingDirection = XMFLOAT3{ 0.0f, 0.0f, 1.0f };
+	m_xmf3Scale = XMFLOAT3{ 1.f, 1.f ,1.f };
 }
 
 CMeteoObject::~CMeteoObject()
 {
+}
+
+void CMeteoObject::SetMovingSpeed(float fSpeed)
+{
+	m_xmf3MovingDirection = Vector3::ScalarProduct(m_xmf3MovingDirection, fSpeed, false);
 }
 
 void CMeteoObject::SetScale(float x, float y, float z)
@@ -146,18 +122,11 @@ void CMeteoObject::SetScale(float x, float y, float z)
 	CGameObject::SetScale(x, y, z);
 }
 
-void CMeteoObject::OnInitialize()
-{
-	//m_pMainRotorFrame = FindFrame("rotor");
-	//m_pTailRotorFrame = FindFrame("black_m_7");
-}
-
 void CMeteoObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 {
 	XMFLOAT3 xmf3Position = GetPosition();
-	xmf3Position = Vector3::Add(xmf3Position, m_xmf3MovingDirection, 30.0f * fTimeElapsed);
+	xmf3Position = Vector3::Add(xmf3Position, m_xmf3MovingDirection, fTimeElapsed);
 	SetPosition(xmf3Position);
-	//printf("pos : %f, %f, %f\n", xmf3Position.x, xmf3Position.y, xmf3Position.z);
 }
 
 //============================================

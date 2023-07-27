@@ -82,10 +82,6 @@ public:
 	XMFLOAT4 GetQuaternion();
 
 	void ResetCoolTime() { m_fCoolTimeRemaining = m_fCoolTime; }
-
-	void SendPos();
-
-	//virtual MissileInfo GetMissileInfo() { MissileInfo info; info.damage = 0; return info; }
 };
 
 class CMissileEnemy : public CEnemy

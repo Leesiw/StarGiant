@@ -360,22 +360,6 @@ void CEnemy::SetIsMoveFalse() {
 	enemy_flags &= ~option3;
 }
 
-void CEnemy::SendPos()
-{
-	if (enemy_flags & option0) {
-		ENEMY_INFO info{};
-		info.id = id;
-		//info.Quaternion = GetQuaternion();
-		info.pos = GetPosition();
-		/*
-		for (auto pl : clients)
-		{
-			//if (false == pl.in_use) continue;
-			pl.send_enemy_packet(info);
-		}*/
-	}
-}
-
 XMFLOAT4 CEnemy::GetQuaternion()
 {
 	XMMATRIX mat = XMLoadFloat4x4(&m_xmf4x4ToParent);

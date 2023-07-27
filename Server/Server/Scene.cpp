@@ -85,6 +85,7 @@ void CScene::BuildObjects()
 			m_ppMeteoObjects[i]->boundingbox = BoundingOrientedBox{ XMFLOAT3{ 0.188906f, 0.977625f, 0.315519f }, XMFLOAT3{ 1.402216f, 1.458820f, 1.499708f }, XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		}
 		m_ppMeteoObjects[i]->SetMovingDirection(random_dir);
+		m_ppMeteoObjects[i]->SetMovingSpeed(urdSpeed(dree));
 	}
 
 	// enemy
@@ -209,14 +210,8 @@ void CScene::Reset()
 		if (urdEnemyAI(dree) > 50) { random_pos.y = -random_pos.y; random_dir.y = -random_dir.y; }
 		if (urdEnemyAI(dree) > 50) { random_pos.z = -random_pos.z; random_dir.z = -random_dir.z; }
 		m_ppMeteoObjects[i]->SetPosition(random_pos.x + p_pos.x, random_pos.y + p_pos.y, random_pos.z + p_pos.z);
-		/*
-		if (i < METEOS / 2) {
-			m_ppMeteoObjects[i]->SetScale(urdScale(dree), urdScale(dree), urdScale(dree));
-		}
-		else {
-			m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
-		}*/
 		m_ppMeteoObjects[i]->SetMovingDirection(random_dir);
+		m_ppMeteoObjects[i]->SetMovingSpeed(urdSpeed(dree));
 	}
 
 	for (int i = 0; i < ENEMIES; ++i) {
@@ -1024,6 +1019,7 @@ void CScene::UpdateMeteo(char obj_id)
 		m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 3);
 
 		m_ppMeteoObjects[obj_id]->SetMovingDirection(Vector3::ScalarProduct(xmf3Sub, -1.f, false));
+		m_ppMeteoObjects[obj_id]->SetMovingSpeed(Vector3::Length(xmf3Sub));
 
 		for (short pl_id : _plist) {
 			if (pl_id == -1) continue;
@@ -1552,6 +1548,7 @@ void CScene::SpawnMeteo(char i)
 		m_ppMeteoObjects[i]->SetScale(urdScale2(dree), urdScale2(dree), urdScale2(dree));
 	}
 	m_ppMeteoObjects[i]->SetMovingDirection(random_dir);
+	m_ppMeteoObjects[i]->SetMovingSpeed(urdSpeed(dree));
 }
 
 void CScene::Send(char* p)
