@@ -81,8 +81,6 @@ public:
 	char heal = 10;
 	char def = 0;
 
-	float						m_fBulletEffectiveRange = 150.0f;
-
 	XMFLOAT4 Quaternion;
 	char cDirection = 0;	// option1 : forward(w) option2 : left(a) option3 : backward(s) option4 : right(d)
 public:
@@ -112,6 +110,8 @@ public:
 
 	bool cutscene_end = false;
 public:
+	void Reset();
+
 	void SetInputInfo(INSIDE_INPUT_INFO i_info) { input_info = i_info; is_update = false; }
 
 	bool CheckCollision(const XMFLOAT3 pos[]);

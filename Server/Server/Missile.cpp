@@ -3,13 +3,22 @@
 
 CMissile::CMissile()
 {
-	m_xmf4x4ToParent = Matrix4x4::Identity();
-	m_xmf4x4World = Matrix4x4::Identity();
+	CGameObject::CGameObject();
 
 	isActive = false;
 
+
+	m_fTrackingTime = 3.5f;
+	m_fTrackingTimeRemaining = 0.f;
+
+	damage = 5;
+
 	// 바운딩 박스 모델 수정 시 수정 필요.
 	boundingbox = BoundingOrientedBox(XMFLOAT3(-2.38419e-07f, 0.640688f, -2.98023e-07f), XMFLOAT3(1.44325f, 6.89483f, 1.44325f), XMFLOAT4(0.f, 0.f, 0.f, 1.f));
+}
+
+CMissile::~CMissile()
+{
 }
 
 void CMissile::Animate(float fTimeElapsed, CGameObject* target)
@@ -27,7 +36,7 @@ void CMissile::Animate(float fTimeElapsed, CGameObject* target)
 	xmf3Position = Vector3::Add(xmf3Position, xmf3Movement);
 	SetPosition(xmf3Position);
 
-	if (m_fTrackingTimeRemaining < -4.f) { Reset(); }
+	if (m_fTrackingTimeRemaining < -5.f) { Reset(); }
 }
 
 void CMissile::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
@@ -43,7 +52,7 @@ void CMissile::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	float pitch = XMConvertToDegrees(asin(-new_pos.y));
 	float yaw = XMConvertToDegrees(atan2(new_pos.x, new_pos.z));
 
-	float rotate_angle = fTimeElapsed * 100.f;
+	float rotate_angle = fTimeElapsed * 60.f;
 
 	XMFLOAT3 p_y_r{ pitch, yaw, 0.f };
 	if (Vector3::Length(p_y_r) > rotate_angle) {

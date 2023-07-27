@@ -11,12 +11,13 @@ class CMissile : public CGameObject {
 private:
 	bool isActive = false;
 
-	float m_fTrackingTime = 5.f;
+	float m_fTrackingTime = 3.5f;
 	float m_fTrackingTimeRemaining;
 
 	char damage;
 public:
 	CMissile();
+	~CMissile();
 
 	virtual void Animate(float fTimeElapsed, CGameObject* target);
 

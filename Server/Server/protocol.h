@@ -251,7 +251,6 @@ struct SPAWN_MISSILE_INFO {
 struct INSIDE_INPUT_INFO {
 	DWORD dwDirection;
 	float yaw;
-	float pitch;
 };
 
 struct INSIDE_PLAYER_INFO {

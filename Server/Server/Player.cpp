@@ -10,6 +10,7 @@
 
 CPlayer::CPlayer()
 {
+	CGameObject::CGameObject();
 	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
@@ -23,6 +24,8 @@ CPlayer::CPlayer()
 	m_fPitch = 0.0f;
 	m_fRoll = 0.0f;
 	m_fYaw = 0.0f;
+
+	is_update = true;
 }
 
 CPlayer::~CPlayer()
@@ -95,8 +98,7 @@ void CPlayer::Rotate(float x, float y, float z)
 void CPlayer::Update(float fTimeElapsed)
 {
 	XMFLOAT3 pos = GetPosition();
-	float dist;
-	dist = Vector3::Length(Vector3::Subtract(pos, XMFLOAT3(10000.f, 10000.f, 10000.f)));
+	float dist = Vector3::Length(Vector3::Subtract(pos, XMFLOAT3(10000.f, 10000.f, 10000.f)));
 
 	if (dist < 1000.f)
 	{
@@ -143,7 +145,19 @@ void CPlayer::OnPrepareRender()
 // 
 CAirplanePlayer::CAirplanePlayer()
 {
-	CGameObject::CGameObject();
+	CPlayer::CPlayer();
+
+	cDirection = 0;
+	Quaternion = XMFLOAT4(-0.f, 0.f, -0.f, 1.f);
+	is_update = true;
+
+	max_hp = 100;
+	hp = 100;
+
+	damage = 3;
+	heal = 10;
+	def = 0;
+
 	SetFriction(250.0f);
 	SetMaxVelocityXZ(100.0f);
 }
@@ -178,7 +192,8 @@ bool CAirplanePlayer::GetHeal()
 void CAirplanePlayer::Reset()
 {
 	cDirection = 0;
-	is_update = false;
+	Quaternion = XMFLOAT4(-0.f, 0.f, -0.f ,1.f);
+	is_update = true;
 
 	m_xmf4x4ToParent = Matrix4x4::Identity();
 	m_xmf4x4World = Matrix4x4::Identity();
@@ -240,6 +255,7 @@ void CAirplanePlayer::OnPrepareRender()
 // 
 CTerrainPlayer::CTerrainPlayer()
 {
+	CPlayer::CPlayer();
 	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
@@ -253,10 +269,41 @@ CTerrainPlayer::CTerrainPlayer()
 	m_fPitch = 0.0f;
 	m_fRoll = 0.0f;
 	m_fYaw = 0.0f;
+
+	input_info.dwDirection = NULL;
+	input_info.yaw = 0.f;
+
+	is_update = true;
+
+	cutscene_end = false;
 }
 
 CTerrainPlayer::~CTerrainPlayer()
 {
+}
+
+void CTerrainPlayer::Reset()
+{
+	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
+
+	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+	m_fMaxVelocityXZ = 0.0f;
+	m_fFriction = 0.0f;
+
+	m_fPitch = 0.0f;
+	m_fRoll = 0.0f;
+	m_fYaw = 0.0f;
+
+	input_info.dwDirection = NULL;
+	input_info.yaw = 0.f;
+
+	is_update = true;
+
+	cutscene_end = false;
 }
 
 bool CTerrainPlayer::CheckCollision(const XMFLOAT3 pos[])
@@ -335,7 +382,6 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, const XMFLOAT3 pos
 {
 	if (dwDirection)
 	{
-
 		XMFLOAT3 xmf3Shift = XMFLOAT3(0, 0, 0);
 		if (dwDirection & DIR_FORWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, fDistance);
 		if (dwDirection & DIR_BACKWARD) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Look, -fDistance);
@@ -349,7 +395,6 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, const XMFLOAT3 pos
 			xmf3Shift.z = -xmf3Shift.z;
 			CPlayer::Move(xmf3Shift, bUpdateVelocity);
 		}
-
 	}
 
 	//CPlayer::Move(dwDirection, fDistance, bUpdateVelocity);
@@ -361,8 +406,6 @@ void CTerrainPlayer::Update(float fTimeElapsed, const XMFLOAT3 pos[])
 		Rotate(0, input_info.yaw - m_fYaw, 0);
 	}
 	if (input_info.dwDirection) {
-		//OnPrepareRender();
-		//UpdateTransform();
 		Move(input_info.dwDirection, 80.0f * fTimeElapsed, pos, false);
 		input_info.dwDirection = NULL;
 	}

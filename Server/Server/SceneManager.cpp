@@ -31,7 +31,7 @@ short SceneManager::FindScene(short id, short pl_id)		// 수정 필요 lock / unlock
 {
 	//_scene_lock.lock();
 	array<CScene*, MAX_ROOM>::iterator iter = std::find_if(m_pScenes.begin(), m_pScenes.end(), [&id](CScene*& scene) {
-		return scene->_id == id;
+		return scene->_id == id && SCENE_ALLOC;
 	});
 
 	if (iter != m_pScenes.end())
@@ -48,7 +48,7 @@ short SceneManager::FindScene(short id, short pl_id)		// 수정 필요 lock / unlock
 	}
 	else {	// 새로운씬으로 배정
 		array<CScene*, MAX_ROOM>::iterator iter2 = std::find_if(m_pScenes.begin(), m_pScenes.end(), [&id](CScene*& scene) {
-			return scene->_id == -1 && scene->_state == SCENE_FREE;
+			return scene->_state == SCENE_FREE;
 		});
 
 		if (iter2 != m_pScenes.end())

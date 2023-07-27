@@ -467,7 +467,6 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (p->room_id != -1) {
 			scene_manager._scene_lock.lock();
 			short scene_num = scene_manager.FindScene(p->room_id, c_id);
-			scene_manager._scene_lock.unlock();
 
 			if (scene_num >= 0) {
 				char num = scene_manager.InsertPlayer(scene_num, c_id);
@@ -485,6 +484,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			else {
 				disconnect(c_id);	return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
 			}
+			scene_manager._scene_lock.unlock();
 		}
 		else {
 			scene_manager._scene_lock.lock();

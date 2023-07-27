@@ -23,5 +23,4 @@ public:
 
 private:
 	std::array<CScene*, MAX_ROOM> m_pScenes;
-	std::array<mutex, MAX_ROOM> m_room;
 };

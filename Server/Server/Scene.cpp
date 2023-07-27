@@ -196,6 +196,7 @@ void CScene::Reset()
 	prev_mission = MissionType::CS_TURN;
 	
 	for (char i = 0; i < 3; ++i) {
+		m_ppPlayers[i]->Reset();
 		m_ppPlayers[i]->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 10.0f, 740.0f));
 		m_ppPlayers[i]->cutscene_end = false;
 	}
