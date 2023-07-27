@@ -2919,7 +2919,7 @@ void CGameFramework::ProcessPacket(char* p)
 			break;
 		}
 		if (packet->data.id == BOSS_ID) {
-			if (curMissionType == MissionType::KILL_GOD)
+			if (curMissionType == MissionType::DEFEAT_BOSS)
 				m_pScene->m_ppBoss->CurMotion = (BossAnimation)packet->data.animation;
 			// 보스 State 변경??
 			break;
