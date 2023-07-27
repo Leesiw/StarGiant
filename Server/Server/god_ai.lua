@@ -75,7 +75,7 @@ function updateGodAI(hp, bpx, bpy, bpz, elapsedTime)
             onappear = false
         end
     elseif state == GodState.IDLE1 then    -- 기본상태
-        idle(frameTime)
+        idle(frameTime, bpx, bpy, bpz)
     elseif state == GodState.DIE then      -- 보스의 체력이 0 이하일 때 죽음 상태 처리
         if curHp <= 0 then
             die()
@@ -90,7 +90,7 @@ end
 
 
 -- 보스의 idle 상태 동작
-function idle(frameTime)
+function idle(frameTime,bpx, bpy, bpz)
     --print("idle 상태")
    -- print(frameTime)
    if not attackState and frameTime >= attackCooldown then
@@ -202,6 +202,25 @@ end
 
 -- 죽음 상태 처리 함수
 function die()
+end
+
+
+-- 보스를 순간이동시키는 함수
+function moveBoss(bpx, bpy, bpz)
+    -- 플레이어 위치로부터 거리가 1300 이하 500 이상인 임의의 위치를 설정하여 순간이동
+    local randomDistance = math.random(500, 1300)
+    local randomAngle = math.random(0, 360)
+    local randomSign = math.random(0, 1) == 0 and 1 or -1  -- 0이면 양수, 1이면 음수
+    local dx = randomDistance * randomSign * math.cos(math.rad(randomAngle))
+    local dy = randomDistance * randomSign * math.sin(math.rad(randomAngle))
+    
+    god_x = bpx + dx
+    god_y = bpy + dy
+    god_z = bpz
+
+    motion = GodState.HIT2
+    frameTime = 0
+
 end
 
 

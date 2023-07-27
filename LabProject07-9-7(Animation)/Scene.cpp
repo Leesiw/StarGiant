@@ -445,7 +445,7 @@ void CScene::BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_ppBoss = new Boss();
 	m_ppBoss->BossObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBossModel);
 	m_ppBoss->SetPosition(5000.0f, 5000.0f, 5000.0f);
-	m_ppBoss->Rotate(0, 0, 0);
+	m_ppBoss->Rotate(0.f, 180.f, 0.f);
 	m_ppBoss->SetScale(100.0f, 100.0f, 100.0f);
 	if (pBossModel) delete pBossModel;
 
@@ -465,7 +465,7 @@ void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	m_ppGod = new God();
 	m_ppGod->GodObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pGodModel);
 	m_ppGod->SetPosition(5000.0f, 5000.0f, 5000.0f);
-	m_ppGod->Rotate(0.f, 0.f, 0.f);
+	m_ppGod->Rotate(0.f, 180.f, 0.f);
 	m_ppGod->SetScale(20.0f, 20.0f, 20.0f);
 	if (pGodModel) delete pGodModel;
 }
@@ -1525,10 +1525,9 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	XMFLOAT3 xmf3Position2 = Vector3::Add(xmf3CameraPosition, Vector3::ScalarProduct(xmf3CameraLook, 10.0f, false));
 
 
-	static int setplstart = 0;
-	if (setplstart == 0 && m_pPlayer[0]->curMissionType == MissionType::CS_TURN) {
+
+	if (m_pPlayer[0]->curMissionType == MissionType::CS_TURN) {
 		m_pPlayer[g_myid]->SetPosition({ 520.219f + g_myid * 10, 230.f, 593.263f });
-		setplstart = 1;
 	}
 
 
@@ -1638,8 +1637,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (m_ppJewel)
 		{
 			m_ppJewel->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y + 300.0f + m_eTime, m_ppBoss->GetPosition().z);
-			//m_ppJewel->SetPosition(xmf3Position);
-			//m_ppJewel->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 			m_ppJewel->Rotate(0.0f, m_fElapsedTime * 30.f, 0.0f);
 			m_ppJewel->Render(pd3dCommandList, pCamera);
 		}
@@ -1653,19 +1650,18 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_BLACK_HOLE || m_pPlayer[0]->curMissionType == MissionType::ESCAPE_BLACK_HOLE)
 			m_ppBlackhole->Render(pd3dCommandList, pCamera);
 	}
-	static int aa = 0;
 
 	for (int i = 0; i < BLACKHOLEMETEOR; i++)
 	{
 		if (m_BlackholeMeteorObjects[i])
 		{
-			if (aa == 0) {
+			if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_BLACK_HOLE) {
 				m_BlackholeMeteorObjects[i]->SetPosition(m_ppBlackhole->GetPosition());
 			}
 			m_BlackholeMeteorObjects[i]->Animate(m_fElapsedTime, m_ppBlackhole->GetPosition());
 			if (!m_BlackholeMeteorObjects[i]->m_pSkinnedAnimationController) m_BlackholeMeteorObjects[i]->UpdateTransform(NULL);
 
-			if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_BLACK_HOLE || m_pPlayer[0]->curMissionType == MissionType::ESCAPE_BLACK_HOLE)
+			if (m_pPlayer[0]->curMissionType == MissionType::ESCAPE_BLACK_HOLE)
 				m_BlackholeMeteorObjects[i]->Render(pd3dCommandList, pCamera);
 		}
 
@@ -1674,9 +1670,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			cout << "z : " << m_BlackholeMeteorObjects[0]->GetPosition().z << endl;*/
 
 	}
-	aa = 1;
 	//=======================================================
-	static int aaaa = 0;
 	if (m_ppBoss) {
 		m_ppBoss->Animate(m_fElapsedTime);
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
@@ -1684,10 +1678,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
 
 		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
-			if (aaaa == 0) {
-				m_ppBoss->Rotate(0.f, 180.f, 0.f);
-				aaaa = 1;
-			}
+
 			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
 		}
 
@@ -1719,17 +1710,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 	}
 
-	static int aaa = 0;
 
 	
 	if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD && m_pPlayer[0]->curMissionType <= MissionType::KILL_GOD)
 		if (m_ppGod) {
 			//m_fbosscutTime += m_fElapsedTime;
-			if (aaa == 0) {
-				//m_ppGod->SetPosition(m_pPlayer[0]->GetPosition());
-				m_ppGod->Rotate(0.f, 180.f, 0.f);
-			}
-			aaa = 1;
 			m_ppGod->Animate(m_fElapsedTime);
 			if (!m_ppGod->m_pSkinnedAnimationController) m_ppGod->UpdateTransform(NULL);
 			m_ppGod->ChangeAnimation(m_ppGod->GetAnimation());
@@ -1828,7 +1813,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 		for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
 			if (!b_Inside) {
-				
+				 
 					m_pSkull[i]->setTarpos(m_pPlayer[0]->GetPosition());
 					m_pSkull[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 					m_pSkull[i]->Animate(m_fElapsedTime);
@@ -1896,16 +1881,15 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 	}
 
-	static int adfa = 0;
 
 
 	if (m_pPlayer[0]->curMissionType == MissionType::CS_ENDING) {
 		m_fbosscutTime += m_fElapsedTime;
 		if (m_ppGod) {
-			/*if (adfa==0)
-				m_ppGod->SetPosition(m_pPlayer[0]->GetPosition().x, m_pPlayer[0]->GetPosition().y, m_pPlayer[0]->GetPosition().z - 1300.0f);*/
 			if (!m_ppGod->m_pSkinnedAnimationController) m_ppGod->UpdateTransform(NULL);
 
+			if(m_ppGod->CurMotion!= GodAnimation::DEATH)
+				m_ppJewel->SetPosition(m_ppGod->GetPosition().x, m_ppGod->GetPosition().y + 300.0f + m_eTime, m_ppGod->GetPosition().z);
 			m_ppGod->ChangeAnimation(GodAnimation::DEATH);
 			m_ppGod->SetState(GodState::DEATH);
 			m_ppGod->Animate(m_fElapsedTime);
@@ -1916,13 +1900,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 		if (m_ppJewel)
 		{
-			if (adfa == 0) {
-				m_ppJewel->SetPosition(m_ppGod->GetPosition().x, m_ppGod->GetPosition().y, m_ppGod->GetPosition().z);
-				m_ppJewel->Rotate(0.0f, 0.f, 90.f);
-			}
-			//m_ppJewel->SetPosition(xmf3Position);
-			//m_ppJewel->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-
 			m_ppJewel->Rotate(m_fElapsedTime * 60.0, 0.0f, 0.0f);
 			m_ppJewel->endingMove(m_fElapsedTime, m_pPlayer[0]->GetPosition());
 			m_ppJewel->Render(pd3dCommandList, pCamera);
@@ -1930,7 +1907,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 
 	}
-	adfa = 1;
 
 	if (b_Inside)
 	{
