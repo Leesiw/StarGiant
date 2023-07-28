@@ -381,7 +381,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		}
 	}
 
-	if (cur_mission == MissionType::DEFEAT_BOSS) {
+	if (cur_mission == MissionType::DEFEAT_BOSS || cur_mission == MissionType::DEFEAT_BOSS2) {
 		BoundingOrientedBox boss_bbox = m_pBoss->UpdateBoundingBox();
 		if (boss_bbox.Intersects(pos, dir, dist)) // 焊胶 面倒贸府
 		{
@@ -395,7 +395,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		}
 	}
 
-	if (cur_mission == MissionType::KILL_GOD) {
+	if (cur_mission == MissionType::KILL_GOD || cur_mission == MissionType::KILL_GOD2) {
 		BoundingOrientedBox god_bbox = m_pGod->UpdateBoundingBox();
 		if (god_bbox.Intersects(pos, dir, dist)) // 矮 面倒贸府
 		{
