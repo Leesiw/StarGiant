@@ -1699,7 +1699,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 				m_pMagicCircle[0]->Render(pd3dCommandList, pCamera);
 			}
 		}
-		if (m_ppBoss->GetAnimation() == BossAnimation::CLAW_ATTACT) {
+		else if (m_ppBoss->GetAnimation() == BossAnimation::CLAW_ATTACT) {
 			if (!b_Inside) {
 				m_pMagicCircle[1]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
 				m_pMagicCircle[1]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
@@ -1708,7 +1708,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 				m_pMagicCircle[1]->Render(pd3dCommandList, pCamera);
 			}
 		}
-		if (m_ppBoss->GetAnimation() == BossAnimation::FLAME_ATTACK) {
+		else if (m_ppBoss->GetAnimation() == BossAnimation::FLAME_ATTACK) {
 			if (!b_Inside) {
 				m_pMagicCircle[2]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
 				m_pMagicCircle[2]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));

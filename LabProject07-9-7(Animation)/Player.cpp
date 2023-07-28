@@ -702,7 +702,7 @@ void CAirplanePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 		{
 			m_ppBullets[i]->Render(pd3dCommandList, pCamera); 
 		};
-	for(int i=0; i<2; i++) m_pAirSprites[i]->CSpriteObject::Render(pd3dCommandList, pCamera);
+	for(int i=0; i<2; i++) if(m_pAirSprites[i])m_pAirSprites[i]->CSpriteObject::Render(pd3dCommandList, pCamera);
 
 	CPlayer::Render(pd3dCommandList, pCamera);
 
