@@ -744,7 +744,6 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (clients[c_id].room_id == -1) { break; }
 		CScene* m_pScene = scene_manager.GetScene(clients[c_id].room_id);
 		CS_ANIMATION_CHANGE_PACKET* p = reinterpret_cast<CS_ANIMATION_CHANGE_PACKET*>(packet);
-		printf("animation change\n", clients[c_id].room_pid);
 		for (auto pl : m_pScene->_plist) {
 			if (pl == -1) { continue; }
 			if (pl == c_id) { continue; }
