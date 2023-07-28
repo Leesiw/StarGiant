@@ -100,7 +100,7 @@ void CScene::BuildDefaultLightsAndMaterials()
 	m_pInsideLights[0].m_xmf4Diffuse = XMFLOAT4(0.73f, 0.73f, 0.73f, 1.0f);
 	m_pInsideLights[0].m_xmf4Specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 0.0f);
 	m_pInsideLights[0].m_xmf3Position = XMFLOAT3(-14.66f, 224.0f, 687.f);
-	m_pInsideLights[0].m_xmf3Direction = XMFLOAT3(+1.0f, 0.0f, 1.0f);
+	m_pInsideLights[0].m_xmf3Direction = XMFLOAT3(+0.0f, -1.0f, 0.0f);//XMFLOAT3(+1.0f, 0.0f, 1.0f);
 
 	/*m_pInsideLights[1].m_bEnable = false;
 	m_pInsideLights[1].m_nType = DIRECTIONAL_LIGHT;
@@ -328,6 +328,8 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	}
 	for (int i = 0; i < MAX_FIRE; ++i) {
 		m_pFire[i] = new CFireObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+		m_pFire[i]->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
 	}
 
 	for (int i = 0; i < MAX_PARTICLES; ++i) {
@@ -1929,6 +1931,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 				m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 				m_pFire[i]->SetPosition(m_pPlayer[0]->getSpritePos(i));
 				m_pFire[i]->Animate(m_fElapsedTime);
+				m_pFire[i]->UpdateShaderVariables(pd3dCommandList, m_pFire[i]->GetShaderVariables());
 				m_pFire[i]->Render(pd3dCommandList, pCamera);
 			}
 		}
@@ -2223,10 +2226,11 @@ void CScene::CheckBoomSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	//}
 }
 
-
 void CScene::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	//그림자맵 깊이 랜더 
+	/*m_pDepthRenderShader->m_pLights[0].m_xmf3Direction = XMFLOAT3(
+		m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.x, m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.y, m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.z+0.01);*/
 	m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
 }
 
