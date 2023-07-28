@@ -487,13 +487,19 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	switch (packet[1]) {
 	case CS_LOGIN: {
 		CS_LOGIN_PACKET* p = reinterpret_cast<CS_LOGIN_PACKET*>(packet);
-		if (clients[c_id].room_id != -1) {	// 이미 배정된 방이 있을 때
-			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
-			scene->_plist_lock.lock();
-			scene->_plist[clients[c_id].room_pid] = -1;
-			clients[c_id].room_id = -1;
-			clients[c_id].room_pid = -1;
-			scene->_plist_lock.unlock();
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id != -1) {	// 이미 배정된 방이 있을 때
+			CScene* scene = scene_manager.GetScene(t_room_id);
+			if (scene->_id != clients[c_id].room_id) {
+				scene->_plist_lock.lock();
+				char t_room_pid = clients[c_id].room_pid;
+				if (t_room_pid != -1) {
+					scene->_plist[t_room_pid] = -1;
+				}
+				clients[c_id].room_id = -1;
+				clients[c_id].room_pid = -1;
+				scene->_plist_lock.unlock();
+			}
 		}
 
 		scene_manager._scene_lock.lock();
@@ -509,7 +515,12 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			CScene* scene = scene_manager.GetScene(scene_num);
 			scene->_s_lock.lock();
 			char num = scene_manager.InsertPlayer(scene_num, c_id);
-			if (num == -1) { disconnect(c_id); scene->_s_lock.unlock(); return; }  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
+			if (num == -1) { 
+				disconnect(c_id); 
+				scene->_s_lock.unlock(); 
+				scene_manager._scene_lock.unlock(); 
+				return; 
+			}  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
 			else if (num == 0) {
 				if (scene->_state == SCENE_FREE) {
 					scene_manager.GetScene(scene_num)->_state = SCENE_ALLOC;
@@ -519,6 +530,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		else {
 			disconnect(c_id);	
+			scene_manager._scene_lock.unlock();
 			return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
 		}
 		scene_manager._scene_lock.unlock();
