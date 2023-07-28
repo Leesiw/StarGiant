@@ -1414,6 +1414,8 @@ int CScene::CheckSitCollisions()
 		for (int i = 0; i < 4; i++) {
 			if (m_pPlayer[g_myid]->aabb.Intersects(xm_SitAABB[i]))
 			{
+				return i;
+				/*
 				std::cout << i << "bound" << std::endl;
 				//i번째 방향으로 카메라돌리고 앉게하기 
 				if (((CTerrainPlayer*)m_pPlayer[g_myid])->motion != AnimationState::SIT) {
@@ -1432,7 +1434,7 @@ int CScene::CheckSitCollisions()
 					//m_pPlayer[g_myid]->SetLook(m_LookCamera[i]);
 					m_pPlayer[g_myid]->SetSitState(false);
 					return i;
-				}
+				}*/
 			}
 		}
 	}
