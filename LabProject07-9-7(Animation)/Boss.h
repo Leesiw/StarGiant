@@ -48,6 +48,7 @@ public:
 
 	char soundon = -1;
 	char soundo0nPAST = -1;
+	CGameObject* m_pHead = NULL; //대가리 위치
 
 	
 protected:
@@ -71,6 +72,7 @@ public:
 
 	void BossAi();
 	void ChangeAnimation(BossAnimation CurState);
+	virtual void Animate(float fTimeElapsed);
 
 
 };

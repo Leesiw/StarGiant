@@ -1835,13 +1835,19 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		cout << "shot";
 	}
 
+
+	//m_pMagicCircl 테스트
+	//m_ppBoss->SetPosition({ 0,0,0 });
+	//m_ppBoss->Animate(m_fElapsedTime);
+	//m_ppBoss->Render(pd3dCommandList, pCamera);
+
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
 		if (!b_Inside) {
 
-			m_pMagicCircle[i]->setTarpos(m_pPlayer[0]->GetPosition());
+			m_pMagicCircle[i]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
 			m_pMagicCircle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 			m_pMagicCircle[i]->Rotate(0, 0, m_eTime * 100);
-			//m_pMagicCircle[i]->Animate(m_fElapsedTime);
+			m_pMagicCircle[i]->Animate(m_fElapsedTime);
 			m_pMagicCircle[i]->Render(pd3dCommandList, pCamera);
 
 		}

@@ -2904,7 +2904,7 @@ CMagicCircleObject::CMagicCircleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 
 	//intervalX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
 	//intervalY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
-	intervalZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 150.0f;
+	//intervalZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 150.0f;
 
 
 	position.x = GetPosition().x + intervalX;
@@ -2934,9 +2934,9 @@ void CMagicCircleObject::Animate(float fElapsedTime)
 	XMFLOAT3 velocityResult;
 	XMStoreFloat3(&velocityResult, velocityVector);
 
-	position.x += velocityResult.x * 10;
-	position.y += velocityResult.y * 10;
-	position.z += velocityResult.z * 10;
+	//position.x += velocityResult.x * 10;
+	//position.y += velocityResult.y * 10;
+	//position.z += velocityResult.z * 10;
 
 
 	SetPosition(position);
