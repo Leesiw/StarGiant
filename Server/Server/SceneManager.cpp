@@ -76,11 +76,6 @@ CScene* SceneManager::GetScene(short id)
 	return m_pScenes[id];
 }
 
-void SceneManager::SceneStart(short num)
-{
-	m_pScenes[num]->Start();
-}
-
 void SceneManager::ResetScene(short num)
 {
 	m_pScenes[num]->_s_lock.lock();
