@@ -1196,7 +1196,7 @@ void CScene::UpdateBoss()
 	if (dist < 1000.f) // boss ¸·±â
 	{
 		XMFLOAT3 ToGo = Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition());
-		ToGo = Vector3::ScalarProduct(ToGo, 800.f);
+		ToGo = Vector3::ScalarProduct(ToGo, 1000.f);
 		ToGo = Vector3::Add(m_pBoss->GetPosition(), ToGo);
 		m_pSpaceship->SetPosition(ToGo);
 	}
