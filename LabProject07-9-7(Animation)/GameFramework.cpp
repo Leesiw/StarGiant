@@ -2776,9 +2776,10 @@ void CGameFramework::ProcessPacket(char* p)
 		if (!m_pScene->m_ppEnemies[packet->data.id]->isAlive) {
 			m_pScene->m_ppEnemies[packet->data.id]->isAlive = true;
 		}
-		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);
 
-		//m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
+		m_pScene->m_ppEnemies[packet->data.id]->Reset();
+		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);
+		m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
 		m_pScene->m_ppEnemies[packet->data.id]->m_xmf3Destination = packet->data.destination;
 
 		m_pScene->m_ppEnemies[packet->data.id]->Maxhp = packet->data.max_hp;

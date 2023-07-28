@@ -1704,9 +1704,10 @@ void CEnemyObject::VelocityUpdate(float fTimeElapsed, XMFLOAT3& player_look)
 
 void CEnemyObject::Reset()
 {
-
+	m_xmf4x4World = Matrix4x4::Identity();
+	m_xmf4x4ToParent = Matrix4x4::Identity();
+	SetScale(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
 }
-
 
 
 void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
@@ -1734,7 +1735,7 @@ void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 		Rotate(pitch, yaw, 0.f);
 	}
 
-	CEnemyObject::UpdateTransform(NULL);
+	UpdateTransform(NULL);
 }
 
 
