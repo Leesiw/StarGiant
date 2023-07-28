@@ -381,7 +381,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		}
 	}
 
-	if (cur_mission == MissionType::DEFEAT_BOSS) {
+	if (cur_mission == MissionType::DEFEAT_BOSS || cur_mission == MissionType::DEFEAT_BOSS2) {
 		BoundingOrientedBox boss_bbox = m_pBoss->UpdateBoundingBox();
 		if (boss_bbox.Intersects(pos, dir, dist)) // 보스 충돌처리
 		{
@@ -395,7 +395,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		}
 	}
 
-	if (cur_mission == MissionType::KILL_GOD) {
+	if (cur_mission == MissionType::KILL_GOD || cur_mission == MissionType::KILL_GOD2) {
 		BoundingOrientedBox god_bbox = m_pGod->UpdateBoundingBox();
 		if (god_bbox.Intersects(pos, dir, dist)) // 갓 충돌처리
 		{
@@ -1196,7 +1196,7 @@ void CScene::UpdateBoss()
 	if (dist < 1000.f) // boss 막기
 	{
 		XMFLOAT3 ToGo = Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition());
-		ToGo = Vector3::ScalarProduct(ToGo, 800.f);
+		ToGo = Vector3::ScalarProduct(ToGo, 1000.f);
 		ToGo = Vector3::Add(m_pBoss->GetPosition(), ToGo);
 		m_pSpaceship->SetPosition(ToGo);
 	}
