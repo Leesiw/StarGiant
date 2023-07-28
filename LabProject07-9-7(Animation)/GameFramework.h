@@ -122,7 +122,7 @@ private:
 	CGameTimer					m_GameTimer;
 
 	CScene						*m_pScene = NULL;
-	CAirplanePlayer						*m_pPlayer[3] = {};
+	CAirplanePlayer						*m_pPlayer[1] = {};
 	CCamera						*m_pCamera = NULL;
 	bool iscut = false;
 	bool isending = false;

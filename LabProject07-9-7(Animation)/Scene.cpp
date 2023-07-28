@@ -531,8 +531,9 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 
 	//=====================================
 	
-	//���Ƿ� �����ϴ� �ٿ���ڽ� (���� ���� Height���� ���� �浹�˻�� �ٲٰ����) 
+
 	b_Inside = true;
+	//���Ƿ� �����ϴ� �ٿ���ڽ� (���� ���� Height���� ���� �浹�˻�� �ٲٰ����) 
 	xm_MapAABB = BoundingBox(XMFLOAT3(m_ppHierarchicalGameObjects[0]->GetPosition().x, m_ppHierarchicalGameObjects[0]->GetPosition().y, m_ppHierarchicalGameObjects[0]->GetPosition().z + 90.f), XMFLOAT3(125.f, 100.0f, 110.0f));
 
 	xm_SitAABB[0] = BoundingBox(XMFLOAT3(417.f, 224.f, 737.f), XMFLOAT3(4.f, 10.0f, 8.0f)); //LEFT
@@ -681,9 +682,9 @@ void CScene::ReleaseObjects()
 		delete[] m_ppEnemyMissiles;
 	}
 
-	if (m_pPlayer[g_myid]) {
-		m_pPlayer[g_myid]->ReleaseUploadBuffers();
-		delete[]m_pPlayer[g_myid];
+	if (m_pPlayer[0]) {
+		m_pPlayer[0]->Release();
+		delete[]m_pPlayer[0];
 	}
 
 
@@ -776,6 +777,9 @@ void CScene::ReleaseObjects()
 		m_pShadowMapToViewport->ReleaseObjects();
 		m_pShadowMapToViewport->Release();
 	}
+
+
+
 
 
 	ReleaseShaderVariables();
@@ -1171,8 +1175,10 @@ void CScene::ReleaseShaderVariables()
 
 void CScene::ReleaseUploadBuffers()
 {
+	
 	if (m_pSkyBox) m_pSkyBox->ReleaseUploadBuffers();
 		
+
 	for (int i = 0; i < MAX_PARTICLES; ++i)if (m_pParticle[i] != NULL) { m_pParticle[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_HEAL_PARTICLES; ++i)if (m_phealParticle[i] != NULL) { m_phealParticle[i]->ReleaseUploadBuffers(); };
 
@@ -1184,24 +1190,21 @@ void CScene::ReleaseUploadBuffers()
 
 
 
-
-
 	for (int i = 0; i < MAX_FIRE; ++i)if (m_pFire[i] != NULL) { 
 		m_pFire[i]->ReleaseUploadBuffers(); 
 	};
 
 
 	if (m_pTerrain) m_pTerrain->ReleaseUploadBuffers();
-	for (int i = 0; i < m_nShaders; i++) m_ppShaders[i]->ReleaseUploadBuffers();
+	for (int i = 0; i < m_nShaders; i++) if(m_ppShaders[i])m_ppShaders[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->ReleaseUploadBuffers();
-	for (int i = 0; i < m_nHierarchicalGameObjects; i++) m_ppHierarchicalGameObjects[i]->ReleaseUploadBuffers();
-	for (int i = 0; i < METEOS; i++)if (m_ppMeteorObjects[i] != NULL) m_ppMeteorObjects[i]->ReleaseUploadBuffers();
+	for (int i = 0; i < m_nHierarchicalGameObjects; i++) if(m_ppHierarchicalGameObjects[i])m_ppHierarchicalGameObjects[i]->ReleaseUploadBuffers();
+	for (int i = 0; i < METEOS; i++)if (m_ppMeteorObjects[i] != NULL) if(m_ppMeteorObjects[i])m_ppMeteorObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < BOSSMETEOS; i++)if (m_ppBossMeteorObjects[i] != NULL) m_ppBossMeteorObjects[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < BLACKHOLEMETEOR; i++)if (m_BlackholeMeteorObjects[i] != NULL) m_BlackholeMeteorObjects[i]->ReleaseUploadBuffers();
 
 
-	for (int i = 0; i < ENEMIES; i++)if (m_ppEnemies[i])	m_ppEnemies[i]->ReleaseUploadBuffers();
-	if (m_pPlayer[g_myid])m_pPlayer[g_myid]->ReleaseUploadBuffers();
+	for (int i = 0; i < ENEMIES; i++)if (m_ppEnemies[i])m_ppEnemies[i]->ReleaseUploadBuffers();
 
 	if (m_pShadowShader)
 		m_pShadowShader->ReleaseUploadBuffers();
@@ -1570,22 +1573,9 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	}
 	if (b_Inside) {
-		m_ppHierarchicalGameObjects[0]->Render(pd3dCommandList, pCamera);
+		//m_ppHierarchicalGameObjects[0]->Render(pd3dCommandList, pCamera);
 		m_ppHierarchicalGameObjects[1]->Render(pd3dCommandList, pCamera);
-
 	}
-
-	
-	//for (int i = 0; i < m_nHierarchicalGameObjects; i++)
-	//{
-	//	if (m_ppHierarchicalGameObjects[i])
-	//	{
-	//		m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
-	//		if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
-	//		m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
-	//	}
-	//}
-
 
 	if (m_ppHierarchicalGameObjects[0])
 	{
@@ -1690,6 +1680,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 	//=======================================================
 	if (m_ppBoss) {
+
+		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
+			m_ppBoss->SetHP(100);
+		}
+
 		m_ppBoss->Animate(m_fElapsedTime);
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
 		//m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
@@ -1758,6 +1753,10 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 
 
+
+	if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_GOD) {
+		m_ppGod->GodHP =100;
+	}
 	
 	if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_GOD && m_pPlayer[0]->curMissionType <= MissionType::KILL_GOD)
 		if (m_ppGod) {
@@ -1796,18 +1795,20 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	//우선 내부일떄 안써서 제한해놓음. 
 	if (!b_Inside) {
 		for (int i = 1; i < SPRITE_CNT; i++) {
-
-			m_ppSprite[i]->Animate(m_fElapsedTime);
-			//m_ppSprite[1]->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(30.0f, -60.0f, 0.0f), m_pPlayer[0]->GetLook());
-			m_ppSprite[i]->UpdateShaderVariables(pd3dCommandList, m_ppSprite[i]->GetShaderVariables());
-			if (m_ppSprite[i]->is_Alive) {
-				m_ppSprite[i]->Render(pd3dCommandList, pCamera);
+			if (m_ppSprite[i]) {
+				m_ppSprite[i]->Animate(m_fElapsedTime);
+				//m_ppSprite[1]->SetfollowPosition(m_pPlayer[0]->GetPosition(), XMFLOAT3(30.0f, -60.0f, 0.0f), m_pPlayer[0]->GetLook());
+				m_ppSprite[i]->UpdateShaderVariables(pd3dCommandList, m_ppSprite[i]->GetShaderVariables());
+				if (m_ppSprite[i]->is_Alive) {
+					m_ppSprite[i]->Render(pd3dCommandList, pCamera);
+				}
 			}
 		}
 	}
 
 	for (int i = 0; i < MAX_PARTICLES; ++i) {
 		if (!b_Inside) {
+			if(m_pParticle[i])
 			if (m_pParticle[i]->isLive) {
 				m_pParticle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 				m_pParticle[i]->Animate(m_fElapsedTime);
@@ -2262,4 +2263,6 @@ void CScene::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 void CScene::clear()
 {
 	//씬 초기화
+
+
 }

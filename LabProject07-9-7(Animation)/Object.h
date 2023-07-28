@@ -402,7 +402,7 @@ public:
 	virtual void BuildMaterials(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList) { }
 
 	virtual void OnPrepareAnimate() { }
-	virtual void Animate(float fTimeElapsed);
+	void Animate(float fTimeElapsed);
 
 	virtual void OnPrepareRender() { }
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
@@ -414,7 +414,9 @@ public:
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT4X4 *pxmf4x4World);
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList *pd3dCommandList, CMaterial *pMaterial);
 
-	virtual void ReleaseUploadBuffers();
+	void ReleaseUploadBuffers();
+	virtual void ReleaseUploadBuffers2();
+
 
 	XMFLOAT3 GetPosition();
 	XMFLOAT2 GetPositionXY() { return(XMFLOAT2(m_xmf4x4World._41, m_xmf4x4World._42)); };
@@ -438,7 +440,8 @@ public:
 	void Rotate(XMFLOAT4 *pxmf4Quaternion);
 
 	CGameObject *GetParent() { return(m_pParent); }
-	virtual void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent=NULL);
+	void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent=NULL);
+
 	CGameObject *FindFrame(char *pstrFrameName);
 
 	CTexture *FindReplicatedTexture(_TCHAR *pstrTextureName);
@@ -800,7 +803,7 @@ public:
 	CB_PLUS_INFO* m_pcbPlusInfo = NULL;
 	ID3D12Resource* m_pcbplusShaderVariable = NULL;
 
-	virtual void Animate(float fElapsedTime);
+	void Animate(float fElapsedTime);
 	void SetRowColumn(int nRow, int nCol) { m_nRows = nRow; m_nCols = nCol; }
 	void SetCntTime(float Time) { m_fCntTime = Time; }
 	void SetSpeed(float Speed) { m_fSpeed = Speed; }
@@ -837,7 +840,6 @@ public:
 	CBlackHole() {};
 	virtual ~CBlackHole() {};
 	CBlackHole(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nWidth = 20, UINT nHeight = 20, UINT nDepth = 0);
-	virtual void Animate(float fElapsedTime);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 public:
 	CTexture* m_blackholeTexture;

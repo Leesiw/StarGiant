@@ -829,8 +829,6 @@ bool CGameFramework::AroundSculpture()
 void CGameFramework::CameraUpdateChange()
 {
 
-
-
 	if (a==0 &&m_pPlayer[0]->getHp() < 90 && m_pCamera->m_bCameraShaking ==false) { 
 		m_pCamera->maxShakingTime = 1.f;
 		m_pCamera->m_bCameraShaking = true;
@@ -1335,24 +1333,24 @@ void CGameFramework::BuildObjects()
 	if (m_pScene) m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 	m_pInsideScene = new CScene();
 	if (m_pInsideScene) m_pInsideScene->BuildInsideObjects(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetDescriptor());
-	
+
 
 #ifdef _WITH_TERRAIN_PLAYER
 	CTerrainPlayer* pPlayer[3];
 	for (int i = 0; i < 3; ++i) {
-		pPlayer[i] = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain,i);
+		pPlayer[i] = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain, i);
 		pPlayer[i]->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 250.0f, 640.0f));
 		pPlayer[i]->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
 	}
 
-	CAirplanePlayer* pAirPlayer[3];
-		pAirPlayer[0]= new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pInsideScene->GetGraphicsRootSignature(), m_pInsideScene->m_pTerrain);
-		pAirPlayer[0]->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
-		pAirPlayer[0]->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
+	CAirplanePlayer* pAirPlayer[1];
+	pAirPlayer[0] = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pInsideScene->GetGraphicsRootSignature(), m_pInsideScene->m_pTerrain);
+	pAirPlayer[0]->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
+	pAirPlayer[0]->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
 
 
 #else
-	CAirplanePlayer *pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL);
+	CAirplanePlayer* pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL);
 	pPlayer->SetPosition(XMFLOAT3(425.0f, 240.0f, 640.0f));
 #endif
 
@@ -1369,15 +1367,29 @@ void CGameFramework::BuildObjects()
 
 
 	m_pd3dCommandList->Close();
-	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
+	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
-
 	if (m_pScene) m_pScene->ReleaseUploadBuffers();
-	if (m_pInsideScene) m_pInsideScene->ReleaseUploadBuffers();
-	if (m_pPlayer) for(int i=0; i< m_pScene->m_nScenePlayer; ++i)m_pPlayer[i]->ReleaseUploadBuffers();
-	if (m_pInsidePlayer)for (int i = 0; i < m_pInsideScene->m_nScenePlayer; ++i) m_pInsidePlayer[i]->ReleaseUploadBuffers();
+
+	if (m_pPlayer)
+	{
+		m_pScene->m_pPlayer[0]->ReleaseUploadBuffers();
+		cout << "m_pPlayer" << endl;
+
+	}
+	if (m_pInsidePlayer)
+		for (int i = 0; i < 3; ++i) {
+			m_pInsideScene->m_pPlayer[i]->ReleaseUploadBuffers();
+			cout << "i : " << i << endl;
+		}
+
+
+
+//	if (m_pInsideScene) m_pInsideScene->ReleaseUploadBuffers();
+	/*if (m_pPlayer) for(int i=0; i< 1; ++i)if(m_pScene->m_pPlayer[i])m_pScene->m_pPlayer[i]->ReleaseUploadBuffers();
+	if (m_pInsidePlayer)for (int i = 0; i < m_pInsideScene->m_nScenePlayer; ++i) if(m_pInsideScene->m_pPlayer[i])m_pInsideScene->m_pPlayer[i]->ReleaseUploadBuffers();*/
 
 	m_GameTimer.Reset();
 }
@@ -1462,7 +1474,7 @@ void CGameFramework::ReleaseObjects()
 	if (m_pUILayer) m_pUILayer->ReleaseResources();
 	if (m_pUILayer) delete m_pUILayer;
 
-	if (m_pPlayer) for (int i = 0; i < 3; ++i)m_pPlayer[i]->Release();
+	if (m_pPlayer) m_pPlayer[0]->Release();
 	if (m_pInsidePlayer) for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Release();
 
 	if (m_pScene) m_pScene->ReleaseObjects();

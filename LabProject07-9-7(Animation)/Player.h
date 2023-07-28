@@ -54,6 +54,8 @@ public:
 	CPlayer();
 	virtual ~CPlayer();
 
+	void SetChild(CGameObject* pChild, bool bReferenceUpdate = false);
+
 	XMFLOAT3 GetPosition() { return(m_xmf3Position); }
 	XMFLOAT2 GetPositionXY() { return(XMFLOAT2{ m_xmf3Position.x, m_xmf3Position.y }); }
 	XMFLOAT3 GetLookVector() { return(m_xmf3Look); }
@@ -136,7 +138,6 @@ public:
 	void SetBulletFromServer(BULLET_INFO bulletInfo);
 	float						m_fBulletEffectiveRange = 300.0f;
 
-
 	SPACESHIP_INFO					player_info;
 	bool							is_update = true;
 	short							hp = 100;
@@ -176,11 +177,18 @@ public:
 	CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext=NULL, int i = 0);
 	virtual ~CTerrainPlayer();
 
-	INSIDE_PLAYER_INFO					player_info;
+
+
+	INSIDE_PLAYER_INFO			player_info;
 	bool						is_update = true;
 	bool						isAlive = false;
 
 	PlayerType type;
+
+	void SetChild(CGameObject* pChild, bool bReferenceUpdate = false);
+	void ReleaseUploadBuffers();
+	void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
+	void Animate(float fTimeElapsed);
 
 
 	CSound* p_effectSound[static_cast<int>(PlayerSounds::COUNT)] = {};

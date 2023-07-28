@@ -677,16 +677,20 @@ void CGameObject::SetChild(CGameObject *pChild, bool bReferenceUpdate)
 	{
 		pChild->m_pParent = this;
 		if (bReferenceUpdate) pChild->AddRef();
+
 	}
 	if (m_pChild)
 	{
 		if (pChild) pChild->m_pSibling = m_pChild->m_pSibling;
 		m_pChild->m_pSibling = pChild;
+
 	}
 	else
 	{
 		m_pChild = pChild;
+		
 	}
+
 }
 
 void CGameObject::SetMesh(CMesh *pMesh)
@@ -788,7 +792,7 @@ float CGameObject::GetTrackAnimationPosition(int nAnimationTrack)
 
 void CGameObject::Animate(float fTimeElapsed)
 {
-	OnPrepareRender();
+	//OnPrepareRender();
 
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->AdvanceTime(fTimeElapsed, this);
 
@@ -858,10 +862,20 @@ void CGameObject::ReleaseUploadBuffers()
 		if (m_ppMaterials[i]) m_ppMaterials[i]->ReleaseUploadBuffers();
 	}
 
-	if (m_pSibling) 
+	if (m_pSibling!=NULL) 
 		m_pSibling->ReleaseUploadBuffers();
-	if (m_pChild) 
+	if (m_pChild != NULL)
 		m_pChild->ReleaseUploadBuffers();
+}
+
+void CGameObject::ReleaseUploadBuffers2()
+{
+	if (m_pMesh) m_pMesh->ReleaseUploadBuffers();
+
+	for (int i = 0; i < m_nMaterials; i++)
+	{
+		if (m_ppMaterials[i]) m_ppMaterials[i]->ReleaseUploadBuffers();
+	}
 }
 
 void CGameObject::SetPosition(float x, float y, float z)
@@ -1653,7 +1667,7 @@ CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	m_xmf4x4Rotate = Matrix4x4::Identity();
 
 	CLoadedModelInfo* pEnemyModel = pModel;
-	if (!pEnemyModel) pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
+	if (!pEnemyModel) pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/AlienDestroyer.bin", NULL);
 
 
 	SetChild(pEnemyModel->m_pModelRootObject, true);
@@ -1802,7 +1816,7 @@ CInsideShipObject::CInsideShipObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	if (!pMeteorModel) pMeteorModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/InsideShip.bin", NULL);
 
 	SetChild(pMeteorModel->m_pModelRootObject, true);
-	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pModel);
+	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pMeteorModel);
 	//m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	//m_pSkinnedAnimationController->SetCallbackKeys(0, 1);
 
@@ -2106,7 +2120,7 @@ void CSpriteObject::Animate(float fElapsedTime)
 			if (++m_nCol == m_nCols) { m_nRow++; m_nCol = 0; }
 			if (m_nRow == m_nRows) { m_nRow = 0;}// , FullAnimated = true; 
 		}
-
+		CGameObject::Animate(fElapsedTime);
 }
 
 
@@ -2232,11 +2246,6 @@ CBlackHole::CBlackHole(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_blackholeMaterial->SetTexture(m_blackholeTexture, 0);
 	m_blackholeMaterial->SetShader(m_blackholeShader);
 	SetMaterial(0, m_blackholeMaterial);
-}
-
-void CBlackHole::Animate(float fElapsedTime)
-{
-	CGameObject::Animate(fElapsedTime);
 }
 
 void CBlackHole::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)

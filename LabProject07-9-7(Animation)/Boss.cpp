@@ -20,8 +20,11 @@ void Boss::BossObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	if (!pBossModel) pBossModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Red.bin", NULL);
 
 
-
+	cout << "boss~";
 	SetChild(pBossModel->m_pModelRootObject, true);
+	cout << "child : " << m_pChild << endl;
+	cout << "m_pSibling : " << m_pSibling << endl;
+
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, static_cast<int>(BossAnimation::COUNT), pBossModel);
 
 	for (int i = 0; i < static_cast<int>(BossAnimation::COUNT); ++i) {
