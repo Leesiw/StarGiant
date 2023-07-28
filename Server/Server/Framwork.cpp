@@ -322,9 +322,9 @@ void CGameFramework::SetMission()
 	levels[MissionType::CS_BOSS_SCREAM].NextMission = MissionType::DEFEAT_BOSS;
 	levels[MissionType::CS_BOSS_SCREAM].cutscene = true;
 	levels[MissionType::CS_BOSS_SCREAM].RestartMission = MissionType::CS_BOSS_SCREAM;
-	levels[MissionType::CS_BOSS_SCREAM].RestartPosition = XMFLOAT3{ 2900.f ,2900.f ,2900.f };
+	levels[MissionType::CS_BOSS_SCREAM].RestartPosition = XMFLOAT3{ 2300.f ,0.f ,-1300.f };
 
-	levels[MissionType::DEFEAT_BOSS].NextMission = MissionType::CS_SHOW_STARGIANT;
+	levels[MissionType::DEFEAT_BOSS].NextMission = MissionType::CS_ANGRY_BOSS;
 	levels[MissionType::DEFEAT_BOSS].MaxMonsterNum = 0;
 	levels[MissionType::DEFEAT_BOSS].SpawnMonsterNum = 0;
 	levels[MissionType::DEFEAT_BOSS].Laser.MAX_HP = 20;
@@ -334,7 +334,24 @@ void CGameFramework::SetMission()
 	levels[MissionType::DEFEAT_BOSS].PlasmaCannon.MAX_HP = 40;
 	levels[MissionType::DEFEAT_BOSS].PlasmaCannon.ATK = 30;
 	levels[MissionType::DEFEAT_BOSS].RestartMission = MissionType::CS_BOSS_SCREAM;
-	levels[MissionType::DEFEAT_BOSS].RestartPosition = XMFLOAT3{ 2900.f ,2900.f ,2900.f };
+	levels[MissionType::DEFEAT_BOSS].RestartPosition = XMFLOAT3{ 2300.f ,0.f ,-1300.f };
+
+	levels[MissionType::CS_ANGRY_BOSS].NextMission = MissionType::DEFEAT_BOSS2;
+	levels[MissionType::CS_ANGRY_BOSS].cutscene = true;
+	levels[MissionType::CS_ANGRY_BOSS].RestartMission = MissionType::CS_BOSS_SCREAM;
+	levels[MissionType::CS_ANGRY_BOSS].RestartPosition = XMFLOAT3{ 2300.f ,0.f ,-1300.f };
+
+	levels[MissionType::DEFEAT_BOSS2].NextMission = MissionType::CS_SHOW_STARGIANT;
+	levels[MissionType::DEFEAT_BOSS2].MaxMonsterNum = 0;
+	levels[MissionType::DEFEAT_BOSS2].SpawnMonsterNum = 0;
+	levels[MissionType::DEFEAT_BOSS2].Laser.MAX_HP = 20;
+	levels[MissionType::DEFEAT_BOSS2].Laser.ATK = 18;
+	levels[MissionType::DEFEAT_BOSS2].Missile.MAX_HP = 35;
+	levels[MissionType::DEFEAT_BOSS2].Missile.ATK = 20;
+	levels[MissionType::DEFEAT_BOSS2].PlasmaCannon.MAX_HP = 40;
+	levels[MissionType::DEFEAT_BOSS2].PlasmaCannon.ATK = 30;
+	levels[MissionType::DEFEAT_BOSS2].RestartMission = MissionType::CS_BOSS_SCREAM;
+	levels[MissionType::DEFEAT_BOSS2].RestartPosition = XMFLOAT3{ 2300.f ,0.f ,-1300.f };
 
 	levels[MissionType::CS_SHOW_STARGIANT].NextMission = MissionType::GO_CENTER;
 	levels[MissionType::CS_SHOW_STARGIANT].cutscene = true;
@@ -410,10 +427,9 @@ void CGameFramework::SetMission()
 	levels[MissionType::CS_SHOW_GOD].NextMission = MissionType::KILL_GOD;
 	levels[MissionType::CS_SHOW_GOD].cutscene = true;
 	levels[MissionType::CS_SHOW_GOD].RestartMission = MissionType::CS_SHOW_GOD;
-	levels[MissionType::CS_SHOW_GOD].RestartPosition = XMFLOAT3{ -2900.f ,-2900.f ,-2900.f };
+	levels[MissionType::CS_SHOW_GOD].RestartPosition = XMFLOAT3{ 1300.f, 0.f, -700.f };
 
-
-	levels[MissionType::KILL_GOD].NextMission = MissionType::CS_ENDING;
+	levels[MissionType::KILL_GOD].NextMission = MissionType::CS_ANGRY_GOD;
 	levels[MissionType::KILL_GOD].MaxMonsterNum = 0;
 	levels[MissionType::KILL_GOD].SpawnMonsterNum = 0;
 	levels[MissionType::KILL_GOD].Laser.MAX_HP = 40;
@@ -423,12 +439,29 @@ void CGameFramework::SetMission()
 	levels[MissionType::KILL_GOD].PlasmaCannon.MAX_HP = 60;
 	levels[MissionType::KILL_GOD].PlasmaCannon.ATK = 30;
 	levels[MissionType::KILL_GOD].RestartMission = MissionType::CS_SHOW_GOD;
-	levels[MissionType::KILL_GOD].RestartPosition = XMFLOAT3{ -2900.f ,-2900.f ,-2900.f };
+	levels[MissionType::KILL_GOD].RestartPosition = XMFLOAT3{ 1300.f, 0.f, -700.f };
+
+	levels[MissionType::CS_ANGRY_GOD].NextMission = MissionType::KILL_GOD2;
+	levels[MissionType::CS_ANGRY_GOD].cutscene = true;
+	levels[MissionType::CS_ANGRY_GOD].RestartMission = MissionType::CS_SHOW_GOD;
+	levels[MissionType::CS_ANGRY_GOD].RestartPosition = XMFLOAT3{ 1300.f, 0.f, -700.f };
+
+	levels[MissionType::KILL_GOD2].NextMission = MissionType::CS_ENDING;
+	levels[MissionType::KILL_GOD2].MaxMonsterNum = 0;
+	levels[MissionType::KILL_GOD2].SpawnMonsterNum = 0;
+	levels[MissionType::KILL_GOD2].Laser.MAX_HP = 40;
+	levels[MissionType::KILL_GOD2].Laser.ATK = 18;
+	levels[MissionType::KILL_GOD2].Missile.MAX_HP = 55;
+	levels[MissionType::KILL_GOD2].Missile.ATK = 20;
+	levels[MissionType::KILL_GOD2].PlasmaCannon.MAX_HP = 60;
+	levels[MissionType::KILL_GOD2].PlasmaCannon.ATK = 30;
+	levels[MissionType::KILL_GOD2].RestartMission = MissionType::CS_SHOW_GOD;
+	levels[MissionType::KILL_GOD2].RestartPosition = XMFLOAT3{ 1300.f, 0.f, -700.f };
 
 	levels[MissionType::CS_ENDING].NextMission = MissionType::CS_ENDING;
 	levels[MissionType::CS_ENDING].cutscene = true;
-	levels[MissionType::CS_ENDING].RestartMission = MissionType::CS_SHOW_GOD;
-	levels[MissionType::CS_ENDING].RestartPosition = XMFLOAT3{ -2900.f ,-2900.f ,-2900.f };
+	levels[MissionType::CS_ENDING].RestartMission = MissionType::CS_ENDING;
+	levels[MissionType::CS_ENDING].RestartPosition = XMFLOAT3{ 1300.f, 0.f, -700.f };
 
 	levels[MissionType::CS_BAD_ENDING].NextMission = MissionType::CS_BAD_ENDING;
 	levels[MissionType::CS_BAD_ENDING].cutscene = true;
@@ -454,13 +487,19 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	switch (packet[1]) {
 	case CS_LOGIN: {
 		CS_LOGIN_PACKET* p = reinterpret_cast<CS_LOGIN_PACKET*>(packet);
-		if (clients[c_id].room_id != -1) {	// 이미 배정된 방이 있을 때
-			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
-			scene->_plist_lock.lock();
-			scene->_plist[clients[c_id].room_pid] = -1;
-			clients[c_id].room_id = -1;
-			clients[c_id].room_pid = -1;
-			scene->_plist_lock.unlock();
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id != -1) {	// 이미 배정된 방이 있을 때
+			CScene* scene = scene_manager.GetScene(t_room_id);
+			if (scene->_id != clients[c_id].room_id) {
+				scene->_plist_lock.lock();
+				char t_room_pid = clients[c_id].room_pid;
+				if (t_room_pid != -1) {
+					scene->_plist[t_room_pid] = -1;
+				}
+				clients[c_id].room_id = -1;
+				clients[c_id].room_pid = -1;
+				scene->_plist_lock.unlock();
+			}
 		}
 
 		scene_manager._scene_lock.lock();
@@ -476,16 +515,22 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			CScene* scene = scene_manager.GetScene(scene_num);
 			scene->_s_lock.lock();
 			char num = scene_manager.InsertPlayer(scene_num, c_id);
-			if (num == -1) { disconnect(c_id); scene->_s_lock.unlock(); return; }  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
+			if (num == -1) { 
+				disconnect(c_id); 
+				scene->_s_lock.unlock(); 
+				scene_manager._scene_lock.unlock(); 
+				return; 
+			}  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
 			else if (num == 0) {
 				if (scene->_state == SCENE_FREE) {
-					scene_manager.GetScene(scene_num)->_state = SCENE_ALLOC;
+					scene->_state = SCENE_ALLOC;
 				}
 			}
 			scene->_s_lock.unlock();
 		}
 		else {
 			disconnect(c_id);	
+			scene_manager._scene_lock.unlock();
 			return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
 		}
 		scene_manager._scene_lock.unlock();
@@ -496,7 +541,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		packet.type = SC_ADD_PLAYER;
 		packet.size = sizeof(packet);
 		packet.data.id = clients[c_id].room_pid;
-		CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+		CScene* scene = scene_manager.GetScene(scene_num);
 		packet.data.yaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
 		packet.data.player_type = clients[c_id].type;
 		packet.data.x = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition().x;
@@ -551,10 +596,12 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	}
 	case CS_CHANGE: {
 		CS_CHANGE_PACKET* p = reinterpret_cast<CS_CHANGE_PACKET*>(packet);
-		if (clients[c_id].room_id == -1) { break; }
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id == -1) { break; }
+		CScene* scene = scene_manager.GetScene(t_room_id);
+
 		if (p->player_type == PlayerType::INSIDE)
 		{
-			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
 			if (clients[c_id].type >= PlayerType::MOVE) {
 				char sit_num = (char)clients[c_id].type - (char)PlayerType::MOVE;
 				scene->can_sit[sit_num] = true;
@@ -568,7 +615,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			packet.size = sizeof(SC_LOGIN_INFO_PACKET);
 			packet.type = SC_CHANGE;
 
-			scene_manager.Send(clients[c_id].room_id, (char*)&packet);	// 수정	
+			scene->Send((char*)&packet);	// 수정	
 
 			SC_MOVE_INSIDE_PACKET pack{};
 			pack.size = sizeof(pack);
@@ -581,7 +628,6 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		else
 		{
-			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
 			char sit_num = (char)p->player_type - (char)PlayerType::MOVE;
 			bool o_state = true;
 			if (false == atomic_compare_exchange_strong(&scene->can_sit[sit_num], &o_state, false))
@@ -590,7 +636,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			clients[c_id].type = p->player_type;
 
 			// 미션
-			if (scene_manager.GetScene(clients[c_id].room_id)->cur_mission == MissionType::TU_SIT && p->player_type == PlayerType::MOVE)
+			if (scene->cur_mission == MissionType::TU_SIT && p->player_type == PlayerType::MOVE)
 			{
 				scene->SetMission(MissionType::TU_KILL);
 			}
@@ -602,7 +648,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			packet.size = sizeof(SC_LOGIN_INFO_PACKET);
 			packet.type = SC_CHANGE;
 
-			scene_manager.Send(clients[c_id].room_id, (char*)&packet);
+			scene->Send((char*)&packet);
 		}
 		break;
 	}
@@ -736,7 +782,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			packet.type = SC_START;
 
 			//printf("start %d\n", clients[c_id].room_id);
-			scene_manager.Send(clients[c_id].room_id, (char*)&packet);
+			scene->Send((char*)&packet);
 		}
 		break;
 	}
@@ -917,9 +963,9 @@ void CGameFramework::disconnect(int c_id)
 
 	lock_guard<mutex> ll(clients[c_id]._s_lock);
 	if (clients[c_id].room_id != -1) {
-		scene_manager.Send(clients[c_id].room_id, (char*)&p);
-
 		CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+		scene->Send((char*)&p);
+
 		if (scene->heal_player == clients[c_id].room_pid) {
 			scene->heal_player = -1;
 		}

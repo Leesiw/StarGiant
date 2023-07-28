@@ -76,11 +76,6 @@ CScene* SceneManager::GetScene(short id)
 	return m_pScenes[id];
 }
 
-void SceneManager::SceneStart(short num)
-{
-	m_pScenes[num]->Start();
-}
-
 void SceneManager::ResetScene(short num)
 {
 	m_pScenes[num]->_s_lock.lock();
@@ -103,16 +98,4 @@ char SceneManager::InsertPlayer(short num, short pl_id)
 void SceneManager::Send(short num, char* p)
 {
 	m_pScenes[num]->Send(p);
-}
-
-bool SceneManager::GetCanSit(short scene_id, PlayerType type)
-{
-	for (auto pl_id : m_pScenes[scene_id]->_plist) {
-		if (pl_id == -1)continue;
-		if (clients[pl_id].type == type) {
-			return false;
-		}
-	}
-
-	return true;
 }

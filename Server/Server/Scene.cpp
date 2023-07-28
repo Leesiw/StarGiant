@@ -600,9 +600,25 @@ void CScene::MissionClear()
 			timer_queue.push(ev);
 
 			if (cur_mission == MissionType::CS_SHOW_GOD) {
+				m_pGod->SetPosition(1300.f, 0.f, 0.f);
+				m_pGod->GodHP = 100;
+				m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
+
 				if (!god_timer_on) {
 					god_timer_on = true;
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
+					timer_queue.push(ev);
+				}
+			}
+			else if (cur_mission == MissionType::CS_BOSS_SCREAM) {
+				
+				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
+				m_pBoss->BossHP = 100;
+				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
+				
+				if (!boss_timer_on) {
+					boss_timer_on = true;
+					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
 					timer_queue.push(ev);
 				}
 			}
@@ -657,14 +673,30 @@ void CScene::SetMission(MissionType mission)
 			timer_queue.push(ev);
 
 			if (cur_mission == MissionType::CS_SHOW_GOD) {
+				m_pGod->SetPosition(1300.f, 0.f, 0.f);
+				m_pGod->GodHP = 100;
+				m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
+
 				if (!god_timer_on) {
 					god_timer_on = true;
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
 					timer_queue.push(ev);
 				}
 			}
+			else if (cur_mission == MissionType::CS_BOSS_SCREAM) {
+				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
+				m_pBoss->BossHP = 100;
+				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
+				
+				if (!boss_timer_on) {
+					boss_timer_on = true;
+					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
+					timer_queue.push(ev);
+				}
+			}
 		}
-		else if (cur_mission == MissionType::FIND_BOSS || cur_mission == MissionType::CS_ANGRY_BOSS || cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::DEFEAT_BOSS) {
+		else if (cur_mission == MissionType::FIND_BOSS) {
+
 			if (!boss_timer_on) {
 				boss_timer_on = true;
 				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
@@ -1141,7 +1173,7 @@ void CScene::UpdateBoss()
 {
 	if (_state != ST_INGAME) { boss_timer_on = false;  return; }
 	if (cur_mission != MissionType::DEFEAT_BOSS && cur_mission != MissionType::CS_BOSS_SCREAM && cur_mission != MissionType::CS_ANGRY_BOSS 
-		&& cur_mission != MissionType::FIND_BOSS) { boss_timer_on = false; return; }
+		&& cur_mission != MissionType::FIND_BOSS && cur_mission != MissionType::DEFEAT_BOSS2) { boss_timer_on = false; return; }
 	if (m_pBoss->BossHP <= 0) {
 		boss_timer_on = false;
 		SetMission(MissionType::CS_SHOW_STARGIANT);
@@ -1154,6 +1186,11 @@ void CScene::UpdateBoss()
 	}
 
 	m_pBoss->Boss_Ai(0.025f, m_pSpaceship, m_pBoss->GetHP());
+
+	if (cur_mission == MissionType::DEFEAT_BOSS && m_pBoss->BossHP <= 50) {
+		SetMission(MissionType::CS_ANGRY_BOSS);
+	}
+
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));
 	if (dist < 1000.f) // boss 막기
@@ -1176,7 +1213,8 @@ void CScene::UpdateGod()
 		SetMission(MissionType::CS_ENDING);
 		return;
 	}
-	if (cur_mission != MissionType::KILL_GOD && cur_mission != MissionType::CS_SHOW_GOD && cur_mission != MissionType::CS_ANGRY_GOD) { god_timer_on = false; return; }
+	if (cur_mission != MissionType::KILL_GOD && cur_mission != MissionType::CS_SHOW_GOD && cur_mission != MissionType::CS_ANGRY_GOD
+		&& cur_mission != MissionType::KILL_GOD2) { god_timer_on = false; return; }
 	if (levels[cur_mission].cutscene) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_GOD, static_cast<short>(num) };
 		timer_queue.push(ev);
@@ -1187,12 +1225,16 @@ void CScene::UpdateGod()
 		SpawnEnemyFromGod();
 	}
 
+	if (cur_mission == MissionType::KILL_GOD && m_pGod->GodHP <= 50) {
+		SetMission(MissionType::CS_ANGRY_GOD);
+	}
+
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pGod->GetPosition()));
-	if (dist < 2000.f) // boss 막기
+	if (dist < 500.f) // boss 막기
 	{
 		XMFLOAT3 ToGo = Vector3::Subtract(m_pSpaceship->GetPosition(), m_pGod->GetPosition());
-		ToGo = Vector3::ScalarProduct(ToGo, 2000.f);
+		ToGo = Vector3::ScalarProduct(ToGo, 500.f);
 		ToGo = Vector3::Add(m_pGod->GetPosition(), ToGo);
 		m_pSpaceship->SetPosition(ToGo);
 	}
