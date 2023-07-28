@@ -353,6 +353,14 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pline[i]->count = i;
 	}
 
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+		m_pMagicCircle[i] = new CMagicCircleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, i, 0);
+		m_pMagicCircle[i]->count = i;
+	}
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+		m_pMagicCircle2[i] = new CMagicCircleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, i, 0);
+		m_pMagicCircle2[i]->count = i;
+	}
 	//=====================================
 	CLoadedModelInfo* pJewelModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/SoftStar.bin", NULL);
 	m_ppJewel = new CJewelObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pJewelModel, 1);
@@ -610,6 +618,10 @@ void CScene::ReleaseObjects()
 	if (m_pFlameParticle) delete[] m_pFlameParticle;
 	if (m_pSkull) delete[] m_pSkull;
 	if (m_pline) delete[] m_pline;
+	if (m_pMagicCircle) delete[] m_pMagicCircle;
+	if (m_pMagicCircle2) delete[] m_pMagicCircle2;
+
+
 
 
 
@@ -1165,6 +1177,10 @@ void CScene::ReleaseUploadBuffers()
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pFlameParticle[i] != NULL) { m_pFlameParticle[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pSkull[i] != NULL) { m_pSkull[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pline[i] != NULL) { m_pline[i]->ReleaseUploadBuffers(); };
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pMagicCircle[i] != NULL) { m_pMagicCircle[i]->ReleaseUploadBuffers(); };
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pMagicCircle2[i] != NULL) { m_pMagicCircle2[i]->ReleaseUploadBuffers(); };
+
+
 
 
 
@@ -1405,6 +1421,8 @@ int CScene::CheckSitCollisions()
 		for (int i = 0; i < 4; i++) {
 			if (m_pPlayer[g_myid]->aabb.Intersects(xm_SitAABB[i]))
 			{
+				return i;
+				/*
 				std::cout << i << "bound" << std::endl;
 				//i번째 방향으로 카메라돌리고 앉게하기 
 				if (((CTerrainPlayer*)m_pPlayer[g_myid])->motion != AnimationState::SIT) {
@@ -1423,7 +1441,7 @@ int CScene::CheckSitCollisions()
 					//m_pPlayer[g_myid]->SetLook(m_LookCamera[i]);
 					m_pPlayer[g_myid]->SetSitState(false);
 					return i;
-				}
+				}*/
 			}
 		}
 	}
@@ -1526,13 +1544,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 
-	if (m_pPlayer[0]->curMissionType == MissionType::CS_TURN) {
-		m_pPlayer[g_myid]->SetPosition({ 520.219f + g_myid * 10, 230.f, 593.263f });
-	}
-
-
-
-
+	//if (!m_pPlayer[g_myid]->setting){
+	//	cout << "setting" << endl;
+	//	m_pPlayer[g_myid]->SetPosition({ 425.f + g_myid * 10, 230.f, 593.263f });
+	//	m_pPlayer[g_myid]->setting = true;
+	//}
 
 	XMFLOAT3 tar = { 10000.0f,10000.0f,10000.0f };
 	if (m_pPlayer[0]->curMissionType == MissionType::GO_PLANET) {
@@ -1676,6 +1692,35 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
 		//m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
 		m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
+
+		if (m_ppBoss->GetAnimation() == BossAnimation::BASIC_ATTACT) {
+			if (!b_Inside) {
+				m_pMagicCircle[0]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
+				m_pMagicCircle[0]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				m_pMagicCircle[0]->Rotate(0, 0, m_eTime * 100);
+				m_pMagicCircle[0]->Animate(m_fElapsedTime);
+				m_pMagicCircle[0]->Render(pd3dCommandList, pCamera);
+			}
+		}
+		if (m_ppBoss->GetAnimation() == BossAnimation::CLAW_ATTACT) {
+			if (!b_Inside) {
+				m_pMagicCircle[1]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
+				m_pMagicCircle[1]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				m_pMagicCircle[1]->Rotate(0, 0, m_eTime * 100);
+				m_pMagicCircle[1]->Animate(m_fElapsedTime);
+				m_pMagicCircle[1]->Render(pd3dCommandList, pCamera);
+			}
+		}
+		if (m_ppBoss->GetAnimation() == BossAnimation::FLAME_ATTACK) {
+			if (!b_Inside) {
+				m_pMagicCircle[2]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
+				m_pMagicCircle[2]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				m_pMagicCircle[2]->Rotate(0, 0, m_eTime * 100);
+				m_pMagicCircle[2]->Animate(m_fElapsedTime);
+				m_pMagicCircle[2]->Render(pd3dCommandList, pCamera);
+			}
+		}
+
 
 		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
 
@@ -1823,6 +1868,14 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 		cout << "shot";
 	}
+
+
+	//m_pMagicCircl 테스트
+	//m_ppBoss->SetPosition({ 0,0,0 });
+	//m_ppBoss->Animate(m_fElapsedTime);
+	//m_ppBoss->Render(pd3dCommandList, pCamera);
+
+
 
 
 	//static int aafsdaa = 0;

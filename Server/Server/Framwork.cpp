@@ -463,39 +463,32 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			scene->_plist_lock.unlock();
 		}
 
-
+		scene_manager._scene_lock.lock();
+		short scene_num = -1;
 		if (p->room_id != -1) {
-			scene_manager._scene_lock.lock();
-			short scene_num = scene_manager.FindScene(p->room_id, c_id);
-
-			if (scene_num >= 0) {
-				char num = scene_manager.InsertPlayer(scene_num, c_id);
-				//if (num == 2) { scene_manager.SceneStart(scene_num); }
-				if (num == -1) { disconnect(c_id); return; }  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
-				else if(num == 0) {
-					CScene* scene = scene_manager.GetScene(scene_num);
-					scene->_s_lock.lock();
-					if (scene->_state == SCENE_FREE) {
-						scene_manager.GetScene(scene_num)->_state = SCENE_ALLOC;
-					}
-					scene->_s_lock.unlock();
-				}
-			}
-			else {
-				disconnect(c_id);	return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
-			}
-			scene_manager._scene_lock.unlock();
+			scene_num = scene_manager.FindScene(p->room_id, c_id);
 		}
 		else {
-			scene_manager._scene_lock.lock();
-			short scene_num = scene_manager.FindScene(c_id);
-			scene_manager._scene_lock.unlock();
-			if(scene_num == -1) {
-				disconnect(c_id);	return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
-			}
-
-			// 자동 배정 (비어있는 Scene 혹은 비어있는 자리)
+			scene_num = scene_manager.FindScene(c_id);	// auto match
 		}
+
+		if (scene_num >= 0) {
+			CScene* scene = scene_manager.GetScene(scene_num);
+			scene->_s_lock.lock();
+			char num = scene_manager.InsertPlayer(scene_num, c_id);
+			if (num == -1) { disconnect(c_id); scene->_s_lock.unlock(); return; }  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
+			else if (num == 0) {
+				if (scene->_state == SCENE_FREE) {
+					scene_manager.GetScene(scene_num)->_state = SCENE_ALLOC;
+				}
+			}
+			scene->_s_lock.unlock();
+		}
+		else {
+			disconnect(c_id);	
+			return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
+		}
+		scene_manager._scene_lock.unlock();
 
 		clients[c_id].send_login_info_packet();
 
@@ -509,15 +502,20 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		packet.data.x = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition().x;
 		packet.data.z = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition().z;
 		
-		scene_manager.Send(clients[c_id].room_id, (char*)& packet);
-		
+		for (auto pl_id : scene->_plist)
+		{
+			if (pl_id == -1) continue;
+			if (pl_id == c_id) continue;
+			clients[pl_id].do_send((char*)&packet);
+		}
+
 		for (auto pl_id : scene->_plist) {
 			if (pl_id == -1) { continue; }
+			if (pl_id == c_id) { continue; }
 			SC_LOGIN_INFO_PACKET my_packet{};
 			my_packet.type = SC_ADD_PLAYER;
 			my_packet.size = sizeof(my_packet);
 			my_packet.data.id = clients[pl_id].room_pid;
-			CScene* scene = scene_manager.GetScene(clients[pl_id].room_id);
 			my_packet.data.yaw = scene->m_ppPlayers[clients[pl_id].room_pid]->GetYaw();
 			my_packet.data.player_type = clients[pl_id].type;
 			my_packet.data.x = scene->m_ppPlayers[clients[pl_id].room_pid]->GetPosition().x;
@@ -565,7 +563,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			clients[c_id].type = PlayerType::INSIDE;
 
 			SC_LOGIN_INFO_PACKET packet{};
-			packet.data.id = c_id;
+			packet.data.id = clients[c_id].room_pid;
 			packet.data.player_type = p->player_type;
 			packet.size = sizeof(SC_LOGIN_INFO_PACKET);
 			packet.type = SC_CHANGE;
@@ -617,9 +615,9 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			scene->m_pSpaceship->SetInputInfo(p->Quaternion);
 			
 			for (auto pl : scene->_plist) {
-				if (pl == -1) { break; }
-				if (pl == c_id) { break; }
-				if (clients[pl]._state != ST_INGAME) { break; }
+				if (pl == -1) { continue; }
+				if (pl == c_id) { continue; }
+				if (clients[pl]._state != ST_INGAME) { continue; }
 				clients[pl].send_spaceship_quaternion_packet(p->Quaternion);
 			}
 		}
@@ -638,6 +636,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (clients[c_id].type == PlayerType::INSIDE) {
 			if (clients[c_id].room_id == -1) { break; }
 			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+			if (levels[scene->cur_mission].cutscene) { break; }
 			float yaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
 			if (yaw != p->data.yaw)
 			{
@@ -745,14 +744,11 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (clients[c_id].room_id == -1) { break; }
 		CScene* m_pScene = scene_manager.GetScene(clients[c_id].room_id);
 		CS_ANIMATION_CHANGE_PACKET* p = reinterpret_cast<CS_ANIMATION_CHANGE_PACKET*>(packet);
-		
 		for (auto pl : m_pScene->_plist) {
-			if (pl == -1) { break; }
-			if (pl == c_id) { break; }
+			if (pl == -1) { continue; }
+			if (pl == c_id) { continue; }
 			clients[pl].send_animation_packet(clients[c_id].room_pid, p->state);
 		}
-		
-
 		break;
 	}
 	case CS_CUTSCENE_END: {
@@ -938,7 +934,7 @@ void CGameFramework::disconnect(int c_id)
 		scene->_plist[clients[c_id].room_pid] = -1;
 
 		if (std::all_of(scene->_plist.begin(), scene->_plist.end(), [](short i) {return i == -1; })) {
-			scene_manager.ResetScene(clients[c_id].room_id);
+			scene_manager.ResetScene(scene->num);
 		}
 		scene->_plist_lock.unlock();
 		

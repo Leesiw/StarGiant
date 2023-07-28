@@ -90,3 +90,10 @@ void God::ChangeAnimation(GodAnimation CurMotion)
 		}
 	}
 }
+
+void God::Animate(float fTimeElapsed)
+{
+	m_pHead = FindFrame("Demon_head_004");
+
+	CGameObject::Animate(fTimeElapsed);
+}

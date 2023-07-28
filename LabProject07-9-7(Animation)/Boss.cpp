@@ -19,6 +19,8 @@ void Boss::BossObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	CLoadedModelInfo* pBossModel = pModel;
 	if (!pBossModel) pBossModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Red.bin", NULL);
 
+
+
 	SetChild(pBossModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, static_cast<int>(BossAnimation::COUNT), pBossModel);
 
@@ -29,6 +31,9 @@ void Boss::BossObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 
 	//m_pSkinnedAnimationController->SetTrackAllUnable(static_cast<int>(BossAnimation::COUNT));
 	m_pSkinnedAnimationController->SetTrackEnable(0, true);
+
+
+
 
 
 
@@ -385,4 +390,11 @@ void Boss::ChangeAnimation(BossAnimation CurMotion)
 		}
 	}
 
+}
+
+void Boss::Animate(float fTimeElapsed)
+{
+	m_pHead = FindFrame("UpperMouth02");
+
+	CGameObject::Animate(fTimeElapsed);
 }

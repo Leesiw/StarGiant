@@ -253,10 +253,10 @@ void Boss::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	XMFLOAT3 p_y_r{ pitch, yaw, 0.f };
 	if (Vector3::Length(p_y_r) > rotate_angle) {
 		p_y_r = Vector3::Normalize(p_y_r);
-		Rotate(p_y_r.x * rotate_angle, p_y_r.y * rotate_angle, 0.f);
+		Rotate(0.f, p_y_r.y * rotate_angle, 0.f);
 	}
 	else {
-		Rotate(pitch, yaw, 0.f);
+		Rotate(0.f, yaw, 0.f);
 	}
 }
 

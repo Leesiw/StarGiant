@@ -2868,3 +2868,102 @@ void CLineObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 {
 	CGameObject::Render(pd3dCommandList, pCamera);
 }
+
+
+//==============
+
+CMagicCircleObject::CMagicCircleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int cnt, int num) : CGameObject(1)
+{
+	CMagicCircleMesh* pParticleMesh;
+
+	if(cnt == 0)
+		pParticleMesh = new CMagicCircleMesh(pd3dDevice, pd3dCommandList, 300.0f, 300.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	else if (cnt == 1)
+		pParticleMesh = new CMagicCircleMesh(pd3dDevice, pd3dCommandList, 300.0f, 300.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	else if (cnt == 2)
+		pParticleMesh = new CMagicCircleMesh(pd3dDevice, pd3dCommandList, 300.0f, 300.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+	else
+		pParticleMesh = new CMagicCircleMesh(pd3dDevice, pd3dCommandList, 300.0f, 300.0f, 0.0f, 1.0f, 0.0f, 1.0f);
+
+	SetMesh(pParticleMesh);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CTexture* pParticleTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	if (num==0)
+		pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/magiccircle.dds", 0); //star
+	else
+		pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/magiccircle2.dds", 0); //star
+
+
+
+	CParticleShader* pParticleShader = new CParticleShader(); //CParticleShader CUIShader
+	pParticleShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pParticleShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CScene::CreateShaderResourceViews(pd3dDevice, pParticleTexture, 21, false);
+
+	CMaterial* pParticleMaterial = new CMaterial(1);
+	pParticleMaterial->SetTexture(pParticleTexture, 0);
+	pParticleMaterial->SetShader(pParticleShader);
+
+	SetMaterial(0, pParticleMaterial);
+
+
+	velocity = 10;
+	//velocity = (float)(rand() % 5);
+
+	angleX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+	angleY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+	angleZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * DirectX::XM_PI;
+
+	//intervalX = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
+	//intervalY = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 50.0f;
+	//intervalZ = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 150.0f;
+
+
+	position.x = GetPosition().x + intervalX;
+	position.y = GetPosition().y + intervalY;
+	position.z = GetPosition().z + intervalZ;
+
+	direction = XMVectorSubtract(XMLoadFloat3(&TargetPos), XMLoadFloat3(&position));
+	direction = XMVector3Normalize(direction);
+}
+
+void CMagicCircleObject::Animate(float fElapsedTime)
+{
+	ffTimeElapsed += fElapsedTime;
+	if (ffTimeElapsed > lifeTime) {
+		isLive = false;
+		ffTimeElapsed = 0.f;
+	}
+
+	if (XMVector3Equal(targetDirection, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f)))
+	{
+		targetDirection = XMVectorSubtract(XMLoadFloat3(&TargetPos), XMLoadFloat3(&position));
+		targetDirection = XMVector3Normalize(targetDirection);
+	}
+
+	// velocity에 따라 파티클 이동
+	XMVECTOR velocityVector = XMVectorScale(targetDirection, velocity * fElapsedTime * 10);
+	XMFLOAT3 velocityResult;
+	XMStoreFloat3(&velocityResult, velocityVector);
+
+	//position.x += velocityResult.x * 10;
+	//position.y += velocityResult.y * 10;
+	//position.z += velocityResult.z * 10;
+
+
+	SetPosition(position);
+
+	CGameObject::Animate(fElapsedTime);
+}
+void CMagicCircleObject::setPos(XMFLOAT3 pos)
+{
+	position.x = pos.x + intervalX;
+	position.y = pos.y + intervalY;
+	position.z = pos.z + intervalZ;
+}
+
+void CMagicCircleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	CGameObject::Render(pd3dCommandList, pCamera);
+}

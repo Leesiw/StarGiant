@@ -2617,6 +2617,14 @@ void CGameFramework::ProcessPacket(char* p)
 
 		m_pInsidePlayer[g_myid]->SetPlayerInfo(info);
 
+		int player_cnt = 0;
+		for (int i = 0; i < 3; ++i) {
+			if (m_pInsidePlayer[i]->isAlive) {
+				++player_cnt;
+			}
+		}
+		matcnt = player_cnt;
+
 	//	float y = m_pInsidePlayer[g_myid]->GetPosition().y;
 	//	m_pInsidePlayer[g_myid]->SetPosition({ packet->data.x, y, packet->data.z });
 		break;
@@ -2677,7 +2685,6 @@ void CGameFramework::ProcessPacket(char* p)
 	case SC_ADD_PLAYER:
 	{
 		SC_LOGIN_INFO_PACKET* packet = reinterpret_cast<SC_LOGIN_INFO_PACKET*>(p);
-		
 		m_pInsidePlayer[packet->data.id]->isAlive = true;
 		m_pInsidePlayer[packet->data.id]->type = player_type;
 		float y = m_pInsidePlayer[packet->data.id]->GetPosition().y;
@@ -2919,7 +2926,7 @@ void CGameFramework::ProcessPacket(char* p)
 			break;
 		}
 		if (packet->data.id == BOSS_ID) {
-			if (curMissionType == MissionType::KILL_GOD)
+			if (curMissionType == MissionType::DEFEAT_BOSS)
 				m_pScene->m_ppBoss->CurMotion = (BossAnimation)packet->data.animation;
 			// 보스 State 변경??
 			break;

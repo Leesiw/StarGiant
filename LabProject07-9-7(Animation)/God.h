@@ -22,6 +22,7 @@ public:
 	bool m2 = false;
 	bool shot = false;
 
+	CGameObject* m_pHead = NULL;
 
 
 public:
@@ -35,6 +36,7 @@ public:
 	int GetcurHp() { return GodHP; }
 
 	void ChangeAnimation(GodAnimation CurState);
+	virtual void Animate(float fTimeElapsed);
 
 
 	char soundon = -1;
