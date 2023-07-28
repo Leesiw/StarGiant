@@ -2976,7 +2976,13 @@ void CGameFramework::ProcessPacket(char* p)
 			}
 		}
 		
-		if (curMissionType != MissionType::CS_BAD_ENDING) {
+		if (curMissionType == MissionType::CS_SHOW_GOD) {
+			m_pPlayer[0]->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
+		}
+		else if (curMissionType == MissionType::CS_BOSS_SCREAM) {
+			m_pPlayer[0]->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
+		}
+		else if (curMissionType != MissionType::CS_BAD_ENDING) {
 			m_effectSound[static_cast<int>(Sounds::CLEAR)]->play();
 		}
 		break;
