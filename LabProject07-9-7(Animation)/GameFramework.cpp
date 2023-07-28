@@ -2749,9 +2749,12 @@ void CGameFramework::ProcessPacket(char* p)
 	case SC_MOVE_SPACESHIP:
 	{
 		SC_MOVE_SPACESHIP_PACKET* packet = reinterpret_cast<SC_MOVE_SPACESHIP_PACKET*>(p);
-		m_pPlayer[0]->SetPosition(packet->pos);
-		m_pCamera->Update(packet->pos, m_GameTimer.GetTimeElapsed());
-		m_pPlayer[0]->Update(m_GameTimer.GetTimeElapsed());
+		SPACESHIP_INFO info;
+		info.pos = packet->pos;
+		m_pPlayer[0]->SetPlayerInfo(info);
+		//m_pPlayer[0]->SetPosition(packet->pos);
+	//	m_pCamera->Update(m_pPlayer[0]->GetLook(), m_GameTimer.GetTimeElapsed());
+		//m_pPlayer[0]->Update(m_GameTimer.GetTimeElapsed());
 		break;
 	}
 	case SC_SPACESHIP_QUATERNION:
