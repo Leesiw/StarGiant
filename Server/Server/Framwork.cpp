@@ -613,7 +613,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			packet.size = sizeof(SC_LOGIN_INFO_PACKET);
 			packet.type = SC_CHANGE;
 
-			scene_manager.Send(clients[c_id].room_id, (char*)&packet);	// 수정	
+			scene->Send((char*)&packet);	// 수정	
 
 			SC_MOVE_INSIDE_PACKET pack{};
 			pack.size = sizeof(pack);
@@ -647,7 +647,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			packet.size = sizeof(SC_LOGIN_INFO_PACKET);
 			packet.type = SC_CHANGE;
 
-			scene_manager.Send(clients[c_id].room_id, (char*)&packet);
+			scene->Send((char*)&packet);
 		}
 		break;
 	}
@@ -781,7 +781,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			packet.type = SC_START;
 
 			//printf("start %d\n", clients[c_id].room_id);
-			scene_manager.Send(clients[c_id].room_id, (char*)&packet);
+			scene->Send((char*)&packet);
 		}
 		break;
 	}
@@ -962,9 +962,9 @@ void CGameFramework::disconnect(int c_id)
 
 	lock_guard<mutex> ll(clients[c_id]._s_lock);
 	if (clients[c_id].room_id != -1) {
-		scene_manager.Send(clients[c_id].room_id, (char*)&p);
-
 		CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+		scene->Send((char*)&p);
+
 		if (scene->heal_player == clients[c_id].room_pid) {
 			scene->heal_player = -1;
 		}

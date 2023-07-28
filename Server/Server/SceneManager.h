@@ -17,7 +17,6 @@ public:
 	void Send(short num, char* p);
 
 	mutex _scene_lock;
-
 private:
 	std::array<CScene*, MAX_ROOM> m_pScenes;
 };
