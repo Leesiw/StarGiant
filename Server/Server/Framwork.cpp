@@ -937,7 +937,7 @@ void CGameFramework::disconnect(int c_id)
 		scene->_plist[clients[c_id].room_pid] = -1;
 
 		if (std::all_of(scene->_plist.begin(), scene->_plist.end(), [](short i) {return i == -1; })) {
-			scene_manager.ResetScene(clients[c_id].room_id);
+			scene_manager.ResetScene(scene->num);
 		}
 		scene->_plist_lock.unlock();
 		

@@ -113,6 +113,9 @@ public:
 		p.size = sizeof(SC_LOGIN_INFO_PACKET);
 		p.type = SC_LOGIN_INFO;
 		p.data.player_type = type;
+		p.data.yaw = 0.f;
+		p.data.x = 425.0f + 10.0f * room_pid;
+		p.data.z = 740.f;
 		do_send(&p);
 	}
 

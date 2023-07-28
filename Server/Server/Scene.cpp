@@ -58,10 +58,10 @@ void CScene::BuildObjects()
 	_plist.fill(-1);
 
 	for (int i = 0; i < 3; ++i) {
-		CTerrainPlayer* pPlayer = new CTerrainPlayer();
-		pPlayer->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 10.0f, 740.0f));
-		pPlayer->cutscene_end = false;
-		m_ppPlayers[i] = pPlayer;
+		m_ppPlayers[i] = new CTerrainPlayer();
+		m_ppPlayers[i]->Reset();
+		m_ppPlayers[i]->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 10.0f, 740.0f));
+		m_ppPlayers[i]->cutscene_end = false;
 	}
 
 	// meteo
