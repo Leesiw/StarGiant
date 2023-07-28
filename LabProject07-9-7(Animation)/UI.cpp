@@ -695,13 +695,13 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
     
 
 
-    if (mty == MissionType::DEFEAT_BOSS) {
+    if (mty == MissionType::DEFEAT_BOSS || mty == MissionType::DEFEAT_BOSS2) {
         m_pd2dDeviceContext->FillRectangle(D2D1::RectF(bossHpbarLeft, bossHpbarTop, bossHpbarRight, bossHpbarBottom), Whitebrush); //배경
         if (bossHpbarRight - BosshpBar > bossHpbarLeft)
             m_pd2dDeviceContext->FillRectangle(D2D1::RectF(bossHpbarLeft, bossHpbarTop, bossHpbarRight - BosshpBar, bossHpbarBottom), Redbrush); // hp
     }
 
-    if (mty == MissionType::KILL_GOD) {
+    if (mty == MissionType::KILL_GOD|| mty == MissionType::KILL_GOD2) {
         m_pd2dDeviceContext->FillRectangle(D2D1::RectF(GodbossHpbarLeft, GodbossHpbarTop, GodbossHpbarRight, GodbossHpbarBottom), Whitebrush); //배경
         if (GodbossHpbarRight - GodBosshpBar > GodbossHpbarLeft)
             m_pd2dDeviceContext->FillRectangle(D2D1::RectF(GodbossHpbarLeft, GodbossHpbarTop, GodbossHpbarRight - GodBosshpBar, GodbossHpbarBottom), Redbrush); // hp

@@ -2103,6 +2103,7 @@ void CSpriteObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 	}
 	UpdateTransform(NULL);
 
+	CGameObject::Render(pd3dCommandList, pCamera);
 	
 }
 
