@@ -1203,8 +1203,8 @@ void CGameFramework::CameraUpdateChange()
 
 	}
 
-	if ((curMissionType == MissionType::DEFEAT_BOSS || curMissionType == MissionType::GO_PLANET 
-		|| curMissionType == MissionType::GO_CENTER || curMissionType == MissionType::ESCAPE_BLACK_HOLE || curMissionType == MissionType::KILL_GOD)
+	if ((curMissionType == MissionType::DEFEAT_BOSS || curMissionType == MissionType::DEFEAT_BOSS2 || curMissionType == MissionType::GO_PLANET
+		|| curMissionType == MissionType::GO_CENTER || curMissionType == MissionType::ESCAPE_BLACK_HOLE || curMissionType == MissionType::KILL_GOD || curMissionType == MissionType::KILL_GOD2)
 		&& (m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA || m_pPlayer[0]->GetCamera()->GetMode() == CUT_SCENE_CAMERA))
 	{
 		if (b_BeforeCheckInside) {
@@ -2121,6 +2121,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 		uiText += L"m 남음 )";
 		break;
 	}
+	case MissionType::DEFEAT_BOSS2:
 	case MissionType::DEFEAT_BOSS:
 	{
 		uiText = L"미션 - 보스를 처치하라 ( ";
@@ -2166,6 +2167,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 		uiText += L"m 남음 )";
 		break;
 	}
+	case MissionType::KILL_GOD2:
 	case MissionType::KILL_GOD:
 	{
 		uiText = L"미션 - 신을 처치하라 ( ";
@@ -2928,13 +2930,13 @@ void CGameFramework::ProcessPacket(char* p)
 			break;
 		}
 		if (packet->data.id == BOSS_ID) {
-			if (curMissionType == MissionType::DEFEAT_BOSS)
+			if (curMissionType == MissionType::DEFEAT_BOSS || curMissionType == MissionType::DEFEAT_BOSS2)
 				m_pScene->m_ppBoss->CurMotion = (BossAnimation)packet->data.animation;
 			// 보스 State 변경??
 			break;
 		}
 		if (packet->data.id == GOD_ID) {
-			if(curMissionType == MissionType::KILL_GOD)
+			if(curMissionType == MissionType::KILL_GOD || curMissionType == MissionType::KILL_GOD2)
 				m_pScene->m_ppGod->CurMotion = (GodAnimation)packet->data.animation;
 			// 보스 State 변경??
 			break;
@@ -2975,7 +2977,7 @@ void CGameFramework::ProcessPacket(char* p)
 				m_pScene->m_ppEnemyMissiles[i]->m_bActive = false;
 			}
 		}
-		
+
 		if (curMissionType == MissionType::CS_SHOW_GOD) {
 			m_pPlayer[0]->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
 		}

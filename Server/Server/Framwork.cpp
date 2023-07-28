@@ -429,7 +429,7 @@ void CGameFramework::SetMission()
 	levels[MissionType::CS_SHOW_GOD].RestartMission = MissionType::CS_SHOW_GOD;
 	levels[MissionType::CS_SHOW_GOD].RestartPosition = XMFLOAT3{ 1300.f, 0.f, -700.f };
 
-	levels[MissionType::KILL_GOD].NextMission = MissionType::CS_SHOW_GOD;
+	levels[MissionType::KILL_GOD].NextMission = MissionType::CS_ANGRY_GOD;
 	levels[MissionType::KILL_GOD].MaxMonsterNum = 0;
 	levels[MissionType::KILL_GOD].SpawnMonsterNum = 0;
 	levels[MissionType::KILL_GOD].Laser.MAX_HP = 40;
@@ -441,10 +441,10 @@ void CGameFramework::SetMission()
 	levels[MissionType::KILL_GOD].RestartMission = MissionType::CS_SHOW_GOD;
 	levels[MissionType::KILL_GOD].RestartPosition = XMFLOAT3{ 1300.f, 0.f, -700.f };
 
-	levels[MissionType::CS_SHOW_GOD].NextMission = MissionType::KILL_GOD2;
-	levels[MissionType::CS_SHOW_GOD].cutscene = true;
-	levels[MissionType::CS_SHOW_GOD].RestartMission = MissionType::CS_SHOW_GOD;
-	levels[MissionType::CS_SHOW_GOD].RestartPosition = XMFLOAT3{ 1300.f, 0.f, -700.f };
+	levels[MissionType::CS_ANGRY_GOD].NextMission = MissionType::KILL_GOD2;
+	levels[MissionType::CS_ANGRY_GOD].cutscene = true;
+	levels[MissionType::CS_ANGRY_GOD].RestartMission = MissionType::CS_SHOW_GOD;
+	levels[MissionType::CS_ANGRY_GOD].RestartPosition = XMFLOAT3{ 1300.f, 0.f, -700.f };
 
 	levels[MissionType::KILL_GOD2].NextMission = MissionType::CS_ENDING;
 	levels[MissionType::KILL_GOD2].MaxMonsterNum = 0;

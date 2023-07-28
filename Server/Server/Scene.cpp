@@ -1186,6 +1186,11 @@ void CScene::UpdateBoss()
 	}
 
 	m_pBoss->Boss_Ai(0.025f, m_pSpaceship, m_pBoss->GetHP());
+
+	if (cur_mission == MissionType::DEFEAT_BOSS && m_pBoss->BossHP <= 50) {
+		SetMission(MissionType::CS_ANGRY_BOSS);
+	}
+
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));
 	if (dist < 1000.f) // boss ¸·±â
@@ -1218,6 +1223,10 @@ void CScene::UpdateGod()
 
 	if (m_pGod->God_Ai(0.025f, m_pSpaceship, m_pGod->GetcurHp())) {
 		SpawnEnemyFromGod();
+	}
+
+	if (cur_mission == MissionType::KILL_GOD && m_pGod->GodHP <= 50) {
+		SetMission(MissionType::CS_ANGRY_GOD);
 	}
 
 	float dist;
