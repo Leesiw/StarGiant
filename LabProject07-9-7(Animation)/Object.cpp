@@ -2872,12 +2872,21 @@ void CLineObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 
 //==============
 
-CMagicCircleObject::CMagicCircleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
+CMagicCircleObject::CMagicCircleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int cnt) : CGameObject(1)
 {
-	ChealParticleMesh* pParticleMesh = new ChealParticleMesh(pd3dDevice, pd3dCommandList, 150.0f, 150.0f, 0.0f);
+	CMagicCircleMesh* pParticleMesh;
+
+	if(cnt == 0)
+		pParticleMesh = new CMagicCircleMesh(pd3dDevice, pd3dCommandList, 300.0f, 300.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	else if (cnt == 1)
+		pParticleMesh = new CMagicCircleMesh(pd3dDevice, pd3dCommandList, 300.0f, 300.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	else if (cnt == 2)
+		pParticleMesh = new CMagicCircleMesh(pd3dDevice, pd3dCommandList, 300.0f, 300.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+	else
+		pParticleMesh = new CMagicCircleMesh(pd3dDevice, pd3dCommandList, 300.0f, 300.0f, 0.0f, 1.0f, 0.0f, 1.0f);
+
 	SetMesh(pParticleMesh);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-
 	CTexture* pParticleTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/magiccircle.dds", 0); //star
 

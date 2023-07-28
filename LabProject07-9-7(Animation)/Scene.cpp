@@ -354,7 +354,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	}
 
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
-		m_pMagicCircle[i] = new CMagicCircleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+		m_pMagicCircle[i] = new CMagicCircleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, i);
 		m_pMagicCircle[i]->count = i;
 	}
 
@@ -1537,13 +1537,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 
-	/*if (m_pPlayer[0]->curMissionType == MissionType::CS_TURN) {
-		m_pPlayer[g_myid]->SetPosition({ 520.219f + g_myid * 10, 230.f, 593.263f });
-	}*/
-
-
-
-
+	//if (!m_pPlayer[g_myid]->setting){
+	//	cout << "setting" << endl;
+	//	m_pPlayer[g_myid]->SetPosition({ 425.f + g_myid * 10, 230.f, 593.263f });
+	//	m_pPlayer[g_myid]->setting = true;
+	//}
 
 	XMFLOAT3 tar = { 10000.0f,10000.0f,10000.0f };
 	if (m_pPlayer[0]->curMissionType == MissionType::GO_PLANET) {
@@ -1687,6 +1685,35 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
 		//m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
 		m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
+
+		if (m_ppBoss->GetAnimation() == BossAnimation::BASIC_ATTACT) {
+			if (!b_Inside) {
+				m_pMagicCircle[0]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
+				m_pMagicCircle[0]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				m_pMagicCircle[0]->Rotate(0, 0, m_eTime * 100);
+				m_pMagicCircle[0]->Animate(m_fElapsedTime);
+				m_pMagicCircle[0]->Render(pd3dCommandList, pCamera);
+			}
+		}
+		if (m_ppBoss->GetAnimation() == BossAnimation::CLAW_ATTACT) {
+			if (!b_Inside) {
+				m_pMagicCircle[1]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
+				m_pMagicCircle[1]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				m_pMagicCircle[1]->Rotate(0, 0, m_eTime * 100);
+				m_pMagicCircle[1]->Animate(m_fElapsedTime);
+				m_pMagicCircle[1]->Render(pd3dCommandList, pCamera);
+			}
+		}
+		if (m_ppBoss->GetAnimation() == BossAnimation::FLAME_ATTACK) {
+			if (!b_Inside) {
+				m_pMagicCircle[2]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
+				m_pMagicCircle[2]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				m_pMagicCircle[2]->Rotate(0, 0, m_eTime * 100);
+				m_pMagicCircle[2]->Animate(m_fElapsedTime);
+				m_pMagicCircle[2]->Render(pd3dCommandList, pCamera);
+			}
+		}
+
 
 		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
 
@@ -1841,17 +1868,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	//m_ppBoss->Animate(m_fElapsedTime);
 	//m_ppBoss->Render(pd3dCommandList, pCamera);
 
-	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
-		if (!b_Inside) {
 
-			m_pMagicCircle[i]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
-			m_pMagicCircle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-			m_pMagicCircle[i]->Rotate(0, 0, m_eTime * 100);
-			m_pMagicCircle[i]->Animate(m_fElapsedTime);
-			m_pMagicCircle[i]->Render(pd3dCommandList, pCamera);
-
-		}
-	}
 
 
 	//static int aafsdaa = 0;
