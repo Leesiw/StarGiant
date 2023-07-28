@@ -2872,7 +2872,7 @@ void CLineObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 
 //==============
 
-CMagicCircleObject::CMagicCircleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int cnt) : CGameObject(1)
+CMagicCircleObject::CMagicCircleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int cnt, int num) : CGameObject(1)
 {
 	CMagicCircleMesh* pParticleMesh;
 
@@ -2888,7 +2888,11 @@ CMagicCircleObject::CMagicCircleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	SetMesh(pParticleMesh);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	CTexture* pParticleTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/magiccircle.dds", 0); //star
+	if (num==0)
+		pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/magiccircle.dds", 0); //star
+	else
+		pParticleTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"UI/magiccircle2.dds", 0); //star
+
 
 
 	CParticleShader* pParticleShader = new CParticleShader(); //CParticleShader CUIShader

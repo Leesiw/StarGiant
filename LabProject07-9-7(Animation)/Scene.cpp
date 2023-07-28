@@ -354,10 +354,13 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	}
 
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
-		m_pMagicCircle[i] = new CMagicCircleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, i);
+		m_pMagicCircle[i] = new CMagicCircleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, i, 0);
 		m_pMagicCircle[i]->count = i;
 	}
-
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+		m_pMagicCircle2[i] = new CMagicCircleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, i, 0);
+		m_pMagicCircle2[i]->count = i;
+	}
 	//=====================================
 	CLoadedModelInfo* pJewelModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/SoftStar.bin", NULL);
 	m_ppJewel = new CJewelObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pJewelModel, 1);
@@ -616,6 +619,8 @@ void CScene::ReleaseObjects()
 	if (m_pSkull) delete[] m_pSkull;
 	if (m_pline) delete[] m_pline;
 	if (m_pMagicCircle) delete[] m_pMagicCircle;
+	if (m_pMagicCircle2) delete[] m_pMagicCircle2;
+
 
 
 
@@ -1173,6 +1178,8 @@ void CScene::ReleaseUploadBuffers()
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pSkull[i] != NULL) { m_pSkull[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pline[i] != NULL) { m_pline[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pMagicCircle[i] != NULL) { m_pMagicCircle[i]->ReleaseUploadBuffers(); };
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pMagicCircle2[i] != NULL) { m_pMagicCircle2[i]->ReleaseUploadBuffers(); };
+
 
 
 
