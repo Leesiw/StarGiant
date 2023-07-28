@@ -145,10 +145,11 @@ void ProcessPacket(int ci, unsigned char packet[])
 	case SC_SPAWN_MISSILE: break;
 	case SC_ALL_METEOR: break;
 	case SC_METEO: break;
+	case SC_SPACESHIP_QUATERNION:
 	case SC_MOVE_SPACESHIP:
 	{
 		SC_MOVE_SPACESHIP_PACKET* move_packet = reinterpret_cast<SC_MOVE_SPACESHIP_PACKET*>(packet);
-		g_clients[ci].pos = move_packet->data.pos;
+		g_clients[ci].pos = move_packet->pos;
 	}
 	case SC_MOVE_INSIDEPLAYER: break;
 	case SC_SPAWN_ENEMY: break;
@@ -394,8 +395,18 @@ void Test_Thread()
 			CS_ATTACK_PACKET my_packet;
 			my_packet.size = sizeof(my_packet);
 			my_packet.type = CS_ATTACK;
-			my_packet.data.pos = { urdRandom(dree),  urdRandom(dree),  urdRandom(dree) };
-			my_packet.data.direction = { 0.f,  1.f,  0.f };
+			my_packet.data.pos = g_clients[i].pos;
+			switch (g_clients[i].id) {
+			case 0:
+				my_packet.data.direction = { -1.f,  0.f,  0.f };
+				break;
+			case 1:
+				my_packet.data.direction = { 0.f,  0.f,  1.f };
+				break;
+			case 2:
+				my_packet.data.direction = { 1.f,  0.f,  0.f };
+				break;
+			}
 			my_packet.attack_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
 			SendPacket(i, &my_packet);
 		}

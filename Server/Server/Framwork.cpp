@@ -509,15 +509,20 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		packet.data.x = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition().x;
 		packet.data.z = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition().z;
 		
-		scene_manager.Send(clients[c_id].room_id, (char*)& packet);
-		
+		for (auto pl_id : scene->_plist)
+		{
+			if (pl_id == -1) continue;
+			if (pl_id == c_id) continue;
+			clients[pl_id].do_send((char*)&packet);
+		}
+
 		for (auto pl_id : scene->_plist) {
 			if (pl_id == -1) { continue; }
+			if (pl_id == c_id) { continue; }
 			SC_LOGIN_INFO_PACKET my_packet{};
 			my_packet.type = SC_ADD_PLAYER;
 			my_packet.size = sizeof(my_packet);
 			my_packet.data.id = clients[pl_id].room_pid;
-			CScene* scene = scene_manager.GetScene(clients[pl_id].room_id);
 			my_packet.data.yaw = scene->m_ppPlayers[clients[pl_id].room_pid]->GetYaw();
 			my_packet.data.player_type = clients[pl_id].type;
 			my_packet.data.x = scene->m_ppPlayers[clients[pl_id].room_pid]->GetPosition().x;
