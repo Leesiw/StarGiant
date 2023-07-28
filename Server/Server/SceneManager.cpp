@@ -99,15 +99,3 @@ void SceneManager::Send(short num, char* p)
 {
 	m_pScenes[num]->Send(p);
 }
-
-bool SceneManager::GetCanSit(short scene_id, PlayerType type)
-{
-	for (auto pl_id : m_pScenes[scene_id]->_plist) {
-		if (pl_id == -1)continue;
-		if (clients[pl_id].type == type) {
-			return false;
-		}
-	}
-
-	return true;
-}

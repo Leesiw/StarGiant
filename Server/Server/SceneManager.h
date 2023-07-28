@@ -16,8 +16,6 @@ public:
 	char InsertPlayer(short num, short pl_id);
 	void Send(short num, char* p);
 
-	bool GetCanSit(short scene_id, PlayerType type);
-
 	mutex _scene_lock;
 
 private:
