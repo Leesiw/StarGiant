@@ -660,18 +660,8 @@ public:
 
 	EnemyState state;
 
-	XMFLOAT4X4 m_xmf4x4Rotate;
-	float m_fPitch, m_fYaw, m_fRoll;
-
-
 	CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks);
 	virtual ~CEnemyObject();
-
-	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
-
-	virtual void Rotate(float x, float y, float z);
-	virtual void Rotate(XMFLOAT3* pxmf3Axis, float fAngle);
-	virtual void Rotate(XMFLOAT4* pxmf4Quaternion);
 
 	virtual void AI(float fTimeElapsed, XMFLOAT3& pl_pos);
 	virtual void MoveAI(float fTimeElapsed, XMFLOAT3& pl_pos);
@@ -681,7 +671,7 @@ public:
 	
 	void VelocityUpdate(float fTimeElapsed, XMFLOAT3& pos);
 
-	void ResetRotate();
+	void Reset();
 	short GetcurHp() { return hp; }
 	short GetMaxHp() { return Maxhp; }
 

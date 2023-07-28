@@ -2778,8 +2778,7 @@ void CGameFramework::ProcessPacket(char* p)
 		}
 		m_pScene->m_ppEnemies[packet->data.id]->SetPosition(packet->data.pos);
 
-		m_pScene->m_ppEnemies[packet->data.id]->ResetRotate();
-		m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
+		//m_pScene->m_ppEnemies[packet->data.id]->Rotate(&packet->data.Quaternion);
 		m_pScene->m_ppEnemies[packet->data.id]->m_xmf3Destination = packet->data.destination;
 
 		m_pScene->m_ppEnemies[packet->data.id]->Maxhp = packet->data.max_hp;

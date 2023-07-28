@@ -1664,7 +1664,6 @@ CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 {
 	isAlive = false;
 	Maxhp = hp;
-	m_xmf4x4Rotate = Matrix4x4::Identity();
 
 	CLoadedModelInfo* pEnemyModel = pModel;
 	if (!pEnemyModel) pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/AlienDestroyer.bin", NULL);
@@ -1677,51 +1676,6 @@ CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 CEnemyObject::~CEnemyObject()
 {
 }
-
-void CEnemyObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
-{
-	if (pxmf4x4Parent) {
-
-		XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(m_xmf4x4ToParent, *pxmf4x4Parent);
-		m_xmf4x4World = Matrix4x4::Multiply(m_xmf4x4Rotate, xmf4x4);
-	}
-	else {
-		m_xmf4x4World = Matrix4x4::Multiply(m_xmf4x4Rotate, m_xmf4x4ToParent);
-	}
-
-	if (m_pSibling) m_pSibling->UpdateTransform(pxmf4x4Parent);
-	if (m_pChild) m_pChild->UpdateTransform(&m_xmf4x4World);
-}
-
-void CEnemyObject::ResetRotate()
-{
-	m_xmf4x4Rotate = Matrix4x4::Identity();
-}
-
-void CEnemyObject::Rotate(float fPitch, float fYaw, float fRoll)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
-void CEnemyObject::Rotate(XMFLOAT3* pxmf3Axis, float fAngle)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(pxmf3Axis), XMConvertToRadians(fAngle));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
-void CEnemyObject::Rotate(XMFLOAT4* pxmf4Quaternion)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationQuaternion(XMLoadFloat4(pxmf4Quaternion));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
 
 void CEnemyObject::VelocityUpdate(float fTimeElapsed, XMFLOAT3& player_look)
 {
@@ -1748,10 +1702,16 @@ void CEnemyObject::VelocityUpdate(float fTimeElapsed, XMFLOAT3& player_look)
 	}
 }
 
+void CEnemyObject::Reset()
+{
+
+}
+
 
 
 void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 {
+
 	XMFLOAT3 new_pos = pos;
 	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// 역행렬
 
@@ -1759,7 +1719,6 @@ void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	if (Vector3::Length(new_pos) > 0.0001f) {
 		new_pos = Vector3::Normalize(new_pos);
 	}
-
 
 	float pitch = XMConvertToDegrees(asin(-new_pos.y));
 	float yaw = XMConvertToDegrees(atan2(new_pos.x, new_pos.z));
@@ -1775,7 +1734,7 @@ void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 		Rotate(pitch, yaw, 0.f);
 	}
 
-	UpdateTransform(NULL);
+	CEnemyObject::UpdateTransform(NULL);
 }
 
 

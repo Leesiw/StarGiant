@@ -750,7 +750,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			}
 			m_pScene->heal_start = std::chrono::system_clock::now();
 			clients[c_id].send_heal_packet();
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, clients[c_id].room_id};
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, t_room_id };
 			timer_queue.push(ev);
 		}
 		else {

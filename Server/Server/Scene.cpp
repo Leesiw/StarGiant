@@ -1799,17 +1799,17 @@ void CScene::Start()
 
 		for (char i = 0; i < METEOS; ++i) {
 			m_ppMeteoObjects[i]->prev_time = chrono::steady_clock::now();
-			TIMER_EVENT ev{ i, chrono::system_clock::now() + 33ms, EV_UPDATE_METEO, num };
+			TIMER_EVENT ev{ i, chrono::system_clock::now() + 33ms, EV_UPDATE_METEO, static_cast<short>(num) };
 			timer_queue.push(ev);
 		}
 
-		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10s, EV_SPAWN_ENEMY, num };
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10s, EV_SPAWN_ENEMY, static_cast<short>(num) };
 		timer_queue.push(ev);
 		m_pSpaceship->prev_time = chrono::steady_clock::now();
-		TIMER_EVENT ev1{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, num };
+		TIMER_EVENT ev1{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, static_cast<short>(num) };
 		timer_queue.push(ev1);
 
-		TIMER_EVENT ev2{ 0, chrono::system_clock::now() + 33ms, EV_SEND_SCENE_INFO, num };
+		TIMER_EVENT ev2{ 0, chrono::system_clock::now() + 33ms, EV_SEND_SCENE_INFO, static_cast<short>(num) };
 		timer_queue.push(ev2);
 
 		TIMER_EVENT ev3{ 1, chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
