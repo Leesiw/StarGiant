@@ -185,9 +185,11 @@ void CScene::Reset()
 	for (auto pl : _plist) {
 		if (pl == -1) { continue; }
 		clients[pl]._s_lock.lock();
-		clients[pl].room_id = -1;
-		clients[pl].room_pid = -1;
-		clients[pl]._state = ST_ALLOC;
+		if (clients[pl]._state == ST_INGAME) {
+			clients[pl]._state = ST_ALLOC;
+			clients[pl].room_id = -1;
+			clients[pl].room_pid = -1;
+		}
 		clients[pl]._s_lock.unlock();
 		pl = -1;
 	}
@@ -814,7 +816,7 @@ void CScene::MoveEnemy(char obj_id)
 			cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::CS_SHOW_GOD) {
 			m_ppEnemies[obj_id]->SetisAliveFalse();
 			for (auto pl : _plist) {
-				if (pl == -1) { break; }
+				if (pl == -1) { continue; }
 				clients[pl].send_bullet_hit_packet(obj_id, -1);
 			}
 			return;
@@ -905,7 +907,7 @@ void CScene::AimingEnemy(char obj_id)
 			cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::CS_SHOW_GOD) {
 			m_ppEnemies[obj_id]->SetisAliveFalse();
 			for (auto pl : _plist) {
-				if (pl == -1) { break; }
+				if (pl == -1) { continue; }
 				clients[pl].send_bullet_hit_packet(obj_id, -1);
 			}
 			return;
