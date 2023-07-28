@@ -353,6 +353,11 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pline[i]->count = i;
 	}
 
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+		m_pMagicCircle[i] = new CMagicCircleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+		m_pMagicCircle[i]->count = i;
+	}
+
 	//=====================================
 	CLoadedModelInfo* pJewelModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/SoftStar.bin", NULL);
 	m_ppJewel = new CJewelObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pJewelModel, 1);
@@ -610,6 +615,8 @@ void CScene::ReleaseObjects()
 	if (m_pFlameParticle) delete[] m_pFlameParticle;
 	if (m_pSkull) delete[] m_pSkull;
 	if (m_pline) delete[] m_pline;
+	if (m_pMagicCircle) delete[] m_pMagicCircle;
+
 
 
 
@@ -1165,6 +1172,8 @@ void CScene::ReleaseUploadBuffers()
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pFlameParticle[i] != NULL) { m_pFlameParticle[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pSkull[i] != NULL) { m_pSkull[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pline[i] != NULL) { m_pline[i]->ReleaseUploadBuffers(); };
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pMagicCircle[i] != NULL) { m_pMagicCircle[i]->ReleaseUploadBuffers(); };
+
 
 
 
@@ -1822,6 +1831,18 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			}
 		}
 		cout << "shot";
+	}
+
+	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+		if (!b_Inside) {
+
+			m_pMagicCircle[i]->setTarpos(m_pPlayer[0]->GetPosition());
+			m_pMagicCircle[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+			m_pMagicCircle[i]->Rotate(0, 0, m_eTime * 100);
+			//m_pMagicCircle[i]->Animate(m_fElapsedTime);
+			m_pMagicCircle[i]->Render(pd3dCommandList, pCamera);
+
+		}
 	}
 
 

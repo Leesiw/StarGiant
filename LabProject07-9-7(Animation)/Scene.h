@@ -235,6 +235,8 @@ public:
 	CFlameParticleObject* m_pFlameParticle[MAX_PARTICLES] = {};
 	CSkullObject* m_pSkull[MAX_CIRCLE_PARTICLES] = {};
 	CLineObject* m_pline[MAX_CIRCLE_PARTICLES] = {};
+	CMagicCircleObject* m_pMagicCircle[MAX_CIRCLE_PARTICLES] = {};
+
 
 
 
