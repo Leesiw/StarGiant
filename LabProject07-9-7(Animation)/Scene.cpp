@@ -616,7 +616,17 @@ void CScene::ReleaseObjects()
 	if (m_pTerrain) delete m_pTerrain;
 	if (m_pSkyBox) delete m_pSkyBox;
 	if (m_pParticle) delete[] m_pParticle;
-	if (m_phealParticle) delete[] m_phealParticle;
+
+	if (m_phealParticle)
+	{
+		for (int i = 0; i < MAX_HEAL_PARTICLES; i++)
+		{
+			m_phealParticle[i]->ReleaseShaderVariables();
+			m_phealParticle[i]->Release();
+		}
+		delete[] m_phealParticle;
+	}
+
 
 	if (m_pFlameParticle) delete[] m_pFlameParticle;
 	if (m_pSkull) delete[] m_pSkull;
@@ -1924,17 +1934,20 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	//}
 	//aafsdaa = 1;
 
-	for (int i = 0; i < MAX_FIRE; ++i) {
-		if (!b_Inside) {
-			if (m_pFire[i]) {
-				m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-				m_pFire[i]->SetPosition(m_pPlayer[0]->getSpritePos(i));
-				m_pFire[i]->Animate(m_fElapsedTime);
-				m_pFire[i]->UpdateShaderVariables(pd3dCommandList, m_pFire[i]->GetShaderVariables());
-				m_pFire[i]->Render(pd3dCommandList, pCamera);
-			}
-		}
-	}
+
+
+	//미안 모르겠어
+	//for (int i = 0; i < MAX_FIRE; ++i) {
+	//	if (!b_Inside) {
+	//		if (m_pFire[i]) {
+	//			m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+	//			m_pFire[i]->SetPosition(m_pPlayer[0]->getSpritePos(i));
+	//			m_pFire[i]->Animate(m_fElapsedTime);
+	//			m_pFire[i]->UpdateShaderVariables(pd3dCommandList, m_pFire[i]->GetShaderVariables());
+	//			m_pFire[i]->Render(pd3dCommandList, pCamera);
+	//		}
+	//	}
+	//}
 
 
 

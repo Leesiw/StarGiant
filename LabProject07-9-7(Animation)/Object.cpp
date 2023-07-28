@@ -2089,22 +2089,20 @@ void CSpriteObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 	//cout << m_ppMaterials[0]->m_ppTextures[0]->m_pRootArgumentInfos[0].m_nRootParameterIndex<<endl;
 	switch (SpriteMode) {
 		case static_cast<int>(SpriteType::Ship):
-			CGameObject::Render(pd3dCommandList, pCamera);
+			//CGameObject::Render(pd3dCommandList, pCamera);
 			SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 			break;
 
 		case static_cast<int>(SpriteType::EnemyBoom):
-			CGameObject::Render(pd3dCommandList, pCamera);
+			//CGameObject::Render(pd3dCommandList, pCamera);
 			SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f)); 
 			//시간 제한 코드 
 			CountDiedTime(1.0f);
 			break;
 		default: break;
 	}
-	UpdateTransform(NULL);
-
-	CGameObject::Render(pd3dCommandList, pCamera);
-	
+	CGameObject::UpdateTransform(NULL);
+	CGameObject::Render(pd3dCommandList, pCamera);	
 }
 
 void CSpriteObject::CountDiedTime(float dieTime)

@@ -464,11 +464,14 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 18, false);
 
-	SetModelSprite(pModel->m_pModelRootObject->m_pChild, pSpriteTexture, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	//SetModelSprite(pModel->m_pModelRootObject->m_pChild, pSpriteTexture, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	SetChild(pModel->m_pModelRootObject, true);
 	cout << "child : " << this->m_pChild << endl;
+	cout << "m_pSibling : " << this->m_pChild->m_pSibling << endl;
+
 
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pModel);
+	m_pSkinnedAnimationController->SetTrackEnable(0, true);
 	/*m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_pSkinnedAnimationController->SetCallbackKeys(0, 1);*/
 
@@ -698,11 +701,14 @@ void CAirplanePlayer::OnPrepareRender()
 void CAirplanePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	for (int i = 0; i < BULLETS; i++)
-		if (m_ppBullets[i]->m_bActive)
-		{
-			m_ppBullets[i]->Render(pd3dCommandList, pCamera); 
-		};
-	for(int i=0; i<2; i++) if(m_pAirSprites[i])m_pAirSprites[i]->CSpriteObject::Render(pd3dCommandList, pCamera);
+		if(m_ppBullets[i])
+			if (m_ppBullets[i]->m_bActive)
+			{
+				m_ppBullets[i]->Render(pd3dCommandList, pCamera); 
+			};
+//	for(int i=0; i<2; i++) if(m_pAirSprites[i])m_pAirSprites[i]->CSpriteObject::Render(pd3dCommandList, pCamera);
+
+
 
 	CPlayer::Render(pd3dCommandList, pCamera);
 
@@ -915,7 +921,7 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	m_pSkinnedAnimationController->SetTrackAnimationSet(3, 3);
 
 
-	m_pSkinnedAnimationController->SetTrackEnable(1, false);
+	m_pSkinnedAnimationController->SetTrackEnable(0, false);
 	m_pSkinnedAnimationController->SetTrackEnable(1, false);
 	m_pSkinnedAnimationController->SetTrackEnable(2, false);
 	m_pSkinnedAnimationController->SetTrackEnable(3, false);
