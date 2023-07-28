@@ -128,6 +128,13 @@ public:
 
 
 
+
+
+
+	void clear();
+
+
+
 protected:
 	ID3D12RootSignature					*m_pd3dGraphicsRootSignature = NULL;
 
@@ -182,7 +189,6 @@ public:
 
 	Boss* m_ppBoss = NULL;
 	God* m_ppGod = NULL;
-	CGameObject* Head = NULL;
 
 
 

@@ -336,6 +336,7 @@ void Boss::ChangeAnimation(BossAnimation CurMotion)
 
 		if (CurMotion == BossAnimation::SCREAM && onceScream) {
 			soundon = static_cast<int>(Sounds::ROAR);
+			onceScream = false;
 		}
 
 		else if (CurMotion == BossAnimation::BASIC_ATTACT) {

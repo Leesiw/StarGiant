@@ -1722,7 +1722,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 
 
-		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
+		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM && m_ppBoss->onceScream) {
 
 			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
 		}
@@ -2250,4 +2250,12 @@ void CScene::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 		D3D12_GPU_VIRTUAL_ADDRESS d3dcbLightsGpuVirtualAddress = m_pd3dcbLights->GetGPUVirtualAddress();
 		pd3dCommandList->SetGraphicsRootConstantBufferView(2, d3dcbLightsGpuVirtualAddress); //Lights
 	}
+}
+
+
+
+
+void CScene::clear()
+{
+	//씬 초기화
 }

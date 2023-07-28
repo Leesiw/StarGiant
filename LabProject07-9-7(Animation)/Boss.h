@@ -49,6 +49,7 @@ public:
 	char soundon = -1;
 	char soundo0nPAST = -1;
 	CGameObject* m_pHead = NULL; //대가리 위치
+	bool onceScream = true;
 
 	
 protected:
@@ -64,7 +65,6 @@ protected:
 	float           			m_fMaxVelocityXZ = 0.0f;
 	float           			m_fMaxVelocityY = 0.0f;
 
-	bool onceScream = true;
 
 public:
 	void BossObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel);
