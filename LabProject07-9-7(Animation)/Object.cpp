@@ -1914,8 +1914,6 @@ void CBulletObject::Reset()
 
 CMissileObject::CMissileObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
 {
-	m_xmf4x4Rotate = Matrix4x4::Identity();
-
 	CLoadedModelInfo* pBulletModel = pModel;
 	if (!pBulletModel) pBulletModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/cube.bin", NULL);
 
@@ -1937,7 +1935,7 @@ void CMissileObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	float pitch = XMConvertToDegrees(asin(-new_pos.y));
 	float yaw = XMConvertToDegrees(atan2(new_pos.x, new_pos.z));
 
-	float rotate_angle = fTimeElapsed * 360.f;
+	float rotate_angle = fTimeElapsed * 180.f;
 
 	XMFLOAT3 p_y_r{ pitch, yaw, 0.f };
 	if (Vector3::Length(p_y_r) > rotate_angle) {
@@ -1951,48 +1949,10 @@ void CMissileObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	UpdateTransform(NULL);
 }
 
-void CMissileObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
-{
-	if (pxmf4x4Parent) {
-
-		XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(m_xmf4x4ToParent, *pxmf4x4Parent);
-		m_xmf4x4World = Matrix4x4::Multiply(m_xmf4x4Rotate, xmf4x4);
-	}
-	else {
-		m_xmf4x4World = Matrix4x4::Multiply(m_xmf4x4Rotate, m_xmf4x4ToParent);
-	}
-
-	if (m_pSibling) m_pSibling->UpdateTransform(pxmf4x4Parent);
-	if (m_pChild) m_pChild->UpdateTransform(&m_xmf4x4World);
-}
-
-void CMissileObject::Rotate(float fPitch, float fYaw, float fRoll)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
-void CMissileObject::Rotate(XMFLOAT3* pxmf3Axis, float fAngle)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(pxmf3Axis), XMConvertToRadians(fAngle));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
-void CMissileObject::Rotate(XMFLOAT4* pxmf4Quaternion)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationQuaternion(XMLoadFloat4(pxmf4Quaternion));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
 void CMissileObject::ResetRotate()
 {
-	m_xmf4x4Rotate = Matrix4x4::Identity();
+	m_xmf4x4World = Matrix4x4::Identity();
+	m_xmf4x4ToParent = Matrix4x4::Identity();
 }
 
 //================================================
