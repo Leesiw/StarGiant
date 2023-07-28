@@ -636,6 +636,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (clients[c_id].type == PlayerType::INSIDE) {
 			if (clients[c_id].room_id == -1) { break; }
 			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+			if (levels[scene->cur_mission].cutscene) { break; }
 			float yaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
 			if (yaw != p->data.yaw)
 			{
