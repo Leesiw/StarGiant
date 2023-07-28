@@ -523,7 +523,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			}  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
 			else if (num == 0) {
 				if (scene->_state == SCENE_FREE) {
-					scene_manager.GetScene(scene_num)->_state = SCENE_ALLOC;
+					scene->_state = SCENE_ALLOC;
 				}
 			}
 			scene->_s_lock.unlock();
@@ -541,7 +541,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		packet.type = SC_ADD_PLAYER;
 		packet.size = sizeof(packet);
 		packet.data.id = clients[c_id].room_pid;
-		CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+		CScene* scene = scene_manager.GetScene(scene_num);
 		packet.data.yaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
 		packet.data.player_type = clients[c_id].type;
 		packet.data.x = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition().x;
@@ -596,10 +596,12 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	}
 	case CS_CHANGE: {
 		CS_CHANGE_PACKET* p = reinterpret_cast<CS_CHANGE_PACKET*>(packet);
-		if (clients[c_id].room_id == -1) { break; }
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id == -1) { break; }
+		CScene* scene = scene_manager.GetScene(t_room_id);
+
 		if (p->player_type == PlayerType::INSIDE)
 		{
-			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
 			if (clients[c_id].type >= PlayerType::MOVE) {
 				char sit_num = (char)clients[c_id].type - (char)PlayerType::MOVE;
 				scene->can_sit[sit_num] = true;
@@ -626,7 +628,6 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		else
 		{
-			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
 			char sit_num = (char)p->player_type - (char)PlayerType::MOVE;
 			bool o_state = true;
 			if (false == atomic_compare_exchange_strong(&scene->can_sit[sit_num], &o_state, false))
@@ -635,7 +636,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			clients[c_id].type = p->player_type;
 
 			// 미션
-			if (scene_manager.GetScene(clients[c_id].room_id)->cur_mission == MissionType::TU_SIT && p->player_type == PlayerType::MOVE)
+			if (scene->cur_mission == MissionType::TU_SIT && p->player_type == PlayerType::MOVE)
 			{
 				scene->SetMission(MissionType::TU_KILL);
 			}
