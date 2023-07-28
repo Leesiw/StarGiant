@@ -463,39 +463,32 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			scene->_plist_lock.unlock();
 		}
 
-
+		scene_manager._scene_lock.lock();
+		short scene_num = -1;
 		if (p->room_id != -1) {
-			scene_manager._scene_lock.lock();
-			short scene_num = scene_manager.FindScene(p->room_id, c_id);
-
-			if (scene_num >= 0) {
-				char num = scene_manager.InsertPlayer(scene_num, c_id);
-				//if (num == 2) { scene_manager.SceneStart(scene_num); }
-				if (num == -1) { disconnect(c_id); return; }  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
-				else if(num == 0) {
-					CScene* scene = scene_manager.GetScene(scene_num);
-					scene->_s_lock.lock();
-					if (scene->_state == SCENE_FREE) {
-						scene_manager.GetScene(scene_num)->_state = SCENE_ALLOC;
-					}
-					scene->_s_lock.unlock();
-				}
-			}
-			else {
-				disconnect(c_id);	return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
-			}
-			scene_manager._scene_lock.unlock();
+			scene_num = scene_manager.FindScene(p->room_id, c_id);
 		}
 		else {
-			scene_manager._scene_lock.lock();
-			short scene_num = scene_manager.FindScene(c_id);
-			scene_manager._scene_lock.unlock();
-			if(scene_num == -1) {
-				disconnect(c_id);	return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
-			}
-
-			// 자동 배정 (비어있는 Scene 혹은 비어있는 자리)
+			scene_num = scene_manager.FindScene(c_id);	// auto match
 		}
+
+		if (scene_num >= 0) {
+			CScene* scene = scene_manager.GetScene(scene_num);
+			scene->_s_lock.lock();
+			char num = scene_manager.InsertPlayer(scene_num, c_id);
+			if (num == -1) { disconnect(c_id); scene->_s_lock.unlock(); return; }  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
+			else if (num == 0) {
+				if (scene->_state == SCENE_FREE) {
+					scene_manager.GetScene(scene_num)->_state = SCENE_ALLOC;
+				}
+			}
+			scene->_s_lock.unlock();
+		}
+		else {
+			disconnect(c_id);	
+			return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
+		}
+		scene_manager._scene_lock.unlock();
 
 		clients[c_id].send_login_info_packet();
 

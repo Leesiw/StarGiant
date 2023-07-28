@@ -1794,13 +1794,5 @@ char CScene::InsertPlayer(short pl_id)
 	}
 	_plist_lock.unlock();
 
-	_s_lock.lock();
-	if (_state == SCENE_INGAME) {
-		clients[pl_id]._s_lock.lock();
-		clients[pl_id]._state = ST_INGAME;
-		clients[pl_id]._s_lock.unlock();
-	}
-	_s_lock.unlock();
-
 	return -1;
 }
