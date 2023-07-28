@@ -655,9 +655,10 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_SPACESHIP_QUATERNION: {
 		CS_SPACESHIP_QUATERNION_PACKET* p = reinterpret_cast<CS_SPACESHIP_QUATERNION_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::MOVE) {
-			if (clients[c_id].room_id == -1) { break; }
 			if (isnan(p->Quaternion.w) || isnan(p->Quaternion.x) || isnan(p->Quaternion.y) || isnan(p->Quaternion.z)) { break; }
-			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+			short t_room_id = clients[c_id].room_id;
+			if (t_room_id == -1) { break; }
+			CScene* scene = scene_manager.GetScene(t_room_id);
 			scene->m_pSpaceship->SetInputInfo(p->Quaternion);
 			
 			for (auto pl : scene->_plist) {
@@ -672,16 +673,18 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_KEY_INPUT: {
 		CS_KEY_INPUT_PACKET* p = reinterpret_cast<CS_KEY_INPUT_PACKET*>(packet);
 		if (clients[c_id].type != PlayerType::MOVE) { break; }
-		if (clients[c_id].room_id == -1) { break; }
-		CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id == -1) { break; }
+		CScene* scene = scene_manager.GetScene(t_room_id);
 		scene->m_pSpaceship->SetKeyInput(p->key);
 		break;
 	}
 	case CS_INSIDE_MOVE: {
 		CS_INSIDE_PACKET* p = reinterpret_cast<CS_INSIDE_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::INSIDE) {
-			if (clients[c_id].room_id == -1) { break; }
-			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+			short t_room_id = clients[c_id].room_id;
+			if (t_room_id == -1) { break; }
+			CScene* scene = scene_manager.GetScene(t_room_id);
 			if (levels[scene->cur_mission].cutscene) { break; }
 			float yaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
 			if (yaw != p->data.yaw)
@@ -713,17 +716,18 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		break;
 	}
 	case CS_ATTACK: {
-		if (clients[c_id].room_id == -1) { break; }
-		CScene* m_pScene = scene_manager.GetScene(clients[c_id].room_id);
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id == -1) { break; }
+		CScene* scene = scene_manager.GetScene(t_room_id);
 
 		CS_ATTACK_PACKET* p = reinterpret_cast<CS_ATTACK_PACKET*>(packet);
 		if (isnan(p->data.direction.x) || isnan(p->data.direction.y) || isnan(p->data.direction.z)) { break; }
 		if (clients[c_id].type >= PlayerType::ATTACK1 && clients[c_id].type <= PlayerType::ATTACK3) {
 			//if (m_pScene->m_pSpaceship->CanAttack((short)clients[c_id].type - (short)PlayerType::ATTACK1)) {
-			m_pScene->CheckEnemyByBulletCollisions(p->data);
-			m_pScene->CheckMeteoByBulletCollisions(p->data);
+			scene->CheckEnemyByBulletCollisions(p->data);
+			scene->CheckMeteoByBulletCollisions(p->data);
 
-			for (short pl_id : m_pScene->_plist) {
+			for (short pl_id : scene->_plist) {
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
 				clients[pl_id].send_bullet_packet( p->data.pos, p->data.direction, p->attack_time);
@@ -734,9 +738,10 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		break;
 	}
 	case CS_HEAL: {
-		if (clients[c_id].room_id == -1) { break; }
 		CS_HEAL_PACKET* p = reinterpret_cast<CS_HEAL_PACKET*>(packet);
-		CScene* m_pScene = scene_manager.GetScene(clients[c_id].room_id);
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id == -1) { break; }
+		CScene* m_pScene = scene_manager.GetScene(t_room_id);
 
 		if (p->start) {
 			char o_state = -1;
@@ -763,32 +768,36 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		break;
 	}
 	case CS_NEXT_MISSION: {
-		if (clients[c_id].room_id == -1) { break; }
-		scene_manager.GetScene(clients[c_id].room_id)->MissionClear();
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id == -1) { break; }
+		scene_manager.GetScene(t_room_id)->MissionClear();
 		break;
 	}
 	case CS_INVINCIBLE_MODE: {
-		if (clients[c_id].room_id == -1) { break; }
-		scene_manager.GetScene(clients[c_id].room_id)->ChangeInvincibleMode();
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id == -1) { break; }
+		scene_manager.GetScene(t_room_id)->ChangeInvincibleMode();
 		break;
 	}
 	case CS_START: {
-		if (clients[c_id].room_id != -1) {
-			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
-			scene->Start();
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id == -1) { break; }
+		CScene* scene = scene_manager.GetScene(t_room_id);
+		scene->Start();
 
-			SC_START_PACKET packet{};
-			packet.size = sizeof(SC_START_PACKET);
-			packet.type = SC_START;
+		SC_START_PACKET packet{};
+		packet.size = sizeof(SC_START_PACKET);
+		packet.type = SC_START;
 
-			//printf("start %d\n", clients[c_id].room_id);
-			scene->Send((char*)&packet);
-		}
+		//printf("start %d\n", clients[c_id].room_id);
+		scene->Send((char*)&packet);
 		break;
 	}
 	case CS_ANIMATION_CHANGE: {
-		if (clients[c_id].room_id == -1) { break; }
-		CScene* m_pScene = scene_manager.GetScene(clients[c_id].room_id);
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id == -1) { break; }
+		CScene* m_pScene = scene_manager.GetScene(t_room_id);
+
 		CS_ANIMATION_CHANGE_PACKET* p = reinterpret_cast<CS_ANIMATION_CHANGE_PACKET*>(packet);
 		for (auto pl : m_pScene->_plist) {
 			if (pl == -1) { continue; }
@@ -798,24 +807,24 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		break;
 	}
 	case CS_CUTSCENE_END: {
-		if (clients[c_id].room_id != -1) {
-			CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
-			if (levels[scene->cur_mission].cutscene) {
-				scene->m_ppPlayers[clients[c_id].room_pid]->cutscene_end = true;
-				char num = 0;
-				for (char i = 0; i < 3; ++i) {
-					if (scene->m_ppPlayers[i]->cutscene_end) {
-						++num;
-					}
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id == -1) { break; }
+		CScene* scene = scene_manager.GetScene(t_room_id);
+		if (levels[scene->cur_mission].cutscene) {
+			scene->m_ppPlayers[clients[c_id].room_pid]->cutscene_end = true;
+			char num = 0;
+			for (char i = 0; i < 3; ++i) {
+				if (scene->m_ppPlayers[i]->cutscene_end) {
+					++num;
 				}
-
-				SC_CUTSCENE_END_NUM_PACKET packet{};
-				packet.size = sizeof(SC_CUTSCENE_END_NUM_PACKET);
-				packet.type = SC_CUTSCENE_END_NUM;
-				packet.num = num;
-				scene->Send((char*)& packet);
 			}
-		}	
+
+			SC_CUTSCENE_END_NUM_PACKET packet{};
+			packet.size = sizeof(SC_CUTSCENE_END_NUM_PACKET);
+			packet.type = SC_CUTSCENE_END_NUM;
+			packet.num = num;
+			scene->Send((char*)&packet);
+		}
 		break;
 	}
 	}
@@ -962,8 +971,11 @@ void CGameFramework::disconnect(int c_id)
 	p.type = SC_REMOVE_PLAYER;
 
 	lock_guard<mutex> ll(clients[c_id]._s_lock);
-	if (clients[c_id].room_id != -1) {
-		CScene* scene = scene_manager.GetScene(clients[c_id].room_id);
+	
+	short t_room_id = clients[c_id].room_id;
+
+	if (t_room_id != -1) {
+		CScene* scene = scene_manager.GetScene(t_room_id);
 		scene->Send((char*)&p);
 
 		if (scene->heal_player == clients[c_id].room_pid) {
