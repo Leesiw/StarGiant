@@ -615,9 +615,9 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			scene->m_pSpaceship->SetInputInfo(p->Quaternion);
 			
 			for (auto pl : scene->_plist) {
-				if (pl == -1) { break; }
-				if (pl == c_id) { break; }
-				if (clients[pl]._state != ST_INGAME) { break; }
+				if (pl == -1) { continue; }
+				if (pl == c_id) { continue; }
+				if (clients[pl]._state != ST_INGAME) { continue; }
 				clients[pl].send_spaceship_quaternion_packet(p->Quaternion);
 			}
 		}
