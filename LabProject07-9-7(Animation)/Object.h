@@ -753,14 +753,6 @@ public:
 
 	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
 
-	XMFLOAT4X4 m_xmf4x4Rotate;
-
-	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
-
-	virtual void Rotate(float x, float y, float z);
-	virtual void Rotate(XMFLOAT3* pxmf3Axis, float fAngle);
-	virtual void Rotate(XMFLOAT4* pxmf4Quaternion);
-
 	void ResetRotate();
 };
 
