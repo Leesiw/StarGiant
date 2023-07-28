@@ -50,8 +50,8 @@ INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 //
 //	return pixInstallationPath / newestVersionFound / L"WinPixGpuCapturer.dll";
 //}
-//
-//
+
+
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {

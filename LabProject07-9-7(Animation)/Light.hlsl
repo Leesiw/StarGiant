@@ -46,7 +46,7 @@ cbuffer cbLights : register(b4)
 	int						gnLights;
 };
 
-Texture2D<float> gtxtDepthTextures[MAX_DEPTH_TEXTURES] : register(t2); //¹Ù²ã¾ßÇÔ 
+Texture2D<float> gtxtDepthTextures[MAX_DEPTH_TEXTURES] : register(t18); //¹Ù²ã¾ßÇÔ 
 SamplerComparisonState gssComparisonPCFShadow : register(s2);
 //
 #define _WITH_PCF_FILTERING

@@ -441,7 +441,7 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	CTexture* pSpriteTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);//Laser_sprite_8
 	pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Explode_8x8.dds", 0);//Explode_8x8
 
-	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 20, false);
+	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 18, false);
 
 	SetModelSprite(pModel->m_pModelRootObject->m_pChild, pSpriteTexture, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	SetChild(pModel->m_pModelRootObject, true);

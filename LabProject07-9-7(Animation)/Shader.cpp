@@ -1398,7 +1398,7 @@ D3D12_INPUT_LAYOUT_DESC CFireShader::CreateInputLayout()
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
 
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[1] = { "TEXCOORD0", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
@@ -1738,62 +1738,63 @@ void CDepthRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommand
 {
 	for (int j = 0; j < MAX_GODRAY_LIGHTS; j++)
 	{
-		//if (!m_pLights[j].m_bEnable)
-		//{
-		//	XMFLOAT3 xmf3Position = XMFLOAT3(-14.66f, 224.0f, 694.f);//m_pLights[j].m_xmf3Position;
-		//	XMFLOAT3 xmf3Look = m_pLights[j].m_xmf3Direction;
-		//	XMFLOAT3 xmf3Up = XMFLOAT3(+1.0f, 0.0f, 1.0f);
+		if (!m_pLights[j].m_bEnable)
+		{
+			XMFLOAT3 xmf3Position = XMFLOAT3(430.219f, 244.f, 693.263f);//m_pLights[j].m_xmf3Position;
+			XMFLOAT3 xmf3Look = m_pLights[j].m_xmf3Direction;
+			XMFLOAT3 xmf3Up = XMFLOAT3(+0.0f, -1.0f, 0.0f);
 
-		//	XMMATRIX xmmtxView = XMMatrixLookToLH(XMLoadFloat3(&xmf3Position), XMLoadFloat3(&xmf3Look), XMLoadFloat3(&xmf3Up));
+			XMMATRIX xmmtxView = XMMatrixLookToLH(XMLoadFloat3(&xmf3Position), XMLoadFloat3(&xmf3Look), XMLoadFloat3(&xmf3Up));
 
-		//	float fNearPlaneDistance = 10.0f, fFarPlaneDistance = m_pLights[j].m_fRange;
+			float fNearPlaneDistance = 10.0f, fFarPlaneDistance = m_pLights[j].m_fRange;
 
-		//	XMMATRIX xmmtxProjection;
-		//	if (m_pLights[j].m_nType == DIRECTIONAL_LIGHT)
-		//	{
-		//		float fWidth = 1024, fHeight = 1024;
-		//		xmmtxProjection = XMMatrixOrthographicLH(fWidth, fHeight, fNearPlaneDistance, fFarPlaneDistance);
-		//		//float fLeft = -(_PLANE_WIDTH * 0.5f), fRight = +(_PLANE_WIDTH * 0.5f), fTop = +(_PLANE_HEIGHT * 0.5f), fBottom = -(_PLANE_HEIGHT * 0.5f);
-		//		//xmmtxProjection = XMMatrixOrthographicOffCenterLH(fLeft * 6.0f, fRight * 6.0f, fBottom * 6.0f, fTop * 6.0f, fBack, fFront);
-		//	}
-		//	else if (m_pLights[j].m_nType == SPOT_LIGHT)
-		//	{
-		//		float fFovAngle = 60.0f; // m_pLights->m_pLights[j].m_fPhi = cos(60.0f);
-		//		float fAspectRatio = float(_DEPTH_BUFFER_WIDTH) / float(_DEPTH_BUFFER_HEIGHT);
-		//		xmmtxProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(fFovAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
-		//	}
-		//	else if (m_pLights[j].m_nType == POINT_LIGHT)
-		//	{
-		//		//ShadowMap[6]
-		//	}
+			XMMATRIX xmmtxProjection;
+			if (m_pLights[j].m_nType == DIRECTIONAL_LIGHT)
+			{
+				float fWidth = 1024, fHeight = 1024;
+				xmmtxProjection = XMMatrixOrthographicLH(fWidth, fHeight, fNearPlaneDistance, fFarPlaneDistance);
+				//float fLeft = -(_PLANE_WIDTH * 0.5f), fRight = +(_PLANE_WIDTH * 0.5f), fTop = +(_PLANE_HEIGHT * 0.5f), fBottom = -(_PLANE_HEIGHT * 0.5f);
+				//xmmtxProjection = XMMatrixOrthographicOffCenterLH(fLeft * 6.0f, fRight * 6.0f, fBottom * 6.0f, fTop * 6.0f, fBack, fFront);
+			}
+			else if (m_pLights[j].m_nType == SPOT_LIGHT)
+			{
+				float fFovAngle = 60.0f; // m_pLights->m_pLights[j].m_fPhi = cos(60.0f);
+				float fAspectRatio = float(_DEPTH_BUFFER_WIDTH) / float(_DEPTH_BUFFER_HEIGHT);
+				xmmtxProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(fFovAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
+			}
+			else if (m_pLights[j].m_nType == POINT_LIGHT)
+			{
+				//ShadowMap[6]
+			}
 
-		//	m_ppDepthRenderCameras[j]->SetPosition(xmf3Position);
-		//	XMStoreFloat4x4(&m_ppDepthRenderCameras[j]->m_xmf4x4View, xmmtxView);//m_ppDepthRenderCameras                 ?  ??    
-		//	XMStoreFloat4x4(&m_ppDepthRenderCameras[j]->m_xmf4x4Projection, xmmtxProjection);
+			m_ppDepthRenderCameras[j]->SetPosition(xmf3Position);
+			XMStoreFloat4x4(&m_ppDepthRenderCameras[j]->m_xmf4x4View, xmmtxView);//m_ppDepthRenderCameras                 ?  ??    
+			XMStoreFloat4x4(&m_ppDepthRenderCameras[j]->m_xmf4x4Projection, xmmtxProjection);
 
-		//	XMMATRIX xmmtxToTexture = XMMatrixTranspose(xmmtxView * xmmtxProjection * m_xmProjectionToTexture);
-		//	XMStoreFloat4x4(&m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4x4ToTexture, xmmtxToTexture);
+			XMMATRIX xmmtxToTexture = XMMatrixTranspose(xmmtxView * xmmtxProjection * m_xmProjectionToTexture);
+			XMStoreFloat4x4(&m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4x4ToTexture, xmmtxToTexture);
 
-		//	//m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(xmf3Position.x, xmf3Position.y, xmf3Position.z, 1.0f);
-		//	//임시 조명 위치 
-		//	m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(-14.66f, 224.0f, 694.f, 1.0f);
-		//	::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(j), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			//m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(xmf3Position.x, xmf3Position.y, xmf3Position.z, 1.0f);
+			//임시 조명 위치 
+			m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(-14.66f, 224.0f, 694.f, 1.0f);
+			::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(j), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-		//	FLOAT pfClearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		//	pd3dCommandList->ClearRenderTargetView(m_pd3dRtvCPUDescriptorHandles[j], pfClearColor, 0, NULL);
+			FLOAT pfClearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			//FLOAT pfClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+			pd3dCommandList->ClearRenderTargetView(m_pd3dRtvCPUDescriptorHandles[j], pfClearColor, 0, NULL);
 
-		//	pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
+			pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
 
-		//	pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandles[j], TRUE, &m_d3dDsvDescriptorCPUHandle);
+			pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandles[j], TRUE, &m_d3dDsvDescriptorCPUHandle);
 
-		//	Render(pd3dCommandList, m_ppDepthRenderCameras[j], Map, Player);
+			Render(pd3dCommandList, m_ppDepthRenderCameras[j], Map, Player);
 
-		//	::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(j), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON);
-		//}
-		//else
-		//{
-		//	m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position.w = 0.0f;
-		//}
+			::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(j), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON);
+		}
+		else
+		{
+			m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position.w = 0.0f;
+		}
 	}
 }
 
@@ -1896,6 +1897,22 @@ D3D12_SHADER_BYTECODE CShadowMapShader::CreateGeometryShader(ID3DBlob** ppd3dSha
 	return(d3dShaderByteCode);
 }
 
+D3D12_INPUT_LAYOUT_DESC CShadowMapShader::CreateInputLayout()
+{
+	UINT nInputElementDescs = 2;
+	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+
+	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+
+	return(d3dInputLayoutDesc);
+}
+
 
 void CShadowMapShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
@@ -1936,13 +1953,13 @@ void CShadowMapShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 
 	UpdateShaderVariables(pd3dCommandList);
 
-	/*for (int i = 0; i < 2; i++) {
-		Map[i]->Render(pd3dCommandList, pCamera);
+	//for (int i = 0; i < 2; i++) {
+	//	Map[i]->Render(pd3dCommandList, pCamera);
 
-	}*/
-	for (int i = 0; i < 3; i++) {
+	//}
+	/*for (int i = 0; i < 3; i++) {
 		Player[i]->Render(pd3dCommandList, pCamera);
-	}
+	}*/
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

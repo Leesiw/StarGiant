@@ -585,22 +585,22 @@ float4 PS_PARTICLE(VS_PARTICLE_OUTPUT input) : SV_TARGET
 //
 SamplerState gssFIRE1 : register(s4);
 SamplerState gssFIRE2 : register(s5);
-cbuffer NoiseBuffer
-{
-	float frameTime = 0;
-	float3 scrollSpeeds = { 1.3f, 2.1f, 2.3f };
-	float3 scales = { 1.0f, 2.0f, 3.0f };
-	float padding = 0;
-};
-
-cbuffer DistortionBuffer
-{
-	float2 distortion1 = { 0.1f, 0.2f };
-	float2 distortion2 = { 0.1f, 0.3f };
-	float2 distortion3 = { 0.1f, 0.1f };
-	float distortionScale = 0.8f;
-	float distortionBias = 0.5f;
-};
+//cbuffer NoiseBuffer
+//{
+//	float frameTime = 0;
+//	float3 scrollSpeeds = { 1.3f, 2.1f, 2.3f };
+//	float3 scales = { 1.0f, 2.0f, 3.0f };
+//	float padding = 0;
+//};
+//
+//cbuffer DistortionBuffer
+//{
+//	float2 distortion1 = { 0.1f, 0.2f };
+//	float2 distortion2 = { 0.1f, 0.3f };
+//	float2 distortion3 = { 0.1f, 0.1f };
+//	float distortionScale = 0.8f;
+//	float distortionBias = 0.5f;
+//};
 
 
 Texture2D gtxtFIRETexture : register(t20);
@@ -610,7 +610,7 @@ Texture2D gtxtNoiseTexture : register(t22);
 struct VS_FIRE_INPUT
 {
 	float3 position : POSITION;
-	float2 uv : TEXCOORD0;
+	float2 uv : TEXCOORD;
 };
 
 struct VS_FIRE_OUTPUT
@@ -624,6 +624,10 @@ struct VS_FIRE_OUTPUT
 
 VS_FIRE_OUTPUT VS_FIRE(VS_FIRE_INPUT input)
 {
+	float frameTime = 0;
+	float3 scrollSpeeds = { 1.3f, 2.1f, 2.3f };
+	float3 scales = { 1.0f, 2.0f, 3.0f };
+
 	VS_FIRE_OUTPUT output;
 
 	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
@@ -652,6 +656,13 @@ float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
 	float2 noiseCoords;
 	float4 fireColor;
 	float4 alphaColor;
+	float frameTime = 0;
+
+		float2 distortion1 = { 0.1f, 0.2f };
+		float2 distortion2 = { 0.1f, 0.3f };
+		float2 distortion3 = { 0.1f, 0.1f };
+		float distortionScale = 0.8f;
+		float distortionBias = 0.5f;
 
 	noise1 = gtxtNoiseTexture.Sample(gssFIRE1, input.uv1);
 	noise2 = gtxtNoiseTexture.Sample(gssFIRE1, input.uv2);
@@ -681,8 +692,8 @@ float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
 
 	fireColor.a = alphaColor;
 
-	return fireColor;
-	//return float4(1.0f,1.0f,0.0f,1.0f);
+	//return fireColor;
+	return float4(1.0f,1.0f,0.0f,1.0f);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -765,32 +776,32 @@ VS_SHADOW_MAP_OUTPUT VSShadowMapShadow(VS_LIGHTING_INPUT input)
 	return(output);
 }
 
-float4 PSShadowMapShadow(VS_SHADOW_MAP_OUTPUT input) : SV_TARGET
-{
-	float4 cIllumination = LightingLight(input.positionW, normalize(input.normalW), true, input.uvs);
-
-	return(cIllumination);
-}
-//
 //float4 PSShadowMapShadow(VS_SHADOW_MAP_OUTPUT input) : SV_TARGET
 //{
-//	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-//	if (gnTexturesMask & MATERIAL_ALBEDO_MAP) cAlbedoColor = gtxtAlbedoTexture.Sample(gssWrap, input.uvs[0].xy);
-//	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-//	if (gnTexturesMask & MATERIAL_SPECULAR_MAP) cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uvs[0].xy);
-//	float4 cNormalColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-//	if (gnTexturesMask & MATERIAL_NORMAL_MAP) cNormalColor = gtxtNormalTexture.Sample(gssWrap, input.uvs[0].xy);
-//	float4 cMetallicColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-//	if (gnTexturesMask & MATERIAL_METALLIC_MAP) cMetallicColor = gtxtMetallicTexture.Sample(gssWrap, input.uvs[0].xy);
-//	float4 cEmissionColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-//	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxtEmissionTexture.Sample(gssWrap, input.uvs[0].xy);
+//	float4 cIllumination = LightingLight(input.positionW, normalize(input.normalW), true, input.uvs);
 //
-//	float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
-//
-//	float4 cIllumination = shadowLighting(input.positionW, normalize(input.normalW), true, input.uvs);
-//
-//	return(lerp(cColor, cIllumination, 0.5f));
+//	return(cIllumination);
 //}
+//
+float4 PSShadowMapShadow(VS_SHADOW_MAP_OUTPUT input) : SV_TARGET
+{
+	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	if (gnTexturesMask & MATERIAL_ALBEDO_MAP) cAlbedoColor = gtxtAlbedoTexture.Sample(gssWrap, input.uvs[0].xy);
+	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	if (gnTexturesMask & MATERIAL_SPECULAR_MAP) cSpecularColor = gtxtSpecularTexture.Sample(gssWrap, input.uvs[0].xy);
+	float4 cNormalColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	if (gnTexturesMask & MATERIAL_NORMAL_MAP) cNormalColor = gtxtNormalTexture.Sample(gssWrap, input.uvs[0].xy);
+	float4 cMetallicColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	if (gnTexturesMask & MATERIAL_METALLIC_MAP) cMetallicColor = gtxtMetallicTexture.Sample(gssWrap, input.uvs[0].xy);
+	float4 cEmissionColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxtEmissionTexture.Sample(gssWrap, input.uvs[0].xy);
+
+	float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
+
+	float4 cIllumination = shadowLighting(input.positionW, normalize(input.normalW), true, input.uvs);
+
+	return(lerp(cColor, cIllumination, 0.5f));
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
