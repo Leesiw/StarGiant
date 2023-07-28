@@ -565,7 +565,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			clients[c_id].type = PlayerType::INSIDE;
 
 			SC_LOGIN_INFO_PACKET packet{};
-			packet.data.id = c_id;
+			packet.data.id = clients[c_id].room_pid;
 			packet.data.player_type = p->player_type;
 			packet.size = sizeof(SC_LOGIN_INFO_PACKET);
 			packet.type = SC_CHANGE;
