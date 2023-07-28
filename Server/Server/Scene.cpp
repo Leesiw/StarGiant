@@ -610,12 +610,12 @@ void CScene::MissionClear()
 					timer_queue.push(ev);
 				}
 			}
-			else if (cur_mission == MissionType::CS_ANGRY_BOSS || cur_mission == MissionType::CS_BOSS_SCREAM) {
-				if (cur_mission == MissionType::CS_BOSS_SCREAM) {
-					m_pBoss->SetPosition(2300.f, 0.f, 0.f);
-					m_pBoss->BossHP = 100;
-					m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
-				}
+			else if (cur_mission == MissionType::CS_BOSS_SCREAM) {
+				
+				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
+				m_pBoss->BossHP = 100;
+				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
+				
 				if (!boss_timer_on) {
 					boss_timer_on = true;
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
@@ -623,7 +623,7 @@ void CScene::MissionClear()
 				}
 			}
 		}
-		else if (cur_mission == MissionType::FIND_BOSS || cur_mission == MissionType::DEFEAT_BOSS) {
+		else if (cur_mission == MissionType::FIND_BOSS) {
 			if (!boss_timer_on) {
 				boss_timer_on = true;
 				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
@@ -683,13 +683,11 @@ void CScene::SetMission(MissionType mission)
 					timer_queue.push(ev);
 				}
 			}
-			else if (cur_mission == MissionType::CS_ANGRY_BOSS || cur_mission == MissionType::CS_BOSS_SCREAM) {
-				if (cur_mission == MissionType::CS_BOSS_SCREAM) {
-					m_pBoss->SetPosition(2300.f, 0.f, 0.f);
-					m_pBoss->BossHP = 100;
-					m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
-
-				}
+			else if (cur_mission == MissionType::CS_BOSS_SCREAM) {
+				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
+				m_pBoss->BossHP = 100;
+				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
+				
 				if (!boss_timer_on) {
 					boss_timer_on = true;
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
@@ -697,7 +695,7 @@ void CScene::SetMission(MissionType mission)
 				}
 			}
 		}
-		else if (cur_mission == MissionType::FIND_BOSS || cur_mission == MissionType::DEFEAT_BOSS) {
+		else if (cur_mission == MissionType::FIND_BOSS) {
 
 			if (!boss_timer_on) {
 				boss_timer_on = true;
@@ -1175,7 +1173,7 @@ void CScene::UpdateBoss()
 {
 	if (_state != ST_INGAME) { boss_timer_on = false;  return; }
 	if (cur_mission != MissionType::DEFEAT_BOSS && cur_mission != MissionType::CS_BOSS_SCREAM && cur_mission != MissionType::CS_ANGRY_BOSS 
-		&& cur_mission != MissionType::FIND_BOSS) { boss_timer_on = false; return; }
+		&& cur_mission != MissionType::FIND_BOSS && cur_mission != MissionType::DEFEAT_BOSS2) { boss_timer_on = false; return; }
 	if (m_pBoss->BossHP <= 0) {
 		boss_timer_on = false;
 		SetMission(MissionType::CS_SHOW_STARGIANT);
@@ -1210,7 +1208,8 @@ void CScene::UpdateGod()
 		SetMission(MissionType::CS_ENDING);
 		return;
 	}
-	if (cur_mission != MissionType::KILL_GOD && cur_mission != MissionType::CS_SHOW_GOD && cur_mission != MissionType::CS_ANGRY_GOD) { god_timer_on = false; return; }
+	if (cur_mission != MissionType::KILL_GOD && cur_mission != MissionType::CS_SHOW_GOD && cur_mission != MissionType::CS_ANGRY_GOD
+		&& cur_mission != MissionType::KILL_GOD2) { god_timer_on = false; return; }
 	if (levels[cur_mission].cutscene) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_GOD, static_cast<short>(num) };
 		timer_queue.push(ev);
