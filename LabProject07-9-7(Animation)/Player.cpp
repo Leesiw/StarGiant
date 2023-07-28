@@ -500,6 +500,50 @@ CAirplanePlayer::~CAirplanePlayer()
 {
 }
 
+void CAirplanePlayer::SetChild(CGameObject* pChild, bool bReferenceUpdate)
+{
+	if (pChild)
+	{
+		pChild->m_pParent = this;
+		if (bReferenceUpdate) pChild->AddRef();
+
+	}
+	if (m_pChild)
+	{
+		if (pChild) pChild->m_pSibling = m_pChild->m_pSibling;
+		m_pChild->m_pSibling = pChild;
+
+	}
+	else
+	{
+		m_pChild = pChild;
+
+	}
+}
+
+void CAirplanePlayer::ReleaseUploadBuffers()
+{
+	if (m_pMesh) m_pMesh->ReleaseUploadBuffers();
+
+	for (int i = 0; i < m_nMaterials; i++)
+	{
+		if (m_ppMaterials[i]) m_ppMaterials[i]->ReleaseUploadBuffers();
+	}
+
+	if (m_pSibling != NULL)
+		m_pSibling->ReleaseUploadBuffers();
+	if (m_pChild != NULL)
+		m_pChild->ReleaseUploadBuffers();
+}
+
+void CAirplanePlayer::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
+{
+	m_xmf4x4World = (pxmf4x4Parent) ? Matrix4x4::Multiply(m_xmf4x4ToParent, *pxmf4x4Parent) : m_xmf4x4ToParent;
+
+	if (m_pSibling) m_pSibling->UpdateTransform(pxmf4x4Parent);
+	if (m_pChild) m_pChild->UpdateTransform(&m_xmf4x4World);
+}
+
 void CAirplanePlayer::SetModelSprite(CGameObject* Loot,CTexture* LootTexture, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
 	//모델들의 이름을 다 돌아들어가보면서 이름찾고, 그 이름의 메쉬를 가지고 잇는놈의 텍스처와.... 메쉬를 CSpriteObject로 바꾼다. 
@@ -626,16 +670,14 @@ void CAirplanePlayer::OnPrepareAnimate()
 
 void CAirplanePlayer::Animate(float fTimeElapsed)
 {
-	if (m_pMainRotorFrame)
-	{
-		XMMATRIX xmmtxRotate = XMMatrixRotationY(XMConvertToRadians(360.0f * 2.0f) * fTimeElapsed);
-		m_pMainRotorFrame->m_xmf4x4ToParent = Matrix4x4::Multiply(xmmtxRotate, m_pMainRotorFrame->m_xmf4x4ToParent);
-	}
-	if (m_pTailRotorFrame)
-	{
-		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
-		m_pTailRotorFrame->m_xmf4x4ToParent = Matrix4x4::Multiply(xmmtxRotate, m_pTailRotorFrame->m_xmf4x4ToParent);
-	}
+
+	CPlayer::OnPrepareRender();
+
+	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->AdvanceTime(fTimeElapsed, this);
+
+	if (m_pSibling) m_pSibling->Animate(fTimeElapsed);
+	if (m_pChild) m_pChild->Animate(fTimeElapsed);
+
 
 	for (int i = 0; i < BULLETS; i++)
 	{
@@ -644,7 +686,7 @@ void CAirplanePlayer::Animate(float fTimeElapsed)
 		};
 	}
 
-	CPlayer::Animate(fTimeElapsed);
+
 }
 
 void CAirplanePlayer::OnPrepareRender()
