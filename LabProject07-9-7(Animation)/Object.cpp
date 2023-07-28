@@ -2471,7 +2471,7 @@ CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	CTexturedRectMesh* pFireMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 10.0f, 10.0f, 0.0f);
 	pFireMesh->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	SetMesh(pFireMesh);
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	//CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	CTexture* pfireTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	pfireTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/fire01.dds", 0); // fire mix color

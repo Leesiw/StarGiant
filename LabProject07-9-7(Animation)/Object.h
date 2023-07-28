@@ -920,7 +920,8 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
-	
+	virtual ID3D12Resource* GetShaderVariables() { return m_pcbplusShaderVariable; }
+
 
 private:
 	float ffTimeElapsed = 0.0f;
