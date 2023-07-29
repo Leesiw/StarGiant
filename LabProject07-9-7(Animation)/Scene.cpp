@@ -1563,6 +1563,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 
+
 	//if (!m_pPlayer[g_myid]->setting){
 	//	cout << "setting" << endl;
 	//	m_pPlayer[g_myid]->SetPosition({ 425.f + g_myid * 10, 230.f, 593.263f });
@@ -1585,6 +1586,13 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_ppHierarchicalGameObjects[9]->SetScale(10, 5, 10);
 		m_ppHierarchicalGameObjects[9]->Render(pd3dCommandList, pCamera);
 
+	}
+	if (m_pPlayer[0]->curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
+		m_ppHierarchicalGameObjects[9]->SetPosition(xmf3Position2);
+		m_ppHierarchicalGameObjects[9]->SetLookAt(m_ppBlackhole->GetPosition(), XMFLOAT3(0.0f, 1.0f, 0.0f));
+		m_ppHierarchicalGameObjects[9]->Rotate(180.f, 0.f, 0.f);
+		m_ppHierarchicalGameObjects[9]->SetScale(10, 5, 10);
+		m_ppHierarchicalGameObjects[9]->Render(pd3dCommandList, pCamera);
 	}
 	if (b_Inside) {
 		//m_ppHierarchicalGameObjects[0]->Render(pd3dCommandList, pCamera);
@@ -1750,8 +1758,13 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 
 
-		if(m_fredbosscutTime < 2 && m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT)
-			m_ppBoss->Render(pd3dCommandList, pCamera); 
+		if (m_fredbosscutTime < 2 && m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT) {
+			m_ppBoss->Render(pd3dCommandList, pCamera);
+		}
+		else if(m_pPlayer[0]->curMissionType == MissionType::GO_CENTER) {
+			m_fredbosscutTime = 0;
+		}
+
 	}
 
 	if (landob) {
