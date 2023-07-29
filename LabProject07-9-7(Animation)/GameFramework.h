@@ -163,7 +163,7 @@ private:
 	short firstbSc = 0;
 
 	MissionType curMissionType = MissionType::TU_SIT;
-	MissionType pastMissionType = MissionType::TU_END;
+	MissionType pastMissionType = MissionType::TU_SIT;
 
 	XMFLOAT3 planetPos = {};
 
