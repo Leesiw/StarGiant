@@ -143,8 +143,10 @@ public:
 	void SetBulletFromServer(BULLET_INFO bulletInfo);
 	float						m_fBulletEffectiveRange = 300.0f;
 
-	SPACESHIP_INFO					player_info;
+	XMFLOAT3	player_info;
+	XMFLOAT4	player_quaternion;
 	bool							is_update = true;
+	bool							is_update_q = true;
 	short							hp = 100;
 	short							max_hp = 100;
 	virtual void OnPrepareAnimate();
@@ -157,7 +159,8 @@ private:
 
 public:
 	//¼­¹ö 
-	void SetPlayerInfo(SPACESHIP_INFO p_info) { player_info = p_info; is_update = false; }
+	void SetPlayerInfo(XMFLOAT3 p_pos) { player_info = p_pos; is_update = false; }
+	void SetQuaternion(XMFLOAT4 p_quaternion) { player_quaternion = p_quaternion; is_update_q = false; }
 	void UpdateOnServer(bool rotate_update = true);
 	XMVECTOR GetQuaternion();
 

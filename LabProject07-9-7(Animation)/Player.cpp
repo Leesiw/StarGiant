@@ -717,17 +717,19 @@ void CAirplanePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 void CAirplanePlayer::UpdateOnServer(bool rotate_update)
 {
 	if (!is_update) {
-		SetPosition(player_info.pos);
-		if (rotate_update) {
-			//XMVECTOR a = XMLoadFloat4(&player_info.Quaternion);
-			//XMMATRIX mat = XMMatrixRotationQuaternion(a);
-			//XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(Matrix4x4::Identity(), mat);
-			//m_xmf3Right.x = m_xmf4x4._11; m_xmf3Right.y = m_xmf4x4._12; m_xmf3Right.z = m_xmf4x4._13;
-			//m_xmf3Up.x = m_xmf4x4._21; m_xmf3Up.y = m_xmf4x4._22; m_xmf3Up.z = xmf4x4._23;
-			//m_xmf3Look.x = xmf4x4._31; m_xmf3Look.y = xmf4x4._32; m_xmf3Look.z = xmf4x4._33;
-		}
-		//m_pCamera->Update(player_info.pos, 0);
+		SetPosition(player_info);
 		is_update = true;
+		//m_pCamera->Update(player_info.pos, 0);
+	}
+
+	if (rotate_update && !is_update_q) {
+		XMVECTOR a = XMLoadFloat4(&player_quaternion);
+		XMMATRIX mat = XMMatrixRotationQuaternion(a);
+		XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(Matrix4x4::Identity(), mat);
+		m_xmf3Right.x = xmf4x4._11; m_xmf3Right.y = xmf4x4._12; m_xmf3Right.z = xmf4x4._13;
+		m_xmf3Up.x = xmf4x4._21; m_xmf3Up.y = xmf4x4._22; m_xmf3Up.z = xmf4x4._23;
+		m_xmf3Look.x = xmf4x4._31; m_xmf3Look.y = xmf4x4._32; m_xmf3Look.z = xmf4x4._33;
+		is_update_q = true;
 	}
 }
 

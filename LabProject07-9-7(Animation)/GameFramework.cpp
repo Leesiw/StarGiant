@@ -2749,9 +2749,7 @@ void CGameFramework::ProcessPacket(char* p)
 	case SC_MOVE_SPACESHIP:
 	{
 		SC_MOVE_SPACESHIP_PACKET* packet = reinterpret_cast<SC_MOVE_SPACESHIP_PACKET*>(p);
-		SPACESHIP_INFO info;
-		info.pos = packet->pos;
-		m_pPlayer[0]->SetPlayerInfo(info);
+		m_pPlayer[0]->SetPlayerInfo(packet->pos);
 		//m_pPlayer[0]->SetPosition(packet->pos);
 	//	m_pCamera->Update(m_pPlayer[0]->GetLook(), m_GameTimer.GetTimeElapsed());
 		//m_pPlayer[0]->Update(m_GameTimer.GetTimeElapsed());
@@ -2762,8 +2760,6 @@ void CGameFramework::ProcessPacket(char* p)
 		CS_SPACESHIP_QUATERNION_PACKET* packet = reinterpret_cast<CS_SPACESHIP_QUATERNION_PACKET*>(p);
 		if (player_type == PlayerType::MOVE) { break; }
 		m_pPlayer[0]->SetQuaternion(packet->Quaternion);
-		m_pCamera->Update(m_pPlayer[0]->GetPosition(), m_GameTimer.GetTimeElapsed());
-		m_pPlayer[0]->Update(m_GameTimer.GetTimeElapsed());
 		break;
 	}
 	case SC_MOVE_INSIDEPLAYER:
