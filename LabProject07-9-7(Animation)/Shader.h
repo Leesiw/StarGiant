@@ -442,6 +442,7 @@ public:
 	virtual void ReleaseShaderVariables();
 
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
+	virtual void BuildSceneObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
 	virtual void AnimateObjects(float fTimeElapsed) { }
 	virtual void ReleaseObjects();
 

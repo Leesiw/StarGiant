@@ -481,7 +481,7 @@ void CSceneMapShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pRenderTexture->AddRef();
 
 	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, m_pDepthTexture->GetTextures());
-	CScene::CreateShaderResourceViews(pd3dDevice, m_pRenderTexture, 20, false); //Depth buffer
+	CScene::CreateShaderResourceViews(pd3dDevice, m_pRenderTexture, 13, false); //Depth buffer
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
