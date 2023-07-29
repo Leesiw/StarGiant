@@ -2557,7 +2557,7 @@ void CGameFramework::Reset_game()
 	room_num = 0;
 	roomNum.clear();
 	b_Inside = true;
-
+	curMissionType = MissionType::TU_SIT;
 	cout << "reset game\n";
 }
 
