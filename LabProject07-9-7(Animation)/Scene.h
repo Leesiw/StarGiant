@@ -9,6 +9,7 @@
 #include "UI.h"
 #include "Boss.h"
 #include "God.h"
+#include "GodRay.h"
 
 
 #define MAX_LIGHTS						16 

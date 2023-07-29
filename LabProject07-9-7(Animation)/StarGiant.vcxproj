@@ -163,7 +163,12 @@
     <ClInclude Include="DDSTextureLoader12.h" />
     <ClInclude Include="Frustrum.h" />
     <ClInclude Include="GameFramework.h" />
-    <ClInclude Include="God.h" />
+    <ClInclude Include="God.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="GodRay.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Sound.h" />
     <ClInclude Include="StarGiant.h" />
     <ClInclude Include="Mesh.h" />
@@ -186,6 +191,7 @@
     <ClCompile Include="Frustrum.cpp" />
     <ClCompile Include="GameFramework.cpp" />
     <ClCompile Include="God.cpp" />
+    <ClCompile Include="GodRay.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="StarGiant.cpp" />
     <ClCompile Include="Mesh.cpp" />
