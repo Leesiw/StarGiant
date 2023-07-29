@@ -501,6 +501,7 @@ void CScene::MissionClear()
 		}
 		else if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
 			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
+			black_hole_time = 30.f;
 
 			SC_BLACK_HOLE_PACKET p{};
 			p.size = sizeof(SC_BLACK_HOLE_PACKET);
@@ -584,7 +585,8 @@ void CScene::SetMission(MissionType mission)
 		}
 		else if (mission == MissionType::ESCAPE_BLACK_HOLE) {
 			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
-			
+			black_hole_time = 30.f;
+
 			SC_BLACK_HOLE_PACKET p{};
 			p.size = sizeof(SC_BLACK_HOLE_PACKET);
 			p.type = SC_BLACK_HOLE;
@@ -1236,6 +1238,11 @@ void CScene::BlackHole()
 {
 	if (_state != ST_INGAME) { black_hole_timer_on = false; return; }
 	if (cur_mission != MissionType::ESCAPE_BLACK_HOLE && cur_mission != MissionType::CS_BAD_ENDING) { black_hole_timer_on = false;  return; }
+	if(cur_mission == MissionType::CS_BAD_ENDING){
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 500ms, EV_BLACK_HOLE, static_cast<short>(num) };
+		timer_queue.push(ev);
+		return;
+	}
 
 	auto time_now = chrono::steady_clock::now();
 	std::chrono::duration<float> elapsed_time = (time_now - b_prev_time);
