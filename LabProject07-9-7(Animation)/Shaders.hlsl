@@ -190,8 +190,8 @@ VS_STANDARD_OUTPUT VSSkinnedAnimationStandard(VS_SKINNED_STANDARD_INPUT input)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-Texture2D gtxtTerrainBaseTexture : register(t1);
-Texture2D gtxtTerrainDetailTexture : register(t2);
+//Texture2D gtxtTerrainBaseTexture : register(t1);
+//Texture2D gtxtTerrainDetailTexture : register(t2);
 
 struct VS_TERRAIN_INPUT
 {
@@ -223,12 +223,12 @@ VS_TERRAIN_OUTPUT VSTerrain(VS_TERRAIN_INPUT input)
 
 float4 PSTerrain(VS_TERRAIN_OUTPUT input) : SV_TARGET
 {
-	float4 cBaseTexColor = gtxtTerrainBaseTexture.Sample(gssWrap, input.uv0);
-	float4 cDetailTexColor = gtxtTerrainDetailTexture.Sample(gssWrap, input.uv1);
-	//	float4 cColor = saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
-		float4 cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
+//	float4 cBaseTexColor = gtxtTerrainBaseTexture.Sample(gssWrap, input.uv0);
+//	float4 cDetailTexColor = gtxtTerrainDetailTexture.Sample(gssWrap, input.uv1);
+//	//	float4 cColor = saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
+//		float4 cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
 
-		return(cColor);
+		return(float4(1.0f,1.0f,1.0f,1.0f));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
