@@ -43,7 +43,7 @@ CGameFramework::CGameFramework()
 	
 	cDirection = 0;
 
-	planetPos = { 10000.0f,10000.0f,10000.0f };
+	planetPos = { 6000.0f, 6000.0f, 6000.0f };
 
 	_state = SCENE_LOBBY;
 	//_state = SCENE_INGAME;
@@ -1423,6 +1423,7 @@ void CGameFramework::UpdateSounds()
 	if (_state == SCENE_LOBBY) {
 		m_lobbybgm->Update(); 
 		m_bgm[2]->stop(); 
+
 	}
 	else {
 		m_lobbybgm->stop();
@@ -2055,12 +2056,20 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	XMVECTOR center = { 0,0,0 };
 	XMVECTOR distcenter = XMVector3Length(XMVectorSubtract(center, v1));
 
+	XMVECTOR center_real = { 1300,0,0 };
+	XMVECTOR distcenter_real = XMVector3Length(XMVectorSubtract(center_real, v1));
+
+
 	float distance;
 	XMStoreFloat(&distance, dist);
 	float distanceCenter;
 	XMStoreFloat(&distanceCenter, distcenter);
 
+	float distanceCenter_real;
+	XMStoreFloat(&distanceCenter_real, distcenter_real);
+
 	distance = distance - 1500.0f;
+	distanceCenter_real = distanceCenter_real - 1000.0f;
 
 	distanceCenter = distanceCenter;
 
@@ -2174,7 +2183,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	case MissionType::GO_CENTER_REAL:
 	{
 		uiText = L"미션 - 진짜 우주의 중심으로 가라! ( ";
-		uiText += centerDist;
+		uiText += distanceCenter_real;
 		uiText += L"m 남음 )";
 		break;
 	}
@@ -2544,6 +2553,9 @@ void CGameFramework::Reset_game()
 	blackholetime = 0;
 	default_shaking_num = 0;
 	blackhole_shaking_num = 0;
+	room_num = 0;
+	roomNum.clear();
+	b_Inside = true;
 
 }
 
