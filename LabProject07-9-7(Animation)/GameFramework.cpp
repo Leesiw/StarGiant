@@ -1936,11 +1936,6 @@ void CGameFramework::UpdateUI()
 	uiText = ChangeMission(curMissionType);
 
 
-	if (scriptsOn) {
-		scriptsStartTime = steady_clock::now();
-		cout << "대사 시작\n";
-		scriptsOn = false;
-	}
 
 
 
@@ -1950,19 +1945,28 @@ void CGameFramework::UpdateUI()
 	uiBossScripts = ChangeBossScripts(curMissionType, m_pScene->m_ppBoss->GetcurHp());
 	else{ uiBossScripts = ChangeBossScripts(curMissionType, m_pScene->m_ppGod->GetcurHp()); }
 
+	if (_state == SCENE_INGAME) {
 
-	if (duration_cast<seconds>(steady_clock::now() - scriptsStartTime).count() >= 5)
-	{
-		uiScripts = L" ";
-	}
+		if (scriptsOn) {
+			scriptsStartTime = steady_clock::now();
+			cout << "대사 시작\n";
+			scriptsOn = false;
+		}
 
-	if (bossScriptsOn) {
-		bossScriptsTime += m_GameTimer.GetTimeElapsed();
+		if (duration_cast<seconds>(steady_clock::now() - scriptsStartTime).count() >= 5)
+		{
+			uiScripts = L" ";
+		}
 
-	}
-	if (bossScriptsTime>=3) {
-		uiBossScripts = L" ";
-		bossScriptsOn = false;
+		if (bossScriptsOn) {
+			bossScriptsTime += m_GameTimer.GetTimeElapsed();
+
+		}
+		if (bossScriptsTime >= 3) {
+			uiBossScripts = L" ";
+			bossScriptsOn = false;
+		}
+
 	}
 
 	wstring JEWEL_ATT;
@@ -1983,7 +1987,6 @@ void CGameFramework::UpdateUI()
 	uiJew += JEWEL_HP;
 
 	std::wstring matwst = std::to_wstring(matcnt);
-
 	std::wstring skipwst = std::to_wstring(skipnum);
 
 
@@ -2037,8 +2040,9 @@ void CGameFramework::UpdateUI()
 		pDist = m_pUILayer->UpdatePlanetDist(m_pPlayer[0], planetPos);
 	}
 
-	if (m_pScene->m_ppBoss->BossHP < 0)
+	if (m_pScene->m_ppBoss->BossHP < 0) {
 		bossdie = 1;
+	}
 
 }
 
@@ -2572,6 +2576,23 @@ void CGameFramework::Reset_game()
 	roomNum.clear();
 	b_Inside = true;
 	curMissionType = MissionType::TU_SIT;
+	pastMissionType = MissionType::TU_SIT;
+
+
+	items[ItemType::JEWEL_ATT] = 0;
+	items[ItemType::JEWEL_DEF] = 0;
+	items[ItemType::JEWEL_HEAL] = 0;
+	items[ItemType::JEWEL_HP] = 0;
+
+	default_shaking_num = 0;
+	blackhole_shaking_num = 0;
+
+
+	bossdie = 0;
+	firstSc = -1;
+	firstbSc = 0;
+
+	killCnt = 0;
 	cout << "reset game\n";
 }
 
@@ -2657,6 +2678,8 @@ void CGameFramework::ProcessPacket(char* p)
 
 		if (player_type == PlayerType::INSIDE) {
 			b_Inside = true;
+			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = AnimationState::IDLE;
+			m_pInsidePlayer[packet->data.id]->SetSitState(false);
 		}
 		else {
 			b_Inside = false;

@@ -184,13 +184,15 @@ void CScene::Reset()
 		if (pl == -1) { continue; }
 		clients[pl]._s_lock.lock();
 		if (clients[pl]._state == ST_INGAME) {
-			clients[pl]._state = ST_ALLOC;
 			clients[pl].room_id = -1;
 			clients[pl].room_pid = -1;
+			clients[pl].type = PlayerType::INSIDE;
+			clients[pl]._state = ST_ALLOC;
 		}
 		clients[pl]._s_lock.unlock();
-		pl = -1;
 	}
+	_plist.fill(-1);
+
 
 	cur_mission = MissionType::CS_TURN;
 	prev_mission = MissionType::CS_TURN;
@@ -483,6 +485,15 @@ void CScene::MissionClear()
 				}
 				else{ boss_timer_m.unlock(); }
 			}
+			else if (cur_mission == MissionType::CS_ENDING) {
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_mission_start_packet(cur_mission);
+				}
+				ResetScene();
+				return;
+			}
 		}
 		else if (cur_mission == MissionType::FIND_BOSS) {
 			boss_timer_m.lock();
@@ -566,6 +577,15 @@ void CScene::SetMission(MissionType mission)
 					timer_queue.push(ev);
 				}
 				else{ boss_timer_m.unlock(); }
+			}
+			else if (cur_mission == MissionType::CS_ENDING) {
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_mission_start_packet(cur_mission);
+				}
+				ResetScene();
+				return;
 			}
 		}
 		else if (mission == MissionType::FIND_BOSS) {
@@ -1353,9 +1373,6 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 			}
 
 			SetMission(levels[prev_mission].RestartMission);
-		}
-		else if (cur_mission == MissionType::CS_ENDING) {
-			ResetScene();
 		}
 		else if (levels[cur_mission].NextMission == next_mission) {
 			SetMission(next_mission);

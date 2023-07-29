@@ -321,7 +321,7 @@ void CGameFramework::SetMission()
 	levels[MissionType::FIND_BOSS].PlasmaCannon.MAX_HP = 40;
 	levels[MissionType::FIND_BOSS].PlasmaCannon.ATK = 30;
 	levels[MissionType::FIND_BOSS].RestartMission = MissionType::FIND_BOSS;
-	levels[MissionType::FIND_BOSS].RestartPosition = XMFLOAT3{ 5500.f ,5500.f ,5500.f };
+	levels[MissionType::FIND_BOSS].RestartPosition = XMFLOAT3{ 4500.f ,4500.f ,4500.f };
 
 	levels[MissionType::CS_BOSS_SCREAM].NextMission = MissionType::DEFEAT_BOSS;
 	levels[MissionType::CS_BOSS_SCREAM].cutscene = true;
@@ -804,6 +804,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		break;
 	}
 	case CS_START: {
+		if (clients[c_id]._state == ST_INGAME) { break; }
 		scene_manager._scene_lock.lock();
 		short t_room_id = clients[c_id].room_id;
 		if (t_room_id == -1) { break; }
