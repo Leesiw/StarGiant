@@ -2666,6 +2666,8 @@ void CGameFramework::Reset_game()
 	curMissionType = MissionType::TU_SIT;
 	pastMissionType = MissionType::TU_SIT;
 
+	m_bgm[1]->stop();
+	m_bgm[2]->stop();
 
 	items[ItemType::JEWEL_ATT] = 0;
 	items[ItemType::JEWEL_DEF] = 0;
@@ -2677,7 +2679,7 @@ void CGameFramework::Reset_game()
 
 
 	bossdie = 0;
-	firstSc = -1;
+	firstSc = -2;
 	firstbSc = 0;
 
 	killCnt = 0;
