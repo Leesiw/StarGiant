@@ -186,6 +186,7 @@ void CScene::Reset()
 		if (clients[pl]._state == ST_INGAME) {
 			clients[pl].room_id = -1;
 			clients[pl].room_pid = -1;
+			clients[pl].type = PlayerType::INSIDE;
 			clients[pl]._state = ST_ALLOC;
 		}
 		clients[pl]._s_lock.unlock();

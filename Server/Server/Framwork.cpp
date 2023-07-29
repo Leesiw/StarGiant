@@ -151,7 +151,6 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		case OP_RESET_SCENE: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			scene->_s_lock.lock();
-
 			if (scene->_state == SCENE_RESET) {
 				scene->_state = SCENE_FREE;
 			}
@@ -807,16 +806,18 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (clients[c_id]._state == ST_INGAME) { break; }
 		scene_manager._scene_lock.lock();
 		short t_room_id = clients[c_id].room_id;
-		if (t_room_id == -1) { break; }
+		if (t_room_id == -1) { scene_manager._scene_lock.unlock(); break; }
 		
 		CScene* scene = scene_manager.GetScene(t_room_id);
 		if (scene->Start()) {
+			scene_manager._scene_lock.unlock();
 			SC_START_PACKET packet{};
 			packet.size = sizeof(SC_START_PACKET);
 			packet.type = SC_START;
 
 			//printf("start %d\n", clients[c_id].room_id);
 			scene->Send((char*)&packet);
+			break;
 		}
 		scene_manager._scene_lock.unlock();
 		break;
@@ -838,8 +839,10 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		short t_room_id = clients[c_id].room_id;
 		if (t_room_id == -1) { break; }
 		CScene* scene = scene_manager.GetScene(t_room_id);
+		if (scene->_state != ST_INGAME) { break; }
 		if (levels[scene->cur_mission].cutscene) {
 			scene->m_ppPlayers[clients[c_id].room_pid]->cutscene_end = true;
+			
 			char num = 0;
 			for (char i = 0; i < 3; ++i) {
 				if (scene->m_ppPlayers[i]->cutscene_end) {

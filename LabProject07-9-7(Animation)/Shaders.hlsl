@@ -172,7 +172,7 @@ VS_STANDARD_OUTPUT VSSkinnedAnimationStandard(VS_SKINNED_STANDARD_INPUT input)
 	float4x4 mtxVertexToBoneWorld = (float4x4)0.0f;
 	for (int i = 0; i < MAX_VERTEX_INFLUENCES; i++)
 	{
-//		mtxVertexToBoneWorld += input.weights[i] * gpmtxBoneTransforms[input.indices[i]];
+		//		mtxVertexToBoneWorld += input.weights[i] * gpmtxBoneTransforms[input.indices[i]];
 		mtxVertexToBoneWorld += input.weights[i] * mul(gpmtxBoneOffsets[input.indices[i]], gpmtxBoneTransforms[input.indices[i]]);
 	}
 	output.positionW = mul(float4(input.position, 1.0f), mtxVertexToBoneWorld).xyz;
@@ -180,7 +180,7 @@ VS_STANDARD_OUTPUT VSSkinnedAnimationStandard(VS_SKINNED_STANDARD_INPUT input)
 	output.tangentW = mul(input.tangent, (float3x3)mtxVertexToBoneWorld).xyz;
 	output.bitangentW = mul(input.bitangent, (float3x3)mtxVertexToBoneWorld).xyz;
 
-//	output.positionW = mul(float4(input.position, 1.0f), gmtxGameObject).xyz;
+	//	output.positionW = mul(float4(input.position, 1.0f), gmtxGameObject).xyz;
 
 	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
 	output.uv = input.uv;
@@ -225,10 +225,10 @@ float4 PSTerrain(VS_TERRAIN_OUTPUT input) : SV_TARGET
 {
 	float4 cBaseTexColor = gtxtTerrainBaseTexture.Sample(gssWrap, input.uv0);
 	float4 cDetailTexColor = gtxtTerrainDetailTexture.Sample(gssWrap, input.uv1);
-//	float4 cColor = saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
-	float4 cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
+	//	float4 cColor = saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
+		float4 cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
 
-	return(cColor);
+		return(cColor);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -286,10 +286,10 @@ VS_UI_OUTPUT VS_UI(VS_UI_INPUT input)
 {
 	VS_UI_OUTPUT output;
 
-output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
-output.uv = input.uv;
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.uv = input.uv;
 
-return(output);
+	return(output);
 }
 
 Texture2D gtxtUITexture : register(t14);
@@ -402,7 +402,7 @@ float4					m_cEmissive;
 	newPos.x += 20.0f * DepthLayer * sin(Distance * 40.0f * 3.1415f);
 	newPos.z += 20.0f * DepthLayer * cos(Distance * 40.0f * 3.1415f);
 
-	
+
 
 	newPos *= depthScale;
 
@@ -448,51 +448,51 @@ float4 PS_GODMain(VS_GOD_OUTPUT input) : SV_TARGET
 */
 
 
-	//임시 거리값 
-	float3 Center = float3(gmtxTexture._11, gmtxTexture._12, gmtxTexture._13);
-	float3 Length = float3(gmtxTexture._21, gmtxTexture._22, gmtxTexture._23); // Weight, Height, Depth
-	float Percent = (input.positionL.z - Center.z) / Length.z;// 0~1 을 가장. 
-	float LineState =0.5f;
-	float sinvalue = LineState * sin(Percent * 3.1415 * 2);
-	
-	if(abs(input.positionL.z) % 100 <10.0f)
-	{
+//임시 거리값 
+float3 Center = float3(gmtxTexture._11, gmtxTexture._12, gmtxTexture._13);
+float3 Length = float3(gmtxTexture._21, gmtxTexture._22, gmtxTexture._23); // Weight, Height, Depth
+float Percent = (input.positionL.z - Center.z) / Length.z;// 0~1 을 가장. 
+float LineState = 0.5f;
+float sinvalue = LineState * sin(Percent * 3.1415 * 2);
 
-	
-	float compositeNoise = 0.15f;
+if (abs(input.positionL.z) % 100 < 10.0f)
+{
 
-	float4 noise1 = gtxtGODTexture1.Sample(gssWrap, input.uv);
-	float4 noise2 = gtxtGODTexture2.Sample(gssWrap, input.uv);
-	compositeNoise = lerp(noise1, noise2, 0.5f);
-	/*output.rgb = compositeNoise * cookie.rgb * lightColor * scale * atten * shadow * ChannelMask;
-		*/
 
-	float4 cookie = float4(1.0f, 1.0f, 1.0f, 1.0f); // 조명 빌보드 텍스처색 (그려지는 조명색)
-	float4 lightColor = float4(0.85f, 0.98f, 1.0f, 1.0f); //진짜 조명색 
-	//float scale = 9.0f / fFractionOfMaxShells;
-	//float atten = 0.25f + 20000.0f / dot(IsPos_depth.xyz, IsPos_Depthxyz);
+float compositeNoise = 0.15f;
 
-	float4 cColor = compositeNoise * float4(cookie.r, cookie.g, cookie.b, 0.0f) * lightColor;
+float4 noise1 = gtxtGODTexture1.Sample(gssWrap, input.uv);
+float4 noise2 = gtxtGODTexture2.Sample(gssWrap, input.uv);
+compositeNoise = lerp(noise1, noise2, 0.5f);
+/*output.rgb = compositeNoise * cookie.rgb * lightColor * scale * atten * shadow * ChannelMask;
+	*/
 
-	cColor.a = saturate(dot(float3(cColor.a, cColor.g, cColor.b), float3(1.0f, 1.0f, 1.0f)));
+float4 cookie = float4(1.0f, 1.0f, 1.0f, 1.0f); // 조명 빌보드 텍스처색 (그려지는 조명색)
+float4 lightColor = float4(0.85f, 0.98f, 1.0f, 1.0f); //진짜 조명색 
+//float scale = 9.0f / fFractionOfMaxShells;
+//float atten = 0.25f + 20000.0f / dot(IsPos_depth.xyz, IsPos_Depthxyz);
 
-	float Distance = distance(input.positionL, Center);
-	float DepthLayer = saturate(Distance / Length.z);
+float4 cColor = compositeNoise * float4(cookie.r, cookie.g, cookie.b, 0.0f) * lightColor;
 
-	Distance = distance(input.positionL, float3(Center.x, 0.0f, Center.z));
-	float normalizedWidth = saturate(Distance / Length.x);
-	float normalizedHeight = saturate(Distance / Length.y);
-	float2 LengthLayer = float2(normalizedWidth, normalizedHeight);
+cColor.a = saturate(dot(float3(cColor.a, cColor.g, cColor.b), float3(1.0f, 1.0f, 1.0f)));
 
-	float alphaChannel = 1.0f - saturate(DepthLayer * LengthLayer.x * LengthLayer.y);
+float Distance = distance(input.positionL, Center);
+float DepthLayer = saturate(Distance / Length.z);
 
-	//return float4(1.0f, 1.0f, 1.0f, 1.0* DepthLayer);
-	return float4(1.0f* DepthLayer, 1.0f* LengthLayer.x, 1.0f* LengthLayer.y, alphaChannel* Percent);
-	}
-	else {
-		return float4(0, 0, 0, 0);
-	}
-	//return float4(0, 0, 0, 0);
+Distance = distance(input.positionL, float3(Center.x, 0.0f, Center.z));
+float normalizedWidth = saturate(Distance / Length.x);
+float normalizedHeight = saturate(Distance / Length.y);
+float2 LengthLayer = float2(normalizedWidth, normalizedHeight);
+
+float alphaChannel = 1.0f - saturate(DepthLayer * LengthLayer.x * LengthLayer.y);
+
+//return float4(1.0f, 1.0f, 1.0f, 1.0* DepthLayer);
+return float4(1.0f * DepthLayer, 1.0f * LengthLayer.x, 1.0f * LengthLayer.y, alphaChannel * Percent);
+}
+else {
+	return float4(0, 0, 0, 0);
+}
+//return float4(0, 0, 0, 0);
 }
 
 
@@ -702,10 +702,8 @@ float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
 struct VS_LIGHTING_INPUT
 {
 	float3 position : POSITION;
-	float2 uv : TEXCOORD;
 	float3 normal : NORMAL;
-	float3 tangent : TANGENT;
-	float3 bitangent : BITANGENT;
+	float2 uv : TEXCOORD;
 };
 
 struct VS_LIGHTING_OUTPUT
@@ -713,8 +711,6 @@ struct VS_LIGHTING_OUTPUT
 	float4 position : SV_POSITION;
 	float3 positionW : POSITION;
 	float3 normalW : NORMAL;
-	float3 tangentW : TANGENT;
-	float3 bitangentW : BITANGENT;
 	float2 uv : TEXCOORD;
 };
 
@@ -726,8 +722,6 @@ VS_LIGHTING_OUTPUT VSLighting(VS_LIGHTING_INPUT input)
 	output.positionW = (float3)mul(float4(input.position, 1.0f), gmtxGameObject);
 	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
 	output.uv = input.uv;
-	output.tangentW = mul(input.tangent, (float3x3)gmtxGameObject);
-	output.bitangentW = mul(input.bitangent, (float3x3)gmtxGameObject);
 
 	return(output);
 }
@@ -767,25 +761,21 @@ struct VS_SHADOW_MAP_OUTPUT
 
 	float4 uvs[1] : TEXCOORD0;
 	float4 uv[1] : TEXCOORD1;
-
-	float3 tangentW : TANGENT;
-	float3 bitangentW : BITANGENT;
 };
 
 VS_SHADOW_MAP_OUTPUT VSShadowMapShadow(VS_LIGHTING_INPUT input)
 {
 	VS_SHADOW_MAP_OUTPUT output = (VS_SHADOW_MAP_OUTPUT)0;
 
-	output.positionW = mul(float4(input.position, 1.0f), gmtxGameObject).xyz;
-	output.normalW = mul(input.normal, (float3x3)gmtxGameObject);
-	output.tangentW = mul(input.tangent, (float3x3)gmtxGameObject);
-	output.bitangentW = mul(input.bitangent, (float3x3)gmtxGameObject);
-	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+	float4 positionW = mul(float4(input.position, 1.0f), gmtxGameObject);
+	output.positionW = positionW.xyz;
+	output.position = mul(mul(positionW, gmtxView), gmtxProjection);
+	output.normalW = mul(float4(input.normal, 0.0f), gmtxGameObject).xyz;
 	output.uv[0].xy = input.uv;
 
 	for (int i = 0; i < 1; i++)
 	{
-		if (gcbToLightSpaces[i].f4Position.w != 0.0f) output.uvs[i] = mul(output.positionW, gcbToLightSpaces[i].mtxToTexture);
+		if (gcbToLightSpaces[i].f4Position.w != 0.0f) output.uvs[i] = mul(positionW, gcbToLightSpaces[i].mtxToTexture);
 	}
 
 	return(output);
@@ -811,8 +801,10 @@ float4 PSShadowMapShadow(VS_SHADOW_MAP_OUTPUT input) : SV_TARGET
 	float4 cEmissionColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxtEmissionTexture.Sample(gssWrap, input.uv[0].xy);
 
-	float3 normalW;
 	float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
+
+	//float3 normalW;
+	//float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
 	//if (gnTexturesMask & MATERIAL_NORMAL_MAP)
 	//{
 	//	float3x3 TBN = float3x3(normalize(input.tangentW), normalize(input.bitangentW), normalize(input.normalW));
@@ -823,11 +815,10 @@ float4 PSShadowMapShadow(VS_SHADOW_MAP_OUTPUT input) : SV_TARGET
 	//{
 	//	normalW = normalize(input.normalW);
 	//}
-
 	//normalW = input.normalW * normalW;
 
 	float4 cIllumination = shadowLighting(input.positionW, normalize(input.normalW), true, input.uvs);
-	//float4 cIllumination2 = Lighting(input.positionW, normalW);
+
 
 	return(lerp(cColor, cIllumination, 0.5f));
 	//return float4(1.0f, 1.0f, 1.0f, 1.0f);
