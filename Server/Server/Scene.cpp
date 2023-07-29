@@ -412,7 +412,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 
 void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 {
-	float dist = 500.f; // 플레이어 사거리
+	float dist = 1000.f; // 플레이어 사거리
 	XMVECTOR pos = XMLoadFloat3(&data.pos);
 	XMVECTOR dir = XMLoadFloat3(&data.direction);
 
