@@ -1483,7 +1483,6 @@ bool CScene::Start()
 
 		TIMER_EVENT ev3{ 1, chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
 		timer_queue.push(ev3);
-		_s_lock.unlock();
 		return true;
 	}
 	_s_lock.unlock();
