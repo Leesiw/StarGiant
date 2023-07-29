@@ -25,8 +25,6 @@ public:
 	void ResetScene();
 	void Reset();
 
-	void AnimateObjects(float fTimeElapsed);
-
 	void CheckMeteoByPlayerCollisions();
 	void CheckEnemyByBulletCollisions(BULLET_INFO& data);
 	void CheckMeteoByBulletCollisions(BULLET_INFO& data);
