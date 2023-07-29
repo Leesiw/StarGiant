@@ -460,19 +460,25 @@ void CScene::MissionClear()
 				m_pBoss->BossHP = 100;
 				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
 				
+				boss_timer_m.lock();
 				if (!boss_timer_on) {
 					boss_timer_on = true;
+					boss_timer_m.unlock();
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
 					timer_queue.push(ev);
 				}
+				else{ boss_timer_m.unlock(); }
 			}
 		}
 		else if (cur_mission == MissionType::FIND_BOSS) {
+			boss_timer_m.lock();
 			if (!boss_timer_on) {
+				boss_timer_m.unlock();
 				boss_timer_on = true;
 				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
 				timer_queue.push(ev);
 			}
+			else{ boss_timer_m.unlock(); }
 		}
 		else if (cur_mission == MissionType::GO_CENTER) {
 			mission_start = chrono::system_clock::now();
@@ -536,20 +542,25 @@ void CScene::SetMission(MissionType mission)
 				m_pBoss->BossHP = 100;
 				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
 				
+				boss_timer_m.lock();
 				if (!boss_timer_on) {
+					boss_timer_m.unlock();
 					boss_timer_on = true;
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
 					timer_queue.push(ev);
 				}
+				else{ boss_timer_m.unlock(); }
 			}
 		}
 		else if (mission == MissionType::FIND_BOSS) {
-
+			boss_timer_m.lock();
 			if (!boss_timer_on) {
+				boss_timer_m.unlock();
 				boss_timer_on = true;
 				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
 				timer_queue.push(ev);
 			}
+			else{ boss_timer_m.unlock(); }
 		}
 		else if (mission == MissionType::GO_CENTER) {
 			mission_start = chrono::system_clock::now();
@@ -583,8 +594,10 @@ void CScene::SetMission(MissionType mission)
 
 void CScene::SetMissionFindBoss()
 {
-	if (cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME) {
+	boss_timer_m.lock();
+	if (cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME && !boss_timer_on) {
 		boss_timer_on = true;
+		boss_timer_m.unlock();
 		cur_mission = MissionType::FIND_BOSS;
 
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, num };
@@ -596,7 +609,7 @@ void CScene::SetMissionFindBoss()
 			clients[pl_id].send_mission_start_packet(cur_mission);
 		}
 	}
-	
+	boss_timer_m.unlock();
 }
 
 void CScene::GetJewels()
