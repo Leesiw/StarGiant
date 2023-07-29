@@ -494,6 +494,16 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			scene->_plist_lock.lock();
 			char t_room_pid = clients[c_id].room_pid;
 			if (t_room_pid != -1) {
+				SC_REMOVE_PLAYER_PACKET p{};
+				p.id = t_room_pid;
+				p.size = sizeof(p);
+				p.type = SC_REMOVE_PLAYER;
+				for (auto pl : scene->_plist) {
+					if (pl == -1) { continue; }
+					clients[pl].do_send(&p);
+				}
+			}
+			if (t_room_pid != -1) {
 				scene->_plist[t_room_pid] = -1;
 			}
 			clients[c_id].room_id = -1;
@@ -964,18 +974,20 @@ int CGameFramework::get_new_client_id()
 
 void CGameFramework::disconnect(int c_id)
 {	
-	SC_REMOVE_PLAYER_PACKET p{};
-	p.id = c_id;
-	p.size = sizeof(p);
-	p.type = SC_REMOVE_PLAYER;
-
 	lock_guard<mutex> ll(clients[c_id]._s_lock);
 	
 	short t_room_id = clients[c_id].room_id;
 
 	if (t_room_id != -1) {
 		CScene* scene = scene_manager.GetScene(t_room_id);
-		scene->Send((char*)&p);
+
+		SC_REMOVE_PLAYER_PACKET p{};
+		p.id = clients[c_id].room_pid;
+		if (p.id != -1) {
+			p.size = sizeof(p);
+			p.type = SC_REMOVE_PLAYER;
+			scene->Send((char*)&p);
+		}
 
 		if (scene->heal_player == clients[c_id].room_pid) {
 			scene->heal_player = -1;
