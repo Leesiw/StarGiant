@@ -1368,6 +1368,19 @@ void CGameFramework::CameraUpdateChange()
 
 }
 
+void CGameFramework::SParticle(int cntParticle, int rangeIncrement, int id)
+{
+	int startRangeMin = 0, startRangeMax = 0;
+	startRangeMin = cntParticle * rangeIncrement;
+	startRangeMax = startRangeMin + (rangeIncrement - 1);
+	
+	cout << "startRangeMin :" << startRangeMin << endl;
+	cout << "startRangeMax :" << startRangeMax << endl;
+
+	m_pScene->setParticleStart(startRangeMin, startRangeMax, m_pScene->m_ppEnemies[id]->GetPosition());
+
+}
+
 void error_display(const char* msg, int err_no)
 {
 	WCHAR* lpMsgBuf;
@@ -2672,6 +2685,9 @@ void CGameFramework::Reset_game()
 	curMissionType = MissionType::TU_SIT;
 	pastMissionType = MissionType::TU_SIT;
 
+	cntParticle = 0;
+	cntdieParticle = 5;
+
 	m_bgm[0]->stop();
 	m_bgm[1]->stop();
 	m_bgm[2]->stop();
@@ -3036,13 +3052,19 @@ void CGameFramework::ProcessPacket(char* p)
 				m_pScene->m_ppEnemies[packet->data.id]->isAlive = false;
 				//m_pScene->AddDieSprite(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
 				m_pScene->AddDieSprite(m_pScene->m_ppEnemies[packet->data.id]->GetPosition(), packet->data.id);
-				m_pScene->setParticleStart(20, m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
+				SParticle(cntdieParticle, 10, packet->data.id);
+				cntdieParticle += 1;
+				if (cntdieParticle == 10) cntdieParticle = 5;
+
 				m_effectSound[static_cast<int>(Sounds::EXP)]->play();
 
 			}
 			else {
 				m_pScene->m_ppEnemies[packet->data.id]->hp = packet->data.hp;
-				m_pScene->setParticleStart(20, m_pScene->m_ppEnemies[packet->data.id]->GetPosition());
+				SParticle(cntParticle, 20, packet->data.id);
+				cntParticle += 1;
+				if (cntParticle == 5) cntParticle = 0;
+				
 				
 
 				cout << "att\n";

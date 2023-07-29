@@ -18,7 +18,7 @@
 #define SPOT_LIGHT						2
 #define DIRECTIONAL_LIGHT				3
 
-#define MAX_PARTICLES					50
+#define MAX_PARTICLES					150
 #define MAX_CIRCLE_PARTICLES			4
 #define MAX_MAGIC_CIRCLE_PARTICLES		3
 
@@ -127,7 +127,7 @@ public:
 	virtual void AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position, int Target);
 	virtual void AddDieSprite(XMFLOAT3 Position, int Target);
 
-	void setParticleStart(int cnt, XMFLOAT3 tarPos);
+	void setParticleStart(int startcnt, int cnt, XMFLOAT3 tarPos);
 	void sethealParticleStart(int cnt, XMFLOAT3 tarPos);
 	void setParticleStarts(int cnt, XMFLOAT3 tarPos, int num);
 
