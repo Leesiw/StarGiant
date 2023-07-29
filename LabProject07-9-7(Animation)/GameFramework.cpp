@@ -480,12 +480,19 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			((CAirplanePlayer*)m_pPlayer[0])->FireBullet(NULL);
 			std::cout << "총알";
 			break;
-		case VK_SPACE: {
+		case VK_SPACE: 
+		{
 			// 이후 컷씬 중일때만 보낼 수 있게 변경
-			CS_CUTSCENE_END_PACKET my_packet;
-			my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
-			my_packet.type = CS_CUTSCENE_END;
-			send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+			if (curMissionType == MissionType::CS_TURN || curMissionType == MissionType::CS_SHOW_PLANET || curMissionType == MissionType::CS_BOSS_SCREAM
+				|| curMissionType == MissionType::CS_ANGRY_BOSS || curMissionType == MissionType::CS_SHOW_STARGIANT ||
+				curMissionType == MissionType::CS_SHOW_BLACK_HOLE || curMissionType == MissionType::CS_SHOW_GOD || curMissionType == MissionType::CS_ANGRY_GOD
+				|| curMissionType == MissionType::CS_ENDING || curMissionType == MissionType::CS_BAD_ENDING) {
+				CS_CUTSCENE_END_PACKET my_packet;
+				my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
+				my_packet.type = CS_CUTSCENE_END;
+				send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+				
+			}
 			break;
 			/*
 			if (((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion != AnimationState::SIT) {
@@ -1101,6 +1108,7 @@ void CGameFramework::CameraUpdateChange()
 
 	//CS_BAD_ENDING 내부일때,
 	if (curMissionType == MissionType::CS_BAD_ENDING && b_Inside && m_pInsidePlayer[g_myid] && !iscut) {
+		cout << "bad_ending\n";
 		if (!isending) m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
 		b_BeforeCheckInside = true;
 		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
@@ -1117,6 +1125,7 @@ void CGameFramework::CameraUpdateChange()
 
 	//CS_BAD_ENDING 외부일때,
 	else if (curMissionType == MissionType::CS_BAD_ENDING && !b_Inside && !iscut) {
+		cout << "bad_ending\n";
 		if (!isending) m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
 		m_pCamera->SetTarget(m_pPlayer[0]->GetPosition());
 		m_pCamera->SetDist(500.0f);
@@ -1235,6 +1244,7 @@ void CGameFramework::CameraUpdateChange()
 
 	if (curMissionType != MissionType::CS_BAD_ENDING && pastMissionType== MissionType::CS_BAD_ENDING)
 	{
+		cout << "bad에서 넘어가요\n";
 		pastMissionType = curMissionType;
 		isending = true;
 		if (b_BeforeCheckInside) {
@@ -1986,17 +1996,21 @@ void CGameFramework::UpdateUI()
 
 	m_pUILayer->UpdateLabels_Jew(uiJew);
 
-	if (matcnt <= 0) {
-		m_pUILayer->UpdateLabels_Lobby(L"room number");
-		m_pUILayer->UpdateLabels_LobbyMatching(L"룸 넘버를 입력하세요");
-		m_pUILayer->UpdateLabels_Lobby(roomNum);
 
+	if (_state == SCENE_LOBBY) {
+		if (matcnt <= 0) {
+			m_pUILayer->UpdateLabels_Lobby(L"room number");
+			m_pUILayer->UpdateLabels_LobbyMatching(L"룸 넘버를 입력하세요");
+			m_pUILayer->UpdateLabels_Lobby(roomNum);
+
+		}
+		else {
+			m_pUILayer->UpdateLabels_LobbyMatching(matwst + L" / 3");
+			m_pUILayer->UpdateLabels_Lobby(roomNum);
+			m_pUILayer->noData = false;
+		}
 	}
-	else {
-		m_pUILayer->UpdateLabels_LobbyMatching(matwst + L" / 3");
-		m_pUILayer->UpdateLabels_Lobby(roomNum);
-		m_pUILayer->noData = false;
-	}
+
 	m_pUILayer->UpdateLabels_Skip(L"스킵은 spacebar - " + skipwst + L" / 3");
 	
 
