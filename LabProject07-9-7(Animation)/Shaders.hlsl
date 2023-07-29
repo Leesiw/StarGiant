@@ -698,12 +698,13 @@ float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-
 struct VS_LIGHTING_INPUT
 {
 	float3 position : POSITION;
-	float3 normal : NORMAL;
 	float2 uv : TEXCOORD;
+	float3 normal : NORMAL;
+	float3 tangent : TANGENT;
+	float3 bitangent : BITANGENT;
 };
 
 struct VS_LIGHTING_OUTPUT
@@ -711,6 +712,8 @@ struct VS_LIGHTING_OUTPUT
 	float4 position : SV_POSITION;
 	float3 positionW : POSITION;
 	float3 normalW : NORMAL;
+	float3 tangentW : TANGENT;
+	float3 bitangentW : BITANGENT;
 	float2 uv : TEXCOORD;
 };
 
@@ -721,9 +724,11 @@ VS_LIGHTING_OUTPUT VSLighting(VS_LIGHTING_INPUT input)
 	output.normalW = mul(input.normal, (float3x3)gmtxGameObject);
 	output.positionW = (float3)mul(float4(input.position, 1.0f), gmtxGameObject);
 	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+	output.tangentW = mul(input.tangent, (float3x3)gmtxGameObject);
+	output.bitangentW = mul(input.bitangent, (float3x3)gmtxGameObject);
 	output.uv = input.uv;
 
-	return(output);
+	return(output); 
 }
 
 float4 PSLighting(VS_LIGHTING_OUTPUT input) : SV_TARGET //      
@@ -759,6 +764,9 @@ struct VS_SHADOW_MAP_OUTPUT
 	float3 positionW : POSITION;
 	float3 normalW : NORMAL;
 
+	float3 tangentW : TANGENT;
+	float3 bitangentW : BITANGENT;
+
 	float4 uvs[1] : TEXCOORD0;
 	float4 uv[1] : TEXCOORD1;
 };
@@ -772,6 +780,8 @@ VS_SHADOW_MAP_OUTPUT VSShadowMapShadow(VS_LIGHTING_INPUT input)
 	output.position = mul(mul(positionW, gmtxView), gmtxProjection);
 	output.normalW = mul(float4(input.normal, 0.0f), gmtxGameObject).xyz;
 	output.uv[0].xy = input.uv;
+	output.tangentW = mul(input.tangent, (float3x3)gmtxGameObject);
+	output.bitangentW = mul(input.bitangent, (float3x3)gmtxGameObject);
 
 	for (int i = 0; i < 1; i++)
 	{
