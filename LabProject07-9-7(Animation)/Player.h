@@ -54,6 +54,9 @@ public:
 	CPlayer();
 	virtual ~CPlayer();
 
+	void SetChild(CGameObject* pChild, bool bReferenceUpdate = false);
+
+
 	XMFLOAT3 GetPosition() { return(m_xmf3Position); }
 	XMFLOAT2 GetPositionXY() { return(XMFLOAT2{ m_xmf3Position.x, m_xmf3Position.y }); }
 	XMFLOAT3 GetLookVector() { return(m_xmf3Look); }
@@ -126,6 +129,10 @@ public:
 	CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext=NULL);
 	virtual ~CAirplanePlayer();
 
+	void SetChild(CGameObject* pChild, bool bReferenceUpdate = false);
+	void ReleaseUploadBuffers();
+	void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
+
 	CGameObject					*m_pMainRotorFrame = NULL;
 	CGameObject					*m_pTailRotorFrame = NULL;
 	
@@ -136,28 +143,30 @@ public:
 	void SetBulletFromServer(BULLET_INFO bulletInfo);
 	float						m_fBulletEffectiveRange = 300.0f;
 
-
-	SPACESHIP_INFO					player_info;
+	XMFLOAT3	player_info;
+	XMFLOAT4	player_quaternion;
 	bool							is_update = true;
+	bool							is_update_q = true;
 	short							hp = 100;
 	short							max_hp = 100;
 	virtual void OnPrepareAnimate();
-	virtual void Animate(float fTimeElapsed);
+	 void Animate(float fTimeElapsed);
 	void SetModelSprite(CGameObject* Loot, CTexture* LootTexture, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
-	virtual XMFLOAT3 getSpritePos(int num) { return m_pAirSprites[num]->GetPosition(); }
+	//virtual XMFLOAT3 getSpritePos(int num) { return m_pAirSprites[num]->GetPosition(); }
 	short getHp(){ return hp; }
 
 private:
 
 public:
 	//¼­¹ö 
-	void SetPlayerInfo(SPACESHIP_INFO p_info) { player_info = p_info; is_update = false; }
+	void SetPlayerInfo(XMFLOAT3 p_pos) { player_info = p_pos; is_update = false; }
+	void SetQuaternion(XMFLOAT4 p_quaternion) { player_quaternion = p_quaternion; is_update_q = false; }
 	void UpdateOnServer(bool rotate_update = true);
 	XMVECTOR GetQuaternion();
 
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	virtual void OnPrepareRender();
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 };
 
 class CSoundCallbackHandler : public CAnimationCallbackHandler
@@ -176,11 +185,18 @@ public:
 	CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext=NULL, int i = 0);
 	virtual ~CTerrainPlayer();
 
-	INSIDE_PLAYER_INFO					player_info;
+
+
+	INSIDE_PLAYER_INFO			player_info;
 	bool						is_update = true;
 	bool						isAlive = false;
 
 	PlayerType type;
+
+	void SetChild(CGameObject* pChild, bool bReferenceUpdate = false);
+	void ReleaseUploadBuffers();
+	void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
+	void Animate(float fTimeElapsed);
 
 
 	CSound* p_effectSound[static_cast<int>(PlayerSounds::COUNT)] = {};

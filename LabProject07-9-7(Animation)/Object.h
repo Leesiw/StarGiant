@@ -402,7 +402,7 @@ public:
 	virtual void BuildMaterials(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList) { }
 
 	virtual void OnPrepareAnimate() { }
-	virtual void Animate(float fTimeElapsed);
+	void Animate(float fTimeElapsed);
 
 	virtual void OnPrepareRender() { }
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
@@ -414,7 +414,9 @@ public:
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList *pd3dCommandList, XMFLOAT4X4 *pxmf4x4World);
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList *pd3dCommandList, CMaterial *pMaterial);
 
-	virtual void ReleaseUploadBuffers();
+	void ReleaseUploadBuffers();
+	virtual void ReleaseUploadBuffers2();
+
 
 	XMFLOAT3 GetPosition();
 	XMFLOAT2 GetPositionXY() { return(XMFLOAT2(m_xmf4x4World._41, m_xmf4x4World._42)); };
@@ -438,7 +440,8 @@ public:
 	void Rotate(XMFLOAT4 *pxmf4Quaternion);
 
 	CGameObject *GetParent() { return(m_pParent); }
-	virtual void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent=NULL);
+	void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent=NULL);
+
 	CGameObject *FindFrame(char *pstrFrameName);
 
 	CTexture *FindReplicatedTexture(_TCHAR *pstrTextureName);
@@ -657,18 +660,8 @@ public:
 
 	EnemyState state;
 
-	XMFLOAT4X4 m_xmf4x4Rotate;
-	float m_fPitch, m_fYaw, m_fRoll;
-
-
 	CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks);
 	virtual ~CEnemyObject();
-
-	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
-
-	virtual void Rotate(float x, float y, float z);
-	virtual void Rotate(XMFLOAT3* pxmf3Axis, float fAngle);
-	virtual void Rotate(XMFLOAT4* pxmf4Quaternion);
 
 	virtual void AI(float fTimeElapsed, XMFLOAT3& pl_pos);
 	virtual void MoveAI(float fTimeElapsed, XMFLOAT3& pl_pos);
@@ -678,7 +671,7 @@ public:
 	
 	void VelocityUpdate(float fTimeElapsed, XMFLOAT3& pos);
 
-	void ResetRotate();
+	void Reset();
 	short GetcurHp() { return hp; }
 	short GetMaxHp() { return Maxhp; }
 
@@ -760,14 +753,6 @@ public:
 
 	void LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos);
 
-	XMFLOAT4X4 m_xmf4x4Rotate;
-
-	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
-
-	virtual void Rotate(float x, float y, float z);
-	virtual void Rotate(XMFLOAT3* pxmf3Axis, float fAngle);
-	virtual void Rotate(XMFLOAT4* pxmf4Quaternion);
-
 	void ResetRotate();
 };
 
@@ -800,7 +785,7 @@ public:
 	CB_PLUS_INFO* m_pcbPlusInfo = NULL;
 	ID3D12Resource* m_pcbplusShaderVariable = NULL;
 
-	virtual void Animate(float fElapsedTime);
+	void Animate(float fElapsedTime);
 	void SetRowColumn(int nRow, int nCol) { m_nRows = nRow; m_nCols = nCol; }
 	void SetCntTime(float Time) { m_fCntTime = Time; }
 	void SetSpeed(float Speed) { m_fSpeed = Speed; }
@@ -813,7 +798,7 @@ public:
 
 	virtual void CreateShaderVariable(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo);
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
+	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 	void CountDiedTime(float dieTime);
 };
 class CSprite2Object : public CSpriteObject
@@ -837,7 +822,6 @@ public:
 	CBlackHole() {};
 	virtual ~CBlackHole() {};
 	CBlackHole(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nWidth = 20, UINT nHeight = 20, UINT nDepth = 0);
-	virtual void Animate(float fElapsedTime);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 public:
 	CTexture* m_blackholeTexture;

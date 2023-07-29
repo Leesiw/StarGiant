@@ -36,10 +36,6 @@ CScene::~CScene()
 {
 }
 
-void CScene::Init()
-{
-}
-
 void CScene::BuildObjects()
 {
 	boss_timer_on = false;
@@ -51,6 +47,7 @@ void CScene::BuildObjects()
 	invincible_mode = false;
 	// player
 	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
+	pAirplanePlayer->Reset();
 	pAirplanePlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 100.0f));
 	pAirplanePlayer->boundingbox = BoundingOrientedBox{ XMFLOAT3(-0.000000f, -0.000000f, -0.000096f), XMFLOAT3(15.5f, 15.5f, 3.90426f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	m_pSpaceship = pAirplanePlayer;
@@ -240,50 +237,6 @@ void CScene::Reset()
 
 }
 
-void CScene::CheckMeteoByPlayerCollisions()
-{
-	/*
-	m_pSpaceship->OnPrepareRender();
-	m_pSpaceship->UpdateTransform();
-	m_pSpaceship->UpdateBoundingBox();
-
-	for (int i = 0; i < METEOS; ++i) {
-	//	if (time(NULL) - m_ppMeteoObjects[i]->coll_time >= 1) {
-			m_ppMeteoObjects[i]->UpdateBoundingBox();
-
-			if (m_pSpaceship->HierarchyIntersects(m_ppMeteoObjects[i]))
-			{
-		//		m_ppMeteoObjects[i]->coll_time = time(NULL);
-				XMFLOAT3 vel1 = m_pSpaceship->GetVelocity();
-				XMFLOAT3 vel2 = m_ppMeteoObjects[i]->GetMovingDirection();
-				float m1 = 1.0f; float m2 = 5.0f;
-				float finalVelX1 = ((m1 - m2) / (m1 + m2)) * vel1.x + ((2.f * m2) / (m1 + m2)) * vel2.x;
-				float finalVelY1 = ((m1 - m2) / (m1 + m2)) * vel1.y + ((2.f * m2) / (m1 + m2)) * vel2.y;
-				float finalVelZ1 = ((m1 - m2) / (m1 + m2)) * vel1.z + ((2.f * m2) / (m1 + m2)) * vel2.z;
-				float finalVelX2 = ((2.f * m1) / (m1 + m2)) * vel1.x + ((m2 - m1) / (m1 + m2)) * vel2.x;
-				float finalVelY2 = ((2.f * m1) / (m1 + m2)) * vel1.y + ((m2 - m1) / (m1 + m2)) * vel2.y;
-				float finalVelZ2 = ((2.f * m1) / (m1 + m2)) * vel1.z + ((m2 - m1) / (m1 + m2)) * vel2.z;
-
-				m_pSpaceship->SetVelocity(XMFLOAT3(finalVelX1, finalVelY1, finalVelZ1));
-				m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(finalVelX2, finalVelY2, finalVelZ2));
-
-				m_pSpaceship->Move(m_pSpaceship->GetVelocity(), true);
-				if (m_pSpaceship->GetHP() > 0) {
-					m_pSpaceship->SetHP(m_pSpaceship->GetHP() - 2);
-				}
-
-				for (short pl_id : _plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_meteo_direction_packet(0, i, m_ppMeteoObjects[i]);
-					clients[pl_id].send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
-
-				}
-			}
-		//}
-	}*/
-}
-
 void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 {
 	float dist = 500.f; // 플레이어 사거리
@@ -381,7 +334,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		}
 	}
 
-	if (cur_mission == MissionType::DEFEAT_BOSS) {
+	if (cur_mission == MissionType::DEFEAT_BOSS || cur_mission == MissionType::DEFEAT_BOSS2) {
 		BoundingOrientedBox boss_bbox = m_pBoss->UpdateBoundingBox();
 		if (boss_bbox.Intersects(pos, dir, dist)) // 보스 충돌처리
 		{
@@ -395,7 +348,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 		}
 	}
 
-	if (cur_mission == MissionType::KILL_GOD) {
+	if (cur_mission == MissionType::KILL_GOD || cur_mission == MissionType::KILL_GOD2) {
 		BoundingOrientedBox god_bbox = m_pGod->UpdateBoundingBox();
 		if (god_bbox.Intersects(pos, dir, dist)) // 갓 충돌처리
 		{
@@ -412,7 +365,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 
 void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 {
-	float dist = 500.f; // 플레이어 사거리
+	float dist = 1000.f; // 플레이어 사거리
 	XMVECTOR pos = XMLoadFloat3(&data.pos);
 	XMVECTOR dir = XMLoadFloat3(&data.direction);
 
@@ -439,115 +392,6 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 			return;
 		}
 	}
-}
-
-void CScene::CheckEnemyCollisions()
-{
-
-	for (int i = 0; i < ENEMIES; ++i) {
-		m_ppEnemies[i]->UpdateBoundingBox();
-	}
-
-	//적&운석
-	for (int i = 0; i < METEOS; ++i) {
-		if (time(NULL) - m_ppMeteoObjects[i]->coll_time >= 1) {
-			m_ppMeteoObjects[i]->UpdateBoundingBox();
-			for (int j = 0; j < ENEMIES; ++j) {
-				
-				//if (m_ppEnemies[j]->HierarchyIntersects(m_ppMeteoObjects[i]))
-				{
-					//m_ppMeteoObjects[i]->coll_time = time(NULL);
-					XMFLOAT3 vel1 = m_ppEnemies[j]->GetVelocity();
-					XMFLOAT3 vel2 = m_ppMeteoObjects[i]->GetMovingDirection();
-					float m1 = 1.0f; float m2 = 5.0f;
-					float finalVelX1 = ((m1 - m2) / (m1 + m2)) * vel1.x + ((2.f * m2) / (m1 + m2)) * vel2.x;
-					float finalVelY1 = ((m1 - m2) / (m1 + m2)) * vel1.y + ((2.f * m2) / (m1 + m2)) * vel2.y;
-					float finalVelZ1 = ((m1 - m2) / (m1 + m2)) * vel1.z + ((2.f * m2) / (m1 + m2)) * vel2.z;
-					float finalVelX2 = ((2.f * m1) / (m1 + m2)) * vel1.x + ((m2 - m1) / (m1 + m2)) * vel2.x;
-					float finalVelY2 = ((2.f * m1) / (m1 + m2)) * vel1.y + ((m2 - m1) / (m1 + m2)) * vel2.y;
-					float finalVelZ2 = ((2.f * m1) / (m1 + m2)) * vel1.z + ((m2 - m1) / (m1 + m2)) * vel2.z;
-
-					m_ppEnemies[j]->SetVelocity(XMFLOAT3(finalVelX1, finalVelY1, finalVelZ1));
-					m_ppMeteoObjects[i]->SetMovingDirection(XMFLOAT3(finalVelX2, finalVelY2, finalVelZ2));
-				}
-			}
-		}
-	}
-
-	// 적들끼리
-	for (int i = 0; i < ENEMIES; ++i)
-	{
-		if (!m_ppEnemies[i]->GetisAlive()) { continue; }
-		for (int j = i + 1; j < ENEMIES; ++j) 
-		{
-			if (!m_ppEnemies[j]->GetisAlive()) { continue; }
-		//	if (m_ppEnemies[i]->HierarchyIntersects(m_ppEnemies[j]))
-			{
-				XMFLOAT3 xmf3Sub = m_ppEnemies[j]->GetPosition();
-				xmf3Sub = Vector3::Subtract(m_ppEnemies[i]->GetPosition(), xmf3Sub);
-				if (Vector3::Length(xmf3Sub) > 0.0001f) {
-					xmf3Sub = Vector3::Normalize(xmf3Sub);
-				}
-				XMFLOAT3 vel = m_ppEnemies[i]->GetVelocity();
-				float fLen = Vector3::Length(vel) / 30.f;
-				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
-				XMFLOAT3 vel2 = m_ppEnemies[j]->GetVelocity();
-
-				m_ppEnemies[i]->SetVelocity(Vector3::Add(vel, xmf3Sub));
-				m_ppEnemies[j]->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
-			}
-		}
-	}
-
-	
-}
-
-
-void CScene::CheckMissileCollisions()
-{
-	for (int i = 0; i < ENEMY_BULLETS; ++i) {
-		if (m_ppMissiles[i]->GetisActive()) {
-			m_ppMissiles[i]->UpdateBoundingBox();
-			//if (m_ppMissiles[i]->HierarchyIntersects(m_pSpaceship))
-			{
-				m_ppMissiles[i]->SetisActive(false);
-				// 충돌처리
-				
-				XMFLOAT3 xmf3Sub = m_pSpaceship->GetPosition();
-				xmf3Sub = Vector3::Subtract(m_ppMissiles[i]->GetPosition(), xmf3Sub);
-				if (Vector3::Length(xmf3Sub) > 0.0001f) {
-					xmf3Sub = Vector3::Normalize(xmf3Sub);
-				}
-				float fLen = 100.f;
-				xmf3Sub = Vector3::ScalarProduct(xmf3Sub, fLen, false);
-
-				XMFLOAT3 vel2 = m_pSpaceship->GetVelocity();
-
-				m_pSpaceship->SetVelocity(Vector3::Add(vel2, xmf3Sub, -1.f));
-				
-				if (m_pSpaceship->GetHP() > 0) {
-					m_pSpaceship->GetAttack(m_ppMissiles[i]->GetDamage());
-				}
-
-				for (short pl_id : _plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_remove_missile_packet(i);
-					clients[pl_id].send_bullet_hit_packet(-1, m_pSpaceship->GetHP());
-				}
-			}
-		}
-	}
-
-}
-
-void CScene::CheckBossCollisions()
-{
-	if (m_pBoss)
-		m_pBoss->UpdateBoundingBox();
-
-	if (m_pGod)
-		m_pGod->UpdateBoundingBox();
 }
 
 void CScene::CheckMissionComplete()
@@ -578,7 +422,6 @@ void CScene::CheckMissionComplete()
 		if (dist < 1000.f) {
 			SetMission(MissionType::CS_SHOW_GOD);
 		}
-
 		return;
 	}
 	}
@@ -600,9 +443,25 @@ void CScene::MissionClear()
 			timer_queue.push(ev);
 
 			if (cur_mission == MissionType::CS_SHOW_GOD) {
+				m_pGod->SetPosition(1300.f, 0.f, 0.f);
+				m_pGod->GodHP = 100;
+				m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
+
 				if (!god_timer_on) {
 					god_timer_on = true;
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
+					timer_queue.push(ev);
+				}
+			}
+			else if (cur_mission == MissionType::CS_BOSS_SCREAM) {
+				
+				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
+				m_pBoss->BossHP = 100;
+				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
+				
+				if (!boss_timer_on) {
+					boss_timer_on = true;
+					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
 					timer_queue.push(ev);
 				}
 			}
@@ -657,14 +516,30 @@ void CScene::SetMission(MissionType mission)
 			timer_queue.push(ev);
 
 			if (cur_mission == MissionType::CS_SHOW_GOD) {
+				m_pGod->SetPosition(1300.f, 0.f, 0.f);
+				m_pGod->GodHP = 100;
+				m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
+
 				if (!god_timer_on) {
 					god_timer_on = true;
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
 					timer_queue.push(ev);
 				}
 			}
+			else if (cur_mission == MissionType::CS_BOSS_SCREAM) {
+				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
+				m_pBoss->BossHP = 100;
+				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
+				
+				if (!boss_timer_on) {
+					boss_timer_on = true;
+					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
+					timer_queue.push(ev);
+				}
+			}
 		}
-		else if (cur_mission == MissionType::FIND_BOSS || cur_mission == MissionType::CS_ANGRY_BOSS || cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::DEFEAT_BOSS) {
+		else if (cur_mission == MissionType::FIND_BOSS) {
+
 			if (!boss_timer_on) {
 				boss_timer_on = true;
 				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
@@ -1141,7 +1016,7 @@ void CScene::UpdateBoss()
 {
 	if (_state != ST_INGAME) { boss_timer_on = false;  return; }
 	if (cur_mission != MissionType::DEFEAT_BOSS && cur_mission != MissionType::CS_BOSS_SCREAM && cur_mission != MissionType::CS_ANGRY_BOSS 
-		&& cur_mission != MissionType::FIND_BOSS) { boss_timer_on = false; return; }
+		&& cur_mission != MissionType::FIND_BOSS && cur_mission != MissionType::DEFEAT_BOSS2 && cur_mission != MissionType::CS_BAD_ENDING) { boss_timer_on = false; return; }
 	if (m_pBoss->BossHP <= 0) {
 		boss_timer_on = false;
 		SetMission(MissionType::CS_SHOW_STARGIANT);
@@ -1154,12 +1029,17 @@ void CScene::UpdateBoss()
 	}
 
 	m_pBoss->Boss_Ai(0.025f, m_pSpaceship, m_pBoss->GetHP());
+
+	if (cur_mission == MissionType::DEFEAT_BOSS && m_pBoss->BossHP <= 50) {
+		SetMission(MissionType::CS_ANGRY_BOSS);
+	}
+
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));
 	if (dist < 1000.f) // boss 막기
 	{
 		XMFLOAT3 ToGo = Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition());
-		ToGo = Vector3::ScalarProduct(ToGo, 800.f);
+		ToGo = Vector3::ScalarProduct(ToGo, 1000.f);
 		ToGo = Vector3::Add(m_pBoss->GetPosition(), ToGo);
 		m_pSpaceship->SetPosition(ToGo);
 	}
@@ -1176,7 +1056,8 @@ void CScene::UpdateGod()
 		SetMission(MissionType::CS_ENDING);
 		return;
 	}
-	if (cur_mission != MissionType::KILL_GOD && cur_mission != MissionType::CS_SHOW_GOD && cur_mission != MissionType::CS_ANGRY_GOD) { god_timer_on = false; return; }
+	if (cur_mission != MissionType::KILL_GOD && cur_mission != MissionType::CS_SHOW_GOD && cur_mission != MissionType::CS_ANGRY_GOD
+		&& cur_mission != MissionType::KILL_GOD2 && cur_mission != MissionType::CS_BAD_ENDING) { god_timer_on = false; return; }
 	if (levels[cur_mission].cutscene) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_GOD, static_cast<short>(num) };
 		timer_queue.push(ev);
@@ -1187,12 +1068,16 @@ void CScene::UpdateGod()
 		SpawnEnemyFromGod();
 	}
 
+	if (cur_mission == MissionType::KILL_GOD && m_pGod->GodHP <= 50) {
+		SetMission(MissionType::CS_ANGRY_GOD);
+	}
+
 	float dist;
 	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pGod->GetPosition()));
-	if (dist < 2000.f) // boss 막기
+	if (dist < 500.f) // boss 막기
 	{
 		XMFLOAT3 ToGo = Vector3::Subtract(m_pSpaceship->GetPosition(), m_pGod->GetPosition());
-		ToGo = Vector3::ScalarProduct(ToGo, 2000.f);
+		ToGo = Vector3::ScalarProduct(ToGo, 500.f);
 		ToGo = Vector3::Add(m_pGod->GetPosition(), ToGo);
 		m_pSpaceship->SetPosition(ToGo);
 	}
@@ -1564,183 +1449,9 @@ void CScene::Send(char* p)
 	}
 }
 
-void CScene::AnimateObjects(float fTimeElapsed)
-{
-
-	float dist;
-	dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));
-	if (dist < 1000.f) // boss 막기
-	{
-		XMFLOAT3 ToGo = Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition());
-		ToGo = Vector3::ScalarProduct(ToGo, 800.f);
-		ToGo = Vector3::Add(m_pBoss->GetPosition(), ToGo);
-		m_pSpaceship->SetPosition(ToGo);
-	}
-
-
-	XMFLOAT3 p_pos = m_pSpaceship->GetPosition();
-	for (int i = 0; i < METEOS; ++i) 
-	{ 
-		XMFLOAT3 m_pos = m_ppMeteoObjects[i]->GetPosition();
-		float dist = Vector3::Length(Vector3::Subtract(m_pos, p_pos));
-		if (dist > 1000.0f){
-			SpawnMeteo(i);
-		}
-		m_ppMeteoObjects[i]->Animate(fTimeElapsed, NULL); 
-	}
-
-	for (int i = 0; i < ENEMIES; ++i)
-	{
-		if (m_ppEnemies[i]->GetisAlive()) { 
-			m_ppEnemies[i]->Animate(fTimeElapsed, m_pSpaceship); 
-			/*
-			if (m_ppEnemies[i]->GetLaunchMissile()) {
-				//MissileInfo info = m_ppEnemies[i]->GetMissileInfo();
-				if (info.damage == 0) continue;
-				for (int j = 0; j < ENEMY_BULLETS; ++j) {
-					if (!m_ppMissiles[j]->GetisActive()) {
-						m_ppMissiles[j]->SetNewMissile(info);
-						MISSILE_INFO m_info{};
-						m_info.id = j;
-						m_info.pos = info.StartPos;
-						m_info.Quaternion = info.Quaternion;
-						
-						for (short pl_id : _plist) {
-							if (pl_id == -1) continue;
-							if (clients[pl_id]._state != ST_INGAME) continue;
-							clients[pl_id].send_missile_packet(m_info);
-						}
-						break;
-					}
-				}
-			}*/
-		}
-	}
-	/*
-	for (int i = 0; i < ENEMY_BULLETS; ++i) {
-		if (m_ppMissiles[i]->GetisActive()) {
-			m_ppMissiles[i]->Animate(fTimeElapsed, m_pSpaceship);
-			MISSILE_INFO m_info{};
-			m_info.id = i;
-			m_info.pos = m_ppMissiles[i]->GetPosition();
-			//printf("%f %f %f\n", m_info.pos.x, m_info.pos.y, m_info.pos.z);
-			for (short pl_id : _plist) {
-				if (pl_id == -1) continue;
-				if (clients[pl_id]._state != ST_INGAME) continue;
-				if (m_ppMissiles[i]->GetisActive()) {
-					clients[pl_id].send_missile_packet(m_info);
-				}
-				else {
-					clients[pl_id].send_remove_missile_packet(i);
-				}
-			}
-		}
-	}*/
-	if (m_pBoss) {
-		m_pBoss->Animate(fTimeElapsed);
-		if(cur_mission == MissionType::FIND_BOSS || cur_mission == MissionType::DEFEAT_BOSS)
-			m_pBoss->Boss_Ai(fTimeElapsed, m_pSpaceship, m_pBoss->GetHP());;
-	}
-
-	if (m_pGod) {
-		m_pGod->Animate(fTimeElapsed);
-		if (cur_mission == MissionType::TU_SIT || cur_mission == MissionType::TU_KILL)
-		//if (cur_mission == MissionType::CS_SHOW_GOD || cur_mission == MissionType::KILL_GOD)
-			m_pGod->God_Ai(fTimeElapsed, m_pSpaceship, m_pGod->GetcurHp());;
-	}
-
-	m_pSpaceship->Update(fTimeElapsed);
-
-	
-	for (int i = 0; i < 3; ++i)
-	{
-		if (_plist[i] == -1) { continue; }
-		XMFLOAT3 pos[2]{};
-		int num = 0;
-		for (int j = 0; j < 3; ++j) {
-			if (j == i) { continue; }
-			if (_plist[j] == -1) { continue; }
-			if (clients[_plist[j]]._state == ST_INGAME) {
-				pos[num] = m_ppPlayers[j]->GetPosition();
-			}
-			else { pos[num] = { 0.f, 0.f, 0.f }; }
-			++num;
-		}
-		m_ppPlayers[i]->Update(fTimeElapsed, pos);
-
-		if (clients[_plist[i]]._state == ST_INGAME && clients[_plist[i]].type == PlayerType::INSIDE) {
-			for (short pl_id : _plist) {
-				if (pl_id == -1) continue;
-				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].send_inside_packet(i, m_ppPlayers[i]);
-			}
-		}
-	}
-
-
-
-	for (short pl_id : _plist) {
-		if (pl_id == -1) continue;
-		if (clients[pl_id]._state != ST_INGAME) continue;
-		//clients[pl_id].send_spaceship_packet(m_pSpaceship);
-	}
-
-//	if (send_time % 30 == 0) {
-		for (int i = 0; i < ENEMIES; ++i) {
-			if (m_ppEnemies[i]->GetisAlive()) {
-				ENEMY_INFO info{};
-				info.id = m_ppEnemies[i]->GetID();
-		//		info.Quaternion = m_ppEnemies[i]->GetQuaternion();
-				info.pos = m_ppEnemies[i]->GetPosition();
-
-				for (short pl_id : _plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_enemy_packet(info);
-				}
-			}
-		}
-
-		for (short pl_id : _plist) {
-			if (pl_id == -1) continue;
-			if (clients[pl_id]._state != ST_INGAME) continue;
-			//clients[pl_id].send_meteo_packet(m_ppMeteoObjects);
-			//for (int i = 0; i < 3; ++i) {
-			//	if (_plist[i] == -1) continue;
-			//	if (clients[_plist[i]]._state == !ST_INGAME) { continue; }
-			//	clients[pl_id].send_change_packet(i, clients[_plist[i]].type);
-			//}
-		}
-//	}
-
-		/*
-	if (heal_player != -1) {
-		std::chrono::duration<double>sec = std::chrono::system_clock::now() - heal_start;
-		heal_start = std::chrono::system_clock::now();
-		if (m_pSpaceship->GetHeal(sec.count())) {
-			for (short pl_id : _plist) {
-				if (pl_id == -1) continue;
-				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].send_bullet_hit_packet(0, -1, m_pSpaceship->GetHP());
-			}
-		}
-	}*/
-
-	CheckMeteoByPlayerCollisions();
-	CheckEnemyCollisions();
-	CheckMissileCollisions();
-
-	CheckMissionComplete();
-	//CheckObjectByBulletCollisions();
-	//CheckEnemyByBulletCollisions();
-
-}
-
-
-
 //--------------------------------------------------------------------------------------------------------
 
-void CScene::Start()
+bool CScene::Start()
 {
 	_s_lock.lock();
 	if (_state == SCENE_ALLOC) {
@@ -1757,24 +1468,26 @@ void CScene::Start()
 
 		for (char i = 0; i < METEOS; ++i) {
 			m_ppMeteoObjects[i]->prev_time = chrono::steady_clock::now();
-			TIMER_EVENT ev{ i, chrono::system_clock::now() + 33ms, EV_UPDATE_METEO, num };
+			TIMER_EVENT ev{ i, chrono::system_clock::now() + 33ms, EV_UPDATE_METEO, static_cast<short>(num) };
 			timer_queue.push(ev);
 		}
 
-		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10s, EV_SPAWN_ENEMY, num };
+		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10s, EV_SPAWN_ENEMY, static_cast<short>(num) };
 		timer_queue.push(ev);
 		m_pSpaceship->prev_time = chrono::steady_clock::now();
-		TIMER_EVENT ev1{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, num };
+		TIMER_EVENT ev1{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_SPACESHIP, static_cast<short>(num) };
 		timer_queue.push(ev1);
 
-		TIMER_EVENT ev2{ 0, chrono::system_clock::now() + 33ms, EV_SEND_SCENE_INFO, num };
+		TIMER_EVENT ev2{ 0, chrono::system_clock::now() + 33ms, EV_SEND_SCENE_INFO, static_cast<short>(num) };
 		timer_queue.push(ev2);
 
 		TIMER_EVENT ev3{ 1, chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
 		timer_queue.push(ev3);
-		return;
+		_s_lock.unlock();
+		return true;
 	}
 	_s_lock.unlock();
+	return false;
 
 }
 

@@ -677,16 +677,20 @@ void CGameObject::SetChild(CGameObject *pChild, bool bReferenceUpdate)
 	{
 		pChild->m_pParent = this;
 		if (bReferenceUpdate) pChild->AddRef();
+
 	}
 	if (m_pChild)
 	{
 		if (pChild) pChild->m_pSibling = m_pChild->m_pSibling;
 		m_pChild->m_pSibling = pChild;
+
 	}
 	else
 	{
 		m_pChild = pChild;
+		
 	}
+
 }
 
 void CGameObject::SetMesh(CMesh *pMesh)
@@ -788,7 +792,7 @@ float CGameObject::GetTrackAnimationPosition(int nAnimationTrack)
 
 void CGameObject::Animate(float fTimeElapsed)
 {
-	OnPrepareRender();
+	//OnPrepareRender();
 
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->AdvanceTime(fTimeElapsed, this);
 
@@ -858,10 +862,20 @@ void CGameObject::ReleaseUploadBuffers()
 		if (m_ppMaterials[i]) m_ppMaterials[i]->ReleaseUploadBuffers();
 	}
 
-	if (m_pSibling) 
+	if (m_pSibling!=NULL) 
 		m_pSibling->ReleaseUploadBuffers();
-	if (m_pChild) 
+	if (m_pChild != NULL)
 		m_pChild->ReleaseUploadBuffers();
+}
+
+void CGameObject::ReleaseUploadBuffers2()
+{
+	if (m_pMesh) m_pMesh->ReleaseUploadBuffers();
+
+	for (int i = 0; i < m_nMaterials; i++)
+	{
+		if (m_ppMaterials[i]) m_ppMaterials[i]->ReleaseUploadBuffers();
+	}
 }
 
 void CGameObject::SetPosition(float x, float y, float z)
@@ -1526,6 +1540,7 @@ CAngrybotObject::CAngrybotObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 	SetChild(pAngrybotModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pAngrybotModel);
+
 }
 
 CAngrybotObject::~CAngrybotObject()
@@ -1541,6 +1556,7 @@ CMonsterObject::CMonsterObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 
 	SetChild(pMonsterModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pMonsterModel);
+
 }
 
 CMonsterObject::~CMonsterObject()
@@ -1556,6 +1572,8 @@ CHumanoidObject::CHumanoidObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 	SetChild(pHumanoidModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pHumanoidModel);
+
+
 }
 
 CHumanoidObject::~CHumanoidObject()
@@ -1571,6 +1589,8 @@ CEthanObject::CEthanObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *
 
 	SetChild(pEthanModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pEthanModel);
+
+
 }
 
 CEthanObject::~CEthanObject()
@@ -1586,6 +1606,8 @@ CLionObject::CLionObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd
 
 	SetChild(pLionModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pLionModel);
+
+
 }
 
 CLionObject::~CLionObject()
@@ -1601,6 +1623,8 @@ CZebraObject::CZebraObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *
 
 	SetChild(pZebraModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pZebraModel);
+
+
 }
 
 CZebraObject::~CZebraObject()
@@ -1616,6 +1640,8 @@ CEagleObject::CEagleObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *
 
 	SetChild(pEagleModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pEagleModel);
+
+
 }
 
 CEagleObject::~CEagleObject()
@@ -1630,6 +1656,8 @@ CMeteorObject::CMeteorObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	SetChild(pMeteorModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pMeteorModel);
+
+
 }
 
 CMeteorObject::~CMeteorObject()
@@ -1650,64 +1678,19 @@ CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 {
 	isAlive = false;
 	Maxhp = hp;
-	m_xmf4x4Rotate = Matrix4x4::Identity();
 
 	CLoadedModelInfo* pEnemyModel = pModel;
-	if (!pEnemyModel) pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/meteo.bin", NULL);
+	if (!pEnemyModel) pEnemyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/AlienDestroyer.bin", NULL);
 
 
 	SetChild(pEnemyModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pEnemyModel);
+
 }
 
 CEnemyObject::~CEnemyObject()
 {
 }
-
-void CEnemyObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
-{
-	if (pxmf4x4Parent) {
-
-		XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(m_xmf4x4ToParent, *pxmf4x4Parent);
-		m_xmf4x4World = Matrix4x4::Multiply(m_xmf4x4Rotate, xmf4x4);
-	}
-	else {
-		m_xmf4x4World = Matrix4x4::Multiply(m_xmf4x4Rotate, m_xmf4x4ToParent);
-	}
-
-	if (m_pSibling) m_pSibling->UpdateTransform(pxmf4x4Parent);
-	if (m_pChild) m_pChild->UpdateTransform(&m_xmf4x4World);
-}
-
-void CEnemyObject::ResetRotate()
-{
-	m_xmf4x4Rotate = Matrix4x4::Identity();
-}
-
-void CEnemyObject::Rotate(float fPitch, float fYaw, float fRoll)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
-void CEnemyObject::Rotate(XMFLOAT3* pxmf3Axis, float fAngle)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(pxmf3Axis), XMConvertToRadians(fAngle));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
-void CEnemyObject::Rotate(XMFLOAT4* pxmf4Quaternion)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationQuaternion(XMLoadFloat4(pxmf4Quaternion));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
 
 void CEnemyObject::VelocityUpdate(float fTimeElapsed, XMFLOAT3& player_look)
 {
@@ -1734,10 +1717,17 @@ void CEnemyObject::VelocityUpdate(float fTimeElapsed, XMFLOAT3& player_look)
 	}
 }
 
+void CEnemyObject::Reset()
+{
+	m_xmf4x4World = Matrix4x4::Identity();
+	m_xmf4x4ToParent = Matrix4x4::Identity();
+	SetScale(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
+}
 
 
 void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 {
+
 	XMFLOAT3 new_pos = pos;
 	XMMATRIX inv_mat = XMMatrixInverse(NULL, XMLoadFloat4x4(&m_xmf4x4World));	// 역행렬
 
@@ -1745,7 +1735,6 @@ void CEnemyObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	if (Vector3::Length(new_pos) > 0.0001f) {
 		new_pos = Vector3::Normalize(new_pos);
 	}
-
 
 	float pitch = XMConvertToDegrees(asin(-new_pos.y));
 	float yaw = XMConvertToDegrees(atan2(new_pos.x, new_pos.z));
@@ -1799,10 +1788,10 @@ void CEnemyObject::AimingAI(float fTimeElapsed, XMFLOAT3& pl_pos)
 CInsideShipObject::CInsideShipObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
 {
 	CLoadedModelInfo* pMeteorModel = pModel;
-	if (!pMeteorModel) pMeteorModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/InsideShip.bin", NULL);
+	if (!pMeteorModel) pMeteorModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/InsideMap.bin", NULL);
 
 	SetChild(pMeteorModel->m_pModelRootObject, true);
-	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pModel);
+	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pMeteorModel);
 	//m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	//m_pSkinnedAnimationController->SetCallbackKeys(0, 1);
 
@@ -1846,7 +1835,6 @@ CBulletObject::CBulletObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	SetChild(pBulletModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pBulletModel);
-	
 
 }
 
@@ -1941,13 +1929,12 @@ void CBulletObject::Reset()
 
 CMissileObject::CMissileObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
 {
-	m_xmf4x4Rotate = Matrix4x4::Identity();
-
 	CLoadedModelInfo* pBulletModel = pModel;
 	if (!pBulletModel) pBulletModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/cube.bin", NULL);
 
 	SetChild(pBulletModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pBulletModel);
+
 }
 
 void CMissileObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
@@ -1964,7 +1951,7 @@ void CMissileObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	float pitch = XMConvertToDegrees(asin(-new_pos.y));
 	float yaw = XMConvertToDegrees(atan2(new_pos.x, new_pos.z));
 
-	float rotate_angle = fTimeElapsed * 360.f;
+	float rotate_angle = fTimeElapsed * 180.f;
 
 	XMFLOAT3 p_y_r{ pitch, yaw, 0.f };
 	if (Vector3::Length(p_y_r) > rotate_angle) {
@@ -1978,48 +1965,10 @@ void CMissileObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
 	UpdateTransform(NULL);
 }
 
-void CMissileObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
-{
-	if (pxmf4x4Parent) {
-
-		XMFLOAT4X4 xmf4x4 = Matrix4x4::Multiply(m_xmf4x4ToParent, *pxmf4x4Parent);
-		m_xmf4x4World = Matrix4x4::Multiply(m_xmf4x4Rotate, xmf4x4);
-	}
-	else {
-		m_xmf4x4World = Matrix4x4::Multiply(m_xmf4x4Rotate, m_xmf4x4ToParent);
-	}
-
-	if (m_pSibling) m_pSibling->UpdateTransform(pxmf4x4Parent);
-	if (m_pChild) m_pChild->UpdateTransform(&m_xmf4x4World);
-}
-
-void CMissileObject::Rotate(float fPitch, float fYaw, float fRoll)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
-void CMissileObject::Rotate(XMFLOAT3* pxmf3Axis, float fAngle)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(pxmf3Axis), XMConvertToRadians(fAngle));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
-void CMissileObject::Rotate(XMFLOAT4* pxmf4Quaternion)
-{
-	XMMATRIX mtxRotate = XMMatrixRotationQuaternion(XMLoadFloat4(pxmf4Quaternion));
-	m_xmf4x4Rotate = Matrix4x4::Multiply(mtxRotate, m_xmf4x4Rotate);
-
-	UpdateTransform(NULL);
-}
-
 void CMissileObject::ResetRotate()
 {
-	m_xmf4x4Rotate = Matrix4x4::Identity();
+	m_xmf4x4World = Matrix4x4::Identity();
+	m_xmf4x4ToParent = Matrix4x4::Identity();
 }
 
 //================================================
@@ -2106,7 +2055,7 @@ void CSpriteObject::Animate(float fElapsedTime)
 			if (++m_nCol == m_nCols) { m_nRow++; m_nCol = 0; }
 			if (m_nRow == m_nRows) { m_nRow = 0;}// , FullAnimated = true; 
 		}
-
+		CGameObject::Animate(fElapsedTime);
 }
 
 
@@ -2116,21 +2065,20 @@ void CSpriteObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 	//cout << m_ppMaterials[0]->m_ppTextures[0]->m_pRootArgumentInfos[0].m_nRootParameterIndex<<endl;
 	switch (SpriteMode) {
 		case static_cast<int>(SpriteType::Ship):
-			CGameObject::Render(pd3dCommandList, pCamera);
+			//CGameObject::Render(pd3dCommandList, pCamera);
 			SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 			break;
 
 		case static_cast<int>(SpriteType::EnemyBoom):
-			CGameObject::Render(pd3dCommandList, pCamera);
+			//CGameObject::Render(pd3dCommandList, pCamera);
 			SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f)); 
 			//시간 제한 코드 
 			CountDiedTime(1.0f);
 			break;
 		default: break;
 	}
-	UpdateTransform(NULL);
-
-	
+	CGameObject::UpdateTransform(NULL);
+	CGameObject::Render(pd3dCommandList, pCamera);	
 }
 
 void CSpriteObject::CountDiedTime(float dieTime)
@@ -2201,6 +2149,7 @@ CMascotObject::CMascotObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	SetChild(pMascotModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pMascotModel);
+
 }
 
 CMascotObject::~CMascotObject()
@@ -2234,11 +2183,6 @@ CBlackHole::CBlackHole(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	SetMaterial(0, m_blackholeMaterial);
 }
 
-void CBlackHole::Animate(float fElapsedTime)
-{
-	CGameObject::Animate(fElapsedTime);
-}
-
 void CBlackHole::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	CGameObject::Render(pd3dCommandList, pCamera);
@@ -2262,7 +2206,6 @@ CBlackHoleMeteorObject::CBlackHoleMeteorObject(ID3D12Device* pd3dDevice, ID3D12G
 	float randomAngle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * XM_PI;
 	m_xmf3MovingDirection = XMFLOAT3(cosf(randomAngle), 0.0f, sinf(randomAngle));
 	m_xmf3MovingDirection = Vector3::Normalize(m_xmf3MovingDirection);
-
 }
 
 
@@ -2365,6 +2308,7 @@ CJewelObject::CJewelObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 	SetChild(pJewelModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pJewelModel);
+
 }
 
 void CJewelObject::endingMove(float fElapsedTime, XMFLOAT3 tarpos)

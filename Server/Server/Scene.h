@@ -19,22 +19,14 @@ public:
 	CScene();
 	~CScene();
 
-	void Init();
-
 	void BuildObjects();
 	void ReleaseObjects();
 
 	void ResetScene();
 	void Reset();
 
-	void AnimateObjects(float fTimeElapsed);
-
-	void CheckMeteoByPlayerCollisions();
 	void CheckEnemyByBulletCollisions(BULLET_INFO& data);
 	void CheckMeteoByBulletCollisions(BULLET_INFO& data);
-	void CheckEnemyCollisions();
-	void CheckMissileCollisions();
-	void CheckBossCollisions();
 
 	void CheckMissionComplete();
 	void MissionClear();
@@ -60,21 +52,19 @@ public:
 	void SpawnEnemyFromGod();
 	void SpawnEnemyFromGod(char id, char num);
 
-	void ChangeInvincibleMode();
-
 	void SpawnEnemy(char id);
-
 	void SpawnMeteo(char i);
 
 	void Send(char* p);
 
-	void Start();
+	bool Start();
 	char InsertPlayer(short pl_id);
 
+	void ChangeInvincibleMode();
+public:
 	CAirplanePlayer* m_pSpaceship = NULL;
 	CTerrainPlayer* m_ppPlayers[3] = { NULL, NULL, NULL };
 
-public:
 	std::array<CMeteoObject*, METEOS>			m_ppMeteoObjects;
 	std::array<CEnemy*, ENEMIES>				m_ppEnemies;
 	std::array<CMissile*, ENEMY_BULLETS>		m_ppMissiles;
@@ -83,35 +73,32 @@ public:
 
 	Boss* m_pBoss;
 	God* m_pGod;
+	bool boss_timer_on = false;
+	bool god_timer_on = false;
 
-
-	short _id;
-	short num;
 
 	std::chrono::system_clock::time_point heal_start;
 	std::atomic_char heal_player = -1;
 
-//	bool						m_bIsRunning = true;
+	XMFLOAT3 black_hole_pos;
+	chrono::steady_clock::time_point b_prev_time;
+	float black_hole_time;
 
-	char						kill_monster_num = 0;
+	char	kill_monster_num = 0;
 
 	MissionType cur_mission;
 	MissionType prev_mission;
 
 	std::atomic_bool can_sit[4];
 
+	bool invincible_mode = false;
+
 	SCENE_STATE _state;
 	mutex _s_lock;
 
+	short _id;
+	short num;
+
 	array<short, 3> _plist;
 	mutex _plist_lock;
-
-	XMFLOAT3 black_hole_pos;
-	chrono::steady_clock::time_point b_prev_time;
-	float black_hole_time;
-
-	bool invincible_mode = false;
-
-	bool boss_timer_on = false;
-	bool god_timer_on = false;
 };

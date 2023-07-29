@@ -60,13 +60,19 @@ short SceneManager::FindScene(short id, short pl_id)		// 수정 필요 lock / unlock
 short SceneManager::FindScene(short pl_id)
 {
 	array<CScene*, MAX_ROOM>::iterator iter = std::find_if(m_pScenes.begin(), m_pScenes.end(), [](CScene*& scene) {
-		return scene->_id == -1 && (scene->_state == SCENE_ALLOC || scene->_state == SCENE_FREE);
+		if (scene->_state != SCENE_ALLOC || scene->_id != -1) { return false; }
+		return std::any_of(scene->_plist.crbegin(), scene->_plist.crend(), [](short pl) {
+			return pl == -1;
+			});
 		});
 
-	if (iter != m_pScenes.end())
-	{
-		return (*iter)->num;
-	}
+	if (iter != m_pScenes.end()){ return (*iter)->num; }
+
+	iter = std::find_if(m_pScenes.begin(), m_pScenes.end(), [](CScene*& scene) {
+		return scene->_state == SCENE_FREE;
+		});
+
+	if (iter != m_pScenes.end()) { return (*iter)->num; }
 
 	return -1;
 }
@@ -74,11 +80,6 @@ short SceneManager::FindScene(short pl_id)
 CScene* SceneManager::GetScene(short id)
 {
 	return m_pScenes[id];
-}
-
-void SceneManager::SceneStart(short num)
-{
-	m_pScenes[num]->Start();
 }
 
 void SceneManager::ResetScene(short num)
@@ -103,16 +104,4 @@ char SceneManager::InsertPlayer(short num, short pl_id)
 void SceneManager::Send(short num, char* p)
 {
 	m_pScenes[num]->Send(p);
-}
-
-bool SceneManager::GetCanSit(short scene_id, PlayerType type)
-{
-	for (auto pl_id : m_pScenes[scene_id]->_plist) {
-		if (pl_id == -1)continue;
-		if (clients[pl_id].type == type) {
-			return false;
-		}
-	}
-
-	return true;
 }

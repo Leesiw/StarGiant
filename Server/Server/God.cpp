@@ -148,6 +148,11 @@ bool God::God_Ai(float fTimeElapsed, CAirplanePlayer* player, int godHp)
 	CurMotion = GodAnimation(lua_tonumber(m_L, -1));
 	lua_pop(m_L, 2);
 
+	if (CurMotion != GodAnimation::IDLE2)
+	{
+		LookAtPosition(fTimeElapsed, player->GetPosition());
+	}
+
 	SendPosition();
 
 	if (PastMotion != CurMotion) {
@@ -164,13 +169,14 @@ bool God::God_Ai(float fTimeElapsed, CAirplanePlayer* player, int godHp)
 		p.data.id = -1;
 		p.data.hp = player->GetHP();
 		scene_manager.Send(scene_num, (char*)&p);
+
+
+		if (CurMotion == GodAnimation::ROAR)
+			return true;
+
+		
 	}
 
-	if (CurMotion != GodAnimation::IDLE2)
-	{
-		LookAtPosition(fTimeElapsed, player->GetPosition());
-	}
-
-	// 적 스폰 시작할때에만 true 반환
 	return false;
+
 }
