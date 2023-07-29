@@ -869,22 +869,22 @@ void CGameFramework::CameraUpdateChange()
 
 	}
 
-	//CS_TURN은 어차피 플레이어 전부 내부에서 시작함
-	if (curMissionType == MissionType::CS_TURN && !iscut) {
-		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
-		cout << "CS_TURN\n";
-		if (!isending) m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
-		m_pInsideCamera->SetTarget({ 530.219f, 230.f, 593.263f });
-		m_pInsideCamera->SetDist(-25.0f);
-		m_pInsideCamera->canTurn = true;
-		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
-		m_pInsideCamera->endc = false;
+	////CS_TURN은 어차피 플레이어 전부 내부에서 시작함
+	//if (curMissionType == MissionType::CS_TURN && !iscut) {
+	//	cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+	//	cout << "CS_TURN\n";
+	//	if (!isending) m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
+	//	m_pInsideCamera->SetTarget({ 530.219f, 230.f, 593.263f });
+	//	m_pInsideCamera->SetDist(-25.0f);
+	//	m_pInsideCamera->canTurn = true;
+	//	m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+	//	m_pInsideCamera->endc = false;
 
-		iscut = true;
-		isending = false;
+	//	iscut = true;
+	//	isending = false;
 
-		cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
-	}
+	//	cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
+	//}
 
 	//CS_SHOW_PLANET 내부일때,
 	if (curMissionType == MissionType::CS_SHOW_PLANET && b_Inside && m_pInsidePlayer[g_myid] && !iscut) {
@@ -3009,6 +3009,17 @@ void CGameFramework::ProcessPacket(char* p)
 	{
 		_state = SCENE_INGAME;
 		m_bgm[0]->play();
+
+		if (!isending) m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode();
+		m_pInsideCamera->SetTarget({ 530.219f, 230.f, 593.263f });
+		m_pInsideCamera->SetDist(-25.0f);
+		m_pInsideCamera->canTurn = true;
+		m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		m_pInsideCamera->endc = false;
+
+		iscut = true;
+		isending = false;
+
 		break;
 	}
 	case SC_BLACK_HOLE:
