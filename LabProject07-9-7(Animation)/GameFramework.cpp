@@ -3044,6 +3044,11 @@ void CGameFramework::ProcessPacket(char* p)
 		blackholetime = packet->time;	// 블랙홀 시간 float 타입 30.0f -> 0.0f
 		break;
 	}
+	case SC_LOGIN_FAIL:
+	{
+		// 플레이어 로그인 실패 : 비어있는 Scene이 없음
+		break;
+	}
 	default:
 		printf("Unknown PACKET type [%d]\n", p[1]);
 		break;
