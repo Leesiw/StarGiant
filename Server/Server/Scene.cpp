@@ -447,12 +447,14 @@ void CScene::MissionClear()
 				m_pGod->SetPosition(1300.f, 0.f, 0.f);
 				m_pGod->GodHP = 100;
 				m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
-
+				god_timer_m.lock();
 				if (!god_timer_on) {
 					god_timer_on = true;
+					god_timer_m.unlock();
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
 					timer_queue.push(ev);
 				}
+				else{ god_timer_m.unlock(); }
 			}
 			else if (cur_mission == MissionType::CS_BOSS_SCREAM) {
 				
@@ -530,12 +532,14 @@ void CScene::SetMission(MissionType mission)
 				m_pGod->SetPosition(1300.f, 0.f, 0.f);
 				m_pGod->GodHP = 100;
 				m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
-
+				god_timer_m.lock();
 				if (!god_timer_on) {
 					god_timer_on = true;
+					god_timer_m.unlock();
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
 					timer_queue.push(ev);
 				}
+				else{ god_timer_m.unlock(); }
 			}
 			else if (mission == MissionType::CS_BOSS_SCREAM) {
 				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
