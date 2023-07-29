@@ -645,6 +645,7 @@ void CScene::SetMissionFindBoss()
 			if (clients[pl_id]._state != ST_INGAME) continue;
 			clients[pl_id].send_mission_start_packet(cur_mission);
 		}
+		return;
 	}
 	boss_timer_m.unlock();
 }

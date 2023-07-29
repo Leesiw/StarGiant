@@ -804,11 +804,11 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	}
 	case CS_START: {
 		if (clients[c_id]._state == ST_INGAME) { break; }
-		scene_manager._scene_lock.lock();
 		short t_room_id = clients[c_id].room_id;
-		if (t_room_id == -1) { scene_manager._scene_lock.unlock(); break; }
-		
+		if (t_room_id == -1) { break; }
 		CScene* scene = scene_manager.GetScene(t_room_id);
+
+		scene_manager._scene_lock.lock();
 		if (scene->Start()) {
 			scene_manager._scene_lock.unlock();
 			SC_START_PACKET packet{};
