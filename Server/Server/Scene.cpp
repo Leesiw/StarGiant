@@ -475,6 +475,7 @@ void CScene::MissionClear()
 			}
 		}
 		else if (cur_mission == MissionType::GO_CENTER) {
+			mission_start = chrono::system_clock::now();
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
 			timer_queue.push(ev);
 		}
@@ -551,6 +552,7 @@ void CScene::SetMission(MissionType mission)
 			}
 		}
 		else if (mission == MissionType::GO_CENTER) {
+			mission_start = chrono::system_clock::now();
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
 			timer_queue.push(ev);
 		}
@@ -1321,7 +1323,7 @@ void CScene::CheckCutsceneEnd(MissionType next_mission)
 			ResetScene();
 		}
 		else if (levels[cur_mission].NextMission == next_mission) {
-				SetMission(next_mission);
+			SetMission(next_mission);
 		}
 		return;
 	}

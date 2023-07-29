@@ -162,7 +162,13 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		case OP_MISSION_CLEAR: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state == ST_INGAME && scene->cur_mission == MissionType::GO_CENTER) {
-				scene->SetMission(MissionType::KILL_MONSTER3);
+				if (scene->mission_start + 20s <= std::chrono::system_clock::now()) {
+					scene->SetMission(MissionType::KILL_MONSTER3);
+				}
+				else {
+					TIMER_EVENT ev{ 0, scene->mission_start + 20s, EV_MISSION_CLEAR, (static_cast<short>(key)) };
+					timer_queue.push(ev);
+				}
 			}
 			delete ex_over;
 			break;
