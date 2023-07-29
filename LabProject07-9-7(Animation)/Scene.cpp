@@ -633,9 +633,6 @@ void CScene::ReleaseObjects()
 
 
 
-
-
-
 	for (int i = 0; i < MAX_FIRE; i++)
 	{
 		m_pFire[i]->ReleaseShaderVariables();
@@ -2104,8 +2101,11 @@ void CScene::RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 	m_ppUIInside[3]->SetPosition(m_SitPos[3].x, m_SitPos[3].y + 10.0f, m_SitPos[3].z);
 
 
+	if(m_pPlayer[0]->isAlive)
 	m_ppUIName[0]->SetPosition(m_pPlayer[0]->GetPosition().x, m_pPlayer[0]->GetPosition().y + 15.0f, m_pPlayer[0]->GetPosition().z);
+	if (m_pPlayer[1]->isAlive)
 	m_ppUIName[1]->SetPosition(m_pPlayer[1]->GetPosition().x, m_pPlayer[1]->GetPosition().y + 15.0f, m_pPlayer[1]->GetPosition().z);
+	if (m_pPlayer[2]->isAlive)
 	m_ppUIName[2]->SetPosition(m_pPlayer[2]->GetPosition().x, m_pPlayer[2]->GetPosition().y + 15.0f, m_pPlayer[2]->GetPosition().z);
 
 

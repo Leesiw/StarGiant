@@ -55,6 +55,7 @@ public:
 	CPlayer();
 	virtual ~CPlayer();
 
+
 	void SetChild(CGameObject* pChild, bool bReferenceUpdate = false);
 
 
