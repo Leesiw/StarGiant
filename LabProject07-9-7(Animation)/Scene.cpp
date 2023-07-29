@@ -2249,7 +2249,7 @@ void CScene::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList)
 		m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.x, m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.y, m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.z+0.01);*/
 	m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
 	m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
-
+}
 void CScene::OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 }
