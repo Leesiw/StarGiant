@@ -490,16 +490,15 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		short t_room_id = clients[c_id].room_id;
 		if (t_room_id != -1) {	// 이미 배정된 방이 있을 때
 			CScene* scene = scene_manager.GetScene(t_room_id);
-			if (scene->_id != clients[c_id].room_id) {
-				scene->_plist_lock.lock();
-				char t_room_pid = clients[c_id].room_pid;
-				if (t_room_pid != -1) {
-					scene->_plist[t_room_pid] = -1;
-				}
-				clients[c_id].room_id = -1;
-				clients[c_id].room_pid = -1;
-				scene->_plist_lock.unlock();
+			if (scene->_id == p->room_id) { break; }
+			scene->_plist_lock.lock();
+			char t_room_pid = clients[c_id].room_pid;
+			if (t_room_pid != -1) {
+				scene->_plist[t_room_pid] = -1;
 			}
+			clients[c_id].room_id = -1;
+			clients[c_id].room_pid = -1;
+			scene->_plist_lock.unlock();
 		}
 
 		scene_manager._scene_lock.lock();
