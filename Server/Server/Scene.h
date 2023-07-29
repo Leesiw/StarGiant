@@ -75,14 +75,17 @@ public:
 	God* m_pGod;
 	bool boss_timer_on = false;
 	bool god_timer_on = false;
+	mutex boss_timer_m;
+	mutex god_timer_m;
 
+	std::chrono::system_clock::time_point mission_start;
 
-	std::chrono::system_clock::time_point heal_start;
 	std::atomic_char heal_player = -1;
 
 	XMFLOAT3 black_hole_pos;
 	chrono::steady_clock::time_point b_prev_time;
 	float black_hole_time;
+	bool black_hole_timer_on = false;
 
 	char	kill_monster_num = 0;
 

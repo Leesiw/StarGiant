@@ -40,6 +40,7 @@ void CScene::BuildObjects()
 {
 	boss_timer_on = false;
 	god_timer_on = false;
+	black_hole_timer_on = false;
 
 	cur_mission = MissionType::CS_TURN;
 	black_hole_time = 30.f;
@@ -486,9 +487,12 @@ void CScene::MissionClear()
 			p.pos = black_hole_pos;
 			Send((char*) & p);
 
-			b_prev_time = chrono::steady_clock::now();
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, static_cast<short>(num) };
-			timer_queue.push(ev);
+			if (black_hole_timer_on == false) {
+				black_hole_timer_on = true;
+				b_prev_time = chrono::steady_clock::now();
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, static_cast<short>(num) };
+				timer_queue.push(ev);
+			}
 		}
 
 		for (short pl_id : _plist) {
@@ -515,7 +519,7 @@ void CScene::SetMission(MissionType mission)
 			TIMER_EVENT ev{ static_cast<char>(levels[mission].NextMission), chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
 			timer_queue.push(ev);
 
-			if (cur_mission == MissionType::CS_SHOW_GOD) {
+			if (mission == MissionType::CS_SHOW_GOD) {
 				m_pGod->SetPosition(1300.f, 0.f, 0.f);
 				m_pGod->GodHP = 100;
 				m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
@@ -526,7 +530,7 @@ void CScene::SetMission(MissionType mission)
 					timer_queue.push(ev);
 				}
 			}
-			else if (cur_mission == MissionType::CS_BOSS_SCREAM) {
+			else if (mission == MissionType::CS_BOSS_SCREAM) {
 				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
 				m_pBoss->BossHP = 100;
 				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
@@ -538,7 +542,7 @@ void CScene::SetMission(MissionType mission)
 				}
 			}
 		}
-		else if (cur_mission == MissionType::FIND_BOSS) {
+		else if (mission == MissionType::FIND_BOSS) {
 
 			if (!boss_timer_on) {
 				boss_timer_on = true;
@@ -546,22 +550,25 @@ void CScene::SetMission(MissionType mission)
 				timer_queue.push(ev);
 			}
 		}
-		else if (cur_mission == MissionType::GO_CENTER) {
+		else if (mission == MissionType::GO_CENTER) {
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
 			timer_queue.push(ev);
 		}
-		else if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
+		else if (mission == MissionType::ESCAPE_BLACK_HOLE) {
 			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
-
+			
 			SC_BLACK_HOLE_PACKET p{};
 			p.size = sizeof(SC_BLACK_HOLE_PACKET);
 			p.type = SC_BLACK_HOLE;
 			p.pos = black_hole_pos;
 			Send((char*)&p);
 
-			b_prev_time = chrono::steady_clock::now();
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, static_cast<short>(num) };
-			timer_queue.push(ev);
+			if (black_hole_timer_on == false) {
+				black_hole_timer_on = true;
+				b_prev_time = chrono::steady_clock::now();
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, static_cast<short>(num) };
+				timer_queue.push(ev);
+			}
 		}
 
 		for (short pl_id : _plist) {
@@ -1197,8 +1204,8 @@ void CScene::SendSceneInfo()
 
 void CScene::BlackHole()
 {
-	if (_state != ST_INGAME) { return; }
-	if (cur_mission != MissionType::ESCAPE_BLACK_HOLE) { return; }
+	if (_state != ST_INGAME) { black_hole_timer_on = false; return; }
+	if (cur_mission != MissionType::ESCAPE_BLACK_HOLE && cur_mission != MissionType::CS_BAD_ENDING) { black_hole_timer_on = false;  return; }
 
 	auto time_now = chrono::steady_clock::now();
 	std::chrono::duration<float> elapsed_time = (time_now - b_prev_time);
