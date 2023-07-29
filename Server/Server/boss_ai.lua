@@ -247,7 +247,7 @@ function nextState(bpx, bpy, bpz)
             onappear = false
         end
 
-        if distance <= 1500 then
+        if distance <= 1600 then
     --        print(onIdle)
             onIdle = true
         else

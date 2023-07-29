@@ -1245,39 +1245,62 @@ void CGameFramework::CameraUpdateChange()
 
 	}
 
-	if (curMissionType != MissionType::CS_BAD_ENDING && pastMissionType== MissionType::CS_BAD_ENDING)
+	if (curMissionType == MissionType::CS_BAD_ENDING)
 	{
 		skipnum = 0;
-
 		cout << "bad에서 넘어가요\n";
-		pastMissionType = curMissionType;
 		isending = true;
-		if (b_BeforeCheckInside) {
-			b_Inside = true;
-			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
-			//m_pInsideCamera->canTurn = true;
-			//m_pCamera->canTurn = true;
-			m_pCamera->fAnglenu = 0;
-			m_pInsideCamera->canchange = true;
-			m_pCamera->canchange = true;
-			m_pCamera->canTurn = false;
-			m_pCamera->canDolly = false;
-			b_BeforeCheckInside = false;
-			iscut = false;
 
-		}
-		else {
-			m_pCamera = m_pPlayer[0]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
-			//m_pCamera->canTurn = true;
-			//m_pInsideCamera->canTurn = true;		
-			m_pCamera->fAnglenu = 0;
-			m_pCamera->canchange = true;
-			m_pInsideCamera->canchange = true;
-			m_pCamera->canTurn = false;
-			m_pCamera->canDolly = false;
-			iscut = false;
+		//if (pastMissionType == MissionType::ESCAPE_BLACK_HOLE) {
 
-		}
+
+		//	b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+		//	m_pCamera->canDolly = true; //줌
+		//	m_pCamera->SetTarget(m_pScene->m_ppBlackhole->GetPosition());
+		//	m_pCamera->SetDist(100.0f);
+		//	cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
+		//	m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		//	iscut = true;
+		//	isending = false;
+
+		//	m_effectSound[static_cast<int>(Sounds::DARK)]->play();
+
+
+
+		//}
+
+
+
+
+
+		//if (b_BeforeCheckInside) {
+		//	b_Inside = true;
+		//	m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+		//	//m_pInsideCamera->canTurn = true;
+		//	//m_pCamera->canTurn = true;
+		//	m_pCamera->fAnglenu = 0;
+		//	m_pInsideCamera->canchange = true;
+		//	m_pCamera->canchange = true;
+		//	m_pCamera->canTurn = false;
+		//	m_pCamera->canDolly = false;
+		//	b_BeforeCheckInside = false;
+		//	iscut = false;
+
+		//}
+		//else {
+		//	m_pCamera = m_pPlayer[0]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+		//	//m_pCamera->canTurn = true;
+		//	//m_pInsideCamera->canTurn = true;		
+		//	m_pCamera->fAnglenu = 0;
+		//	m_pCamera->canchange = true;
+		//	m_pInsideCamera->canchange = true;
+		//	m_pCamera->canTurn = false;
+		//	m_pCamera->canDolly = false;
+		//	iscut = false;
+
+		//}
+		pastMissionType = MissionType::CS_BAD_ENDING;
+
 	}
 
 
@@ -2093,7 +2116,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	float distanceCenter_real;
 	XMStoreFloat(&distanceCenter_real, distcenter_real);
 
-	distance = distance - 1500.0f;
+	distance = distance - 1400.0f;
 	distanceCenter_real = distanceCenter_real - 1000.0f;
 
 	distanceCenter = distanceCenter;
@@ -3007,7 +3030,7 @@ void CGameFramework::ProcessPacket(char* p)
 			break;
 		}
 		if (packet->data.id == BOSS_ID) {
-			if (curMissionType == MissionType::DEFEAT_BOSS || curMissionType == MissionType::DEFEAT_BOSS2)
+			if (curMissionType == MissionType::FIND_BOSS || curMissionType == MissionType::DEFEAT_BOSS || curMissionType == MissionType::DEFEAT_BOSS2)
 				m_pScene->m_ppBoss->CurMotion = (BossAnimation)packet->data.animation;
 			// 보스 State 변경??
 			break;
