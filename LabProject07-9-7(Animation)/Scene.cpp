@@ -1864,6 +1864,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	if ((m_pPlayer[0]->curMissionType == MissionType::KILL_GOD|| m_pPlayer[0]->curMissionType == MissionType::KILL_GOD2) && m_ppGod->CurMotion == GodAnimation::MELEE2) {
 		if (m_ppGod->m2) {
+			cout << "m2";
 			setParticleStarts(MAX_CIRCLE_PARTICLES, m_ppGod->GetPosition(), 0);
 			m_ppGod->m2 = false;
 		}
@@ -1876,24 +1877,24 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 				m_pFlameParticle[i]->Render(pd3dCommandList, pCamera);
 			}
 		}
-		cout << "m2";
 	}
 	if ((m_pPlayer[0]->curMissionType == MissionType::KILL_GOD || m_pPlayer[0]->curMissionType == MissionType::KILL_GOD2) && m_ppGod->CurMotion == GodAnimation::SHOT) {
 		if (m_ppGod->shot) {
-			setParticleStarts(MAX_CIRCLE_PARTICLES, m_ppGod->GetPosition(), 0);
+			setParticleStarts(MAX_CIRCLE_PARTICLES, m_ppGod->GetPosition(), 1);
 			m_ppGod->shot = false;
+			cout << "shot";
+
 		}
 		for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
 			if (!b_Inside) {
-				 
-					m_pSkull[i]->setTarpos(m_pPlayer[0]->GetPosition());
-					m_pSkull[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-					m_pSkull[i]->Animate(m_fElapsedTime);
-					m_pSkull[i]->Render(pd3dCommandList, pCamera);
-				
+
+				m_pSkull[i]->setTarpos(m_pPlayer[0]->GetPosition());
+				m_pSkull[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+				m_pSkull[i]->Animate(m_fElapsedTime);
+				m_pSkull[i]->Render(pd3dCommandList, pCamera);
+
 			}
 		}
-		cout << "shot";
 	}
 
 

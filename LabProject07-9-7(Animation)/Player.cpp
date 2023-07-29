@@ -801,6 +801,7 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			break;
 
 		case DRIVE_CAMERA:
+			cout << "drive mode \n";
 			SetFriction(250.0f);
 			SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
 			SetMaxVelocityXZ(300.0f);

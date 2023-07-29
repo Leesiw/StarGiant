@@ -158,8 +158,19 @@ bool God::God_Ai(float fTimeElapsed, CAirplanePlayer* player, int godHp)
 	if (PastMotion != CurMotion) {
 		SendAnimation();
 
-		if (CurMotion == GodAnimation::SHOT) player->GetAttack(2);
-		if (CurMotion == GodAnimation::MELEE1) player->GetAttack(4);
+		if (CurMotion == GodAnimation::SHOT) player->GetAttack(10); //원
+		if (CurMotion == GodAnimation::MELEE1) player->GetAttack(20); //해골
+		if (CurMotion == GodAnimation::MELEE2) player->GetAttack(15); // 파티클
+		if (CurMotion == GodAnimation::HIT1) {
+			GodHP += 10;
+			SC_BULLET_HIT_PACKET p;
+			p.size = sizeof(SC_BULLET_HIT_PACKET);
+			p.type = SC_BULLET_HIT;
+			p.data.id = GOD_ID;
+			p.data.hp = GodHP;
+			scene_manager.Send(scene_num, (char*)&p);
+		}
+
 
 
 		PastMotion = CurMotion;

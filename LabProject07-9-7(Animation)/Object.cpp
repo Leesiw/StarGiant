@@ -2710,18 +2710,13 @@ void CSkullObject::Animate(float fElapsedTime)
 		ffTimeElapsed = 0.f;
 	}
 
-
-
+	// 처음 한 번만 TargetPos로 향하는 방향 벡터 계산
 	if (XMVector3Equal(targetDirection, XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f)))
 	{
 		targetDirection = XMVectorSubtract(XMLoadFloat3(&TargetPos), XMLoadFloat3(&position));
 		targetDirection = XMVector3Normalize(targetDirection);
 	}
-	 
-	////타겟을 향해 계속
-	//targetDirection = XMVectorSubtract(XMLoadFloat3(&TargetPos), XMLoadFloat3(&position));
-	//targetDirection = XMVector3Normalize(targetDirection);
-	
+
 	// velocity에 따라 파티클 이동
 	XMVECTOR velocityVector = XMVectorScale(targetDirection, velocity * fElapsedTime * 10);
 	XMFLOAT3 velocityResult;
