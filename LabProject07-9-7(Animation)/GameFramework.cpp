@@ -48,8 +48,8 @@ CGameFramework::CGameFramework()
 	_state = SCENE_LOBBY;
 	//_state = SCENE_INGAME;
 
-	a = 0;
-	b = 0;
+	default_shaking_num = 0;
+	blackhole_shaking_num = 0;
 	
 	scriptsStartTime = steady_clock::now();
 	_tcscpy_s(m_pszFrameRate, _T("StarGiant ("));
@@ -829,33 +829,33 @@ bool CGameFramework::AroundSculpture()
 void CGameFramework::CameraUpdateChange()
 {
 
-	if (a==0 &&m_pPlayer[0]->getHp() < 90 && m_pCamera->m_bCameraShaking ==false) { 
+	if (default_shaking_num ==0 &&m_pPlayer[0]->getHp() < 90 && m_pCamera->m_bCameraShaking ==false) {
 		m_pCamera->maxShakingTime = 1.f;
 		m_pCamera->m_bCameraShaking = true;
-		a = 1;
+		default_shaking_num = 1;
 	}
-	if (a == 1 && m_pPlayer[0]->getHp() < 80 && m_pCamera->m_bCameraShaking == false) {
+	if (default_shaking_num == 1 && m_pPlayer[0]->getHp() < 80 && m_pCamera->m_bCameraShaking == false) {
 		m_pCamera->maxShakingTime = 1.f;
 		m_pCamera->m_bCameraShaking = true;
-		a = 2;
+		default_shaking_num = 2;
 	}
-	if (a == 2 && m_pPlayer[0]->getHp() < 50 && m_pCamera->m_bCameraShaking == false) {
+	if (default_shaking_num == 2 && m_pPlayer[0]->getHp() < 50 && m_pCamera->m_bCameraShaking == false) {
 		m_pCamera->maxShakingTime = 1.5f;
 		m_pCamera->m_bCameraShaking = true;
-		a = 3;
+		default_shaking_num = 3;
 	}
-	if (a == 3 && m_pPlayer[0]->getHp() < 20 && m_pCamera->m_bCameraShaking == false) {
+	if (default_shaking_num == 3 && m_pPlayer[0]->getHp() < 20 && m_pCamera->m_bCameraShaking == false) {
 		m_pCamera->maxShakingTime = 1.5f;
 		m_pCamera->m_bCameraShaking = true;
-		a = 4;
+		default_shaking_num = 4;
 	}
 
-	if (b==0 && curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
+	if (blackhole_shaking_num ==0 && curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
 		m_pCamera->maxShakingTime = 1.0f;
 		m_pCamera->m_bCameraShaking = true;
-		b = 1;
+		blackhole_shaking_num = 1;
 	}
-	if (b == 1 && curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
+	if (blackhole_shaking_num == 1 && curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
 		XMVECTOR v1 = XMLoadFloat3(&m_pPlayer[0]->GetPosition());
 		XMVECTOR v2 = XMLoadFloat3(&m_pScene->m_ppBlackhole->GetPosition());
 		XMVECTOR dist = XMVector3Length(XMVectorSubtract(v2, v1));
@@ -2535,6 +2535,16 @@ wstring CGameFramework::ChangeBossScripts(MissionType mType, short hp)
 	};
 
 	return uiScripts;
+}
+
+void CGameFramework::Reset_game()
+{
+
+	matcnt = 0;
+	blackholetime = 0;
+	default_shaking_num = 0;
+	blackhole_shaking_num = 0;
+
 }
 
 

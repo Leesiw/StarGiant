@@ -54,7 +54,7 @@ public:
 	MissionType pM = MissionType::CS_TURN;
 	MissionType cM = MissionType::CS_TURN;
 
-
+	void Reset_game();
 
 	chrono::steady_clock::time_point scriptsStartTime;
 	bool scriptsOn = false;
@@ -145,8 +145,8 @@ private:
 	CSound* m_effectSound[static_cast<int>(Sounds::COUNT)] = {};
 
 
-	int a = 0;
-	int b = 0;
+	int default_shaking_num = 0;
+	int blackhole_shaking_num = 0;
 
 	//
 	wstring roomNum;
