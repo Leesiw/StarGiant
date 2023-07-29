@@ -36,10 +36,6 @@ CScene::~CScene()
 {
 }
 
-void CScene::Init()
-{
-}
-
 void CScene::BuildObjects()
 {
 	boss_timer_on = false;
@@ -51,6 +47,7 @@ void CScene::BuildObjects()
 	invincible_mode = false;
 	// player
 	CAirplanePlayer* pAirplanePlayer = new CAirplanePlayer();
+	pAirplanePlayer->Reset();
 	pAirplanePlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 100.0f));
 	pAirplanePlayer->boundingbox = BoundingOrientedBox{ XMFLOAT3(-0.000000f, -0.000000f, -0.000096f), XMFLOAT3(15.5f, 15.5f, 3.90426f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
 	m_pSpaceship = pAirplanePlayer;
@@ -578,7 +575,6 @@ void CScene::CheckMissionComplete()
 		if (dist < 1000.f) {
 			SetMission(MissionType::CS_SHOW_GOD);
 		}
-
 		return;
 	}
 	}
@@ -1173,7 +1169,7 @@ void CScene::UpdateBoss()
 {
 	if (_state != ST_INGAME) { boss_timer_on = false;  return; }
 	if (cur_mission != MissionType::DEFEAT_BOSS && cur_mission != MissionType::CS_BOSS_SCREAM && cur_mission != MissionType::CS_ANGRY_BOSS 
-		&& cur_mission != MissionType::FIND_BOSS && cur_mission != MissionType::DEFEAT_BOSS2) { boss_timer_on = false; return; }
+		&& cur_mission != MissionType::FIND_BOSS && cur_mission != MissionType::DEFEAT_BOSS2 && cur_mission != MissionType::CS_BAD_ENDING) { boss_timer_on = false; return; }
 	if (m_pBoss->BossHP <= 0) {
 		boss_timer_on = false;
 		SetMission(MissionType::CS_SHOW_STARGIANT);
@@ -1214,7 +1210,7 @@ void CScene::UpdateGod()
 		return;
 	}
 	if (cur_mission != MissionType::KILL_GOD && cur_mission != MissionType::CS_SHOW_GOD && cur_mission != MissionType::CS_ANGRY_GOD
-		&& cur_mission != MissionType::KILL_GOD2) { god_timer_on = false; return; }
+		&& cur_mission != MissionType::KILL_GOD2 && cur_mission != MissionType::CS_BAD_ENDING) { god_timer_on = false; return; }
 	if (levels[cur_mission].cutscene) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_GOD, static_cast<short>(num) };
 		timer_queue.push(ev);

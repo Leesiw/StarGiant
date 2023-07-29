@@ -19,8 +19,6 @@ public:
 	CScene();
 	~CScene();
 
-	void Init();
-
 	void BuildObjects();
 	void ReleaseObjects();
 
