@@ -804,6 +804,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		break;
 	}
 	case CS_START: {
+		if (clients[c_id]._state == ST_INGAME) { break; }
 		scene_manager._scene_lock.lock();
 		short t_room_id = clients[c_id].room_id;
 		if (t_room_id == -1) { break; }
