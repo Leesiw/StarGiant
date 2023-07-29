@@ -309,7 +309,7 @@ void CGameFramework::SetMission()
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].PlasmaCannon.MAX_HP = 40;
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].PlasmaCannon.ATK = 30;
 	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].RestartMission = MissionType::CS_SHOW_PLANET;
-	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].RestartPosition = XMFLOAT3{ 5000.f ,5000.f ,5000.f };
+	levels[MissionType::KILL_MONSTER_ONE_MORE_TIME].RestartPosition = XMFLOAT3{ 3000.f ,3000.f ,3000.f };
 
 	levels[MissionType::FIND_BOSS].NextMission = MissionType::CS_BOSS_SCREAM;
 	levels[MissionType::FIND_BOSS].MaxMonsterNum = ENEMIES;
@@ -321,7 +321,7 @@ void CGameFramework::SetMission()
 	levels[MissionType::FIND_BOSS].PlasmaCannon.MAX_HP = 40;
 	levels[MissionType::FIND_BOSS].PlasmaCannon.ATK = 30;
 	levels[MissionType::FIND_BOSS].RestartMission = MissionType::FIND_BOSS;
-	levels[MissionType::FIND_BOSS].RestartPosition = XMFLOAT3{ 9500.f ,9500.f ,9500.f };
+	levels[MissionType::FIND_BOSS].RestartPosition = XMFLOAT3{ 5500.f ,5500.f ,5500.f };
 
 	levels[MissionType::CS_BOSS_SCREAM].NextMission = MissionType::DEFEAT_BOSS;
 	levels[MissionType::CS_BOSS_SCREAM].cutscene = true;
