@@ -2557,7 +2557,7 @@ void CGameFramework::Reset_game()
 	room_num = 0;
 	roomNum.clear();
 	b_Inside = true;
-
+	curMissionType = MissionType::TU_SIT;
 	cout << "reset game\n";
 }
 
@@ -3060,6 +3060,9 @@ void CGameFramework::ProcessPacket(char* p)
 	}
 	case SC_LOGIN_FAIL:
 	{
+		room_num = 0;
+		roomNum.clear();
+		matcnt = 0;
 		// 플레이어 로그인 실패 : 비어있는 Scene이 없음
 		break;
 	}
