@@ -153,6 +153,8 @@ private:
 	short room_num = 0;
 	short killCnt = 0; 
 	short skipnum = 0;
+
+	bool sendNC = false;
 	
 	float pDist = 0;
 	float bDist = 0;

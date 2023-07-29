@@ -1107,9 +1107,9 @@ void CGameFramework::CameraUpdateChange()
 	
 
 	//CS_BAD_ENDING 내부일때,
-	if (curMissionType == MissionType::CS_BAD_ENDING && b_Inside && m_pInsidePlayer[g_myid] && !iscut) {
+	if (curMissionType == MissionType::CS_BAD_ENDING && b_Inside && m_pInsidePlayer[g_myid] && !iscut && !isending) {
 		cout << "bad_ending\n";
-		if (!isending) m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
+
 		b_BeforeCheckInside = true;
 		b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
 		m_pCamera->SetTarget(m_pPlayer[0]->GetPosition());
@@ -1118,24 +1118,26 @@ void CGameFramework::CameraUpdateChange()
 		cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		iscut = true;
-		isending = false;
+
 
 		m_effectSound[static_cast<int>(Sounds::BAD)]->play();
+		isending = true;
+
 	}
 
 	//CS_BAD_ENDING 외부일때,
-	else if (curMissionType == MissionType::CS_BAD_ENDING && !b_Inside && !iscut) {
+	else if (curMissionType == MissionType::CS_BAD_ENDING && !b_Inside && !iscut && !isending) {
 		cout << "bad_ending\n";
-		if (!isending) m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
 		m_pCamera->SetTarget(m_pPlayer[0]->GetPosition());
 		m_pCamera->SetDist(500.0f);
 
 		m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
 		cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
 		iscut = true;
-		isending = false;
 
 		m_effectSound[static_cast<int>(Sounds::BAD)]->play();
+		isending = true;
+
 
 	}
 
@@ -1176,6 +1178,8 @@ void CGameFramework::CameraUpdateChange()
 		my_packet.size = sizeof(CS_CUTSCENE_END_PACKET);
 		my_packet.type = CS_CUTSCENE_END;
 		send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+
+
 
 		if (curMissionType == MissionType::CS_ENDING) {
 			b_Inside = true;
@@ -1228,7 +1232,6 @@ void CGameFramework::CameraUpdateChange()
 			m_pCamera->canDolly = false;
 
 			b_BeforeCheckInside = false;
-			iscut = false;
 
 		}
 		else {
@@ -1238,68 +1241,121 @@ void CGameFramework::CameraUpdateChange()
 			m_pInsideCamera->canchange = true;
 			m_pCamera->canTurn = false;
 			m_pCamera->canDolly = false;
-			iscut = false;
 
 		}
+		iscut = false;
+
 		m_effectSound[static_cast<int>(Sounds::DARK)]->stop();
 
 	}
 
-	if (curMissionType == MissionType::CS_BAD_ENDING)
+	if (curMissionType != MissionType::CS_BAD_ENDING && isending)
 	{
-		skipnum = 0;
 		cout << "bad에서 넘어가요\n";
-		isending = true;
-
-		//if (pastMissionType == MissionType::ESCAPE_BLACK_HOLE) {
+		m_effectSound[static_cast<int>(Sounds::DARK)]->stop();
 
 
-		//	b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
-		//	m_pCamera->canDolly = true; //줌
-		//	m_pCamera->SetTarget(m_pScene->m_ppBlackhole->GetPosition());
-		//	m_pCamera->SetDist(100.0f);
-		//	cout << "Inside m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
-		//	m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
-		//	iscut = true;
-		//	isending = false;
+		if (pastMissionType == MissionType::GO_PLANET) {
+			cout << "bad -> GO_PLANET임"; //CS_SHOW_PLANET
+			b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+			m_pCamera->SetTarget(planetPos);
+			m_pCamera->SetDist(1000.0f);
+			m_pCamera->canDolly = true; //줌
+			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		}
 
-		//	m_effectSound[static_cast<int>(Sounds::DARK)]->play();
+		else if (pastMissionType == MissionType::KILL_MONSTER_ONE_MORE_TIME) {
+			cout << "bad -> KILL_MONSTER_ONE_MORE_TIME임"; //CS_SHOW_PLANET
+			b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+			m_pCamera->SetTarget(planetPos);
+			m_pCamera->SetDist(1000.0f);
+			m_pCamera->canDolly = true; //줌
+			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		}
 
+		else if (pastMissionType == MissionType::DEFEAT_BOSS) {
+			cout << "bad -> DEFEAT_BOSS임"; //CS_BOSS_SCREAM
+			b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+			m_pCamera->canDolly = true; //줌
+			m_pCamera->SetTarget(m_pScene->m_ppBoss->GetPosition());
+			m_pCamera->SetDist(1500.0f);
+			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		}
 
+		else if (pastMissionType == MissionType::DEFEAT_BOSS2) {
+			cout << "bad -> DEFEAT_BOSS2임"; //CS_BOSS_SCREAM
+			b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+			m_pCamera->canDolly = true; //줌
+			m_pCamera->SetTarget(m_pScene->m_ppBoss->GetPosition());
+			m_pCamera->SetDist(1500.0f);
+			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		}
+		else if (pastMissionType == MissionType::GO_CENTER) {
+			cout << "bad -> GO_CENTER임"; //CS_SHOW_STARGIANT
+			b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+			m_pCamera->canDolly = true; //줌
+			m_pCamera->SetTarget(m_pScene->m_ppBoss->GetPosition());
+			m_pCamera->SetDist(1300.0f);
+			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		}
 
-		//}
+		else if (pastMissionType == MissionType::ESCAPE_BLACK_HOLE) {
+			cout << "bad -> ESCAPE_BLACK_HOLE임";
+			b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+			m_pCamera->canDolly = true; //줌
+			m_pCamera->SetTarget(m_pScene->m_ppBlackhole->GetPosition());
+			m_pCamera->SetDist(100.0f);
+			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+			m_effectSound[static_cast<int>(Sounds::DARK)]->play();
+		}
 
+		else if (pastMissionType == MissionType::KILL_GOD) {
+			cout << "bad -> KILL_GOD임";  //CS_SHOW_GOD
+			b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+			m_pCamera->canDolly = true; //줌
+			m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
+			m_pCamera->SetDist(500.0f);
+			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		}
 
+		else if (pastMissionType == MissionType::KILL_GOD2) {
+			cout << "bad -> KILL_GOD2임";  //CS_SHOW_GOD
+			b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
+			m_pCamera->canDolly = true; //줌
+			m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
+			m_pCamera->SetDist(500.0f);
+			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
+		}
 
+		else {
+			cout << "default die \n";
+			if (b_BeforeCheckInside) {
 
+				b_Inside = true;
+				m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+				m_pCamera->fAnglenu = 0;
+				m_pInsideCamera->canchange = true;
+				m_pCamera->canchange = true;
+				m_pCamera->canTurn = false;
+				m_pCamera->canDolly = false;
+				b_BeforeCheckInside = false;
 
-		//if (b_BeforeCheckInside) {
-		//	b_Inside = true;
-		//	m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
-		//	//m_pInsideCamera->canTurn = true;
-		//	//m_pCamera->canTurn = true;
-		//	m_pCamera->fAnglenu = 0;
-		//	m_pInsideCamera->canchange = true;
-		//	m_pCamera->canchange = true;
-		//	m_pCamera->canTurn = false;
-		//	m_pCamera->canDolly = false;
-		//	b_BeforeCheckInside = false;
-		//	iscut = false;
+			}
+			else {
+				m_pCamera = m_pPlayer[0]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
+				m_pCamera->fAnglenu = 0;
+				m_pCamera->canchange = true;
+				m_pInsideCamera->canchange = true;
+				m_pCamera->canTurn = false;
+				m_pCamera->canDolly = false;
 
-		//}
-		//else {
-		//	m_pCamera = m_pPlayer[0]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
-		//	//m_pCamera->canTurn = true;
-		//	//m_pInsideCamera->canTurn = true;		
-		//	m_pCamera->fAnglenu = 0;
-		//	m_pCamera->canchange = true;
-		//	m_pInsideCamera->canchange = true;
-		//	m_pCamera->canTurn = false;
-		//	m_pCamera->canDolly = false;
-		//	iscut = false;
+			}
+		}
 
-		//}
-		pastMissionType = MissionType::CS_BAD_ENDING;
+		isending = false;
+		iscut = false;
+		skipnum = 0;
+		pastMissionType = curMissionType;
 
 	}
 
@@ -1893,7 +1949,7 @@ void CGameFramework::FrameAdvance()
 #endif
 
 
-	if ((m_pPlayer && !b_Inside)&& player_type ==PlayerType::MOVE) if(m_pPlayer[0])m_pPlayer[0]->Render(m_pd3dCommandList, m_pCamera);
+	if ((m_pPlayer && !b_Inside)&& player_type ==PlayerType::MOVE) if(m_pPlayer[0]->curMissionType !=MissionType::CS_BAD_ENDING)m_pPlayer[0]->Render(m_pd3dCommandList, m_pCamera);
 	if (m_pInsidePlayer && b_Inside)for (int i = 0; i < 3; ++i) {
 		if (m_pInsidePlayer[i]->isAlive) {
 			m_pInsidePlayer[i]->Render(m_pd3dCommandList, m_pInsideCamera);
@@ -2083,6 +2139,8 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	wstring bossDist;
 	wstring bossDie;
 	wstring centerDist;
+	wstring realCenterDist;
+
 	wstring blackholetimewst;
 
 
@@ -2131,6 +2189,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	bossDie = to_wstring(bossdie);
 
 	centerDist = to_wstring(distanceCenter);
+	realCenterDist = to_wstring(distanceCenter_real);
 
 	wstring uiTextSpace = L" ";
 	wstring uiTextCnt = L" / 20";
@@ -2231,7 +2290,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	case MissionType::GO_CENTER_REAL:
 	{
 		uiText = L"미션 - 진짜 우주의 중심으로 가라! ( ";
-		uiText += distanceCenter_real;
+		uiText += realCenterDist;
 		uiText += L"m 남음 )";
 		break;
 	}
@@ -3076,6 +3135,12 @@ void CGameFramework::ProcessPacket(char* p)
 			for (int i = 0; i < MISSILES; ++i) {
 				m_pScene->m_ppEnemyMissiles[i]->m_bActive = false;
 			}
+
+			//if (m_pInsidePlayer && b_Inside)for (int i = 0; i < 3; ++i) {
+			//	if (m_pInsidePlayer[i]->isAlive) {
+			//		m_pInsidePlayer[i]->curMissionType= MissionType::CS_BAD_ENDING;
+			//	}
+			//}
 		}
 
 		if (curMissionType != MissionType::CS_BAD_ENDING) {
