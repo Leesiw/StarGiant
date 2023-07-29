@@ -2678,6 +2678,8 @@ void CGameFramework::ProcessPacket(char* p)
 
 		if (player_type == PlayerType::INSIDE) {
 			b_Inside = true;
+			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = AnimationState::IDLE;
+			m_pInsidePlayer[packet->data.id]->SetSitState(false);
 		}
 		else {
 			b_Inside = false;
