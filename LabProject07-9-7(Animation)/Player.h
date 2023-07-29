@@ -123,6 +123,11 @@ public:
 	bool HierarchyIntersects(CSkinnedMesh* pCollisionGameObject, bool isSecond = false);
 
 	virtual XMFLOAT3 getSpritePos(int num) { return XMFLOAT3(0.f, 0.f, 0.f); }
+
+
+public:
+		CGameObject* m_pEngine[2] = {};
+
 };
 
 class CAirplanePlayer : public CPlayer
@@ -144,6 +149,7 @@ public:
 	void FireBullet(CGameObject* pLockedObject);
 	void SetBulletFromServer(BULLET_INFO bulletInfo);
 	float						m_fBulletEffectiveRange = 300.0f;
+
 
 	XMFLOAT3	player_info;
 	XMFLOAT4	player_quaternion;

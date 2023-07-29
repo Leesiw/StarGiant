@@ -667,13 +667,13 @@ void CAirplanePlayer::SetBulletFromServer(BULLET_INFO bulletInfo)
 
 void CAirplanePlayer::OnPrepareAnimate()
 {
-	m_pMainRotorFrame = FindFrame("Top_Rotor");
-	m_pTailRotorFrame = FindFrame("Tail_Rotor");
+	m_pEngine[0] = FindFrame("Feather_L");
+	m_pEngine[1] = FindFrame("Feather_R");
 }
 
 void CAirplanePlayer::Animate(float fTimeElapsed)
 {
-
+	OnPrepareAnimate();
 	CPlayer::OnPrepareRender();
 
 	if (m_pSkinnedAnimationController) m_pSkinnedAnimationController->AdvanceTime(fTimeElapsed, this);
