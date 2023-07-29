@@ -132,7 +132,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 662); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 350); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()  19
 
 	CMaterial::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -371,12 +371,12 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_ppJewel->SetScale(100.0f, 100.0f, 100.0f);
 	if (pJewelModel) delete pJewelModel;
 	//=====================================
+	//07.29 -> 272오브젝트 생성중임
 
 
-
-	BuildBoss(pd3dDevice, pd3dCommandList);
-	BuildGod(pd3dDevice, pd3dCommandList);
-	BuildUI(pd3dDevice, pd3dCommandList);
+	BuildBoss(pd3dDevice, pd3dCommandList); //2obj
+	BuildGod(pd3dDevice, pd3dCommandList); //1obj
+	BuildUI(pd3dDevice, pd3dCommandList); //31obj
 
 
 	m_nShaders = 1;
@@ -561,7 +561,7 @@ void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 
 	
 
-	BuildUIInside(pd3dDevice, pd3dCommandList);
+	BuildUIInside(pd3dDevice, pd3dCommandList); //4
 
 	/*m_nShaders = 1;
 	m_ppShaders = new CShader * [m_nShaders];

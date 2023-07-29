@@ -1540,6 +1540,10 @@ CAngrybotObject::CAngrybotObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 	SetChild(pAngrybotModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pAngrybotModel);
+
+
+	if (pModel && pModel != pAngrybotModel)
+		delete pModel;
 }
 
 CAngrybotObject::~CAngrybotObject()
@@ -1555,6 +1559,12 @@ CMonsterObject::CMonsterObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 
 	SetChild(pMonsterModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pMonsterModel);
+
+
+
+	if (pModel && pModel != pMonsterModel)
+		delete pModel;
+
 }
 
 CMonsterObject::~CMonsterObject()
@@ -1570,6 +1580,10 @@ CHumanoidObject::CHumanoidObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 
 	SetChild(pHumanoidModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pHumanoidModel);
+
+	if (pModel && pModel != pHumanoidModel)
+		delete pModel;
+
 }
 
 CHumanoidObject::~CHumanoidObject()
@@ -1585,6 +1599,11 @@ CEthanObject::CEthanObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *
 
 	SetChild(pEthanModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pEthanModel);
+
+
+	if (pModel && pModel != pEthanModel)
+		delete pModel;
+
 }
 
 CEthanObject::~CEthanObject()
@@ -1600,6 +1619,11 @@ CLionObject::CLionObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd
 
 	SetChild(pLionModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pLionModel);
+
+	
+	if (pModel && pModel != pLionModel)
+		delete pModel;
+
 }
 
 CLionObject::~CLionObject()
@@ -1615,6 +1639,12 @@ CZebraObject::CZebraObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *
 
 	SetChild(pZebraModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pZebraModel);
+
+
+	if (pModel && pModel != pZebraModel)
+		delete pModel;
+
+
 }
 
 CZebraObject::~CZebraObject()
@@ -1630,6 +1660,12 @@ CEagleObject::CEagleObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *
 
 	SetChild(pEagleModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pEagleModel);
+
+
+
+	if (pModel && pModel != pEagleModel)
+		delete pModel;
+
 }
 
 CEagleObject::~CEagleObject()
@@ -1644,6 +1680,12 @@ CMeteorObject::CMeteorObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	SetChild(pMeteorModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pMeteorModel);
+
+
+	if (pModel && pModel != pMeteorModel)
+		delete pModel;
+
+
 }
 
 CMeteorObject::~CMeteorObject()
@@ -1671,6 +1713,11 @@ CEnemyObject::CEnemyObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 	SetChild(pEnemyModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pEnemyModel);
+
+
+	if (pModel && pModel != pEnemyModel)
+		delete pModel;
+
 }
 
 CEnemyObject::~CEnemyObject()
@@ -1780,6 +1827,12 @@ CInsideShipObject::CInsideShipObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	//m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	//m_pSkinnedAnimationController->SetCallbackKeys(0, 1);
 
+
+
+	if (pModel && pModel != pMeteorModel)
+		delete pModel;
+
+
 }
 
 CInsideShipObject::~CInsideShipObject()
@@ -1820,7 +1873,13 @@ CBulletObject::CBulletObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	SetChild(pBulletModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pBulletModel);
-	
+
+
+
+	if (pModel && pModel != pBulletModel)
+		delete pModel;
+
+
 
 }
 
@@ -1920,6 +1979,11 @@ CMissileObject::CMissileObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	SetChild(pBulletModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pBulletModel);
+
+	if (pModel && pModel != pBulletModel)
+		delete pModel;
+
+
 }
 
 void CMissileObject::LookAtPosition(float fTimeElapsed, const XMFLOAT3& pos)
@@ -2134,6 +2198,13 @@ CMascotObject::CMascotObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	SetChild(pMascotModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pMascotModel);
+
+
+
+	if (pModel && pModel != pMascotModel)
+		delete pModel;
+
+
 }
 
 CMascotObject::~CMascotObject()
@@ -2190,6 +2261,11 @@ CBlackHoleMeteorObject::CBlackHoleMeteorObject(ID3D12Device* pd3dDevice, ID3D12G
 	float randomAngle = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 2.0f * XM_PI;
 	m_xmf3MovingDirection = XMFLOAT3(cosf(randomAngle), 0.0f, sinf(randomAngle));
 	m_xmf3MovingDirection = Vector3::Normalize(m_xmf3MovingDirection);
+
+
+	if (pModel && pModel != pMeteorModel)
+		delete pModel;
+
 
 }
 
@@ -2293,6 +2369,11 @@ CJewelObject::CJewelObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 	SetChild(pJewelModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pJewelModel);
+
+	if (pModel && pModel != pJewelModel)
+		delete pModel;
+
+
 }
 
 void CJewelObject::endingMove(float fElapsedTime, XMFLOAT3 tarpos)
