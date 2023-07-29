@@ -82,35 +82,43 @@ void CScene::BuildDefaultLightsAndMaterials()
 	m_pLights[4].m_xmf3Position = XMFLOAT3(600.0f, 250.0f, 700.0f);
 	m_pLights[4].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.001f, 0.0001f);
 	/// //GodRay Light
-	m_pLights[5].m_nType = POINT_LIGHT;
-	m_pLights[5].m_fRange = 2000.0f;
-	m_pLights[5].m_bEnable = true;
-	m_pLights[5].m_xmf4Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	m_pLights[5].m_xmf4Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_pLights[5].m_xmf4Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.0f);
-	m_pLights[5].m_xmf3Position = XMFLOAT3(-14.66f, 224.0f, 694.f);
-	m_pLights[5].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.001f, 0.0001f);
+	m_pLights[5].m_nType = SPOT_LIGHT;
+	m_pLights[5].m_fRange = 1000.0f;
+	m_pLights[5].m_bEnable = false;
+	m_pLights[5].m_xmf4Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	m_pLights[5].m_xmf4Diffuse = XMFLOAT4(0.54f, 0.54f, 0.54f, 1.0f);
+	m_pLights[5].m_xmf4Specular = XMFLOAT4(0.13f, 0.13f, 0.13f, 0.0f);
+	m_pLights[5].m_xmf3Position = XMFLOAT3(530.219f, 244.f, 593.263f);
+	m_pLights[5].m_xmf3Direction = XMFLOAT3(-1.0f, -1.0f, 1.0f);
+	m_pLights[5].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.1f, 0.001f);
+	m_pLights[5].m_fFalloff = 8.0f;
+	m_pLights[5].m_fPhi = (float)cos(XMConvertToRadians(40.0f));
+	m_pLights[5].m_fTheta = (float)cos(XMConvertToRadians(20.0f));
 
+	m_nInsideLights = MAX_GODRAY_LIGHTS;
 	m_pInsideLights = new LIGHT[MAX_GODRAY_LIGHTS];
-	::ZeroMemory(m_pInsideLights, sizeof(LIGHT));
-	m_pInsideLights[0].m_bEnable = false; //이게 없어서... 아.. 
+	m_pInsideLights[0].m_nType = SPOT_LIGHT;
+	m_pInsideLights[0].m_fRange = 1000.0f;
+	m_pInsideLights[0].m_bEnable = true;
+	m_pInsideLights[0].m_xmf4Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	m_pInsideLights[0].m_xmf4Diffuse = XMFLOAT4(0.54f, 0.54f, 0.54f, 1.0f);
+	m_pInsideLights[0].m_xmf4Specular = XMFLOAT4(0.13f, 0.13f, 0.13f, 0.0f);
+	m_pInsideLights[0].m_xmf3Position = XMFLOAT3(430.219f, 244.f, 693.263f);
+	m_pInsideLights[0].m_xmf3Direction = XMFLOAT3(-1.0f, -1.0f, 1.0f);
+	m_pInsideLights[0].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.1f, 0.001f);
+
+	/*m_pInsideLights = new LIGHT[MAX_GODRAY_LIGHTS];
+::ZeroMemory(m_pInsideLights, sizeof(LIGHT));
+	m_pInsideLights[0].m_bEnable = false; //이게 없어서... 아..
 	m_pInsideLights[0].m_nType = DIRECTIONAL_LIGHT;
-	m_pInsideLights[0].m_fRange = 2000.0f;
+m_pInsideLights[0].m_fRange = 10.0f;
 	m_pInsideLights[0].m_xmf4Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	m_pInsideLights[0].m_xmf4Diffuse = XMFLOAT4(0.73f, 0.73f, 0.73f, 1.0f);
 	m_pInsideLights[0].m_xmf4Specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 0.0f);
 	m_pInsideLights[0].m_xmf3Position = XMFLOAT3(-14.66f, 224.0f, 687.f);
-	m_pInsideLights[0].m_xmf3Direction = XMFLOAT3(+0.0f, -1.0f, 0.0f);//XMFLOAT3(+1.0f, 0.0f, 1.0f);
+	m_pInsideLights[0].m_xmf3Direction = XMFLOAT3(+0.0f, -1.0f, -1.0f);//XMFLOAT3(+1.0f, 0.0f, 1.0f);
 
-	/*m_pInsideLights[1].m_bEnable = false;
-	m_pInsideLights[1].m_nType = DIRECTIONAL_LIGHT;
-	m_pInsideLights[1].m_fRange = 4307.0f;
-	m_pInsideLights[1].m_xmf4Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	m_pInsideLights[1].m_xmf4Diffuse = XMFLOAT4(0.73f, 0.73f, 0.73f, 1.0f);
-	m_pInsideLights[1].m_xmf4Specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 0.0f);
-	m_pInsideLights[1].m_xmf3Direction = XMFLOAT3(0.0f, -1.0f, 0.0f);
-	m_pInsideLights[1].m_xmf3Attenuation = XMFLOAT3(-1.0f, -1.0f, 0.0f);
-*/
+
 }
 
 void CScene::BuildLobbyObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -784,6 +792,7 @@ void CScene::ReleaseObjects()
 	ReleaseShaderVariables();
 
 	if (m_pLights) delete[] m_pLights;
+	if (m_pInsideLights) delete[] m_pInsideLights;
 }
 
 
@@ -1158,9 +1167,17 @@ void CScene::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 void CScene::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	::memcpy(m_pcbMappedLights->m_pLights, m_pLights, sizeof(LIGHT) * m_nLights);
-	::memcpy(&m_pcbMappedLights->m_xmf4GlobalAmbient, &m_xmf4GlobalAmbient, sizeof(XMFLOAT4));
-	::memcpy(&m_pcbMappedLights->m_nLights, &m_nLights, sizeof(int));
+
+	if (b_Inside) {
+		::memcpy(m_pcbMappedLights->m_pLights, m_pInsideLights, sizeof(LIGHT) * m_nInsideLights);
+		::memcpy(&m_pcbMappedLights->m_xmf4GlobalAmbient, &m_xmf4GlobalAmbient, sizeof(XMFLOAT4));
+		::memcpy(&m_pcbMappedLights->m_nLights, &m_nInsideLights, sizeof(int));
+	}
+	else {
+		::memcpy(m_pcbMappedLights->m_pLights, m_pLights, sizeof(LIGHT) * m_nLights);
+		::memcpy(&m_pcbMappedLights->m_xmf4GlobalAmbient, &m_xmf4GlobalAmbient, sizeof(XMFLOAT4));
+		::memcpy(&m_pcbMappedLights->m_nLights, &m_nLights, sizeof(int));
+	}
 }
 
 void CScene::ReleaseShaderVariables()
@@ -1573,10 +1590,10 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 	if (b_Inside) {
 		//m_ppHierarchicalGameObjects[0]->Render(pd3dCommandList, pCamera);
-		m_ppHierarchicalGameObjects[1]->Render(pd3dCommandList, pCamera);
+		//m_ppHierarchicalGameObjects[1]->Render(pd3dCommandList, pCamera);
 	}
 
-	if (m_ppHierarchicalGameObjects[0])
+	if (!b_Inside && m_ppHierarchicalGameObjects[0])
 	{
 		m_ppHierarchicalGameObjects[0]->Animate(m_fElapsedTime);
 		if (!m_ppHierarchicalGameObjects[0]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[0]->UpdateTransform(NULL);
@@ -1965,8 +1982,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	if (b_Inside)
 	{
-		//if (m_pShadowShader) m_pShadowShader->Render(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
-		//if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(pd3dCommandList, pCamera); //깊이맵 상태를 보여줌 
+		if (m_pShadowShader) m_pShadowShader->Render(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
+		if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(pd3dCommandList, pCamera); //깊이맵 상태를 보여줌 
 	}
 }
 
@@ -2230,8 +2247,8 @@ void CScene::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	//그림자맵 깊이 랜더 
 	/*m_pDepthRenderShader->m_pLights[0].m_xmf3Direction = XMFLOAT3(
 		m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.x, m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.y, m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.z+0.01);*/
+	m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
 	m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
-}
 
 void CScene::OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {

@@ -49,6 +49,7 @@ protected:
 public:
 	AnimationState motion;
 	MissionType curMissionType;
+	bool						isAlive = false;
 	
 public:
 	CPlayer();
@@ -189,7 +190,7 @@ public:
 
 	INSIDE_PLAYER_INFO			player_info;
 	bool						is_update = true;
-	bool						isAlive = false;
+	
 
 	PlayerType type;
 
