@@ -262,6 +262,7 @@ public:
 	LIGHT* m_pInsideLights = NULL;
 
 	int									m_nLights = 0;
+	int									m_nInsideLights = 0;
 
 	XMFLOAT4							m_xmf4GlobalAmbient;
 
@@ -282,6 +283,7 @@ public:
 	bool isDiedSprite = false;
 
 	int m_temp = 2;
+
 
 
 };

@@ -52,6 +52,8 @@ void CMesh::OnPreRender(ID3D12GraphicsCommandList *pd3dCommandList, void *pConte
 	pd3dCommandList->IASetVertexBuffers(m_nSlot, 1, &m_d3dPositionBufferView);
 }
 
+
+
 void CMesh::Render(ID3D12GraphicsCommandList *pd3dCommandList, int nSubSet)
 {
 	UpdateShaderVariables(pd3dCommandList);
@@ -61,6 +63,25 @@ void CMesh::Render(ID3D12GraphicsCommandList *pd3dCommandList, int nSubSet)
 	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);
 
 	if((m_nSubMeshes > 0) && (nSubSet < m_nSubMeshes))
+	{
+		pd3dCommandList->IASetIndexBuffer(&(m_pd3dSubSetIndexBufferViews[nSubSet]));
+		pd3dCommandList->DrawIndexedInstanced(m_pnSubSetIndices[nSubSet], 1, 0, 0, 0);
+	}
+	else
+	{
+		pd3dCommandList->DrawInstanced(m_nVertices, 1, m_nOffset, 0);
+	}
+}
+
+void CMesh::ShadowRender(ID3D12GraphicsCommandList* pd3dCommandList, int nSubSet)
+{
+	UpdateShaderVariables(pd3dCommandList);
+
+	OnPreShadowRender(pd3dCommandList, NULL);
+
+	pd3dCommandList->IASetPrimitiveTopology(m_d3dPrimitiveTopology);
+
+	if ((m_nSubMeshes > 0) && (nSubSet < m_nSubMeshes))
 	{
 		pd3dCommandList->IASetIndexBuffer(&(m_pd3dSubSetIndexBufferViews[nSubSet]));
 		pd3dCommandList->DrawIndexedInstanced(m_pnSubSetIndices[nSubSet], 1, 0, 0, 0);
@@ -594,6 +615,12 @@ void CStandardMesh::OnPreRender(ID3D12GraphicsCommandList *pd3dCommandList, void
 {
 	D3D12_VERTEX_BUFFER_VIEW pVertexBufferViews[5] = { m_d3dPositionBufferView, m_d3dTextureCoord0BufferView, m_d3dNormalBufferView, m_d3dTangentBufferView, m_d3dBiTangentBufferView };
 	pd3dCommandList->IASetVertexBuffers(m_nSlot, 5, pVertexBufferViews);
+}
+
+void CStandardMesh::OnPreShadowRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
+{
+	D3D12_VERTEX_BUFFER_VIEW pVertexBufferViews[2] = { m_d3dPositionBufferView, m_d3dNormalBufferView };
+	pd3dCommandList->IASetVertexBuffers(m_nSlot, 2, pVertexBufferViews);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

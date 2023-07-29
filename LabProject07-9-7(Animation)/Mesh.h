@@ -82,7 +82,9 @@ public:
 	XMFLOAT3 GetPosition() { return XMFLOAT3(m_pxmf3Positions->x, m_pxmf3Positions->y, m_pxmf3Positions->z); };
 
 	virtual void OnPreRender(ID3D12GraphicsCommandList *pd3dCommandList, void *pContext);
+	virtual void OnPreShadowRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext) {}
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, int nSubSet);
+	virtual void ShadowRender(ID3D12GraphicsCommandList *pd3dCommandList, int nSubSet);
 	virtual void OnPostRender(ID3D12GraphicsCommandList *pd3dCommandList, void *pContext);
 };
 
@@ -202,6 +204,7 @@ public:
 	virtual void ReleaseUploadBuffers();
 
 	virtual void OnPreRender(ID3D12GraphicsCommandList *pd3dCommandList, void *pContext);
+	virtual void OnPreShadowRender(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

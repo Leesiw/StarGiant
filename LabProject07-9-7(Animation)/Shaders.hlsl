@@ -703,6 +703,7 @@ struct VS_LIGHTING_INPUT
 {
 	float3 position : POSITION;
 	float3 normal : NORMAL;
+	//float2 uv : TEXCOORD;
 };
 
 struct VS_LIGHTING_OUTPUT
@@ -743,7 +744,7 @@ PS_DEPTH_OUTPUT PSDepthWriteShader(VS_LIGHTING_OUTPUT input)
 	PS_DEPTH_OUTPUT output;
 
 	output.fzPosition = input.position.z;
-	output.fDepth = input.position.z;
+	output.fDepth = 1.0f;//input.position.z;
 
 	return(output);
 }
@@ -757,6 +758,7 @@ struct VS_SHADOW_MAP_OUTPUT
 	float3 normalW : NORMAL;
 
 	float4 uvs[1] : TEXCOORD0;
+	float4 uv[1] : TEXCOORD1;
 };
 
 VS_SHADOW_MAP_OUTPUT VSShadowMapShadow(VS_LIGHTING_INPUT input)
@@ -767,6 +769,7 @@ VS_SHADOW_MAP_OUTPUT VSShadowMapShadow(VS_LIGHTING_INPUT input)
 	output.positionW = positionW.xyz;
 	output.position = mul(mul(positionW, gmtxView), gmtxProjection);
 	output.normalW = mul(float4(input.normal, 0.0f), gmtxGameObject).xyz;
+	//output.uv[0] = input.uv;
 
 	for (int i = 0; i < 1; i++)
 	{
@@ -798,9 +801,25 @@ float4 PSShadowMapShadow(VS_SHADOW_MAP_OUTPUT input) : SV_TARGET
 
 	float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
 
+	//float3 normalW;
+	//float4 cColor = cAlbedoColor + cSpecularColor + cMetallicColor + cEmissionColor;
+	//if (gnTexturesMask & MATERIAL_NORMAL_MAP)
+	//{
+	//	float3x3 TBN = float3x3(normalize(input.tangentW), normalize(input.bitangentW), normalize(input.normalW));
+	//	float3 vNormal = normalize(cNormalColor.rgb * 2.0f - 1.0f); //[0, 1] ¡æ [-1, 1]
+	//	normalW = normalize(mul(vNormal, TBN));
+	//}
+	//else
+	//{
+	//	normalW = normalize(input.normalW);
+	//}
+	//normalW = input.normalW * normalW;
+
 	float4 cIllumination = shadowLighting(input.positionW, normalize(input.normalW), true, input.uvs);
 
+
 	return(lerp(cColor, cIllumination, 0.5f));
+	//return float4(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

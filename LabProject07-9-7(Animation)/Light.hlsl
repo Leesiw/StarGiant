@@ -243,6 +243,7 @@ float4 LightingLight(float3 vPosition, float3 vNormal, bool bShadow, float4 uvs[
 
 	return(cColor);
 }
+
 float4 shadowLighting(float3 vPosition, float3 vNormal, bool bShadow, float4 uvs[1])
 {
 	float3 vCameraPosition = float3(gvCameraPosition.x, gvCameraPosition.y, gvCameraPosition.z);

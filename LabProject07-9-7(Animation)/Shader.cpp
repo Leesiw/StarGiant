@@ -1538,6 +1538,7 @@ D3D12_INPUT_LAYOUT_DESC CDepthRenderShader::CreateInputLayout()
 
 	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	pd3dInputElementDescs[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//pd3dInputElementDescs[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }; // TEXCOORD1 추가
 
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
 	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
@@ -1681,6 +1682,7 @@ void CDepthRenderShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	for (int i = 0; i < MAX_DEPTH_TEXTURES; i++)
 	{
 		m_ppDepthRenderCameras[i] = new CCamera();
+		m_ppDepthRenderCameras[i]->SetMode(THIRD_PERSON_CAMERA);
 		m_ppDepthRenderCameras[i]->SetViewport(0, 0, _DEPTH_BUFFER_WIDTH, _DEPTH_BUFFER_HEIGHT, 0.0f, 1.0f);
 		m_ppDepthRenderCameras[i]->SetScissorRect(0, 0, _DEPTH_BUFFER_WIDTH, _DEPTH_BUFFER_HEIGHT);
 		m_ppDepthRenderCameras[i]->CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -1738,15 +1740,15 @@ void CDepthRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommand
 {
 	for (int j = 0; j < MAX_GODRAY_LIGHTS; j++)
 	{
-		if (!m_pLights[j].m_bEnable)
+		if (m_pLights[j].m_bEnable)
 		{
-			XMFLOAT3 xmf3Position = XMFLOAT3(430.219f, 244.f, 693.263f);//m_pLights[j].m_xmf3Position;
+			XMFLOAT3 xmf3Position =m_pLights[j].m_xmf3Position;//XMFLOAT3(430.219f, 244.f, 693.263f);//m_pLights[j].m_xmf3Position;
 			XMFLOAT3 xmf3Look = m_pLights[j].m_xmf3Direction;
-			XMFLOAT3 xmf3Up = XMFLOAT3(+0.0f, -1.0f, 0.0f);
+			XMFLOAT3 xmf3Up = XMFLOAT3(+0.0f, 1.0f, 0.0f);
 
 			XMMATRIX xmmtxView = XMMatrixLookToLH(XMLoadFloat3(&xmf3Position), XMLoadFloat3(&xmf3Look), XMLoadFloat3(&xmf3Up));
 
-			float fNearPlaneDistance = 10.0f, fFarPlaneDistance = m_pLights[j].m_fRange;
+			float fNearPlaneDistance = 0.1f, fFarPlaneDistance = m_pLights[j].m_fRange;//5.0f;
 
 			XMMATRIX xmmtxProjection;
 			if (m_pLights[j].m_nType == DIRECTIONAL_LIGHT)
@@ -1776,7 +1778,7 @@ void CDepthRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommand
 
 			//m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(xmf3Position.x, xmf3Position.y, xmf3Position.z, 1.0f);
 			//임시 조명 위치 
-			m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(-14.66f, 224.0f, 694.f, 1.0f);
+			m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(430.219f, 244.f, 693.263f,1.0f);
 			::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(j), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 			FLOAT pfClearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -1787,7 +1789,7 @@ void CDepthRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommand
 
 			pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandles[j], TRUE, &m_d3dDsvDescriptorCPUHandle);
 
-			//Render(pd3dCommandList, m_ppDepthRenderCameras[j], Map, Player);
+			Render(pd3dCommandList, m_ppDepthRenderCameras[j], Map, Player);
 
 			::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(j), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON);
 		}
@@ -1806,11 +1808,13 @@ void CDepthRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCam
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
 	/*for (int i = 0; i < 2; i++){
+		Map[i]->ShadowRender(pd3dCommandList, pCamera);
 		Map[i]->Render(pd3dCommandList, pCamera);
 
 	}*/
 	for (int i = 0; i < 3; i++) {
-		Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
+		if(Player[i]->isAlive) Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
+		if(Player[i]->isAlive) Player[i]->ShadowRender(pd3dCommandList, pCamera); //only shadow to player
 
 	}
 }
@@ -1953,13 +1957,17 @@ void CShadowMapShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 
 	UpdateShaderVariables(pd3dCommandList);
 
-	//for (int i = 0; i < 2; i++) {
-	//	Map[i]->Render(pd3dCommandList, pCamera);
+	Map[0]->Animate(m_fElapsedTime);
+	if (!Map[0]->m_pSkinnedAnimationController) Map[0]->UpdateTransform(NULL);
+	//Map[0]->Render(pd3dCommandList, pCamera);
 
-	//}
-	/*for (int i = 0; i < 3; i++) {
-		Player[i]->Render(pd3dCommandList, pCamera);
-	}*/
+	Map[0]->ShadowRender(pd3dCommandList, pCamera);
+	//Map[1]->Render(pd3dCommandList, pCamera); //Map과 Player내용물이 shadowMapshader로 그려지도록 해야함. 다른 Standard shadeer로 그려지면 안됌 
+
+	for (int i = 0; i < 3; i++) {
+		if (Player[i]->isAlive) Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
+
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
