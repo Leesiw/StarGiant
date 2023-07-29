@@ -1814,7 +1814,7 @@ void CDepthRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCam
 	}*/
 	for (int i = 0; i < 3; i++) {
 		if(Player[i]->isAlive) Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
-		if(Player[i]->isAlive) Player[i]->ShadowRender(pd3dCommandList, pCamera); //only shadow to player
+		//if(Player[i]->isAlive) Player[i]->ShadowRender(pd3dCommandList, pCamera); //only shadow to player
 
 	}
 }
