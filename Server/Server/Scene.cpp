@@ -410,14 +410,14 @@ void CScene::CheckMissionComplete()
 	}
 	case MissionType::FIND_BOSS: {
 		float dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));		// юс╫ц абг╔
-		if (dist < 1500.0f) {
+		if (dist < 1400.0f) {
 			SetMission(MissionType::CS_BOSS_SCREAM);
 		}
 		return;
 	}
 	case MissionType::GO_CENTER_REAL: {
 		XMFLOAT3 player_pos = m_pSpaceship->GetPosition();
-		XMFLOAT3 planet_pos{ 0.f, 0.f, 0.f }; // юс╫ц абг╔
+		XMFLOAT3 planet_pos{ 1300.f, 0.f, 0.f }; // юс╫ц абг╔
 
 		float dist = Vector3::Length(Vector3::Subtract(player_pos, planet_pos));
 		if (dist < 1000.f) {
@@ -464,7 +464,6 @@ void CScene::MissionClear()
 				else{ god_timer_m.unlock(); }
 			}
 			else if (cur_mission == MissionType::CS_BOSS_SCREAM) {
-				
 				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
 				m_pBoss->BossHP = 100;
 				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
