@@ -536,10 +536,13 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			scene->_s_lock.lock();
 			char num = scene_manager.InsertPlayer(scene_num, c_id);
 			if (num == -1) { 
-				printf("disconnect -> scene에 플레이어 추가 불가능\n");
-				disconnect(c_id); 
 				scene->_s_lock.unlock(); 
-				scene_manager._scene_lock.unlock(); 
+				scene_manager._scene_lock.unlock();
+				printf("scene에 플레이어 추가 불가능\n");
+				SC_LOGIN_FAIL_PACKET f_packet{};
+				f_packet.size = sizeof(SC_LOGIN_FAIL_PACKET);
+				f_packet.type = SC_LOGIN_FAIL;
+				clients[c_id].do_send(&f_packet);
 				return; 
 			}  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
 			if (scene->_state == SCENE_FREE) {
@@ -548,9 +551,11 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			scene->_s_lock.unlock();
 		}
 		else {
-			printf("disconnect -> 비어있는 scene이 없음\n");
-			disconnect(c_id);	
 			scene_manager._scene_lock.unlock();
+			SC_LOGIN_FAIL_PACKET f_packet{};
+			f_packet.size = sizeof(SC_LOGIN_FAIL_PACKET);
+			f_packet.type = SC_LOGIN_FAIL;
+			clients[c_id].do_send(&f_packet);
 			return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
 		}
 		scene_manager._scene_lock.unlock();

@@ -55,6 +55,7 @@ constexpr char CS_ATTACK = 5;
 constexpr char CS_HEAL = 6;
 constexpr char CS_ANIMATION_CHANGE = 7;
 
+constexpr char SC_LOGIN_FAIL = 8;
 constexpr char SC_LOGIN_INFO = 9;
 constexpr char SC_CHANGE = 10;
 constexpr char SC_ADD_PLAYER = 11;
@@ -583,6 +584,10 @@ struct SC_BLACK_HOLE_TIME_PACKET {
 	float time;
 };
 
+struct SC_LOGIN_FAIL_PACKET {
+	unsigned char size;
+	char	type;
+};
 
 
 #pragma pack (pop)
