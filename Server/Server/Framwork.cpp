@@ -511,6 +511,10 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			}
 			clients[c_id].room_id = -1;
 			clients[c_id].room_pid = -1;
+
+			if (std::all_of(scene->_plist.begin(), scene->_plist.end(), [](short i) {return i == -1; })) {
+				scene_manager.ResetScene(scene->num);
+			}
 			scene->_plist_lock.unlock();
 		}
 
@@ -533,10 +537,8 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 				scene_manager._scene_lock.unlock(); 
 				return; 
 			}  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
-			else if (num == 0) {
-				if (scene->_state == SCENE_FREE) {
-					scene->_state = SCENE_ALLOC;
-				}
+			if (scene->_state == SCENE_FREE) {
+				scene->_state = SCENE_ALLOC;
 			}
 			scene->_s_lock.unlock();
 		}
@@ -792,17 +794,20 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		break;
 	}
 	case CS_START: {
+		scene_manager._scene_lock.lock();
 		short t_room_id = clients[c_id].room_id;
 		if (t_room_id == -1) { break; }
+		
 		CScene* scene = scene_manager.GetScene(t_room_id);
-		scene->Start();
+		if (scene->Start()) {
+			SC_START_PACKET packet{};
+			packet.size = sizeof(SC_START_PACKET);
+			packet.type = SC_START;
 
-		SC_START_PACKET packet{};
-		packet.size = sizeof(SC_START_PACKET);
-		packet.type = SC_START;
-
-		//printf("start %d\n", clients[c_id].room_id);
-		scene->Send((char*)&packet);
+			//printf("start %d\n", clients[c_id].room_id);
+			scene->Send((char*)&packet);
+		}
+		scene_manager._scene_lock.unlock();
 		break;
 	}
 	case CS_ANIMATION_CHANGE: {
