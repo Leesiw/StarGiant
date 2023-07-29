@@ -182,6 +182,7 @@ void ProcessPacket(int ci, unsigned char packet[])
 		}
 		break; }
 	case SC_ENEMY_STATE: break;
+	case SC_LOGIN_FAIL: break;
 	case SC_MOVE_GOD: break;
 	case SC_MOVE_BOSS: break;
 	case SC_KILL_NUM: break;
