@@ -632,7 +632,7 @@ void CScene::SetMission(MissionType mission)
 void CScene::SetMissionFindBoss()
 {
 	boss_timer_m.lock();
-	if (cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME && !boss_timer_on) {
+	if (!boss_timer_on) {
 		boss_timer_on = true;
 		boss_timer_m.unlock();
 		cur_mission = MissionType::FIND_BOSS;
