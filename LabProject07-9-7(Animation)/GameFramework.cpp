@@ -1922,6 +1922,11 @@ void CGameFramework::FrameAdvance()
 		m_pInsideScene->OnPrepareRender(m_pd3dCommandList);
 		m_pInsideScene->OnPreRender(m_pd3dCommandList);
 	}
+	/*else
+	{
+		m_pScene->OnPrepareRender(m_pd3dCommandList);
+		m_pScene->OnPreRender(m_pd3dCommandList);
+	}*/
 
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
 	::ZeroMemory(&d3dResourceBarrier, sizeof(D3D12_RESOURCE_BARRIER));

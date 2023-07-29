@@ -106,6 +106,7 @@ public:
 
 	void RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 	void RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
+	void RenderGodRay(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, CGameObject *obj1 =NULL, CGameObject* obj2 = NULL );
 
 
 
@@ -194,7 +195,7 @@ public:
 
 	Boss* m_ppBoss = NULL;
 	God* m_ppGod = NULL;
-
+	CGameObject* pMoonObject;
 
 
 
