@@ -1696,8 +1696,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
 			m_ppBoss->CurState = BossState::SCREAM;
 			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
-			m_ppBoss->SetHP(100);
-			m_ppBoss->onceScream = true;
+			m_ppBoss->SetHP(100);	
 		}
 
 		m_ppBoss->Animate(m_fElapsedTime);
@@ -1735,12 +1734,14 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 		if (m_pPlayer[0]->curMissionType == MissionType::CS_ANGRY_BOSS)
 		{
+			
 			m_ppBoss->CurState = BossState::SCREAM;
 			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
 		}
 
 		if (m_ppBoss->BossHP <= 0 || m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_STARGIANT)
 		{
+			m_ppBoss->onceScream = true;
 			m_fredbosscutTime += m_fElapsedTime;
 			m_ppBoss->CurState = BossState::DIE;
 			m_ppBoss->ChangeAnimation(BossAnimation::DIE);
