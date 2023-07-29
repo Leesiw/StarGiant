@@ -98,13 +98,13 @@ void CPlayer::Rotate(float x, float y, float z)
 void CPlayer::Update(float fTimeElapsed)
 {
 	XMFLOAT3 pos = GetPosition();
-	float dist = Vector3::Length(Vector3::Subtract(pos, XMFLOAT3(10000.f, 10000.f, 10000.f)));
+	float dist = Vector3::Length(Vector3::Subtract(pos, XMFLOAT3(6000.f, 6000.f, 6000.f)));
 
 	if (dist < 1000.f)
 	{
-		XMFLOAT3 ToGo = Vector3::Subtract(pos, XMFLOAT3(10000.f, 10000.f, 10000.f));
+		XMFLOAT3 ToGo = Vector3::Subtract(pos, XMFLOAT3(6000.f, 6000.f, 6000.f));
 		ToGo = Vector3::ScalarProduct(ToGo, 1000.f);
-		ToGo = Vector3::Add(XMFLOAT3(10000.f, 10000.f, 10000.f), ToGo);
+		ToGo = Vector3::Add(XMFLOAT3(6000.f, 6000.f, 6000.f), ToGo);
 		SetPosition(ToGo);
 	}
 

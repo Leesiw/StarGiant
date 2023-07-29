@@ -400,7 +400,7 @@ void CScene::CheckMissionComplete()
 	switch (cur_mission) {
 	case MissionType::GO_PLANET: {
 		XMFLOAT3 player_pos = m_pSpaceship->GetPosition();
-		XMFLOAT3 planet_pos{ 10000.f, 10000.f, 10000.f }; // ÀÓ½Ã ÁÂÇ¥
+		XMFLOAT3 planet_pos{ 6000.f, 6000.f, 6000.f }; // ÀÓ½Ã ÁÂÇ¥
 
 		float dist = Vector3::Length(Vector3::Subtract(player_pos, planet_pos));
 		if (dist < 1000.f) {
@@ -410,14 +410,14 @@ void CScene::CheckMissionComplete()
 	}
 	case MissionType::FIND_BOSS: {
 		float dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(), m_pBoss->GetPosition()));		// ÀÓ½Ã ÁÂÇ¥
-		if (dist < 1500.0f) {
+		if (dist < 1400.0f) {
 			SetMission(MissionType::CS_BOSS_SCREAM);
 		}
 		return;
 	}
 	case MissionType::GO_CENTER_REAL: {
 		XMFLOAT3 player_pos = m_pSpaceship->GetPosition();
-		XMFLOAT3 planet_pos{ 0.f, 0.f, 0.f }; // ÀÓ½Ã ÁÂÇ¥
+		XMFLOAT3 planet_pos{ 1300.f, 0.f, 0.f }; // ÀÓ½Ã ÁÂÇ¥
 
 		float dist = Vector3::Length(Vector3::Subtract(player_pos, planet_pos));
 		if (dist < 1000.f) {
@@ -448,18 +448,32 @@ void CScene::MissionClear()
 				m_pGod->GodHP = 100;
 				m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
 
+				SC_MOVE_SPACESHIP_PACKET p{};
+				p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
+				p.type = SC_MOVE_SPACESHIP;
+				p.pos = m_pSpaceship->GetPosition();
+				Send((char*)&p);
+
+				god_timer_m.lock();
 				if (!god_timer_on) {
 					god_timer_on = true;
+					god_timer_m.unlock();
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
 					timer_queue.push(ev);
 				}
+				else{ god_timer_m.unlock(); }
 			}
 			else if (cur_mission == MissionType::CS_BOSS_SCREAM) {
-				
 				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
 				m_pBoss->BossHP = 100;
 				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
 				
+				SC_MOVE_SPACESHIP_PACKET p{};
+				p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
+				p.type = SC_MOVE_SPACESHIP;
+				p.pos = m_pSpaceship->GetPosition();
+				Send((char*)&p);
+
 				boss_timer_m.lock();
 				if (!boss_timer_on) {
 					boss_timer_on = true;
@@ -529,18 +543,19 @@ void CScene::SetMission(MissionType mission)
 			if (mission == MissionType::CS_SHOW_GOD) {
 				m_pGod->SetPosition(1300.f, 0.f, 0.f);
 				m_pGod->GodHP = 100;
-				m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
 
+				god_timer_m.lock();
 				if (!god_timer_on) {
 					god_timer_on = true;
+					god_timer_m.unlock();
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
 					timer_queue.push(ev);
 				}
+				else{ god_timer_m.unlock(); }
 			}
 			else if (mission == MissionType::CS_BOSS_SCREAM) {
 				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
 				m_pBoss->BossHP = 100;
-				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
 				
 				boss_timer_m.lock();
 				if (!boss_timer_on) {

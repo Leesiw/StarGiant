@@ -172,7 +172,7 @@ enum class ItemType : char
 enum class MissionType : char
 {
 	CS_TURN,	// ÄÆ¾À ¿ìÁÖ¼± Áß½É ÇÑ¹ÙÄû µ¹±â
-	TU_SIT, TU_KILL, TU_HILL, TU_END, GET_JEWELS, Kill_MONSTER, 
+	TU_SIT, TU_KILL, TU_HILL, GET_JEWELS, Kill_MONSTER, 
 	CS_SHOW_PLANET,
 	GO_PLANET, KILL_MONSTER_ONE_MORE_TIME, FIND_BOSS,
 	CS_BOSS_SCREAM,
