@@ -68,7 +68,7 @@ public:
 
 	void Send(char* p);
 
-	void Start();
+	bool Start();
 	char InsertPlayer(short pl_id);
 
 	CAirplanePlayer* m_pSpaceship = NULL;
