@@ -616,20 +616,7 @@ void CScene::ReleaseObjects()
 	if (m_pTerrain) delete m_pTerrain;
 	if (m_pSkyBox) delete m_pSkyBox;
 	if (m_pParticle) delete[] m_pParticle;
-
-
-	for (int i = 0; i < MAX_HEAL_PARTICLES; i++) {
-
-		if (m_phealParticle[i]) {
-
-			m_phealParticle[i]->ReleaseShaderVariables();
-			m_phealParticle[i]->Release();
-		}
-
-		delete[] m_phealParticle;
-	}
-
-
+	if (m_phealParticle) delete[] m_phealParticle;
 	if (m_pFlameParticle) delete[] m_pFlameParticle;
 	if (m_pSkull) delete[] m_pSkull;
 	if (m_pline) delete[] m_pline;
