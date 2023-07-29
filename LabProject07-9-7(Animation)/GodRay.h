@@ -67,7 +67,7 @@ public:
 
 };
 
-class CDepthRenderShader : public CBaseShader
+/*class CDepthRenderShader : public CBaseShader
 {
 public:
 	CDepthRenderShader(CGameObject** pObjects, LIGHT* pLights);
@@ -90,13 +90,13 @@ public:
 
 protected:
 
-};
+};*/
 //
-class CShadowMapShader : public CShader
+class CSceneMapShader : public CShader
 {
 public:
-	CShadowMapShader(CGameObject** pObjects);
-	virtual ~CShadowMapShader();
+	CSceneMapShader(CGameObject** pObjects);
+	virtual ~CSceneMapShader();
 
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
 	void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE d3dPrimitiveTopology, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, DXGI_FORMAT dxgiDsvFormat);

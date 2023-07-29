@@ -476,6 +476,34 @@ void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	if (pGodModel) delete pGodModel;
 }
 
+void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** pObject)
+{
+	m_pSceneRenderShader = new CSceneRenderShader(pObject, m_pInsideLights);//m_pInsideLights);
+	DXGI_FORMAT pdxgiRtvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
+	m_pSceneRenderShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
+	m_pSceneRenderShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
+
+	m_pSceneMapShader = new CSceneMapShader(pObject);
+	m_pSceneMapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	m_pSceneMapShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
+	//
+	CGodRayShader* pGodRayShader = new CGodRayShader(); //inside Godray light need bulidobject
+
+	m_pDepthRenderShader = new CDepthRenderShader(pGodRayShader, m_pInsideLights);//m_pInsideLights);
+	//DXGI_FORMAT pdxgiRtvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
+	m_pDepthRenderShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
+	m_pDepthRenderShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
+
+	m_pShadowShader = new CShadowMapShader(pGodRayShader);
+	m_pShadowShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	m_pShadowShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
+
+	//m_pShadowMapToViewport = new CTextureToViewportShader();
+	//m_pShadowMapToViewport->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	//m_pShadowMapToViewport->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
+
+}
+
 void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap)
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);

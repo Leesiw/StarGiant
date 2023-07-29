@@ -79,6 +79,8 @@ public:
 	void BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
+	void BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** pObject);
+
 	void BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap);
 	void ReleaseObjects();
 
@@ -251,9 +253,10 @@ public:
 
 
 
+	CSceneRenderShader* m_pSceneRenderShader = NULL;
+	CSceneMapShader* m_pSceneMapShader = NULL;
 
 	CDepthRenderShader* m_pDepthRenderShader = NULL;
-
 	CShadowMapShader* m_pShadowShader = NULL;
 	CTextureToViewportShader* m_pShadowMapToViewport = NULL;
 
