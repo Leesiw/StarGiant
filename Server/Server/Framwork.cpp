@@ -762,7 +762,6 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			if (false == atomic_compare_exchange_strong(&m_pScene->heal_player, &o_state, clients[c_id].room_pid)) {
 				break;
 			}
-			m_pScene->heal_start = std::chrono::system_clock::now();
 			clients[c_id].send_heal_packet();
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, t_room_id };
 			timer_queue.push(ev);
