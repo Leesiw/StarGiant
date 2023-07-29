@@ -425,7 +425,7 @@ void CGameFramework::SetMission()
 	levels[MissionType::GO_CENTER_REAL].Missile.ATK = 20;
 	levels[MissionType::GO_CENTER_REAL].PlasmaCannon.MAX_HP = 60;
 	levels[MissionType::GO_CENTER_REAL].PlasmaCannon.ATK = 30;
-	levels[MissionType::GO_CENTER_REAL].RestartMission = MissionType::CS_SHOW_BLACK_HOLE;
+	levels[MissionType::GO_CENTER_REAL].RestartMission = MissionType::GO_CENTER_REAL;
 	levels[MissionType::GO_CENTER_REAL].RestartPosition = XMFLOAT3{ 3500.f ,3500.f ,3500.f };
 
 	levels[MissionType::CS_SHOW_GOD].NextMission = MissionType::KILL_GOD;
