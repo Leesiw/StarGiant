@@ -1172,6 +1172,8 @@ void CGameFramework::CameraUpdateChange()
 			b_Inside = true;
 			_state = SCENE_LOBBY;
 
+			Reset_game();
+
 			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
 			m_pCamera = m_pPlayer[0]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
 			m_pCamera->fAnglenu = 0;
@@ -2548,7 +2550,6 @@ wstring CGameFramework::ChangeBossScripts(MissionType mType, short hp)
 
 void CGameFramework::Reset_game()
 {
-
 	matcnt = 0;
 	blackholetime = 0;
 	default_shaking_num = 0;
@@ -2557,6 +2558,7 @@ void CGameFramework::Reset_game()
 	roomNum.clear();
 	b_Inside = true;
 
+	cout << "reset game\n";
 }
 
 
