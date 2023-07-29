@@ -8,8 +8,9 @@ GodState = {
     SHOT = 4,
     HIT1 = 5,
     HIT2 = 6,
-    DEATH = 7,
-    ATTACK = 8
+    ROAR = 7,
+    DEATH = 8,
+    ATTACK = 9
 
 }
 
@@ -68,6 +69,8 @@ function updateGodAI(hp, bpx, bpy, bpz, elapsedTime)
     melee1Cooldown = melee1Cooldown - elapsedTime
     melee2Cooldown = melee2Cooldown - elapsedTime
     hit1Cooldown = hit1Cooldown - elapsedTime
+    hit2Cooldown = hit2Cooldown - elapsedTime
+
 
     if state == GodState.IDLE2 then        -- 보스가 나타날 때
         if onappear then
@@ -103,7 +106,7 @@ function idle(frameTime,bpx, bpy, bpz)
 
         if curHp <= (MaxHp / 2) then
             SHOT_COOL_TIME = 4
-            randomIndex = math.random(2,5)
+            randomIndex = math.random(2,6)
             if frameTime >= moveCooldown then
                 moveBoss(bpx, bpy, bpz)
                 print("move")
@@ -139,9 +142,12 @@ function idle(frameTime,bpx, bpy, bpz)
             attackCooldown = frameTime + HIT1_COOL_TIME
             attackCooldown = frameTime + ATTACK_COOL_TIME
             attackState = true
+        elseif attackType == tonumber(GodState.HIT2) then
+            spawn()
+            attackCooldown = frameTime + HIT2_COOL_TIME
+            attackCooldown = frameTime + ATTACK_COOL_TIME
+            attackState = true
         end
-
-
    end
 end
 
@@ -197,6 +203,10 @@ function heal(curHp)
     frameTime = 0
 end
 
+function spawn()
+    motion = GodState.ROAR
+    frameTime = 0
+end
 
 -- 죽음 상태 처리 함수
 function die()

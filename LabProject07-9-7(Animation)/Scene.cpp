@@ -132,7 +132,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 562); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 662); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
 
 	CMaterial::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -595,7 +595,7 @@ void CScene::ReleaseObjects()
 {
 	if (m_pd3dGraphicsRootSignature) m_pd3dGraphicsRootSignature->Release();
 	if (m_pd3dCbvSrvDescriptorHeap) m_pd3dCbvSrvDescriptorHeap->Release();
-	
+
 	if (m_ppGameObjects)
 	{
 		for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->Release();
@@ -617,13 +617,15 @@ void CScene::ReleaseObjects()
 	if (m_pSkyBox) delete m_pSkyBox;
 	if (m_pParticle) delete[] m_pParticle;
 
-	if (m_phealParticle)
-	{
-		for (int i = 0; i < MAX_HEAL_PARTICLES; i++)
-		{
+
+	for (int i = 0; i < MAX_HEAL_PARTICLES; i++) {
+
+		if (m_phealParticle[i]) {
+
 			m_phealParticle[i]->ReleaseShaderVariables();
 			m_phealParticle[i]->Release();
 		}
+
 		delete[] m_phealParticle;
 	}
 
@@ -1692,7 +1694,10 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	if (m_ppBoss) {
 
 		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
+			m_ppBoss->CurState = BossState::SCREAM;
+			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
 			m_ppBoss->SetHP(100);
+			m_ppBoss->onceScream = true;
 		}
 
 		m_ppBoss->Animate(m_fElapsedTime);
@@ -1726,12 +1731,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 				m_pMagicCircle[2]->Animate(m_fElapsedTime);
 				m_pMagicCircle[2]->Render(pd3dCommandList, pCamera);
 			}
-		}
-
-
-		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM && m_ppBoss->onceScream) {
-			m_ppBoss->CurState = BossState::SCREAM;
-			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
 		}
 
 		if (m_pPlayer[0]->curMissionType == MissionType::CS_ANGRY_BOSS)
@@ -1827,7 +1826,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 
-	if (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_ppGod->CurMotion == GodAnimation::HIT1) {
+	if ((m_pPlayer[0]->curMissionType == MissionType::KILL_GOD || m_pPlayer[0]->curMissionType == MissionType::KILL_GOD2) && m_ppGod->CurMotion == GodAnimation::HIT1) {
 		if (m_ppGod->heal) {
 			sethealParticleStart(MAX_HEAL_PARTICLES, m_ppGod->GetPosition());
 			cout << "heal";
@@ -1846,7 +1845,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 
 
-	if (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_ppGod->CurMotion == GodAnimation::MELEE2) {
+	if ((m_pPlayer[0]->curMissionType == MissionType::KILL_GOD|| m_pPlayer[0]->curMissionType == MissionType::KILL_GOD2) && m_ppGod->CurMotion == GodAnimation::MELEE2) {
 		if (m_ppGod->m2) {
 			setParticleStarts(MAX_CIRCLE_PARTICLES, m_ppGod->GetPosition(), 0);
 			m_ppGod->m2 = false;
@@ -1862,7 +1861,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 		cout << "m2";
 	}
-	if (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_ppGod->CurMotion == GodAnimation::SHOT) {
+	if ((m_pPlayer[0]->curMissionType == MissionType::KILL_GOD || m_pPlayer[0]->curMissionType == MissionType::KILL_GOD2) && m_ppGod->CurMotion == GodAnimation::SHOT) {
 		if (m_ppGod->shot) {
 			setParticleStarts(MAX_CIRCLE_PARTICLES, m_ppGod->GetPosition(), 0);
 			m_ppGod->shot = false;
@@ -2007,7 +2006,7 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 
 
 
-	if (m_ppUI[1] && m_ppGod->CurMotion == GodAnimation::MELEE1 && m_pPlayer[0]->curMissionType == MissionType::KILL_GOD && m_biteTime < 2)
+	if (m_ppUI[1] && m_ppGod->CurMotion == GodAnimation::MELEE1 && (m_pPlayer[0]->curMissionType == MissionType::KILL_GOD || m_pPlayer[0]->curMissionType == MissionType::KILL_GOD2) && m_biteTime < 2)
 	{
 		m_biteTime += m_fElapsedTime;
 		m_ppUI[2]->SetPosition(xmf3Position);
@@ -2057,7 +2056,7 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 
 	}
 
-	if (m_ppUI[1] && m_ppBoss->CurMotion == BossAnimation::CLAW_ATTACT && m_pPlayer[0]->curMissionType == MissionType::DEFEAT_BOSS)
+	if (m_ppUI[1] && m_ppBoss->CurMotion == BossAnimation::CLAW_ATTACT && (m_pPlayer[0]->curMissionType == MissionType::DEFEAT_BOSS|| m_pPlayer[0]->curMissionType == MissionType::DEFEAT_BOSS2))
 	{
 		m_ppUI[1]->Render(pd3dCommandList, pCamera);
 	}
