@@ -2666,6 +2666,7 @@ void CGameFramework::Reset_game()
 	curMissionType = MissionType::TU_SIT;
 	pastMissionType = MissionType::TU_SIT;
 
+	m_bgm[0]->stop();
 	m_bgm[1]->stop();
 	m_bgm[2]->stop();
 
@@ -2676,6 +2677,11 @@ void CGameFramework::Reset_game()
 
 	default_shaking_num = 0;
 	blackhole_shaking_num = 0;
+
+	m_pScene->m_fbosscutTime = 0;
+	m_pScene->m_fredbosscutTime = 0;
+	m_pScene->m_eTime = 0;
+
 
 
 	bossdie = 0;
