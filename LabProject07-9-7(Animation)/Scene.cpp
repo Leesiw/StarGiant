@@ -386,6 +386,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	BuildBoss(pd3dDevice, pd3dCommandList); //2obj
 	BuildGod(pd3dDevice, pd3dCommandList); //1obj
 	BuildUI(pd3dDevice, pd3dCommandList); //31obj
+	BuildGodRay(pd3dDevice, pd3dCommandList,m_pPlayer); //31obj
 
 
 	m_nShaders = 0;
@@ -476,16 +477,16 @@ void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	if (pGodModel) delete pGodModel;
 }
 
-void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** pObject)
+void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CPlayer** pPlayer)
 {
-	m_pSceneRenderShader = new CSceneRenderShader(pObject, m_pInsideLights);//m_pInsideLights);
+	m_pSceneRenderShader = new CSceneRenderShader(pPlayer, m_pInsideLights);//m_pInsideLights);
 	DXGI_FORMAT pdxgiRtvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
 	m_pSceneRenderShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pSceneRenderShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
 
-	m_pSceneMapShader = new CSceneMapShader(pObject);
+	m_pSceneMapShader = new CSceneMapShader(pPlayer);
 	m_pSceneMapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
-	m_pSceneMapShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
+	m_pSceneMapShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pSceneRenderShader->GetDepthTexture());
 	//
 	CGodRayShader* pGodRayShader = new CGodRayShader(); //inside Godray light need bulidobject
 

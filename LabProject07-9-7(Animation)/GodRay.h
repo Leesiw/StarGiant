@@ -9,11 +9,11 @@ struct TOLIGHTSPACES;
 class CBaseShader : public CShader
 {
 public:
-	CBaseShader(CGameObject** pObjects, LIGHT* pLights);
+	CBaseShader(CPlayer** pPlayer, LIGHT* pLights);
 	virtual ~CBaseShader();
 
 public:
-	CGameObject						** m_ppRenderObjects = 0;
+	CPlayer** m_ppRenderObjects = 0;
 	LIGHT							* m_pLights = NULL;
 	CTexture						* m_pRenderTexture = NULL;
 
@@ -47,7 +47,7 @@ public:
 class CSceneRenderShader : public CBaseShader
 {
 public:
-	CSceneRenderShader(CGameObject** pObjects, LIGHT* pLights);
+	CSceneRenderShader(CPlayer** pPlayer, LIGHT* pLights);
 	virtual ~CSceneRenderShader();
 
 	void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE d3dPrimitiveTopology, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, DXGI_FORMAT dxgiDsvFormat);
@@ -95,7 +95,7 @@ protected:
 class CSceneMapShader : public CShader
 {
 public:
-	CSceneMapShader(CGameObject** pObjects);
+	CSceneMapShader(CPlayer** pPlayer);
 	virtual ~CSceneMapShader();
 
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
@@ -117,11 +117,12 @@ public:
 	virtual void ReleaseUploadBuffers();
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player);
+	CTexture* GetDepthTexture() { return(m_pRenderTexture); }
 
 public:
-	CGameObject** m_pRenderObjects = NULL;
+	CPlayer** m_pRenderObjects = NULL;
 
-	CTexture* m_pDepthTexture = NULL;
+	CTexture* m_pRenderTexture = NULL;
 };
 
 

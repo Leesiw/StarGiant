@@ -5,9 +5,9 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-CBaseShader::CBaseShader(CGameObject** pObjects, LIGHT* pLights)
+CBaseShader::CBaseShader(CPlayer** pPlayer, LIGHT* pLights)
 {
-	m_ppRenderObjects = pObjects;
+	m_ppRenderObjects = pPlayer;
 
 	m_pLights = pLights;
 	m_pToLightSpaces = new TOLIGHTSPACES;
@@ -84,7 +84,7 @@ void CBaseShader::ReleaseShaderVariables()
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-CSceneRenderShader::CSceneRenderShader(CGameObject** pObjects, LIGHT* pLights) :CBaseShader(pObjects, pLights)
+CSceneRenderShader::CSceneRenderShader(CPlayer** pPlayer, LIGHT* pLights) :CBaseShader(pPlayer, pLights)
 {
 }
 
@@ -354,9 +354,9 @@ void CSceneRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCam
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-CSceneMapShader::CSceneMapShader(CGameObject** pObjects)
+CSceneMapShader::CSceneMapShader(CPlayer** pPlayer)
 {
-	m_pRenderObjects = pObjects;
+	m_pRenderObjects = pPlayer;
 }
 
 CSceneMapShader::~CSceneMapShader()
@@ -463,7 +463,7 @@ void CSceneMapShader::ReleaseShaderVariables()
 
 void CSceneMapShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (m_pDepthTexture) m_pDepthTexture->UpdateShaderVariables(pd3dCommandList);
+	if (m_pRenderTexture) m_pRenderTexture->UpdateShaderVariables(pd3dCommandList);
 }
 
 void CSceneMapShader::ReleaseUploadBuffers()
@@ -472,18 +472,18 @@ void CSceneMapShader::ReleaseUploadBuffers()
 
 void CSceneMapShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
-	m_pDepthTexture = (CTexture*)pContext;
-	m_pDepthTexture->AddRef();
+	m_pRenderTexture = (CTexture*)pContext;
+	m_pRenderTexture->AddRef();
 
 	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, m_pDepthTexture->GetTextures());
-	CScene::CreateShaderResourceViews(pd3dDevice, m_pDepthTexture, 20, false); //Depth buffer
+	CScene::CreateShaderResourceViews(pd3dDevice, m_pRenderTexture, 20, false); //Depth buffer
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
 void CSceneMapShader::ReleaseObjects()
 {
-	if (m_pDepthTexture) m_pDepthTexture->Release();
+	if (m_pRenderTexture) m_pRenderTexture->Release();
 }
 
 void CSceneMapShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player)
