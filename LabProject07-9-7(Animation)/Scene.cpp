@@ -161,7 +161,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	CLoadedModelInfo* pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/planet.bin", NULL);
 	m_ppHierarchicalGameObjects[0] = new CAngrybotObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pAngrybotModel, 1);
 	m_ppHierarchicalGameObjects[0]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppHierarchicalGameObjects[0]->SetPosition(10000.0f, 10000.0f, 10000.0f);
+	m_ppHierarchicalGameObjects[0]->SetPosition(6000.0f, 6000.0f, 6000.0f);
 	m_ppHierarchicalGameObjects[0]->SetScale(100.f, 100.f, 100.f);
 	if (pAngrybotModel) delete pAngrybotModel;
 
@@ -363,10 +363,11 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pline[i]->count = i;
 	}
 
-	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
+	for (int i = 0; i < MAX_MAGIC_CIRCLE_PARTICLES; ++i) {
 		m_pMagicCircle[i] = new CMagicCircleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, i, 0);
 		m_pMagicCircle[i]->count = i;
 	}
+
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i) {
 		m_pMagicCircle2[i] = new CMagicCircleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, i, 0);
 		m_pMagicCircle2[i]->count = i;
@@ -1198,7 +1199,7 @@ void CScene::ReleaseUploadBuffers()
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pFlameParticle[i] != NULL) { m_pFlameParticle[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pSkull[i] != NULL) { m_pSkull[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pline[i] != NULL) { m_pline[i]->ReleaseUploadBuffers(); };
-	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pMagicCircle[i] != NULL) { m_pMagicCircle[i]->ReleaseUploadBuffers(); };
+	for (int i = 0; i < MAX_MAGIC_CIRCLE_PARTICLES; ++i)if (m_pMagicCircle[i] != NULL) { m_pMagicCircle[i]->ReleaseUploadBuffers(); };
 	for (int i = 0; i < MAX_CIRCLE_PARTICLES; ++i)if (m_pMagicCircle2[i] != NULL) { m_pMagicCircle2[i]->ReleaseUploadBuffers(); };
 
 
@@ -1568,7 +1569,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	//	m_pPlayer[g_myid]->setting = true;
 	//}
 
-	XMFLOAT3 tar = { 10000.0f,10000.0f,10000.0f };
+	XMFLOAT3 tar = { 6000.0f,6000.0f,6000.0f };
 	if (m_pPlayer[0]->curMissionType == MissionType::GO_PLANET) {
 		m_ppHierarchicalGameObjects[9]->SetPosition(xmf3Position2);
 		m_ppHierarchicalGameObjects[9]->SetLookAt(tar, XMFLOAT3(0.0f, 1.0f, 0.0f));
@@ -1740,7 +1741,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
 		}
 
-		if (m_ppBoss->BossHP <= 0 || m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_STARGIANT)
+		if (m_ppBoss->BossHP <= 0 || m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_STARGIANT)
 		{
 			m_ppBoss->onceScream = true;
 			m_fredbosscutTime += m_fElapsedTime;
