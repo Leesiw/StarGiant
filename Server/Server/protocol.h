@@ -55,6 +55,7 @@ constexpr char CS_ATTACK = 5;
 constexpr char CS_HEAL = 6;
 constexpr char CS_ANIMATION_CHANGE = 7;
 
+constexpr char SC_LOGIN_FAIL = 8;
 constexpr char SC_LOGIN_INFO = 9;
 constexpr char SC_CHANGE = 10;
 constexpr char SC_ADD_PLAYER = 11;
@@ -172,7 +173,7 @@ enum class ItemType : char
 enum class MissionType : char
 {
 	CS_TURN,	// ÄÆ¾À ¿ìÁÖ¼± Áß½É ÇÑ¹ÙÄû µ¹±â
-	TU_SIT, TU_KILL, TU_HILL, TU_END, GET_JEWELS, Kill_MONSTER, 
+	TU_SIT, TU_KILL, TU_HILL, GET_JEWELS, Kill_MONSTER, 
 	CS_SHOW_PLANET,
 	GO_PLANET, KILL_MONSTER_ONE_MORE_TIME, FIND_BOSS,
 	CS_BOSS_SCREAM,
@@ -583,6 +584,10 @@ struct SC_BLACK_HOLE_TIME_PACKET {
 	float time;
 };
 
+struct SC_LOGIN_FAIL_PACKET {
+	unsigned char size;
+	char	type;
+};
 
 
 #pragma pack (pop)

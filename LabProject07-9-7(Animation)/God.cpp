@@ -83,7 +83,6 @@ void God::ChangeAnimation(GodAnimation CurMotion)
 		auto now = std::chrono::steady_clock::now();
 
 		if (std::chrono::steady_clock::now() > target_time) {
-			cout << "d";
 			m_pSkinnedAnimationController->SetTrackPosition(static_cast<int>(CurMotion), 1.0f);
 			SetTrackAnimationPosition(static_cast<int>(CurMotion), 1.0f);
 			m_pSkinnedAnimationController->SetTrackSpeed(static_cast<int>(CurMotion), 0.0f);

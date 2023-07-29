@@ -650,7 +650,8 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
 
     if (sst == 0) {
         m_pd2dDeviceContext->DrawImage(m_pd2dfxGaussianBlur_Lobby, &d2dPoint_Lobby);
-
+        actime = 0; // 걍 초기화여기서
+        actime2 = 0;
 
         for (auto textBlock : m_vLobbyBlocks)
         {

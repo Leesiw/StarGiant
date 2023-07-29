@@ -241,12 +241,10 @@ void CGameFramework::SetMission()
 
 	levels[MissionType::TU_SIT].NextMission = MissionType::TU_KILL;
 	levels[MissionType::TU_KILL].NextMission = MissionType::TU_HILL;
-	levels[MissionType::TU_HILL].NextMission = MissionType::TU_END;
-	levels[MissionType::TU_END].NextMission = MissionType::GET_JEWELS;
+	levels[MissionType::TU_HILL].NextMission = MissionType::GET_JEWELS;
 	
-
 	for (int i = static_cast<int>(MissionType::TU_SIT);
-		i <= static_cast<int>(MissionType::TU_END); ++i) {
+		i <= static_cast<int>(MissionType::TU_HILL); ++i) {
 		MissionType m = static_cast<MissionType>(i);
 		levels[m].MaxMonsterNum = 6;
 		levels[m].SpawnMonsterNum = 3;
@@ -538,9 +536,13 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			scene->_s_lock.lock();
 			char num = scene_manager.InsertPlayer(scene_num, c_id);
 			if (num == -1) { 
-				disconnect(c_id); 
 				scene->_s_lock.unlock(); 
-				scene_manager._scene_lock.unlock(); 
+				scene_manager._scene_lock.unlock();
+				printf("scene에 플레이어 추가 불가능\n");
+				SC_LOGIN_FAIL_PACKET f_packet{};
+				f_packet.size = sizeof(SC_LOGIN_FAIL_PACKET);
+				f_packet.type = SC_LOGIN_FAIL;
+				clients[c_id].do_send(&f_packet);
 				return; 
 			}  // 일단 disconnect 이후 로그인 fail 패킷으로 변경
 			if (scene->_state == SCENE_FREE) {
@@ -549,8 +551,11 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			scene->_s_lock.unlock();
 		}
 		else {
-			disconnect(c_id);	
 			scene_manager._scene_lock.unlock();
+			SC_LOGIN_FAIL_PACKET f_packet{};
+			f_packet.size = sizeof(SC_LOGIN_FAIL_PACKET);
+			f_packet.type = SC_LOGIN_FAIL;
+			clients[c_id].do_send(&f_packet);
 			return;// 일단 disconnect 이후 로그인 fail 패킷으로 변경
 		}
 		scene_manager._scene_lock.unlock();

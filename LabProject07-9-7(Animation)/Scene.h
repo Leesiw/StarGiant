@@ -19,6 +19,8 @@
 
 #define MAX_PARTICLES					50
 #define MAX_CIRCLE_PARTICLES			4
+#define MAX_MAGIC_CIRCLE_PARTICLES		3
+
 
 #define MAX_HEAL_PARTICLES				20
 

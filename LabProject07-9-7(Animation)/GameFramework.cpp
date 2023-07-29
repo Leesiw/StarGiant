@@ -43,13 +43,13 @@ CGameFramework::CGameFramework()
 	
 	cDirection = 0;
 
-	planetPos = { 10000.0f,10000.0f,10000.0f };
+	planetPos = { 6000.0f, 6000.0f, 6000.0f };
 
 	_state = SCENE_LOBBY;
 	//_state = SCENE_INGAME;
 
-	a = 0;
-	b = 0;
+	default_shaking_num = 0;
+	blackhole_shaking_num = 0;
 	
 	scriptsStartTime = steady_clock::now();
 	_tcscpy_s(m_pszFrameRate, _T("StarGiant ("));
@@ -829,33 +829,33 @@ bool CGameFramework::AroundSculpture()
 void CGameFramework::CameraUpdateChange()
 {
 
-	if (a==0 &&m_pPlayer[0]->getHp() < 90 && m_pCamera->m_bCameraShaking ==false) { 
+	if (default_shaking_num ==0 &&m_pPlayer[0]->getHp() < 90 && m_pCamera->m_bCameraShaking ==false) {
 		m_pCamera->maxShakingTime = 1.f;
 		m_pCamera->m_bCameraShaking = true;
-		a = 1;
+		default_shaking_num = 1;
 	}
-	if (a == 1 && m_pPlayer[0]->getHp() < 80 && m_pCamera->m_bCameraShaking == false) {
+	if (default_shaking_num == 1 && m_pPlayer[0]->getHp() < 80 && m_pCamera->m_bCameraShaking == false) {
 		m_pCamera->maxShakingTime = 1.f;
 		m_pCamera->m_bCameraShaking = true;
-		a = 2;
+		default_shaking_num = 2;
 	}
-	if (a == 2 && m_pPlayer[0]->getHp() < 50 && m_pCamera->m_bCameraShaking == false) {
+	if (default_shaking_num == 2 && m_pPlayer[0]->getHp() < 50 && m_pCamera->m_bCameraShaking == false) {
 		m_pCamera->maxShakingTime = 1.5f;
 		m_pCamera->m_bCameraShaking = true;
-		a = 3;
+		default_shaking_num = 3;
 	}
-	if (a == 3 && m_pPlayer[0]->getHp() < 20 && m_pCamera->m_bCameraShaking == false) {
+	if (default_shaking_num == 3 && m_pPlayer[0]->getHp() < 20 && m_pCamera->m_bCameraShaking == false) {
 		m_pCamera->maxShakingTime = 1.5f;
 		m_pCamera->m_bCameraShaking = true;
-		a = 4;
+		default_shaking_num = 4;
 	}
 
-	if (b==0 && curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
+	if (blackhole_shaking_num ==0 && curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
 		m_pCamera->maxShakingTime = 1.0f;
 		m_pCamera->m_bCameraShaking = true;
-		b = 1;
+		blackhole_shaking_num = 1;
 	}
-	if (b == 1 && curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
+	if (blackhole_shaking_num == 1 && curMissionType == MissionType::ESCAPE_BLACK_HOLE) {
 		XMVECTOR v1 = XMLoadFloat3(&m_pPlayer[0]->GetPosition());
 		XMVECTOR v2 = XMLoadFloat3(&m_pScene->m_ppBlackhole->GetPosition());
 		XMVECTOR dist = XMVector3Length(XMVectorSubtract(v2, v1));
@@ -1172,6 +1172,8 @@ void CGameFramework::CameraUpdateChange()
 			b_Inside = true;
 			_state = SCENE_LOBBY;
 
+			Reset_game();
+
 			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(THIRD_PERSON_CAMERA, m_GameTimer.GetTimeElapsed());
 			m_pCamera = m_pPlayer[0]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
 			m_pCamera->fAnglenu = 0;
@@ -1423,6 +1425,7 @@ void CGameFramework::UpdateSounds()
 	if (_state == SCENE_LOBBY) {
 		m_lobbybgm->Update(); 
 		m_bgm[2]->stop(); 
+
 	}
 	else {
 		m_lobbybgm->stop();
@@ -2055,12 +2058,20 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	XMVECTOR center = { 0,0,0 };
 	XMVECTOR distcenter = XMVector3Length(XMVectorSubtract(center, v1));
 
+	XMVECTOR center_real = { 1300,0,0 };
+	XMVECTOR distcenter_real = XMVector3Length(XMVectorSubtract(center_real, v1));
+
+
 	float distance;
 	XMStoreFloat(&distance, dist);
 	float distanceCenter;
 	XMStoreFloat(&distanceCenter, distcenter);
 
+	float distanceCenter_real;
+	XMStoreFloat(&distanceCenter_real, distcenter_real);
+
 	distance = distance - 1500.0f;
+	distanceCenter_real = distanceCenter_real - 1000.0f;
 
 	distanceCenter = distanceCenter;
 
@@ -2174,7 +2185,7 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 	case MissionType::GO_CENTER_REAL:
 	{
 		uiText = L"미션 - 진짜 우주의 중심으로 가라! ( ";
-		uiText += centerDist;
+		uiText += distanceCenter_real;
 		uiText += L"m 남음 )";
 		break;
 	}
@@ -2535,6 +2546,19 @@ wstring CGameFramework::ChangeBossScripts(MissionType mType, short hp)
 	};
 
 	return uiScripts;
+}
+
+void CGameFramework::Reset_game()
+{
+	matcnt = 0;
+	blackholetime = 0;
+	default_shaking_num = 0;
+	blackhole_shaking_num = 0;
+	room_num = 0;
+	roomNum.clear();
+	b_Inside = true;
+	curMissionType = MissionType::TU_SIT;
+	cout << "reset game\n";
 }
 
 
@@ -2988,13 +3012,7 @@ void CGameFramework::ProcessPacket(char* p)
 			}
 		}
 
-		if (curMissionType == MissionType::CS_SHOW_GOD) {
-			m_pPlayer[0]->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
-		}
-		else if (curMissionType == MissionType::CS_BOSS_SCREAM) {
-			m_pPlayer[0]->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
-		}
-		else if (curMissionType != MissionType::CS_BAD_ENDING) {
+		if (curMissionType != MissionType::CS_BAD_ENDING) {
 			m_effectSound[static_cast<int>(Sounds::CLEAR)]->play();
 		}
 		break;
@@ -3038,6 +3056,14 @@ void CGameFramework::ProcessPacket(char* p)
 	{
 		SC_BLACK_HOLE_TIME_PACKET* packet = reinterpret_cast<SC_BLACK_HOLE_TIME_PACKET*>(p);
 		blackholetime = packet->time;	// 블랙홀 시간 float 타입 30.0f -> 0.0f
+		break;
+	}
+	case SC_LOGIN_FAIL:
+	{
+		room_num = 0;
+		roomNum.clear();
+		matcnt = 0;
+		// 플레이어 로그인 실패 : 비어있는 Scene이 없음
 		break;
 	}
 	default:
