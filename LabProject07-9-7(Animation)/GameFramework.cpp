@@ -2635,11 +2635,11 @@ void CGameFramework::ProcessPacket(char* p)
 
 		int player_cnt = 0;
 		for (int i = 0; i < 3; ++i) {
-			if (m_pInsidePlayer[i]->isAlive) {
-				++player_cnt;
+			if (i != g_myid) {
+				m_pInsidePlayer[i]->isAlive = false;
 			}
 		}
-		matcnt = player_cnt;
+		matcnt = 1;
 
 	//	float y = m_pInsidePlayer[g_myid]->GetPosition().y;
 	//	m_pInsidePlayer[g_myid]->SetPosition({ packet->data.x, y, packet->data.z });
