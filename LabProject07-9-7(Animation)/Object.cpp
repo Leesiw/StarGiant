@@ -1820,7 +1820,7 @@ void CEnemyObject::AimingAI(float fTimeElapsed, XMFLOAT3& pl_pos)
 CInsideShipObject::CInsideShipObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks)
 {
 	CLoadedModelInfo* pMeteorModel = pModel;
-	if (!pMeteorModel) pMeteorModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/InsideShip.bin", NULL);
+	if (!pMeteorModel) pMeteorModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/InsideMap.bin", NULL);
 
 	SetChild(pMeteorModel->m_pModelRootObject, true);
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pMeteorModel);
