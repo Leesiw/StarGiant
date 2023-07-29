@@ -2203,9 +2203,9 @@ void CScene::AddDieSprite(XMFLOAT3 Position, int Target)
 
 }
 
-void CScene::setParticleStart(int cnt, XMFLOAT3 tarPos)
+void CScene::setParticleStart(int startcnt, int cnt, XMFLOAT3 tarPos)
 {
-	for (int i = 0; i < cnt; i++)
+	for (int i = startcnt; i < cnt; i++)
 	{
 		m_pParticle[i]->isLive = true;
 		m_pParticle[i]->setPos(tarPos);

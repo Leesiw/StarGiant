@@ -126,6 +126,10 @@ private:
 	CCamera						*m_pCamera = NULL;
 	bool iscut = false;
 	bool isending = false;
+	short cntParticle = 0;
+	short cntdieParticle = 5;
+
+	void SParticle(int cntParticle, int rangeIncrement, int id);
 
 	DWORD m_pBeforeCamera = NULL;
 
