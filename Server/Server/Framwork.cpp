@@ -487,11 +487,13 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	switch (packet[1]) {
 	case CS_LOGIN: {
 		CS_LOGIN_PACKET* p = reinterpret_cast<CS_LOGIN_PACKET*>(packet);
+		scene_manager._scene_lock.lock();
 		short t_room_id = clients[c_id].room_id;
 		if (t_room_id != -1) {	// 이미 배정된 방이 있을 때
 			CScene* scene = scene_manager.GetScene(t_room_id);
-			if (scene->_id == p->room_id) { break; }
-			scene->_plist_lock.lock();
+			if (scene->_id == p->room_id) { scene_manager._scene_lock.unlock(); return; }
+			
+			scene->_plist_lock.lock();	// 재매칭 진행
 			char t_room_pid = clients[c_id].room_pid;
 			if (t_room_pid != -1) {
 				SC_REMOVE_PLAYER_PACKET p{};
@@ -511,7 +513,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			scene->_plist_lock.unlock();
 		}
 
-		scene_manager._scene_lock.lock();
+		
 		short scene_num = -1;
 		if (p->room_id != -1) {
 			scene_num = scene_manager.FindScene(p->room_id, c_id);
