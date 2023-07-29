@@ -486,6 +486,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 
 	switch (packet[1]) {
 	case CS_LOGIN: {
+		if (clients[c_id]._state == ST_INGAME) { break; }
 		CS_LOGIN_PACKET* p = reinterpret_cast<CS_LOGIN_PACKET*>(packet);
 		scene_manager._scene_lock.lock();
 		short t_room_id = clients[c_id].room_id;
