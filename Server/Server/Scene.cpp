@@ -447,6 +447,13 @@ void CScene::MissionClear()
 				m_pGod->SetPosition(1300.f, 0.f, 0.f);
 				m_pGod->GodHP = 100;
 				m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
+
+				SC_MOVE_SPACESHIP_PACKET p{};
+				p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
+				p.type = SC_MOVE_SPACESHIP;
+				p.pos = m_pSpaceship->GetPosition();
+				Send((char*)&p);
+
 				god_timer_m.lock();
 				if (!god_timer_on) {
 					god_timer_on = true;
@@ -462,6 +469,12 @@ void CScene::MissionClear()
 				m_pBoss->BossHP = 100;
 				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
 				
+				SC_MOVE_SPACESHIP_PACKET p{};
+				p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
+				p.type = SC_MOVE_SPACESHIP;
+				p.pos = m_pSpaceship->GetPosition();
+				Send((char*)&p);
+
 				boss_timer_m.lock();
 				if (!boss_timer_on) {
 					boss_timer_on = true;
