@@ -673,7 +673,7 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
             m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarRight - hpBar, FRAME_BUFFER_HEIGHT - 50), Redbrush); // hp
     }
 
-    if(mty == MissionType::CS_SHOW_PLANET || mty == MissionType::CS_BOSS_SCREAM || mty == MissionType::CS_SHOW_STARGIANT || mty == MissionType::CS_SHOW_BLACK_HOLE || mty == MissionType::CS_SHOW_GOD)
+    if(mty == MissionType::CS_SHOW_PLANET || mty == MissionType::CS_BOSS_SCREAM || mty == MissionType::CS_ANGRY_BOSS || mty == MissionType::CS_SHOW_STARGIANT || mty == MissionType::CS_SHOW_BLACK_HOLE || mty == MissionType::CS_SHOW_GOD || mty == MissionType::CS_ANGRY_GOD)
         for (auto textBlock : m_vSkipBlocks)
         {
             m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, Redbrush);
