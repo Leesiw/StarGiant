@@ -1215,7 +1215,10 @@ void CGameFramework::CameraUpdateChange()
 		|| curMissionType == MissionType::GO_CENTER || curMissionType == MissionType::ESCAPE_BLACK_HOLE || curMissionType == MissionType::KILL_GOD || curMissionType == MissionType::KILL_GOD2)
 		&& (m_pInsidePlayer[g_myid]->GetCamera()->GetMode() == CUT_SCENE_CAMERA || m_pPlayer[0]->GetCamera()->GetMode() == CUT_SCENE_CAMERA))
 	{
+		skipnum = 0;
+
 		if (b_BeforeCheckInside) {
+
 			b_Inside = true;
 			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
 			m_pCamera->fAnglenu = 0;
@@ -1244,6 +1247,8 @@ void CGameFramework::CameraUpdateChange()
 
 	if (curMissionType != MissionType::CS_BAD_ENDING && pastMissionType== MissionType::CS_BAD_ENDING)
 	{
+		skipnum = 0;
+
 		cout << "bad에서 넘어가요\n";
 		pastMissionType = curMissionType;
 		isending = true;
@@ -2568,6 +2573,7 @@ wstring CGameFramework::ChangeBossScripts(MissionType mType, short hp)
 
 void CGameFramework::Reset_game()
 {
+	skipnum = 0;
 	matcnt = 0;
 	blackholetime = 0;
 	default_shaking_num = 0;

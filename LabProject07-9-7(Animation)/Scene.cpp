@@ -1761,7 +1761,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (m_fredbosscutTime < 2 && m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT) {
 			m_ppBoss->Render(pd3dCommandList, pCamera);
 		}
-		else if(m_pPlayer[0]->curMissionType == MissionType::GO_CENTER) {
+		
+		if(m_pPlayer[0]->curMissionType == MissionType::GO_CENTER) {
 			m_fredbosscutTime = 0;
 		}
 
