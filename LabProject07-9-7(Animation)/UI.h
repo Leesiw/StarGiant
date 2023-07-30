@@ -78,16 +78,16 @@ private:
 
 
 
-    float bossHpbarLeft = m_nScreenWidth / 10;
-    float bossHpbarRight = m_nScreenWidth / 10 * 9;
-    float bossHpbarTop = m_nScreenHeight / 10 * 1;
-    float bossHpbarBottom = m_nScreenHeight / 10 * 1.5;
+    //float bossHpbarLeft = m_nScreenWidth / 10;
+    //float bossHpbarRight = m_nScreenWidth / 10 * 9;
+    //float bossHpbarTop = m_nScreenHeight / 10 * 1;
+    //float bossHpbarBottom = m_nScreenHeight / 10 * 1.5;
 
 
-    float GodbossHpbarLeft = m_nScreenWidth / 10;
-    float GodbossHpbarRight = m_nScreenWidth / 10 * 9;
-    float GodbossHpbarTop = m_nScreenHeight / 10 * 1;
-    float GodbossHpbarBottom = m_nScreenHeight / 10 * 1.5;
+    //float GodbossHpbarLeft = m_nScreenWidth / 10;
+    //float GodbossHpbarRight = m_nScreenWidth / 10 * 9;
+    //float GodbossHpbarTop = m_nScreenHeight / 10 * 1;
+    //float GodbossHpbarBottom = m_nScreenHeight / 10 * 1.5;
 
     float m_fWidth;
     float m_fHeight;

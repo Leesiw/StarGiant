@@ -525,6 +525,8 @@ void UILayer::UpdateBossHp(short curhp, short maxHp)
 {
 
    // BosshpBar = float(maxHp - curhp) * 1.5;
+    float bossHpbarLeft = m_nScreenWidth / 10;
+    float bossHpbarRight = m_nScreenWidth / 10 * 9;
 
     BosshpBar = (bossHpbarRight - bossHpbarLeft) - (float(curhp) / float(maxHp)) * (bossHpbarRight - bossHpbarLeft);
 
@@ -533,6 +535,9 @@ void UILayer::UpdateBossHp(short curhp, short maxHp)
 
 void UILayer::UpdateGodBossHp(short curhp, short maxHp)
 {
+    float GodbossHpbarLeft = m_nScreenWidth / 10;
+    float GodbossHpbarRight = m_nScreenWidth / 10 * 9;
+
     GodBosshpBar = (GodbossHpbarRight - GodbossHpbarLeft) - (float(curhp) / float(maxHp)) * (GodbossHpbarRight - GodbossHpbarLeft);
 }
 
@@ -595,7 +600,7 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
 
     D2D_POINT_2F d2dPoint = { 0.0f, m_nScreenHeight /2 * 1.5f };
 
-    D2D_POINT_2F d2dPoint_jew = { 0.0f, 55.0f };
+    D2D_POINT_2F d2dPoint_jew = { 0.0f, m_nScreenWidth / 20};
 
     D2D_POINT_2F d2dPoint_nevi = { -25, -75 };
 
@@ -702,6 +707,16 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
         m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(m_bossDot.x, m_bossDot.z), 5.0f, 5.0f), DotBossbrush);
 
 
+        float bossHpbarLeft = m_nScreenWidth / 10;
+        float bossHpbarRight = m_nScreenWidth / 10 * 9;
+        float bossHpbarTop = m_nScreenHeight / 10 * 1;
+        float bossHpbarBottom = m_nScreenHeight / 10 * 1.5;
+
+
+        float GodbossHpbarLeft = m_nScreenWidth / 10;
+        float GodbossHpbarRight = m_nScreenWidth / 10 * 9;
+        float GodbossHpbarTop = m_nScreenHeight / 10 * 1;
+        float GodbossHpbarBottom = m_nScreenHeight / 10 * 1.5;
 
 
         if (mty == MissionType::DEFEAT_BOSS || mty == MissionType::DEFEAT_BOSS2) {
