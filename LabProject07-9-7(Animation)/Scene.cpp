@@ -334,11 +334,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_BlackholeMeteorObjects[i]->SetScale(randomScale, randomScale, randomScale);
 		if (pMeteoModel) delete pMeteoModel;
 	}
-	for (int i = 0; i < MAX_FIRE; ++i) {
-		m_pFire[i] = new CFireObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
-		m_pFire[i]->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-	}
 
 	for (int i = 0; i < MAX_PARTICLES; ++i) {
 		m_pParticle[i] = new CParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
@@ -372,6 +368,13 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pMagicCircle2[i] = new CMagicCircleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, i, 0);
 		m_pMagicCircle2[i]->count = i;
 	}
+
+	for (int i = 0; i < MAX_FIRE; ++i) {
+		m_pFire[i] = new CFireObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+		m_pFire[i]->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	}
+
 	//=====================================
 	CLoadedModelInfo* pJewelModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/SoftStar.bin", NULL);
 	m_ppJewel = new CJewelObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pJewelModel, 1);
@@ -920,13 +923,13 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 
 	pd3dDescriptorRanges[17].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	pd3dDescriptorRanges[17].NumDescriptors = 1;
-	pd3dDescriptorRanges[17].BaseShaderRegister = 21; //t21: gtxtAlphaTexture
+	pd3dDescriptorRanges[17].BaseShaderRegister = 21; //t21:  gtxtNoiseTexture 
 	pd3dDescriptorRanges[17].RegisterSpace = 0;
 	pd3dDescriptorRanges[17].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	pd3dDescriptorRanges[18].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	pd3dDescriptorRanges[18].NumDescriptors = 1;
-	pd3dDescriptorRanges[18].BaseShaderRegister = 22; //t21: gtxtNoiseTexture
+	pd3dDescriptorRanges[18].BaseShaderRegister = 22; //t22: gtxtAlphaTexture
 	pd3dDescriptorRanges[18].RegisterSpace = 0;
 	pd3dDescriptorRanges[18].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
@@ -1054,12 +1057,12 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 
 	pd3dRootParameters[23].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	pd3dRootParameters[23].DescriptorTable.NumDescriptorRanges = 1;
-	pd3dRootParameters[23].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[17]); //Alpha
+	pd3dRootParameters[23].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[17]); //Noise
 	pd3dRootParameters[23].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	pd3dRootParameters[24].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	pd3dRootParameters[24].DescriptorTable.NumDescriptorRanges = 1;
-	pd3dRootParameters[24].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[18]); //Noise
+	pd3dRootParameters[24].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[18]); // Alpha
 	pd3dRootParameters[24].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	pd3dRootParameters[25].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;

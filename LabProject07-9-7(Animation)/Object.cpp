@@ -2436,35 +2436,39 @@ void CParticleObject::setPos(XMFLOAT3 pos)
 //======================
 CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
-	//CFireMesh* pFireMesh = new CFireMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
-	CTexturedRectMesh* pFireMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 10.0f, 10.0f, 0.0f);
+	CFireMesh* pFireMesh = new CFireMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
+	//CTexturedRectMesh* pFireMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 10.0f, 10.0f, 0.0f);
 	pFireMesh->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	SetMesh(pFireMesh);
+
 	//CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	CTexture* pfireTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	pfireTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/fire01.dds", 0); // fire mix color
 
+	CTexture* pnoiseTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pnoiseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/noise01.dds", 0);//fre material texture
+
 	CTexture* palphaTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	palphaTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/alpha01.dds", 0);
 
-	CTexture* pnoiseTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pnoiseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/noise01.dds", 0);//fre material texture
+
 
 	CFireShader* pFireShader = new CFireShader();
 	pFireShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	pFireShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	CScene::CreateShaderResourceViews(pd3dDevice, pfireTexture, 22, false);
-	CScene::CreateShaderResourceViews(pd3dDevice, palphaTexture, 23, false);
-	CScene::CreateShaderResourceViews(pd3dDevice, pnoiseTexture, 24, false);
+	CScene::CreateShaderResourceViews(pd3dDevice, pnoiseTexture, 23, false);
+	CScene::CreateShaderResourceViews(pd3dDevice, palphaTexture, 24, false);
 
 
 
-	CMaterial* pFireMaterial = new CMaterial(1);
-	/*pFireMaterial->SetTexture(pfireTexture);
-	pFireMaterial->SetTexture(palphaTexture);*/
+	CMaterial* pFireMaterial = new CMaterial(3);
+	pFireMaterial->SetTexture(pfireTexture);
 	pFireMaterial->SetTexture(pnoiseTexture);
+	pFireMaterial->SetTexture(palphaTexture);
+
 
 
 	pFireMaterial->SetShader(pFireShader);

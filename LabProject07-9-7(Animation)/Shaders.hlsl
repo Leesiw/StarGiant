@@ -604,13 +604,14 @@ SamplerState gssFIRE2 : register(s5);
 
 
 Texture2D gtxtFIRETexture : register(t20);
-Texture2D gtxtAlphaTexture : register(t21);
-Texture2D gtxtNoiseTexture : register(t22);
+Texture2D gtxtNoiseTexture : register(t21);
+Texture2D gtxtAlphaTexture : register(t22);
 
 struct VS_FIRE_INPUT
 {
 	float3 position : POSITION;
 	float2 uv : TEXCOORD;
+
 };
 
 struct VS_FIRE_OUTPUT
@@ -658,11 +659,11 @@ float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
 	float4 alphaColor;
 	float frameTime = 0;
 
-		float2 distortion1 = { 0.1f, 0.2f };
-		float2 distortion2 = { 0.1f, 0.3f };
-		float2 distortion3 = { 0.1f, 0.1f };
-		float distortionScale = 0.8f;
-		float distortionBias = 0.5f;
+	float2 distortion1 = { 0.1f, 0.2f };
+	float2 distortion2 = { 0.1f, 0.3f };
+	float2 distortion3 = { 0.1f, 0.1f };
+	float distortionScale = 0.8f;
+	float distortionBias = 0.5f;
 
 	noise1 = gtxtNoiseTexture.Sample(gssFIRE1, input.uv1);
 	noise2 = gtxtNoiseTexture.Sample(gssFIRE1, input.uv2);
@@ -690,10 +691,11 @@ float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
 	// 불의 투명도
 	alphaColor = gtxtAlphaTexture.Sample(gssFIRE2, noiseCoords.xy);
 
+	//fireColor = alphaColor * fireColor;
 	fireColor.a = alphaColor;
 
-	//return fireColor;
-	return float4(1.0f,1.0f,0.0f,1.0f);
+	return fireColor;
+	//return float4(0.0f,1.0f,0.0f,1.0f);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
