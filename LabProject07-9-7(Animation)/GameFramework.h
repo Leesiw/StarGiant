@@ -49,7 +49,12 @@ public:
 	void UpdateUI();
 	wstring ChangeMission(MissionType mT);
 	wstring ChangeScripts(MissionType mT);
-	wstring ChangeBossScripts(MissionType mT, short hp);
+	wstring ChangeBossScripts(BossAnimation bA, short hp);
+	wstring ChangeBossScripts(GodAnimation gA, short hp);
+
+	short bgmstart = 0;
+
+
 
 	MissionType pM = MissionType::CS_TURN;
 	MissionType cM = MissionType::CS_TURN;

@@ -1835,12 +1835,13 @@ void CGameFramework::FrameAdvance()
 {
 	m_GameTimer.Tick(30.0f);
 	ProcessInput();
-	CameraUpdateChange();
 
 	
 
+	CameraUpdateChange();
 
 	AnimateObjects();
+
 
 	UpdateUI();
 
@@ -2050,8 +2051,8 @@ void CGameFramework::UpdateUI()
 
 	uiScripts = ChangeScripts(curMissionType);
 	if(curMissionType<MissionType::CS_SHOW_GOD)
-	uiBossScripts = ChangeBossScripts(curMissionType, m_pScene->m_ppBoss->GetcurHp());
-	else{ uiBossScripts = ChangeBossScripts(curMissionType, m_pScene->m_ppGod->GetcurHp()); }
+	uiBossScripts = ChangeBossScripts(m_pScene->m_ppBoss->GetAnimation(),m_pScene->m_ppBoss->GetcurHp());
+	else{ uiBossScripts = ChangeBossScripts( m_pScene->m_ppGod->GetAnimation(), m_pScene->m_ppGod->GetcurHp()); }
 
 	if (_state == SCENE_INGAME) {
 
@@ -2279,6 +2280,12 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 		uiText += bossDie;
 		uiText += L" / 1 )";
 
+		if (bgmstart == 0) {
+			m_bgm[1]->play();
+			m_bgm[0]->stop();
+			bgmstart = 1;
+		}
+
 		break;
 	}
 	//2R
@@ -2324,6 +2331,13 @@ wstring CGameFramework::ChangeMission(MissionType mType)
 		uiText = L"미션 - 신을 처치하라 ( ";
 		uiText += bossDie;
 		uiText += L" / 1 )";
+
+		if (bgmstart == 1) {
+			m_bgm[1]->stop();
+			m_bgm[2]->play();
+			bgmstart = 2;
+		}
+
 		break;
 	}
 	
@@ -2554,125 +2568,215 @@ wstring CGameFramework::ChangeScripts(MissionType mType)
 	return uiScripts;
 }
 
-wstring CGameFramework::ChangeBossScripts(MissionType mType, short hp)
+wstring CGameFramework::ChangeBossScripts(BossAnimation bA, short hp)
 {
 	wstring uiScripts = L" ";
 
-	switch (mType) {
-	case MissionType::CS_BOSS_SCREAM:
-	{	
-		uiScripts = L"스타 자이언트는 내 것이다...";
+	switch (bA) {
+	case BossAnimation::SCREAM:
+	{
+		uiScripts = L" ";
 		if (firstbSc == 0) {
 			firstbSc = 1;
 			bossScriptsOn = true;
 			bossScriptsTime = 0;
 
-			m_bgm[1]->play();
-			m_bgm[0]->stop();
+			
 		}
 		break;
 	}
-	case MissionType::DEFEAT_BOSS:
+	case BossAnimation::BASIC_ATTACT:
 	{
-		uiScripts = L"너가 이길 수 있을까?";
-		if (firstbSc == 1) {
-			firstbSc = 2;
+		uiScripts = L"기본 공격을 하고있어!";
+		bossScriptsOn = true;
+		bossScriptsTime = 0;
+
+		if (hp < 50) {
+			uiScripts = L"이런!기본 공격을 조심해!";
 			bossScriptsOn = true;
 			bossScriptsTime = 0;
-
-		}
-		if (hp < 50) {
-			uiScripts = L"봐주지 않겠다...";
-			if (firstbSc == 2) {
-				firstbSc = 3;
-				bossScriptsOn = true;
-				bossScriptsTime = 0;
-
-			}
 		}
 
 		if (hp < 20) {
-			uiScripts = L"안 돼...";
-			if (firstbSc == 3) {
-				firstbSc = 4;
-				bossScriptsOn = true;
-				bossScriptsTime = 0;
-			}
+			uiScripts = L"기본 공격을 조심해!!!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
 		}
 
 		break;
 	}
-	case MissionType::CS_SHOW_STARGIANT:
+	case BossAnimation::CLAW_ATTACT:
 	{
-		uiScripts = L"내 보물......";
-		if (firstbSc == 4 || firstbSc == 2 || firstbSc == 3) {
-			firstbSc = 5;
-			bossScriptsOn = true;
-			bossScriptsTime = 0;
-		}
-		break;
-	}
-	case MissionType::CS_SHOW_GOD:
-	{
-		uiScripts = L"스타 자이언트를 내놓아라...";
-		if (firstbSc == 5) {
-			firstbSc = 6;
-			bossScriptsOn = true;
-			bossScriptsTime = 0;
-			m_bgm[2]->play();
-			m_bgm[1]->stop();
-
-		}
-		break;
-	}
-	case MissionType::KILL_GOD:
-	{
-		uiScripts = L"감히...";
-		if (firstbSc ==6) {
-			firstbSc = 7;
-			bossScriptsOn = true;
-			bossScriptsTime = 0;
-
-		}
+		uiScripts = L"발톱을 조심해!";
+		bossScriptsOn = true;
+		bossScriptsTime = 0;
 
 		if (hp < 50) {
-			uiScripts = L"봐주지 않겠다...";
-			if (firstbSc == 7) {
-				firstbSc = 8;
-				bossScriptsOn = true;
-				bossScriptsTime = 0;
-
-			}
+			uiScripts = L"이런! 발톱을 조심해!!!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
 		}
 
 		if (hp < 20) {
-			uiScripts = L"안 돼...";
-			if (firstbSc == 8) {
-				firstbSc = 9;
-				bossScriptsOn = true;
-				bossScriptsTime = 0;
-			}
-		}
-
-		break;
-	}
-	case MissionType::CS_ENDING:
-	{
-		uiScripts = L"......";
-		if (firstbSc == 9 || firstbSc == 8 || firstbSc == 7) {
-			firstbSc = 0;
+			uiScripts = L"얼마 남지 않았어! 발톱을 조심해!!!!";
 			bossScriptsOn = true;
 			bossScriptsTime = 0;
+		}
 
-			m_bgm[0]->play();
-			m_bgm[1]->stop();
+		break;
+	}
+	case BossAnimation::FLAME_ATTACK:
+	{
+		uiScripts = L"조심해!";
+		bossScriptsOn = true;
+		bossScriptsTime = 0;
+
+		if (hp < 50) {
+			uiScripts = L"이런! 조심해!!!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+		}
+
+		if (hp < 20) {
+			uiScripts = L"얼마 남지 않았어! 조심해!!!!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
 		}
 		break;
 	}
+
+	case BossAnimation::DIE:
+	{
+		uiScripts = L"잘했어!";
+		bossScriptsOn = true;
+		bossScriptsTime = 0;
+
+		break;
+	}
+
+
 	default:
 		uiScripts = L" ";
 		break;
-	};
+
+
+	}
+
+	return uiScripts;
+}
+
+wstring CGameFramework::ChangeBossScripts(GodAnimation gA, short hp)
+{
+	wstring uiScripts = L" ";
+
+	switch (gA) {
+	case GodAnimation::MELEE1:
+	{
+		uiScripts = L"이빨을 조심해!";
+		if (firstbSc == 0) {
+			firstbSc = 1;
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+
+		
+		}
+		break;
+	}
+	case GodAnimation::MELEE2:
+	{
+		uiScripts = L"초음파를 조심해!";
+		bossScriptsOn = true;
+		bossScriptsTime = 0;
+
+		if (hp < 50) {
+			uiScripts = L"이런..초음파를 조심해!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+		}
+
+		if (hp < 20) {
+			uiScripts = L"얼마 남지 않았어! 조심해!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+		}
+
+		break;
+	}
+	case GodAnimation::SHOT:
+	{
+		uiScripts = L"해골을 조심해!";
+		bossScriptsOn = true;
+		bossScriptsTime = 0;
+
+		if (hp < 50) {
+			uiScripts = L"이런! 해골을 조심해!!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+		}
+
+		if (hp < 20) {
+			uiScripts = L"얼마 남지 않았어! 조심해!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+		}
+
+		break;
+	}
+	case GodAnimation::HIT1:
+	{
+		uiScripts = L"적이 회복하고 있어.";
+		bossScriptsOn = true;
+		bossScriptsTime = 0;
+
+		if (hp < 50) {
+			uiScripts = L"적이 회복해!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+		}
+
+		if (hp < 20) {
+			uiScripts = L"얼마 남지 않았어! 적을 공격해!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+		}
+		break;
+	}
+	case GodAnimation::HIT2:
+	{
+		uiScripts = L"이동했어!";
+		bossScriptsOn = true;
+		bossScriptsTime = 0;
+
+		if (hp < 50) {
+			uiScripts = L"적이 도망치고 있어!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+		}
+
+		if (hp < 20) {
+			uiScripts = L"이동했어!!";
+			bossScriptsOn = true;
+			bossScriptsTime = 0;
+		}
+		break;
+	}
+
+	case GodAnimation::DEATH:
+	{
+		uiScripts = L"잘했어!";
+		bossScriptsOn = true;
+		bossScriptsTime = 0;
+
+		break;
+	}
+
+
+	default:
+		uiScripts = L" ";
+		break;
+
+
+	}
 
 	return uiScripts;
 }
@@ -2692,6 +2796,7 @@ void CGameFramework::Reset_game()
 
 	cntParticle = 0;
 	cntdieParticle = 5;
+	bgmstart = 0;
 
 	m_bgm[0]->stop();
 	m_bgm[1]->stop();
