@@ -2512,6 +2512,29 @@ void CFireObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandLi
 
 }
 
+void CFireObject::SetLookAt(XMFLOAT3& xmf3TargetPosition, XMFLOAT3& xmf3Up)
+{
+	XMFLOAT3 xmf3Position(m_xmf4x4ToParent._41, m_xmf4x4ToParent._42, m_xmf4x4ToParent._43);
+	XMFLOAT4X4 mtxLookAt = Matrix4x4::LookAtLH(xmf3Position, xmf3TargetPosition, xmf3Up);
+	m_xmf4x4ToParent._11 = mtxLookAt._11; m_xmf4x4ToParent._12 = mtxLookAt._21; m_xmf4x4ToParent._13 = mtxLookAt._31;
+	m_xmf4x4ToParent._21 = mtxLookAt._12; m_xmf4x4ToParent._22 = mtxLookAt._22; m_xmf4x4ToParent._23 = mtxLookAt._32;
+	m_xmf4x4ToParent._31 = mtxLookAt._13; m_xmf4x4ToParent._32 = mtxLookAt._23; m_xmf4x4ToParent._33 = mtxLookAt._33;
+
+}
+
+void CFireObject::Rotate180Degrees()
+{
+	m_xmf4x4ToParent._11 = -m_xmf4x4ToParent._11;
+	m_xmf4x4ToParent._22 = -m_xmf4x4ToParent._22;
+	m_xmf4x4ToParent._33 = -m_xmf4x4ToParent._33;
+}
+
+
+
+
+
+
+
 CFlameParticleObject::CFlameParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
 	CParticleMesh* pParticleMesh = new CParticleMesh(pd3dDevice, pd3dCommandList, 150.0f, 150.0f, 0.0f);

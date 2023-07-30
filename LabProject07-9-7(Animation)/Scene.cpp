@@ -373,6 +373,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 		m_pFire[i] = new CFireObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 		m_pFire[i]->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
+
 	}
 
 	//=====================================
@@ -1972,12 +1973,12 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 
-	//미안 모르겠어
 	for (int i = 0; i < MAX_FIRE; ++i) {
 		if (!b_Inside) {
 			if (m_pFire[i]) {
-				m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 				m_pFire[i]->SetPosition(m_pPlayer[0]->m_pEngine[i]->GetPosition());
+				m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+
 				m_pFire[i]->Animate(m_fElapsedTime);
 				m_pFire[i]->UpdateShaderVariables(pd3dCommandList, m_pFire[i]->GetShaderVariables());
 				m_pFire[i]->Render(pd3dCommandList, pCamera);
