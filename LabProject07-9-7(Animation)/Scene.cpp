@@ -1992,7 +1992,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 	//미안 모르겠어
-	/*for (int i = 0; i < MAX_FIRE; ++i) {
+
+	for (int i = 0; i < MAX_FIRE; ++i) {
 		if (!b_Inside) {
 			if (m_pFire[i]) {
 				m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
@@ -2002,7 +2003,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 				m_pFire[i]->Render(pd3dCommandList, pCamera);
 			}
 		}
-	}*/
+	}
 
 
 

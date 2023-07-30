@@ -459,15 +459,59 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommand
 	CLoadedModelInfo *pModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/CephalonShip.bin", NULL);
 	//CLoadedModelInfo *pModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Doggy_V1.bin", NULL);
 	
-	CTexture* pSpriteTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);//Laser_sprite_8
-	pSpriteTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Explode_8x8.dds", 0);//Explode_8x8
-
-	CScene::CreateShaderResourceViews(pd3dDevice, pSpriteTexture, 18, false);
-
-	//SetModelSprite(pModel->m_pModelRootObject->m_pChild, pSpriteTexture, pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	SetChild(pModel->m_pModelRootObject, true);
-	cout << "child : " << this->m_pChild << endl;
-	cout << "m_pSibling : " << this->m_pChild->m_pSibling << endl;
+
+
+	//==flame==================================================
+	CFireShader* pFireShader = new CFireShader();
+	pFireShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pFireShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CTexture* pfireTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pfireTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/fire02.dds", 0); // fire mix color
+
+	CTexture* pnoiseTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pnoiseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/noise01.dds", 0);//fre material texture
+
+	CTexture* palphaTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	palphaTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/alpha01.dds", 0);
+
+	CScene::CreateShaderResourceViews(pd3dDevice, pfireTexture, 22, false);
+	CScene::CreateShaderResourceViews(pd3dDevice, pnoiseTexture, 23, false);
+	CScene::CreateShaderResourceViews(pd3dDevice, palphaTexture, 24, false);
+
+	CMaterial* pFireMaterial = new CMaterial(3);
+	pFireMaterial->SetTexture(pfireTexture, 0);
+	pFireMaterial->SetTexture(pnoiseTexture, 1);
+	pFireMaterial->SetTexture(palphaTexture, 2);
+
+	pFireMaterial->SetShader(pFireShader);
+
+	m_pEngine[0] = FindFrame("Feather_L");
+	m_pEngine[1] = FindFrame("Feather_R");
+
+
+	for (int i = 0; i < 2; i++) {
+		m_pEngineFlame[i] = new CFireObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+		m_pEngineFlame[i]->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	}
+
+	m_pEngineFlame[0] = (CFireObject*)m_pEngine[0];
+	m_pEngineFlame[1] = (CFireObject*)m_pEngine[1];
+
+	m_pEngineFlame[0]->SetMaterial(0, pFireMaterial);
+	m_pEngineFlame[1]->SetMaterial(0, pFireMaterial);
+
+
+
+	//SetMaterial(0, pFireMaterial);
+
+
+	//===================================================
+
+
+	//cout << "child : " << this->m_pChild << endl;
+	//cout << "m_pSibling : " << this->m_pChild->m_pSibling << endl;
 
 
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pModel);
@@ -586,6 +630,8 @@ void CAirplanePlayer::SetModelSprite(CGameObject* Loot,CTexture* LootTexture, ID
 		};
 	}
 }
+
+
 
 void CAirplanePlayer::FireBullet(CGameObject* pLockedObject)
 {
@@ -708,7 +754,11 @@ void CAirplanePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 			};
 //	for(int i=0; i<2; i++) if(m_pAirSprites[i])m_pAirSprites[i]->CSpriteObject::Render(pd3dCommandList, pCamera);
 
-
+	//for (int i = 0; i < 2; i++) {
+	//	m_pEngineFlame[i]->Animate(0.0);
+	//	m_pEngineFlame[i]->UpdateShaderVariables(pd3dCommandList, m_pEngineFlame[i]->GetShaderVariables());
+	//	m_pEngineFlame[i]->Render(pd3dCommandList, pCamera);
+	//}
 
 	CPlayer::Render(pd3dCommandList, pCamera);
 

@@ -128,6 +128,7 @@ public:
 public:
 		CGameObject* m_pEngine[2] = {};
 
+
 };
 
 class CAirplanePlayer : public CPlayer
@@ -144,6 +145,8 @@ public:
 	CGameObject					*m_pTailRotorFrame = NULL;
 	
 	CSpriteObject* m_pAirSprites[2];
+	CFireObject* m_pEngineFlame[2];
+
 	CGameObject** m_BulletObjects = NULL;
 	CBulletObject* m_ppBullets[BULLETS];
 	void FireBullet(CGameObject* pLockedObject);
@@ -162,6 +165,8 @@ public:
 	void SetModelSprite(CGameObject* Loot, CTexture* LootTexture, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	//virtual XMFLOAT3 getSpritePos(int num) { return m_pAirSprites[num]->GetPosition(); }
 	short getHp(){ return hp; }
+
+
 
 private:
 

@@ -2487,7 +2487,7 @@ void CFireObject::Animate(float fElapsedTime)
 void CFireObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	UpdateShaderVariables(pd3dCommandList, m_pcbplusShaderVariable);
-	CGameObject::Render(pd3dCommandList, pCamera);
+	//CGameObject::Render(pd3dCommandList, pCamera);
 }
 
 void CFireObject::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
