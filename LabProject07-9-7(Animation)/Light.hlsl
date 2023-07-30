@@ -304,6 +304,6 @@ float4 shadowLighting(float3 vPosition, float3 vNormal, bool bShadow, float4 uvs
 	cColor += (gcGlobalAmbientLight * gMaterial.m_cAmbient);
 	cColor.a = gMaterial.m_cDiffuse.a;
 
-	return(cColor);
+	return (lerp(cColor,float4(0.1f,0.1f,0.1f,1.0f),0.3f));
 }
 
