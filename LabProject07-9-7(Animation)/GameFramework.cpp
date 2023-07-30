@@ -705,7 +705,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 			break;
 		}
         case WM_RBUTTONDOWN:
-			_state = SCENE_INGAME;
+			//_state = SCENE_INGAME;
 			break;
         case WM_LBUTTONUP:
 			if (isHealing && player_type == PlayerType::INSIDE && AroundSculpture()) {
