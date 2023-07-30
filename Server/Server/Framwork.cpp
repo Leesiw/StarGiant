@@ -732,7 +732,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			pack.size = sizeof(pack);
 			pack.type = SC_MOVE_INSIDEPLAYER;
 			pack.data.id = clients[c_id].room_pid;
-			pack.data.m_fYaw = yaw;
+			pack.data.m_fYaw = p->data.yaw;
 			pack.data.pos = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition();
 
 			scene->Send((char*)&pack);
