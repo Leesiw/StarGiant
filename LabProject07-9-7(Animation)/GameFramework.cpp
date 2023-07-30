@@ -390,60 +390,89 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 		case '0':
 		case VK_NUMPAD0:
-			cout << "0";
-			roomNum += L"0";
+			if (roomNum.length() < 6) {
+				cout << "0";
+				roomNum += L"0";
+			}
 			break;
 
 		case '1':
 		case VK_NUMPAD1:
+			if (roomNum.length() < 6) {
+
 			cout << "1";
 			roomNum += L"1";
+			}
 
 			break;
 
 		case '2':
 		case VK_NUMPAD2:
+			if (roomNum.length() < 6) {
+
 			cout << "2";
 			roomNum += L"2";
+			}
 			break;
 
 		case '3':
 		case VK_NUMPAD3:
+			if (roomNum.length() < 6) {
+
 			cout << "3";
 			roomNum += L"3";
+			}
 			break;
 
 		case '4':
 		case VK_NUMPAD4:
+			if (roomNum.length() < 6) {
+
 			cout << "4";
 			roomNum += L"4";
+			}
 			break;
 
 		case '5':
 		case VK_NUMPAD5:
+			if (roomNum.length() < 6) {
+
 			cout << "5";
 			roomNum += L"5";
+			}
 			break;
 
 		case '6':
 		case VK_NUMPAD6:
+			if (roomNum.length() < 6) {
+
 			cout << "6";
 			roomNum += L"6";
+			}
 			break;
 		case '7':
 		case VK_NUMPAD7:
+			if (roomNum.length() < 6) {
+
 			cout << "7";
 			roomNum += L"7";
+			}
 			break;
 		case '8':
 		case VK_NUMPAD8:
+			if (roomNum.length() < 6) {
+
 			cout << "8";
 			roomNum += L"8";
+			}
 			break;
 		case '9':
 		case VK_NUMPAD9:
-			cout << "9";
-			roomNum += L"9";
+			if (roomNum.length() < 6) {
+
+				cout << "9";
+				roomNum += L"9";
+			}
 			break;
 
 		case VK_BACK:
@@ -458,27 +487,9 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 		case VK_F1:
 		case VK_F2:
-		case VK_F3:
-			m_pCamera = m_pPlayer[0]->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
-			break;
-		case VK_F4:
-			m_pCamera = m_pPlayer[0]->ChangeCamera(DRIVE_CAMERA, m_GameTimer.GetTimeElapsed());
-			break;
-		case VK_F5:
-			m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_L, m_GameTimer.GetTimeElapsed());
-			break;
-		case VK_F6:
-			m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_C, m_GameTimer.GetTimeElapsed());
-			break;
-		case VK_F7:
-			m_pCamera = m_pPlayer[0]->ChangeCamera(ATTACT_CAMERA_R, m_GameTimer.GetTimeElapsed());
 			break;
 		case VK_F9:
 			ChangeSwapChainState();
-			break;
-		case VK_CONTROL:
-			((CAirplanePlayer*)m_pPlayer[0])->FireBullet(NULL);
-			std::cout << "총알";
 			break;
 		case VK_SPACE: 
 		{
@@ -494,22 +505,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				
 			}
 			break;
-			/*
-			if (((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion != AnimationState::SIT) {
-				((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = AnimationState::SIT;
-				std::cout << "앉기";
-			}
-			else
-			{
-				std::cout << "서기";
-				((CTerrainPlayer*)m_pInsidePlayer[g_myid])->motion = AnimationState::IDLE;
-			}*/
-		}
-		case VK_TAB: {
-			//b_Inside = !b_Inside;
-			m_pInsideScene->m_pShadowMapToViewport->b_RTV1 = !m_pInsideScene->m_pShadowMapToViewport->b_RTV1;
-			std::cout << "";
-			break;
 		}
 		case 'I':
 		{
@@ -518,88 +513,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			my_packet.type = CS_INVINCIBLE_MODE;
 
 			send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
-			break;
-		}
-		case 'R': //컷씬 테스트
-		{
-
-		if (b_Inside&& m_pInsidePlayer[g_myid]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) { //내부일때
-			m_pBeforeCamera = m_pInsidePlayer[g_myid]->GetCamera()->GetMode(); // 저장하고
-
-			cout << "Inside m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
-			b_BeforeCheckInside = true;
-			b_Inside = false; // 외부로 이동시키고 끝나면 다시 내부로 이동시켜야됨
-			m_pCamera->SetTarget(planetPos);
-			m_pCamera->SetDist(1000.0f);
-			cout << "m_pCamera->GetMode() - " << m_pCamera->GetMode() << endl;
-			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
-
-			/*m_pInsideCamera->SetTarget({ 414.456f,224.f,676.309f });
-			m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());*/
-		}
-
-		else if(!b_Inside && m_pPlayer[0]->GetCamera()->GetMode() != CUT_SCENE_CAMERA) { //외부일 때
-			m_pBeforeCamera = m_pPlayer[0]->GetCamera()->GetMode();
-			m_pCamera->SetTarget(m_pScene->m_ppGod->GetPosition());
-			m_pCamera->SetDist(3000.0f);
-			m_pCamera->canDolly = true; //줌
-			m_pCamera = m_pPlayer[0]->ChangeToCutSceneCamera(CUT_SCENE_CAMERA, m_GameTimer.GetTimeElapsed());
-			cout << "m_pCamera->GetMode() - " << m_pInsideCamera->GetMode() << endl;
-
-		}
-		cout << "m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
-		cout << "r";
-
-		break;
-		}
-
-		case 'E': //컷씬 테스트 돌아오기
-		{
-			if (m_pBeforeCamera != NULL) {
-				if (b_Inside) {
-					m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
-					cout << "Inside m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
-				}
-				else {
-					if (b_BeforeCheckInside)
-					{
-						b_Inside = true;
-						m_pInsideCamera = m_pInsidePlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
-						cout << "Inside m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
-					}
-					else {
-						m_pCamera = m_pPlayer[g_myid]->ChangeCamera(m_pBeforeCamera, m_GameTimer.GetTimeElapsed());
-						cout << "m_pBeforeCamera->GetMode() - " << m_pBeforeCamera << endl;
-					}
-
-				}
-			}
-			cout << "e";
-
-			break;
-		}
-
-		case 'M':
-		{
-			room_num = static_cast<short>(std::stoi(roomNum));
-			CS_LOGIN_PACKET packet;
-			packet.size = sizeof(packet);
-			packet.type = CS_LOGIN;
-			packet.room_id = room_num;
-			if (_state == SCENE_LOBBY) {
-				send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
-			}
-			break;
-		}
-		case 'P':
-		{
-			CS_NEXT_MISSION_PACKET packet;
-			packet.size = sizeof(packet);
-			packet.type = CS_START;
-			if (_state == SCENE_LOBBY) {
-				send(sock, reinterpret_cast<char*>(&packet), sizeof(packet), NULL);
-			}
-
 			break;
 		}
 		case 'N':
