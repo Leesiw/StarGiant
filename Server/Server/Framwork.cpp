@@ -559,17 +559,19 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		scene_manager._scene_lock.unlock();
 
+		char p_id = clients[c_id].room_pid;
+		if (p_id == -1) { break; }
 		clients[c_id].send_login_info_packet();
 
 		SC_LOGIN_INFO_PACKET packet{};
 		packet.type = SC_ADD_PLAYER;
 		packet.size = sizeof(packet);
-		packet.data.id = clients[c_id].room_pid;
+		packet.data.id = p_id;
 		CScene* scene = scene_manager.GetScene(scene_num);
-		packet.data.yaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
+		packet.data.yaw = scene->m_ppPlayers[p_id]->GetYaw();
 		packet.data.player_type = clients[c_id].type;
-		packet.data.x = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition().x;
-		packet.data.z = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition().z;
+		packet.data.x = scene->m_ppPlayers[p_id]->GetPosition().x;
+		packet.data.z = scene->m_ppPlayers[p_id]->GetPosition().z;
 		
 		for (auto pl_id : scene->_plist)
 		{
@@ -621,7 +623,8 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_CHANGE: {
 		CS_CHANGE_PACKET* p = reinterpret_cast<CS_CHANGE_PACKET*>(packet);
 		short t_room_id = clients[c_id].room_id;
-		if (t_room_id == -1) { break; }
+		char p_id = clients[c_id].room_pid;
+		if (t_room_id == -1 || p_id == -1) { break; }
 		CScene* scene = scene_manager.GetScene(t_room_id);
 
 		if (p->player_type == PlayerType::INSIDE)
@@ -644,9 +647,9 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			SC_MOVE_INSIDE_PACKET pack{};
 			pack.size = sizeof(pack);
 			pack.type = SC_MOVE_INSIDEPLAYER;
-			pack.data.id = clients[c_id].room_pid;
-			pack.data.m_fYaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
-			pack.data.pos = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition();
+			pack.data.id = p_id;
+			pack.data.m_fYaw = scene->m_ppPlayers[p_id]->GetYaw();
+			pack.data.pos = scene->m_ppPlayers[p_id]->GetPosition();
 
 			scene->Send((char*)&pack);
 		}
@@ -707,33 +710,34 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		CS_INSIDE_PACKET* p = reinterpret_cast<CS_INSIDE_PACKET*>(packet);
 		if (clients[c_id].type == PlayerType::INSIDE) {
 			short t_room_id = clients[c_id].room_id;
-			if (t_room_id == -1) { break; }
+			short p_id = clients[c_id].room_pid;
+			if (t_room_id == -1 || p_id == -1) { break; }
 			CScene* scene = scene_manager.GetScene(t_room_id);
 			if (levels[scene->cur_mission].cutscene) { break; }
-			float yaw = scene->m_ppPlayers[clients[c_id].room_pid]->GetYaw();
+			float yaw = scene->m_ppPlayers[p_id]->GetYaw();
 			if (yaw != p->data.yaw)
 			{
-				scene->m_ppPlayers[clients[c_id].room_pid]->Rotate(0, p->data.yaw - yaw, 0);
+				scene->m_ppPlayers[p_id]->Rotate(0, p->data.yaw - yaw, 0);
 			}
 
 			XMFLOAT3 pos[2]{};
 			char num = 0;
 			for (char i = 0; i < 3; ++i)
 			{
-				if (i == clients[c_id].room_pid) { continue; }
+				if (i == p_id) { continue; }
 				if (scene->_plist[i] == -1) { continue; }
 				pos[num] = scene->m_ppPlayers[i]->GetPosition();
 				++num;
 			}
 
-			scene->m_ppPlayers[clients[c_id].room_pid]->Move(p->data.dwDirection, 2.64f, pos);
+			scene->m_ppPlayers[p_id]->Move(p->data.dwDirection, 2.64f, pos);
 
 			SC_MOVE_INSIDE_PACKET pack{};
 			pack.size = sizeof(pack);
 			pack.type = SC_MOVE_INSIDEPLAYER;
-			pack.data.id = clients[c_id].room_pid;
+			pack.data.id = p_id;
 			pack.data.m_fYaw = p->data.yaw;
-			pack.data.pos = scene->m_ppPlayers[clients[c_id].room_pid]->GetPosition();
+			pack.data.pos = scene->m_ppPlayers[p_id]->GetPosition();
 
 			scene->Send((char*)&pack);
 		}
@@ -841,7 +845,10 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		CScene* scene = scene_manager.GetScene(t_room_id);
 		if (scene->_state != ST_INGAME) { break; }
 		if (levels[scene->cur_mission].cutscene) {
-			scene->m_ppPlayers[clients[c_id].room_pid]->cutscene_end = true;
+
+			char p_id = clients[c_id].room_pid;
+			if (p_id == -1) { break; }
+			scene->m_ppPlayers[p_id]->cutscene_end = true;
 			
 			char num = 0;
 			for (char i = 0; i < 3; ++i) {
