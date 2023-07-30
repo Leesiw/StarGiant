@@ -61,11 +61,9 @@ public:
 
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
 	
-	void PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** Map, CPlayer** Player, CCamera* View);
+	void PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CSkyBox* Map, CPlayer** Player, CCamera* View);
 
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player);
-	void SetMoonObject(CGameObject* Moon);
-	CGameObject *pMoonObject; 
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CSkyBox* Sky, CPlayer** Player);
 };
 
 /*class CDepthRenderShader : public CBaseShader

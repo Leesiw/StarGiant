@@ -385,11 +385,12 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	//=====================================
 	//07.29 -> 272오브젝트 생성중임
 
-
+	
 	BuildBoss(pd3dDevice, pd3dCommandList); //2obj
 	BuildGod(pd3dDevice, pd3dCommandList); //1obj
+
 	BuildUI(pd3dDevice, pd3dCommandList, m_nScreenWidth, m_nScreenHeight); //31obj
-	BuildGodRay(pd3dDevice, pd3dCommandList,m_pPlayer); //31obj
+	BuildGodRay(pd3dDevice, pd3dCommandList,m_pPlayer, m_pd3dGraphicsRootSignature); //31obj
 
 
 	m_nShaders = 0;
@@ -481,7 +482,7 @@ void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 }
 
 
-void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CPlayer** pPlayer)
+void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CPlayer** pPlayer, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
 	m_pSceneRenderShader = new CSceneRenderShader(pPlayer, m_pInsideLights);//정상적인 씬이 그려지는 자리. 
 	DXGI_FORMAT pdxgiRtvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
@@ -505,6 +506,24 @@ void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	m_pShadowMapToViewport->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	m_pShadowMapToViewport->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
 
+	pMoonTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pMoonTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Moon.dds", 0);
+	CScene::CreateShaderResourceViews(pd3dDevice, pMoonTexture, 15, false);
+
+	pMoonObject = new CGameObject(1);
+	CMaterial* pRayMaterial = new CMaterial(1);
+	CUIShader* pMoonShader = new CUIShader();
+	pMoonShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pMoonShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CTexturedRectMesh* NRayMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 100, 100, 0.0f);
+	pMoonObject->SetMesh(NRayMesh);
+
+	//Noise Texture 섞기 
+	pRayMaterial->SetTexture(pMoonTexture);
+	pRayMaterial->SetShader(pMoonShader);
+
+	pMoonObject->SetMaterial(0, pRayMaterial);
 	//텍스처 하나를 조명계산하고 이걸 바로  씬 텍스처 위에 섞는 쉐이더 1개 
 
 }
@@ -646,6 +665,7 @@ void CScene::ReleaseObjects()
 
 	if (m_pTerrain) delete m_pTerrain;
 	if (m_pSkyBox) delete m_pSkyBox;
+	if (pMoonObject) delete pMoonObject;
 	if (m_pParticle) delete[] m_pParticle;
 	if (m_phealParticle) delete[] m_phealParticle;
 	if (m_pFlameParticle) delete[] m_pFlameParticle;
@@ -1213,6 +1233,7 @@ void CScene::ReleaseUploadBuffers()
 {
 	
 	if (m_pSkyBox) m_pSkyBox->ReleaseUploadBuffers();
+	if (pMoonObject) pMoonObject->ReleaseUploadBuffers();
 		
 
 	for (int i = 0; i < MAX_PARTICLES; ++i)if (m_pParticle[i] != NULL) { m_pParticle[i]->ReleaseUploadBuffers(); };
@@ -1565,7 +1586,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	pd3dCommandList->SetGraphicsRootConstantBufferView(2, d3dcbLightsGpuVirtualAddress); //Lights
 
 	if (m_pSkyBox) m_pSkyBox->Render(pd3dCommandList, pCamera);
-
+	if (pMoonObject&&!b_Inside) {
+		pMoonObject->SetLookAt(m_pPlayer[0]->GetPosition());
+		pMoonObject->SetPosition(Vector3::Add(m_pPlayer[0]->GetPosition(), XMFLOAT3(50.f, 0.f, 50.f)));
+		pMoonObject->Render(pd3dCommandList, pCamera);
+	}
 
 	//if (m_pTerrain && !b_Inside) m_pTerrain->Render(pd3dCommandList, pCamera);
 
@@ -2317,11 +2342,17 @@ void CScene::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* m_
 	//그림자맵 깊이 랜더 
 	if (!b_Inside) {
 		m_pSceneRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
-		m_pSceneRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer, m_pTargetCamera);
+		m_pSceneRenderShader->PrepareShadowMap(pd3dCommandList, m_pSkyBox, m_pPlayer, m_pTargetCamera);
+
+		m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
+		m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer, m_pTargetCamera,pMoonObject);
 	}
-	m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
-	m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
+	else {
+		m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
+		m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
+	}
 }
+	
 void CScene::OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 }
