@@ -2436,7 +2436,7 @@ void CParticleObject::setPos(XMFLOAT3 pos)
 //======================
 CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature) : CGameObject(1)
 {
-	CFireMesh* pFireMesh = new CFireMesh(pd3dDevice, pd3dCommandList, 30.0f, 30.0f, 0.0f);
+	CFireMesh* pFireMesh = new CFireMesh(pd3dDevice, pd3dCommandList, 20.0f, 30.0f, 0.0f);
 	//CTexturedRectMesh* pFireMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 10.0f, 10.0f, 0.0f);
 	pFireMesh->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	SetMesh(pFireMesh);
@@ -2449,7 +2449,7 @@ CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 
 
 	CTexture* pfireTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pfireTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/fire01.dds", 0); // fire mix color
+	pfireTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/fire02.dds", 0); // fire mix color
 
 	CTexture* pnoiseTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	pnoiseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/noise01.dds", 0);//fre material texture
@@ -2504,6 +2504,7 @@ void CFireObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandLi
 {
 	time +=  m_GameTimer.GetTimeElapsed();
 	m_pcbPlusInfo->gfCurrentTime = time;
+	if (time >= 1000.0f) time = 0;
 	//XMStoreFloat4x4(&m_pcbPlusInfo->gfCurrentTime, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Texture)));
 
 	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbPlusInfo->GetGPUVirtualAddress();
