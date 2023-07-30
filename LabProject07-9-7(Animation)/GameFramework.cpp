@@ -1765,7 +1765,7 @@ void CGameFramework::ProcessInput()
 
 	if (isConnect) {
 		m_pPlayer[0]->UpdateOnServer(player_type == PlayerType::INSIDE);
-		for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->UpdateOnServer(i != g_myid);
+		for (int i = 0; i < 3; ++i) { m_pInsidePlayer[i]->UpdateOnServer(i != g_myid); }
 	}
 	if(!b_Inside) for (int i = 0; i < 1; ++i)m_pPlayer[i]->Update(m_GameTimer.GetTimeElapsed());
 	else for (int i = 0; i < 3; ++i)m_pInsidePlayer[i]->Update(m_GameTimer.GetTimeElapsed());
@@ -3294,9 +3294,19 @@ void CGameFramework::ProcessPacket(char* p)
 			//}
 		}
 
+		if (curMissionType != MissionType::CS_ENDING) {
+			for (int i = 0; i < MISSILES; ++i) {
+				m_pScene->m_ppEnemyMissiles[i]->m_bActive = false;
+			}
+			for (int i = 0; i < ENEMIES; ++i) {
+				m_pScene->m_ppEnemies[i]->isAlive= false;
+			}
+		}
+
 		if (curMissionType != MissionType::CS_BAD_ENDING) {
 			m_effectSound[static_cast<int>(Sounds::CLEAR)]->play();
 		}
+
 		break;
 	}
 	case SC_KILL_NUM:
