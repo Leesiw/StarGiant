@@ -2910,11 +2910,26 @@ void CGameFramework::ProcessPacket(char* p)
 		player_type = packet->data.player_type;
 
 		if (player_type == PlayerType::INSIDE) {
-			b_Inside = true;
 			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = AnimationState::IDLE;
 			m_pInsidePlayer[packet->data.id]->SetSitState(false);
+			b_Inside = true;
 		}
-		else {
+		else if (player_type == PlayerType::MOVE) {
+			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = AnimationState::SIT;
+			m_pInsidePlayer[packet->data.id]->SetPosition(m_pInsideScene->m_SitPos[3]);
+			m_pInsidePlayer[packet->data.id]->is_update = true;
+			m_pInsidePlayer[packet->data.id]->Rotate(0.f, 90.f - m_pInsidePlayer[packet->data.id]->GetYaw(), 0.f);
+			m_pInsidePlayer[packet->data.id]->SetSitState(true);
+			b_Inside = false;
+
+		}
+		else {	// Attack
+			int i = (int)packet->data.player_type - 2;
+			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = AnimationState::SIT;
+			m_pInsidePlayer[packet->data.id]->SetPosition(m_pInsideScene->m_SitPos[i]);
+			m_pInsidePlayer[packet->data.id]->is_update = true;
+			m_pInsidePlayer[packet->data.id]->Rotate(0.f, 90.f * (float)i - m_pInsidePlayer[packet->data.id]->GetYaw(), 0.f);
+			m_pInsidePlayer[packet->data.id]->SetSitState(true);
 			b_Inside = false;
 		}
 		m_pInsidePlayer[g_myid]->type = player_type;
@@ -2999,6 +3014,27 @@ void CGameFramework::ProcessPacket(char* p)
 		float y = m_pInsidePlayer[packet->data.id]->GetPosition().y;
 		m_pInsidePlayer[packet->data.id]->SetPosition({ packet->data.x, y, packet->data.z });
 		m_pInsidePlayer[packet->data.id]->Rotate(0.f, packet->data.yaw - m_pInsidePlayer[packet->data.id]->GetYaw(), 0.f);
+
+		if (packet->data.player_type == PlayerType::INSIDE) {
+			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = AnimationState::IDLE;
+			m_pInsidePlayer[packet->data.id]->SetSitState(false);
+		}
+		else if (packet->data.player_type == PlayerType::MOVE) {
+			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = AnimationState::SIT;
+			m_pInsidePlayer[packet->data.id]->SetPosition(m_pInsideScene->m_SitPos[3]);
+			m_pInsidePlayer[packet->data.id]->is_update = true;
+			m_pInsidePlayer[packet->data.id]->Rotate(0.f, 90.f - m_pInsidePlayer[packet->data.id]->GetYaw(), 0.f);
+			m_pInsidePlayer[packet->data.id]->SetSitState(true);
+
+		}
+		else {	// Attack
+			int i = (int)packet->data.player_type - 2;
+			((CTerrainPlayer*)m_pInsidePlayer[packet->data.id])->motion = AnimationState::SIT;
+			m_pInsidePlayer[packet->data.id]->SetPosition(m_pInsideScene->m_SitPos[i]);
+			m_pInsidePlayer[packet->data.id]->is_update = true;
+			m_pInsidePlayer[packet->data.id]->Rotate(0.f, 90.f * (float)i - m_pInsidePlayer[packet->data.id]->GetYaw(), 0.f);
+			m_pInsidePlayer[packet->data.id]->SetSitState(true);
+		}
 
 		INSIDE_PLAYER_INFO info{};
 		info.pos.x = packet->data.x;
