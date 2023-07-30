@@ -261,7 +261,7 @@ void CSceneRenderShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	m_ppRenderCamera->SetViewport(0, 0, _DEPTH_BUFFER_WIDTH, _DEPTH_BUFFER_HEIGHT, 0.0f, 1.0f);
 	m_ppRenderCamera->SetScissorRect(0, 0, _DEPTH_BUFFER_WIDTH, _DEPTH_BUFFER_HEIGHT);
 	m_ppRenderCamera->CreateShaderVariables(pd3dDevice, pd3dCommandList);
-
+	pMoonObject = new CGameObject();
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -271,7 +271,7 @@ void CSceneRenderShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 //}
 
 
-void CSceneRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** Map, CPlayer** Player,CCamera* View) // ?          ?  ? ? 
+void CSceneRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CSkyBox* Map, CPlayer** Player,CCamera* View) // ?          ?  ? ? 
 {
 	if (m_pLights->m_bEnable)
 	{
@@ -334,21 +334,18 @@ void CSceneRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommand
 	}
 }
 
-void CSceneRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player)
+void CSceneRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CSkyBox* Sky, CPlayer** Player)
 {
 	CShader::Render(pd3dCommandList, pCamera);
 
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
-	/*for (int i = 0; i < 2; i++){
-		Map[i]->ShadowRender(pd3dCommandList, pCamera);
-		Map[i]->Render(pd3dCommandList, pCamera);
+	Sky->Render(pd3dCommandList, pCamera);
 
-	}*/
 	for (int i = 0; i < 3; i++) {
 		//if (Player[i]->isAlive) Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
-		//if(Player[i]->isAlive) Player[i]->ShadowRender(pd3dCommandList, pCamera); //only shadow to player
+		if(Player[0])if(Player[0]->isAlive) Player[i]->ShadowRender(pd3dCommandList, pCamera); //only shadow to player
 
 	}
 	if (Player[0]) {

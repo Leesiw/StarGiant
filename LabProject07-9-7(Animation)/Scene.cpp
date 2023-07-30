@@ -2316,11 +2316,15 @@ void CScene::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* m_
 	//그림자맵 깊이 랜더 
 	if (!b_Inside) {
 		m_pSceneRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
-		m_pSceneRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer, m_pTargetCamera);
+		m_pSceneRenderShader->PrepareShadowMap(pd3dCommandList, m_pSkyBox, m_pPlayer, m_pTargetCamera);
+
+		m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
+		m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer, m_pTargetCamera, m_pSceneRenderShader->pMoonObject);
 	}
 	m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
 	m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
-}
+	}
+	
 void CScene::OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 }

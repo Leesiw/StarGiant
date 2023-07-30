@@ -1803,37 +1803,29 @@ void CDepthRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommand
 	}
 }
 
-void CDepthRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** Map, CPlayer** Player, CCamera* View, LIGHT* Ray)
+void CDepthRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** Map, CPlayer** Player, CCamera* View, CGameObject* Ray)
 {
 
-	if (Ray->m_bEnable) //받은 카메라와, 고정된 조명 한개 
-	{
-		XMFLOAT3 xmf3Position = Ray->m_xmf3Position;//XMFLOAT3(430.219f, 244.f, 693.263f);//m_pLights[j].m_xmf3Position;
-		XMFLOAT3 xmf3Look = Ray->m_xmf3Direction;
+	//if (Ray->m_bEnable) //받은 카메라와, 고정된 조명 한개 
+	//{
+		XMFLOAT3 xmf3Position = Ray->GetPosition();//XMFLOAT3(430.219f, 244.f, 693.263f);//m_pLights[j].m_xmf3Position;
+		XMFLOAT3 xmf3Look = Ray->GetLook();
 		XMFLOAT3 xmf3Up = XMFLOAT3(+0.0f, 1.0f, 0.0f);
 
 		XMMATRIX xmmtxView = XMMatrixLookToLH(XMLoadFloat3(&xmf3Position), XMLoadFloat3(&xmf3Look), XMLoadFloat3(&xmf3Up));
 
-		float fNearPlaneDistance = 0.1f, fFarPlaneDistance = Ray->m_fRange;//5.0f;
-
-		XMMATRIX xmmtxProjection;
-		if (Ray->m_nType == DIRECTIONAL_LIGHT)
-		{
-			float fWidth = 1024, fHeight = 1024;
-			xmmtxProjection = XMMatrixOrthographicLH(fWidth, fHeight, fNearPlaneDistance, fFarPlaneDistance);
-			//float fLeft = -(_PLANE_WIDTH * 0.5f), fRight = +(_PLANE_WIDTH * 0.5f), fTop = +(_PLANE_HEIGHT * 0.5f), fBottom = -(_PLANE_HEIGHT * 0.5f);
-			//xmmtxProjection = XMMatrixOrthographicOffCenterLH(fLeft * 6.0f, fRight * 6.0f, fBottom * 6.0f, fTop * 6.0f, fBack, fFront);
-		}
-		else if (Ray->m_nType == SPOT_LIGHT)
-		{
+		float fNearPlaneDistance = 0.1f, fFarPlaneDistance = 300.0f;// Ray->m_fRange;//5.0f;
+		/*if (Ray->m_nType == SPOT_LIGHT)
+		{*/
+			XMMATRIX xmmtxProjection;
 			float fFovAngle = 60.0f; // m_pLights->m_pLights[j].m_fPhi = cos(60.0f);
 			float fAspectRatio = float(_DEPTH_BUFFER_WIDTH) / float(_DEPTH_BUFFER_HEIGHT);
 			xmmtxProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(fFovAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
-		}
-		else if (Ray->m_nType == POINT_LIGHT)
-		{
-			//ShadowMap[6]
-		}
+		//}
+		//else if (Ray->m_nType == POINT_LIGHT)
+		//{
+		//	//ShadowMap[6]
+		//}
 
 		//XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4View, xmmtxView);//m_ppDepthRenderCameras                 ?  ??    
 		//XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4Projection, xmmtxProjection);
@@ -1857,11 +1849,11 @@ void CDepthRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommand
 		Render(pd3dCommandList, View, Map, Player);
 
 		::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(0), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON);
-	}
+	/*}
 	else
 	{
 		m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4Position.w = 0.0f;
-	}
+	}*/
 
 }
 
