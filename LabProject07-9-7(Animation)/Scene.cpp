@@ -480,24 +480,24 @@ void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	if (pGodModel) delete pGodModel;
 }
 
+
 void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CPlayer** pPlayer)
 {
-	m_pSceneRenderShader = new CSceneRenderShader(pPlayer, m_pInsideLights);//m_pInsideLights);
+	m_pSceneRenderShader = new CSceneRenderShader(pPlayer, m_pInsideLights);//정상적인 씬이 그려지는 자리. 
 	DXGI_FORMAT pdxgiRtvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
 	m_pSceneRenderShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pSceneRenderShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
 
 	m_pSceneMapShader = new CSceneMapShader(pPlayer);
-	m_pSceneMapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
-	m_pSceneMapShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pSceneRenderShader->GetDepthTexture());
+	m_pSceneMapShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pSceneRenderShader->GetDepthTexture()); //텍스처 업로드 
 	//
 	CGodRayShader* pGodRayShader = new CGodRayShader(); //inside Godray light need bulidobject
 
-	m_pDepthRenderShader = new CDepthRenderShader(pGodRayShader, m_pInsideLights);//m_pInsideLights);
+	m_pDepthRenderShader = new CDepthRenderShader(pGodRayShader, m_pInsideLights);//m_pInsideLights); //그림자맵을 그려야하는 자리. 
 	m_pDepthRenderShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pDepthRenderShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
 
-	m_pShadowShader = new CShadowMapShader(pGodRayShader);
+	m_pShadowShader = new CShadowMapShader(pGodRayShader); //쉐도우 그림자를 그릴떄 그림자 부분 조명계산없이 검은색으로, 쿠키를 받아서 같이 그리기.(쿠키흰색) 
 	m_pShadowShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	m_pShadowShader->BuildSceneObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
 
@@ -505,7 +505,11 @@ void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	m_pShadowMapToViewport->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	m_pShadowMapToViewport->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
 
+	//텍스처 하나를 조명계산하고 이걸 바로  씬 텍스처 위에 섞는 쉐이더 1개 
+
 }
+
+
 
 void CScene::BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap)
 {
@@ -1549,7 +1553,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	//if (b_Inside)if (m_pDepthRenderShader)m_pDepthRenderShader->UpdateShaderVariables(pd3dCommandList); //깊이값 없뎃
-	//if (!b_Inside)if (pSceneRenderShader)m_pDepthRenderShader->UpdateShaderVariables(pd3dCommandList); //깊이값 없뎃
+	if (!b_Inside)if (m_pSceneRenderShader)m_pSceneRenderShader->UpdateShaderVariables(pd3dCommandList); //깊이값 없뎃
 	//if (!b_Inside)if (m_pDepthRenderShader)m_pDepthRenderShader->UpdateShaderVariables(pd3dCommandList); //깊이값 없뎃
 
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
@@ -2305,12 +2309,12 @@ void CScene::CheckBoomSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	//}
 }
 
-void CScene::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void CScene::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* m_pTargetCamera)
 {
 	//그림자맵 깊이 랜더 
 	if (!b_Inside) {
 		m_pSceneRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
-		m_pSceneRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
+		m_pSceneRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer, m_pTargetCamera);
 	}
 	m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
 	m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);

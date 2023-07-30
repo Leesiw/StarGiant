@@ -913,44 +913,83 @@ float4 PSTextureToViewport(VS_TEXTURED_OUTPUT input) : SV_Target
 
 	return((float4)(fDepthFromLight0 * 0.8f));
 }
+/////////////////////////////////////////////////////////////
 
 //
-//float4 ps_main(float4 toProj : TEXCOORD0, float4 toProjScrolll : TEXCORRD1,
-//    float4 toProjScroll2 : TEXCOORD2, float4 IsPos_dept : TEXCOORD3, float4 ChannelMask : COLOR0,
-//    uniform bool bScrollingNoise,
-//    uniform bool bShadowMapping,
-//    uniform bool bCookie) :COLOR
+//Texture2D CookieSampler;
+//Texture2D ScrollingNoiseSampler;
+//Texture2D ShadowMapSampler;
+//
+//struct PS_INPUT
 //{
-//    float compositeNoise = 0.015f;
-//float shadow = 1.0f;
-//float4 cookie = (1.0f, 1.0f, 1.0f, 1.0f);
+//	float4 toProj : TEXCOORD0;
+//	float4 toProjScroll1 : TEXCOORD1;
+//	float4 toProjScroll2 : TEXCOORD2;
+//	float4 IsPos_depth : TEXCOORD3;
+//	float4 ChannelMask : COLOR0;
+//};
 //
-//float shadowMapDepth;
-//float4 output; 
+//float4 ps_main(PS_INPUT input) : SV_TARGET
+//{
+//	bool bScrollingNoise;
+//	bool bShadowMapping;
+//	bool bCookie;
 //
-//if (bCookie) {
-//    cookie = tex2Dproj(CookieSampler, toProj);
+//	float compositeNoise = 0.015f;
+//	float shadow = 1.0f;
+//	float4 cookie = float4(1.0f, 1.0f, 1.0f, 1.0f);
+//
+//	float shadowMapDepth;
+//	float4 output;
+//
+//	if (bCookie)
+//	{
+//		cookie = CookieSampler.SampleGrad(LinearSampler, input.toProj, ddx(input.toProj), ddy(input.toProj));
+//	}
+//
+//	if (bScrollingNoise)
+//	{
+//		float4 noise1 = ScrollingNoiseSampler.SampleGrad(LinearSampler, input.toProjScroll1, ddx(input.toProjScroll1), ddy(input.toProjScroll1));
+//		float4 noise2 = ScrollingNoiseSampler.SampleGrad(LinearSampler, input.toProjScroll2, ddx(input.toProjScroll2), ddy(input.toProjScroll2));
+//
+//		compositeNoise = noise1.r * noise2.g * 0.05f;
+//	}
+//
+//	shadowMapDepth = ShadowMapSampler.SampleGrad(LinearSampler, input.toProj, ddx(input.toProj), ddy(input.toProj));
+//
+//	if (bShadowMapping)
+//	{
+//		if (input.IsPos_depth.w < shadowMapDepth)
+//			shadow = 1.0f;
+//		else
+//			shadow = 0.0f;
+//	}
+//
+//	float atten = 0.25f + 20000.f / dot(input.IsPos_depth.xyz, input.IsPos_depth.xyz);
+//	float scale = 9.0f / fFractionOfMaxShells;
+//
+//	output.rgb = compositeNoise * cookie.rgb * lightColor * scale * atten * shadow * input.ChannelMask;
+//	output.a = 1.0f; // Set alpha to 1.0
+//
+//	return output;
 //}
 //
-//if (bScrollingNosie) {
-//    float4 noise1 = tex2Dproj(ScrollingNoiseSampler, toProjScroll1);
-//    float4 noise2 = tex2Dproj(ScrollingNoiseSampler, toProjScroll2);
+////Texcoord로 현재픽셀위치, 광원의 위치까지의 거리를 구하고 그걸 빛광선화 시킨 것 
+//float4 main(float2 texCoord : TEXCOORD0) : COLOR0
+//{   
+//	// Calculate vector from pixel to light source in screen space.    
+//	half2 deltaTexCoord = (texCoord - ScreenLightPos.xy);   // Divide by number of samples and scale by control factor.   
+//	deltaTexCoord *= 1.0f / NUM_SAMPLES * Density;   // Store initial sample.    
+//	half3 color = tex2D(frameSampler, texCoord);   // Set up illumination decay factor.    
+//	half illuminationDecay = 1.0f;   // Evaluate summation from Equation 3 NUM_SAMPLES iterations.    
+//	
+//	or (int i = 0; i < NUM_SAMPLES; i++)   {     // Step sample location along ray.     
+//		texCoord -= deltaTexCoord;     // Retrieve sample at new location.    
+//		half3 sample = tex2D(frameSampler, texCoord);     // Apply sample attenuation scale/decay factors.     
+//		sample *= illuminationDecay * Weight;     // Accumulate combined color.    
+//		color += sample;     // Update exponential decay factor.     
+//		illuminationDecay *= Decay;   
+//	}   // Output final color with a further scale control factor.    
 //
-//    compositeNoise = noise1.r * noise2.g * 0.05f;
-//    
-//}
-//
-//shadowMapDepth = tex2Dproj(ShadowMapSampler, tcProj);
-//
-//if (bShadowMapping) {
-//    if (IsPos_depth.w < shadowMapDepth)
-//        shadow = 1.0f;
-//    else
-//        shadow = 0.0f;
-//}
-//float atten = 0.25f + 20000.f / dot(IsPos_depth.xyz, IsPos_depth.xyz); 
-//float scale = 9.0f / fFractionOfMaxShells; 
-//
-//output.rgb = compositeNoise * cookie.rgb * lightColor * scale * atten * shadow * ChannelMask;
-//return output;
+//	return float4( color * Exposure, 1); 
 //}

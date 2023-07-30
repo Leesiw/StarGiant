@@ -99,7 +99,7 @@ public:
     void AnimateObjects(float fTimeElapsed);
 
 	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
-	void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* m_pTargetCamera);
 	void OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList);
 
     void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
