@@ -117,19 +117,46 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
+	//ghAppInstance = hInstance;
+
+	//RECT rc = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT };
+	//DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_BORDER;
+	//AdjustWindowRect(&rc, dwStyle, FALSE);
+	//HWND hMainWnd = CreateWindow(szWindowClass, szTitle, dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, hInstance, NULL);
+
+	//if (!hMainWnd) return(FALSE);
+
+	//gGameFramework.OnCreate(hInstance, hMainWnd);
+
+	//::ShowWindow(hMainWnd, nCmdShow);
+	//::UpdateWindow(hMainWnd);
+
+	//return(TRUE);
+
 	ghAppInstance = hInstance;
 
-	RECT rc = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT };
-	DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_BORDER;
-	AdjustWindowRect(&rc, dwStyle, FALSE);
-	HWND hMainWnd = CreateWindow(szWindowClass, szTitle, dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, hInstance, NULL);
+	// 모니터의 너비와 높이를 얻는다
+	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+	gGameFramework.SetScreenSize(screenWidth, screenHeight);
+	// 윈도우 스타일을 변경한다 (WS_POPUP으로 변경)
+	DWORD dwStyle = WS_POPUP;
+
+	// 창 크기를 모니터의 크기로 변경한다
+	RECT rc = { 0, 0, screenWidth, screenHeight };
+
+	// 윈도우를 생성한다 (전체 화면)
+	HWND hMainWnd = CreateWindow(szWindowClass, szTitle, dwStyle, 0, 0, screenWidth, screenHeight, NULL, NULL, hInstance, NULL);
 
 	if (!hMainWnd) return(FALSE);
 
 	gGameFramework.OnCreate(hInstance, hMainWnd);
 
-	::ShowWindow(hMainWnd, nCmdShow);
-	::UpdateWindow(hMainWnd);
+	// 윈도우를 최대화하여 전체 화면으로 표시한다
+	ShowWindow(hMainWnd, SW_MAXIMIZE);
+
+	// 윈도우를 업데이트한다
+	UpdateWindow(hMainWnd);
 
 	return(TRUE);
 }

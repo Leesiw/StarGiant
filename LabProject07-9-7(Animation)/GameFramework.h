@@ -24,6 +24,11 @@ public:
 	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);
 	void OnDestroy();
 
+	void SetScreenSize(int width, int height){
+		m_nScreenWidth = width;
+		m_nScreenHeight = height;
+	};
+
 	void CreateSwapChain();
 	void CreateDirect3DDevice();
 	void CreateCommandQueueAndList();
@@ -88,12 +93,17 @@ public:
 	void CameraUpdateChange();
 
 
+	int m_nScreenWidth;
+	int m_nScreenHeight;
+
 private:
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd; 
 
 	int							m_nWndClientWidth;
 	int							m_nWndClientHeight;
+
+
         
 	IDXGIFactory4				*m_pdxgiFactory = NULL;
 	IDXGISwapChain3				*m_pdxgiSwapChain = NULL;

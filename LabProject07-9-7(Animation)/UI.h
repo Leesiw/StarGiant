@@ -11,7 +11,7 @@ struct TextBlock
 class UILayer
 {
 public:
-    UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue);
+    UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, int m_nWndClientWidth, int m_nWndClientHeight);
 
     void UpdateLabels(const std::wstring& strUIText);
     void UpdateLabels_Scripts(const std::wstring& strUIText);
@@ -53,30 +53,41 @@ public:
     void ReleaseResources();
     void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height);
 
+
+    void SetScreenSize(int width, int height) {
+        m_nScreenWidth = width;
+        m_nScreenHeight = height;
+    };
 private:
     UINT GetRenderTargetsCount() { return static_cast<UINT>(m_vWrappedRenderTargets.size()); }
     void Initialize(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue);
     void InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue);
     void DrawDot(int dotCnt = NULL, XMFLOAT3[] = NULL);
 
+    int m_nScreenWidth;
+    int m_nScreenHeight;
+
+    UINT originalWidth, originalHeight;
+    float scaleX ;
+    float scaleY;
 
 
-    float hpbarLeft = FRAME_BUFFER_WIDTH /10 * 8;
-    float hpbarRight = FRAME_BUFFER_WIDTH / 10 * 8.7;
+    float hpbarLeft = m_nScreenWidth /10 * 8;
+    float hpbarRight = m_nScreenWidth / 10 * 8.7;
 
 
 
 
-    float bossHpbarLeft = FRAME_BUFFER_WIDTH / 10;
-    float bossHpbarRight = FRAME_BUFFER_WIDTH / 10 * 9;
-    float bossHpbarTop = FRAME_BUFFER_HEIGHT / 10 * 1;
-    float bossHpbarBottom = FRAME_BUFFER_HEIGHT / 10 * 1.5;
+    float bossHpbarLeft = m_nScreenWidth / 10;
+    float bossHpbarRight = m_nScreenWidth / 10 * 9;
+    float bossHpbarTop = m_nScreenHeight / 10 * 1;
+    float bossHpbarBottom = m_nScreenHeight / 10 * 1.5;
 
 
-    float GodbossHpbarLeft = FRAME_BUFFER_WIDTH / 10;
-    float GodbossHpbarRight = FRAME_BUFFER_WIDTH / 10 * 9;
-    float GodbossHpbarTop = FRAME_BUFFER_HEIGHT / 10 * 1;
-    float GodbossHpbarBottom = FRAME_BUFFER_HEIGHT / 10 * 1.5;
+    float GodbossHpbarLeft = m_nScreenWidth / 10;
+    float GodbossHpbarRight = m_nScreenWidth / 10 * 9;
+    float GodbossHpbarTop = m_nScreenHeight / 10 * 1;
+    float GodbossHpbarBottom = m_nScreenHeight / 10 * 1.5;
 
     float m_fWidth;
     float m_fHeight;

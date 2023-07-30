@@ -5,8 +5,10 @@
 
 
 
-UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue)
+UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, int m_nWndClientWidth, int m_nWndClientHeight)
 {
+    SetScreenSize(m_nWndClientWidth, m_nWndClientHeight);
+
     m_fWidth = 0.0f;
     m_fHeight = 0.0f;
     m_vWrappedRenderTargets.resize(nFrame);
@@ -137,13 +139,7 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_nevi);
     m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_nevi2);
 
-    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1EdgeDetection, &m_pd2dfxSize_Lobby);
-
-
-
-
-
-    
+    m_pd2dDeviceContext->CreateEffect(CLSID_D2D1Scale, &m_pd2dfxSize_Lobby);
 
 
     IWICBitmapDecoder* pwicBitmapDecoder;
@@ -326,20 +322,32 @@ void UILayer::InitializeImage(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_pd2dfxGaussianBlur_Lobby->SetInputEffect(0, m_pd2dfxBitmapSource_Lobby);
     m_pd2dfxGaussianBlur_Lobby->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 0.0f);
 
+    
 
+    pwicFrameDecode_Lobby->GetSize(&originalWidth, &originalHeight);
+
+    scaleX = static_cast<float>(m_nScreenWidth) / static_cast<float>(originalWidth);
+    scaleY = static_cast<float>(m_nScreenHeight) / static_cast<float>(originalHeight);
+
+    cout << m_nScreenWidth << endl;
+    cout << m_nScreenHeight << endl;
+
+    // Create and set up the size effect
     m_pd2dfxSize_Lobby->SetInputEffect(0, m_pd2dfxBitmapSource_Lobby);
-    m_pd2dfxSize_Lobby->SetValue(D2D1_BITMAPSOURCE_PROP_SCALE, D2D1::Vector2F(0.1f, 0.1f));
+    m_pd2dfxSize_Lobby->SetValue(D2D1_SCALE_PROP_SCALE, D2D1::Vector2F(scaleX, scaleY));
 
+    m_pd2dfxGaussianBlur_Lobby->SetInputEffect(0, m_pd2dfxSize_Lobby);
 
-
-    if (pwicBitmapDecoder_Lobby) pwicBitmapDecoder_Lobby->Release();
+    // Release resources
+    if (m_pd2dfxSize_Lobby) m_pd2dfxSize_Lobby->Release();
     if (pwicFrameDecode_Lobby) pwicFrameDecode_Lobby->Release();
+    if (pwicBitmapDecoder_Lobby) pwicBitmapDecoder_Lobby->Release();
 }
 
 void UILayer::DrawDot(int dotCnt, XMFLOAT3[])
 {
     for (int i= 0; i < dotCnt; ++i) {
-        m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(100.0f, FRAME_BUFFER_HEIGHT / 2.0f + 100.0f), 5.0f, 5.0f), Redbrush); // 이게 중심
+        m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(100.0f, m_nScreenHeight / 2.0f + 100.0f), 5.0f, 5.0f), Redbrush); // 이게 중심
     }
 }
 
@@ -350,31 +358,31 @@ void UILayer::UpdateLabels(const wstring& strUIText)
 
 void UILayer::UpdateLabels_Scripts(const std::wstring& strUIText)
 {
-    m_vScriptsBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT - 100, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwScriptsFormat };
+    m_vScriptsBlocks[0] = { strUIText, D2D1::RectF(0.0f, m_nScreenHeight - 100, m_fWidth, m_nScreenHeight - 20), m_pdwScriptsFormat };
 }
 
 void UILayer::UpdateLabels_BossScripts(const std::wstring& strUIText)
 {
-    m_vBossScriptsBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT / 7 * 5, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwBossScriptsFormat };
+    m_vBossScriptsBlocks[0] = { strUIText, D2D1::RectF(0.0f, m_nScreenHeight / 7 * 5, m_fWidth, m_nScreenHeight - 20), m_pdwBossScriptsFormat };
 }
 
 void UILayer::UpdateLabels_Jew(const std::wstring& strUIText)
 {
-    m_vJewBlocks[0] = { strUIText, D2D1::RectF(15.0f, FRAME_BUFFER_HEIGHT / 9, FRAME_BUFFER_WIDTH / 16, FRAME_BUFFER_HEIGHT), m_pdwJewFormat };
+    m_vJewBlocks[0] = { strUIText, D2D1::RectF(15.0f, m_nScreenHeight / 9, m_nScreenWidth / 16, m_nScreenHeight), m_pdwJewFormat };
 }
 
 void UILayer::UpdateLabels_Lobby(const std::wstring& strUIText)
 {
-    m_vLobbyBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT / 7 * 4.15, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwLobbyFormat };
+    m_vLobbyBlocks[0] = { strUIText, D2D1::RectF(0.0f, m_nScreenHeight / 7 * 4.15, m_fWidth, m_nScreenHeight - 20), m_pdwLobbyFormat };
 }
 
 void UILayer::UpdateLabels_LobbyMatching(const std::wstring& strUIText)
 {
-    m_vLobbyMatchingBlocks[0] = { strUIText, D2D1::RectF(0.0f, FRAME_BUFFER_HEIGHT / 7 * 3.15, m_fWidth, FRAME_BUFFER_HEIGHT - 20), m_pdwLobbyMatchingFormat };
+    m_vLobbyMatchingBlocks[0] = { strUIText, D2D1::RectF(0.0f, m_nScreenHeight / 7 * 3.15, m_fWidth, m_nScreenHeight - 20), m_pdwLobbyMatchingFormat };
 }
 void UILayer::UpdateLabels_Skip(const std::wstring& strUIText)
 {
-    m_vSkipBlocks[0] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 4 * 3, FRAME_BUFFER_HEIGHT / 10 * 9.8 , FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT / 10 * 9.5), m_pdwSkipFormat };
+    m_vSkipBlocks[0] = { strUIText, D2D1::RectF(m_nScreenWidth / 4 * 3, m_nScreenHeight / 10 * 9.8 , m_nScreenWidth, m_nScreenHeight / 10 * 9.5), m_pdwSkipFormat };
 }
 
 void UILayer::UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool live)
@@ -418,7 +426,7 @@ void UILayer::UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool l
     cpos.z = cpos.z * mapScale;
 
     cpos.x = cpos.x + 100.0f;
-    cpos.z = cpos.z + FRAME_BUFFER_HEIGHT / 2.0f * 1.75;
+    cpos.z = cpos.z + m_nScreenHeight / 2.0f * 1.75;
 
     if (id == BOSS_ID)
     {
@@ -430,10 +438,10 @@ void UILayer::UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool l
     if (live == false)
     {
         m_enemyDot[id].x = 100.0f;
-        m_enemyDot[id].z = FRAME_BUFFER_HEIGHT / 2.0f + 100.0f;
+        m_enemyDot[id].z = m_nScreenHeight / 2.0f + 100.0f;
     }
 
-    else if (!(cpos.x > 200.0f || cpos.x <-200.0f || cpos.z > FRAME_BUFFER_HEIGHT / 2.0f * 3.0 || cpos.z < -(FRAME_BUFFER_HEIGHT / 1.5))&& id!=BOSS_ID)
+    else if (!(cpos.x > 200.0f || cpos.x <-200.0f || cpos.z > m_nScreenHeight / 2.0f * 3.0 || cpos.z < -(m_nScreenHeight / 1.5))&& id!=BOSS_ID)
     {
         m_enemyDot[id].x = cpos.x;
         m_enemyDot[id].z = cpos.z;
@@ -441,7 +449,7 @@ void UILayer::UpdateDots(int id, CAirplanePlayer* player, XMFLOAT3& epos, bool l
     else if (id != BOSS_ID)
     {
         m_enemyDot[id].x = 100.0f;
-        m_enemyDot[id].z = FRAME_BUFFER_HEIGHT / 2.0f  + 100.0f;
+        m_enemyDot[id].z = m_nScreenHeight / 2.0f  + 100.0f;
     }
 
     else {
@@ -585,23 +593,28 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
 
 
 
-    D2D_POINT_2F d2dPoint = { 0.0f, FRAME_BUFFER_HEIGHT/2 * 1.5f };
+    D2D_POINT_2F d2dPoint = { 0.0f, m_nScreenHeight /2 * 1.5f };
 
     D2D_POINT_2F d2dPoint_jew = { 0.0f, 55.0f };
 
     D2D_POINT_2F d2dPoint_nevi = { -25, -75 };
 
-    D2D_POINT_2F d2dPoint_logo = { FRAME_BUFFER_WIDTH/2 - 512, FRAME_BUFFER_HEIGHT /2 - 128};
+    D2D_POINT_2F d2dPoint_logo = { m_nScreenWidth /2 - 512, m_nScreenHeight /2 - 128};
 
 
-    D2D_POINT_2F d2dPoint_Lobby = { FRAME_BUFFER_WIDTH / 2 - 800, FRAME_BUFFER_HEIGHT / 2 - 450 };
+
+    float halfWidth = originalWidth * scaleX * 0.5f;
+    float halfHeight = originalHeight * scaleY * 0.5f;
+    D2D_POINT_2F d2dPoint_Lobby = { m_nScreenWidth * 0.5f - halfWidth, m_nScreenHeight * 0.5f - halfHeight };
+
+
 
 
     D2D_RECT_F d2dRect = { 0.0f, 0.0f, 100.0f, 200.0f };
 
     D2D1::Matrix3x2F matScale, matTranslation, matRot, matRot2, matTM, matTM2;
     matScale = D2D1::Matrix3x2F::Scale(0.05f, 0.05f);
-    matTranslation = D2D1::Matrix3x2F::Translation(FRAME_BUFFER_WIDTH / 2.0f, FRAME_BUFFER_HEIGHT / 2.0f);
+    matTranslation = D2D1::Matrix3x2F::Translation(m_nScreenWidth / 2.0f, m_nScreenHeight / 2.0f);
     matRot = D2D1::Matrix3x2F::Rotation(angle);
     matTM = matRot * matTranslation ;
 
@@ -669,13 +682,13 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
     }
     else
     {
-        m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarRight, FRAME_BUFFER_HEIGHT - 50), Whitebrush); //배경
+        m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, m_nScreenHeight - 60, hpbarRight, m_nScreenHeight - 50), Whitebrush); //배경
         if (hpbarRight - hpBar > hpbarLeft)
-            m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarRight - hpBar, FRAME_BUFFER_HEIGHT - 50), Redbrush); // hp
+            m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, m_nScreenHeight - 60, hpbarRight - hpBar, m_nScreenHeight - 50), Redbrush); // hp
 
         for (auto& a : m_enemyDot)
         {
-            if (!(a.x == 100.0f && a.z == FRAME_BUFFER_HEIGHT / 2.0f + 100.0f))
+            if (!(a.x == 100.0f && a.z == m_nScreenHeight / 2.0f + 100.0f))
                 m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(a.x, a.z), 5.0f, 5.0f), Redbrush);
         }
 
@@ -777,6 +790,7 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
 {
     m_fWidth = static_cast<float>(nWidth);
     m_fHeight = static_cast<float>(nHeight);
+    SetScreenSize(m_fWidth, m_fHeight);
 
     D2D1_BITMAP_PROPERTIES1 d2dBitmapProperties = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED));
 

@@ -136,7 +136,7 @@ void CScene::BuildLobbyObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_ppUI[0]->SetPosition(0.0f, 0.0f, 0.0f);*/
 }
 
-void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int m_nScreenWidth, int m_nScreenHeight)
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
@@ -388,7 +388,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	BuildBoss(pd3dDevice, pd3dCommandList); //2obj
 	BuildGod(pd3dDevice, pd3dCommandList); //1obj
-	BuildUI(pd3dDevice, pd3dCommandList); //31obj
+	BuildUI(pd3dDevice, pd3dCommandList, m_nScreenWidth, m_nScreenHeight); //31obj
 	BuildGodRay(pd3dDevice, pd3dCommandList,m_pPlayer); //31obj
 
 
@@ -408,12 +408,12 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 
 
-void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+void CScene::BuildUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int m_nScreenWidth, int m_nScreenHeight)
 {
 	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 300);
 
-	float fx = FRAME_BUFFER_WIDTH / 2;
-	float fy = FRAME_BUFFER_HEIGHT / 2;
+	float fx = m_nScreenWidth / 2;
+	float fy = m_nScreenHeight / 2;
 
 	m_ppUI[0] = new CUI(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, static_cast<int>(UIType::CROSSHAIR), 2, 2, 0);
 	m_ppUI[0]->SetPosition(fx, fy, 0.0f);
@@ -2109,9 +2109,10 @@ void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 	//m_ppUI[4]->SetPosition(m_ppEnemies[0]->GetPosition().x, m_ppEnemies[0]->GetPosition().y + 10.0f, m_ppEnemies[0]->GetPosition().z);
 	//m_ppUI[4]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 0.5f, 0.0f));
 
-	CCamera a = m_pPlayer[0]->GetCamera();
+
+	CCamera *a = m_pPlayer[0]->GetCamera();
 	
-	if (m_ppUI[0]&& !(a.GetMode()== DRIVE_CAMERA || a.GetMode() == CUT_SCENE_CAMERA))
+	if (m_ppUI[0]&& !(a->GetMode()== DRIVE_CAMERA || a->GetMode() == CUT_SCENE_CAMERA))
 	{
 		m_ppUI[0]->Render(pd3dCommandList, pCamera);
 

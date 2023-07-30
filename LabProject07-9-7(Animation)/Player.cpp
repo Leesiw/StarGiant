@@ -392,9 +392,9 @@ CCamera* CPlayer::ChangeToCutSceneCamera(DWORD nNewCameraMode, float fTimeElapse
 		m_pCamera = OnChangeCamera(CUT_SCENE_CAMERA, nCurrentCameraMode);
 		m_pCamera->SetTimeLag(0.0f);
 		m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, -50.0f));
-		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, float(m_nScreenWidth / float(m_nScreenHeight)), 60.0f);
+		m_pCamera->SetViewport(0, 0, m_nScreenWidth, m_nScreenHeight, 0.0f, 1.0f);
+		m_pCamera->SetScissorRect(0, 0, m_nScreenWidth, m_nScreenHeight);
 		break;
 
 	default:
@@ -808,9 +808,9 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera = OnChangeCamera(FIRST_PERSON_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
-			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, float(m_nScreenWidth / float(m_nScreenHeight)), 60.0f);
+			m_pCamera->SetViewport(0, 0, m_nScreenWidth, m_nScreenHeight, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, m_nScreenWidth, m_nScreenHeight);
 			break;
 		case SPACESHIP_CAMERA:
 			SetFriction(100.5f);
@@ -820,9 +820,9 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera = OnChangeCamera(SPACESHIP_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 0.0f, 0.0f));
-			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, float(m_nScreenWidth / float(m_nScreenHeight)), 60.0f);
+			m_pCamera->SetViewport(0, 0, m_nScreenWidth, m_nScreenHeight, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, m_nScreenWidth, m_nScreenHeight);
 			break;
 		case THIRD_PERSON_CAMERA:
 			//SetFriction(20.5f);
@@ -845,9 +845,9 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.25f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, -50.0f));
-			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, float(m_nScreenWidth / float(m_nScreenHeight)), 60.0f);
+			m_pCamera->SetViewport(0, 0, m_nScreenWidth, m_nScreenHeight, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, m_nScreenWidth, m_nScreenHeight);
 			break;
 
 		case DRIVE_CAMERA:
@@ -859,9 +859,9 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera = OnChangeCamera(DRIVE_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.25f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, -50.0f));
-			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, float(m_nScreenWidth / float(m_nScreenHeight)), 60.0f);
+			m_pCamera->SetViewport(0, 0, m_nScreenWidth, m_nScreenHeight, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, m_nScreenWidth, m_nScreenHeight);
 			pastcam = DRIVE_CAMERA;
 
 			break;
@@ -876,9 +876,9 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 				m_pCamera->Rotate(0.0f, -r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 10.0f, 0.0f));
-			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, float(m_nScreenWidth / float(m_nScreenHeight)), 60.0f);
+			m_pCamera->SetViewport(0, 0, m_nScreenWidth, m_nScreenHeight, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, m_nScreenWidth, m_nScreenHeight);
 			pastcam = ATTACT_CAMERA_C;
 			
 			break;
@@ -895,9 +895,9 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 				m_pCamera->Rotate(0.0f, r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 10.0f, 0.0f));
-			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, float(m_nScreenWidth / float(m_nScreenHeight)), 60.0f);
+			m_pCamera->SetViewport(0, 0, m_nScreenWidth, m_nScreenHeight, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, m_nScreenWidth, m_nScreenHeight);
 			pastcam = ATTACT_CAMERA_L;
 
 			break;
@@ -914,9 +914,9 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 				m_pCamera->Rotate(0.0f, r, 0.0f);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 10.0f, 0.0f));
-			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, float(m_nScreenWidth / float(m_nScreenHeight)), 60.0f);
+			m_pCamera->SetViewport(0, 0, m_nScreenWidth, m_nScreenHeight, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, m_nScreenWidth, m_nScreenHeight);
 			pastcam = ATTACT_CAMERA_R;
 			break;
 		default:
@@ -1099,9 +1099,9 @@ CCamera *CTerrainPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera = OnChangeCamera(FIRST_PERSON_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, 0.0f));
-			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, float(m_nScreenWidth / float(m_nScreenHeight)), 60.0f);
+			m_pCamera->SetViewport(0, 0, m_nScreenWidth, m_nScreenHeight, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, m_nScreenWidth, m_nScreenHeight);
 			break;
 		case SPACESHIP_CAMERA:
 			SetFriction(125.0f);
@@ -1111,9 +1111,9 @@ CCamera *CTerrainPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera = OnChangeCamera(SPACESHIP_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.0f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 0.0f, 0.0f));
-			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, float(m_nScreenWidth / float(m_nScreenHeight)), 60.0f);
+			m_pCamera->SetViewport(0, 0, m_nScreenWidth, m_nScreenHeight, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, m_nScreenWidth, m_nScreenHeight);
 			break;
 		case THIRD_PERSON_CAMERA:
 			SetFriction(250.0f);
@@ -1123,9 +1123,9 @@ CCamera *CTerrainPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 			m_pCamera = OnChangeCamera(THIRD_PERSON_CAMERA, nCurrentCameraMode);
 			m_pCamera->SetTimeLag(0.25f);
 			m_pCamera->SetOffset(XMFLOAT3(0.0f, 20.0f, -50.0f));
-			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
-			m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
-			m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, float(m_nScreenWidth / float(m_nScreenHeight)), 60.0f);
+			m_pCamera->SetViewport(0, 0, m_nScreenWidth, m_nScreenHeight, 0.0f, 1.0f);
+			m_pCamera->SetScissorRect(0, 0, m_nScreenWidth, m_nScreenHeight);
 			break;
 		default:
 			break;

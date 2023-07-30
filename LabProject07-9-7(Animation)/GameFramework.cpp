@@ -75,6 +75,10 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	m_hInstance = hInstance;
 	m_hWnd = hMainWnd;
 
+	m_nWndClientWidth = m_nScreenWidth;
+	m_nWndClientHeight = m_nScreenHeight;
+
+
 	CreateDirect3DDevice();
 	CreateCommandQueueAndList();
 	CreateRtvAndDsvDescriptorHeaps();
@@ -352,7 +356,6 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 {
 	if (m_pScene) m_pScene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
 
-
 	switch (nMessageID)
 	{
 		case WM_LBUTTONDOWN:
@@ -597,21 +600,42 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 			int mouseY = HIWORD(lParam);
 
 			// 화면의 일정 부분을 나타내는 영역을 정의합니다.
-			int screenAreaLeft = 500;
-			int screenAreaTop = 650;
-			int screenAreaRight = 1100;
-			int screenAreaBottom = 800;
+			//원래 크기
+			int originalLeft = 660;
+			int originalTop = 810;
+			int originalRight = 1260;
+			int originalBottom = 950;
 
+			int originalLeft1 = 1375;
+			int originalTop1 = 654;
+			int originalRight1 = 1667;
+			int originalBottom1 = 772;
 
-			int screenAreaLeft1 = 1100;
-			int screenAreaTop1 = 550;
-			int screenAreaRight1 = 1450;
-			int screenAreaBottom1 = 650;
+			int originalLeft2 = 222;
+			int originalTop2 = 654;
+			int originalRight2 = 552;
+			int originalBottom2 = 772;
 
-			int screenAreaLeft2 = 150;
-			int screenAreaTop2 = 550;
-			int screenAreaRight2 = 450;
-			int screenAreaBottom2 = 650;
+			// 화면의 크기에 대한 비율 계산
+			float scaleX = static_cast<float>(m_nScreenWidth) / 1920.0f;
+			float scaleY = static_cast<float>(m_nScreenHeight) / 1080.0f;
+
+			// 비율로 변환된 좌표 계산
+			int screenAreaLeft = static_cast<int>(originalLeft * scaleX);
+			int screenAreaTop = static_cast<int>(originalTop * scaleY);
+			int screenAreaRight = static_cast<int>(originalRight * scaleX);
+			int screenAreaBottom = static_cast<int>(originalBottom * scaleY);
+
+			int screenAreaLeft1 = static_cast<int>(originalLeft1 * scaleX);
+			int screenAreaTop1 = static_cast<int>(originalTop1 * scaleY);
+			int screenAreaRight1 = static_cast<int>(originalRight1 * scaleX);
+			int screenAreaBottom1 = static_cast<int>(originalBottom1 * scaleY);
+
+			int screenAreaLeft2 = static_cast<int>(originalLeft2 * scaleX);
+			int screenAreaTop2 = static_cast<int>(originalTop2 * scaleY);
+			int screenAreaRight2 = static_cast<int>(originalRight2 * scaleX);
+			int screenAreaBottom2 = static_cast<int>(originalBottom2 * scaleY);
+
 
 			if (_state == SCENE_LOBBY) {
 				if (mouseX >= screenAreaLeft1 && mouseX <= screenAreaRight1 && mouseY >= screenAreaTop1 && mouseY <= screenAreaBottom1 && !roomNum.empty()) {
@@ -1352,14 +1376,15 @@ void CGameFramework::BuildObjects()
 {
 	if (!m_pUILayer)
 	{
-		m_pUILayer = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue);
+		m_pUILayer = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, m_nWndClientWidth, m_nWndClientHeight);
+
 	}
 	m_pUILayer->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight);
 
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
 	m_pScene = new CScene();
-	if (m_pScene) m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+	if (m_pScene) m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_nWndClientWidth, m_nWndClientHeight);
 	m_pInsideScene = new CScene();
 	if (m_pInsideScene) m_pInsideScene->BuildInsideObjects(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetDescriptor());
 
@@ -1368,12 +1393,14 @@ void CGameFramework::BuildObjects()
 	CTerrainPlayer* pPlayer[3];
 	for (int i = 0; i < 3; ++i) {
 		pPlayer[i] = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain, i);
+		pPlayer[i]->SetScreenSize(m_nScreenWidth, m_nScreenHeight);
 		pPlayer[i]->SetPosition(XMFLOAT3(425.0f + 10.0f * i, 250.0f, 640.0f));
 		pPlayer[i]->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
 	}
 
 	CAirplanePlayer* pAirPlayer[1];
 	pAirPlayer[0] = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pInsideScene->GetGraphicsRootSignature(), m_pInsideScene->m_pTerrain);
+	pAirPlayer[0]->SetScreenSize(m_nScreenWidth, m_nScreenHeight);
 	pAirPlayer[0]->SetPosition(XMFLOAT3(425.0f, 250.0f, 640.0f));
 	pAirPlayer[0]->SetScale(XMFLOAT3(15.0f, 15.0f, 15.0f));
 

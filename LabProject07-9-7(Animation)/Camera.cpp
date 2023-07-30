@@ -23,7 +23,7 @@ CCamera::CCamera()
 	m_pPlayer = NULL;
 }
 
-CCamera::CCamera(CCamera *pCamera)
+CCamera::CCamera(CCamera *pCamera, int m_nScreenWidth, int m_nScreenHeight)
 {
 	if (pCamera)
 	{
@@ -33,8 +33,8 @@ CCamera::CCamera(CCamera *pCamera)
 	{
 		m_xmf4x4View = Matrix4x4::Identity();
 		m_xmf4x4Projection = Matrix4x4::Identity();
-		m_d3dViewport = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT, 0.0f, 1.0f };
-		m_d3dScissorRect = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT };
+		m_d3dViewport = { 0, 0, float(m_nScreenWidth) ,float( m_nScreenHeight), 0.0f, 1.0f };
+		m_d3dScissorRect = { 0, 0, m_nScreenWidth , m_nScreenHeight };
 		m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 		m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
@@ -191,7 +191,7 @@ bool CCamera::CameraSence1(bool ON)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CSpaceShipCamera
 
-CSpaceShipCamera::CSpaceShipCamera(CCamera *pCamera) : CCamera(pCamera)
+CSpaceShipCamera::CSpaceShipCamera(CCamera *pCamera) : CCamera(pCamera, m_nScreenWidth, m_nScreenHeight)
 {
 	m_nMode = SPACESHIP_CAMERA;
 }
@@ -236,7 +236,7 @@ void CSpaceShipCamera::Rotate(float x, float y, float z)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CFirstPersonCamera
 
-CFirstPersonCamera::CFirstPersonCamera(CCamera *pCamera) : CCamera(pCamera)
+CFirstPersonCamera::CFirstPersonCamera(CCamera *pCamera) : CCamera(pCamera, m_nScreenWidth, m_nScreenHeight)
 {
 	m_nMode = FIRST_PERSON_CAMERA;
 	if (pCamera)
@@ -285,7 +285,7 @@ void CFirstPersonCamera::Rotate(float x, float y, float z)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CThirdPersonCamera
 
-CThirdPersonCamera::CThirdPersonCamera(CCamera *pCamera) : CCamera(pCamera)
+CThirdPersonCamera::CThirdPersonCamera(CCamera *pCamera) : CCamera(pCamera, m_nScreenWidth, m_nScreenHeight)
 {
 	m_nMode = THIRD_PERSON_CAMERA;
 	if (pCamera)
@@ -394,7 +394,7 @@ void CSitEventCamera::SetLookAt(XMFLOAT3& vLookAt)
 	m_xmf3Look = XMFLOAT3(mtxLookAt._13, mtxLookAt._23, mtxLookAt._33);*/
 }
 
-CAttactCamera::CAttactCamera(CCamera* pCamera) : CCamera(pCamera)
+CAttactCamera::CAttactCamera(CCamera* pCamera) : CCamera(pCamera, m_nScreenWidth, m_nScreenHeight)
 {
 	m_nMode = ATTACT_CAMERA_C;
 
@@ -481,7 +481,7 @@ void CAttactCamera::Rotate(float x, float y, float z)
 //
 
 
-CDriveCamera::CDriveCamera(CCamera* pCamera) : CCamera(pCamera)
+CDriveCamera::CDriveCamera(CCamera* pCamera) : CCamera(pCamera, m_nScreenWidth, m_nScreenHeight)
 {
 	m_nMode = DRIVE_CAMERA;
 
@@ -615,7 +615,7 @@ void CFrustrumCamera::UpdateFrustrum()
 
 
 //ÄÆ¾À À§ÇÑ Ä«¸Þ¶ó
-CCutSceneCamera::CCutSceneCamera(CCamera* pCamera) : CCamera(pCamera)
+CCutSceneCamera::CCutSceneCamera(CCamera* pCamera) : CCamera(pCamera, m_nScreenWidth, m_nScreenHeight)
 {
 	m_nMode = CUT_SCENE_CAMERA;
 	if (pCamera)

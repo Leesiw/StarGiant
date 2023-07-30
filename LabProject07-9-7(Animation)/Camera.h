@@ -39,7 +39,8 @@ protected:
 	float           				m_fRoll;
 	float           				m_fYaw;
 
-
+	int m_nScreenWidth;
+	int m_nScreenHeight;
 
 
 	XMFLOAT3						m_xmf3LookAtWorld;
@@ -57,8 +58,14 @@ protected:
 	float m_shakingTime = 0.0f;
 public:
 	CCamera();
-	CCamera(CCamera *pCamera);
+	CCamera(CCamera *pCamera, int m_nScreenWidth, int m_nScreenHeight);
 	virtual ~CCamera();
+
+	void SetScreenSize(int width, int height) {
+		m_nScreenWidth = width;
+		m_nScreenHeight = height;
+	};
+
 
 	DWORD							m_nMode;
 	XMFLOAT4X4						m_xmf4x4View;
