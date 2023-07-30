@@ -2443,6 +2443,11 @@ CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 
 	//CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
+	CFireShader* pFireShader = new CFireShader();
+	pFireShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+	pFireShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+
 	CTexture* pfireTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	pfireTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/fire01.dds", 0); // fire mix color
 
@@ -2452,22 +2457,17 @@ CFireObject::CFireObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	CTexture* palphaTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	palphaTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"data/alpha01.dds", 0);
 
-
-
-	CFireShader* pFireShader = new CFireShader();
-	pFireShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
-	pFireShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
-
 	CScene::CreateShaderResourceViews(pd3dDevice, pfireTexture, 22, false);
 	CScene::CreateShaderResourceViews(pd3dDevice, pnoiseTexture, 23, false);
 	CScene::CreateShaderResourceViews(pd3dDevice, palphaTexture, 24, false);
 
 
 
+
 	CMaterial* pFireMaterial = new CMaterial(3);
-	pFireMaterial->SetTexture(pfireTexture);
-	pFireMaterial->SetTexture(pnoiseTexture);
-	pFireMaterial->SetTexture(palphaTexture);
+	pFireMaterial->SetTexture(pfireTexture, 0);
+	pFireMaterial->SetTexture(pnoiseTexture, 1);
+	pFireMaterial->SetTexture(palphaTexture, 2);
 
 
 
@@ -2502,7 +2502,8 @@ void CFireObject::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12Graphics
 
 void CFireObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* m_pd3dcbPlusInfo)
 {
-	m_pcbPlusInfo->gfCurrentTime = m_GameTimer.GetTimeElapsed();
+	time +=  m_GameTimer.GetTimeElapsed();
+	m_pcbPlusInfo->gfCurrentTime = time;
 	//XMStoreFloat4x4(&m_pcbPlusInfo->gfCurrentTime, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Texture)));
 
 	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbPlusInfo->GetGPUVirtualAddress();

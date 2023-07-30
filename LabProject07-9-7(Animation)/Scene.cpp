@@ -482,26 +482,10 @@ void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 
 void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CPlayer** pPlayer)
 {
-	CUIShader* pMoonShader = new CUIShader();
-	pMoonShader->CreateShader(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
-	pMoonShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
-
-	pMoonObject = new CGameObject(1);
-	CMaterial* pRayMaterial = new CMaterial(1);
-	CTexturedRectMesh* NRayMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 200, 200, 0.0f);
-	pMoonObject->SetMesh(NRayMesh);
-
-	CTexture* pMoonTexture;
-	pMoonTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pMoonTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Model/Textures/Moon.dds", 0);
-	pRayMaterial->SetTexture(pMoonTexture);
-	pRayMaterial->SetShader(pMoonShader);
-
 	m_pSceneRenderShader = new CSceneRenderShader(pPlayer, m_pInsideLights);//m_pInsideLights);
 	DXGI_FORMAT pdxgiRtvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
 	m_pSceneRenderShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pSceneRenderShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
-	m_pSceneRenderShader->SetMoonObject(pMoonObject);
 
 	m_pSceneMapShader = new CSceneMapShader(pPlayer);
 	m_pSceneMapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
@@ -516,7 +500,7 @@ void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 
 	m_pShadowShader = new CShadowMapShader(pGodRayShader);
 	m_pShadowShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
-	m_pShadowShader->BuildSceneObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
+	m_pShadowShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
 
 	//m_pShadowMapToViewport = new CTextureToViewportShader();
 	//m_pShadowMapToViewport->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
@@ -1022,12 +1006,12 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 
 	pd3dRootParameters[13].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	pd3dRootParameters[13].DescriptorTable.NumDescriptorRanges = 1;
-	pd3dRootParameters[13].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[8]); //Scene buffer
+	pd3dRootParameters[13].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[8]);
 	pd3dRootParameters[13].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	pd3dRootParameters[14].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	pd3dRootParameters[14].DescriptorTable.NumDescriptorRanges = 1;
-	pd3dRootParameters[14].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[9]);//SceneDepth buffer 
+	pd3dRootParameters[14].DescriptorTable.pDescriptorRanges = &(pd3dDescriptorRanges[9]);
 	pd3dRootParameters[14].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	pd3dRootParameters[15].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
@@ -2033,8 +2017,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		if (m_pShadowShader) m_pShadowShader->Render(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
 		if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(pd3dCommandList, pCamera); //깊이맵 상태를 보여줌 
 	}
-
-	RenderGodRay(pd3dCommandList, pCamera); //last
 }
 
 void CScene::RenderUI(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -2185,19 +2167,6 @@ void CScene::RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 	
 }
 
-void CScene::RenderGodRay(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject* obj1, CGameObject* obj2)
-{
-	
-	if (!b_Inside)
-	{
-		//if (m_pSceneRenderShader)m_pDepthRenderShader->UpdateShaderVariables(pd3dCommandList);
-		//if (m_pSceneMapShader) m_pShadowShader->Render(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
-		//if (m_pDepthRenderShader)m_pDepthRenderShader->UpdateShaderVariables(pd3dCommandList); 
-		//if (m_pShadowShader) m_pShadowShader->Render(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
-		//if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(pd3dCommandList, pCamera); //깊이맵 상태를 보여줌 
-	}
-}
-
 
 void CScene::AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position, int Target)
 {//m_pDieSprite 의 함수를 발동하면, 그만큼 있다가 알아서 사라지게하기.
@@ -2310,11 +2279,9 @@ void CScene::CheckBoomSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 void CScene::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (!b_Inside) {
-		m_pSceneRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
-		m_pSceneRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
-	}
 	//그림자맵 깊이 랜더 
+	/*m_pDepthRenderShader->m_pLights[0].m_xmf3Direction = XMFLOAT3(
+		m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.x, m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.y, m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.z+0.01);*/
 	m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
 	m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
 }
@@ -2328,6 +2295,11 @@ void CScene::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	UpdateShaderVariables(pd3dCommandList);
 
+	//if (m_pd3dcbMaterials)
+	//{
+	//	D3D12_GPU_VIRTUAL_ADDRESS d3dcbMaterialsGpuVirtualAddress = m_pd3dcbMaterials->GetGPUVirtualAddress();
+	//	pd3dCommandList->SetGraphicsRootConstantBufferView(3, d3dcbMaterialsGpuVirtualAddress); //Materials
+	//}
 	if (m_pd3dcbLights)
 	{
 		D3D12_GPU_VIRTUAL_ADDRESS d3dcbLightsGpuVirtualAddress = m_pd3dcbLights->GetGPUVirtualAddress();
