@@ -275,45 +275,21 @@ void CSceneRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommand
 {
 	if (m_pLights->m_bEnable)
 	{
-		XMFLOAT3 xmf3Position = m_pLights->m_xmf3Position;//XMFLOAT3(430.219f, 244.f, 693.263f);//m_pLights[j].m_xmf3Position;
-		XMFLOAT3 xmf3Look = m_pLights->m_xmf3Direction;
-		XMFLOAT3 xmf3Up = XMFLOAT3(+0.0f, 1.0f, 0.0f);
+		XMFLOAT3 xmf3Position = View->GetPosition();//XMFLOAT3(430.219f, 244.f, 693.263f);//m_pLights[j].m_xmf3Position;
+		XMFLOAT3 xmf3Look = View->GetLookVector();
+		XMFLOAT3 xmf3Up = View->GetUpVector();
+
 
 		XMMATRIX xmmtxView = XMMatrixLookToLH(XMLoadFloat3(&xmf3Position), XMLoadFloat3(&xmf3Look), XMLoadFloat3(&xmf3Up));
-
-		float fNearPlaneDistance = 0.1f, fFarPlaneDistance = m_pLights->m_fRange;//5.0f;
-
 		XMMATRIX xmmtxProjection;
-		if (m_pLights->m_nType == DIRECTIONAL_LIGHT)
-		{
-			float fWidth = 1024, fHeight = 1024;
-			xmmtxProjection = XMMatrixOrthographicLH(fWidth, fHeight, fNearPlaneDistance, fFarPlaneDistance);
-			//float fLeft = -(_PLANE_WIDTH * 0.5f), fRight = +(_PLANE_WIDTH * 0.5f), fTop = +(_PLANE_HEIGHT * 0.5f), fBottom = -(_PLANE_HEIGHT * 0.5f);
-			//xmmtxProjection = XMMatrixOrthographicOffCenterLH(fLeft * 6.0f, fRight * 6.0f, fBottom * 6.0f, fTop * 6.0f, fBack, fFront);
-		}
-		else if (m_pLights->m_nType == SPOT_LIGHT)
-		{
-			float fFovAngle = 60.0f; // m_pLights->m_pLights[j].m_fPhi = cos(60.0f);
-			float fAspectRatio = float(_DEPTH_BUFFER_WIDTH) / float(_DEPTH_BUFFER_HEIGHT);
-			xmmtxProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(fFovAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
-		}
-		else if (m_pLights->m_nType == POINT_LIGHT)
-		{
-			//ShadowMap[6]
-		}
 
 		m_ppRenderCamera = View;
 		m_ppRenderCamera->m_xmf4x4View = View->m_xmf4x4View;
 		m_ppRenderCamera->m_xmf4x4Projection = View->m_xmf4x4Projection;
-		//XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4View, xmmtxView);//m_ppDepthRenderCameras                 ?  ??    
-		//XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4Projection, xmmtxProjection);
 
-		XMMATRIX xmmtxToTexture = XMMatrixTranspose(xmmtxView * xmmtxProjection * m_xmProjectionToTexture);
-		XMStoreFloat4x4(&m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4x4ToTexture, xmmtxToTexture);
+		XMFLOAT3 vCameraPosition = View->GetPosition();
+		m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4Position = XMFLOAT4(vCameraPosition.x, vCameraPosition.y, vCameraPosition.z, 1.0f);
 
-		//m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(xmf3Position.x, xmf3Position.y, xmf3Position.z, 1.0f);
-		//임시 조명 위치 
-		m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4Position = XMFLOAT4(430.219f, 244.f, 693.263f, 1.0f); //?
 		::SynchronizeResourceTransition(pd3dCommandList, m_pRenderTexture->GetTexture(0), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		FLOAT pfClearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -343,7 +319,7 @@ void CSceneRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCam
 
 	Sky->Render(pd3dCommandList, pCamera);
 
-	if(Player[0])if(Player[0]->isAlive) Player[0]->Render(pd3dCommandList, pCamera); //only shadow to player
+	if(Player[0]) Player[0]->Render(pd3dCommandList, pCamera); //only shadow to player
 
 }
 

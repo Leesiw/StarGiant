@@ -1846,7 +1846,7 @@ void CDepthRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommand
 
 		pd3dCommandList->OMSetRenderTargets(1,&m_pd3dRtvCPUDescriptorHandles[0], TRUE, &m_d3dDsvDescriptorCPUHandle);
 
-		Render(pd3dCommandList, View, Map, Player);
+		Render2(pd3dCommandList, View, Map, Player);
 
 		::SynchronizeResourceTransition(pd3dCommandList, m_pDepthTexture->GetTexture(0), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON);
 	/*}
@@ -1874,6 +1874,17 @@ void CDepthRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCam
 		//if(Player[i]->isAlive) Player[i]->ShadowRender(pd3dCommandList, pCamera); //only shadow to player
 
 	}
+}
+
+void CDepthRenderShader::Render2(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player)
+{
+	CShader::Render(pd3dCommandList, pCamera);
+
+	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+	pCamera->UpdateShaderVariables(pd3dCommandList);
+
+	if (Player[0])Player[0]->Render(pd3dCommandList, pCamera); //only shadow to player
+		
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2047,7 +2058,7 @@ void CShadowMapShader::SceneRender(ID3D12GraphicsCommandList* pd3dCommandList, C
 
 	UpdateShaderVariables(pd3dCommandList);
 
-	//if (Player[0]->isAlive) Player[0]->Render(pd3dCommandList, pCamera); //only shadow to player
+	if (Player[0]->isAlive) Player[0]->Render(pd3dCommandList, pCamera); //only shadow to player
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2165,13 +2176,13 @@ void CTextureToViewportShader::Render(ID3D12GraphicsCommandList* pd3dCommandList
 	pd3dCommandList->DrawInstanced(6, 1, 0, 0);
 }
 
-
-
-
-
-
-
-
-
-
+//D3D12_SHADER_BYTECODE CMoonShader::CreateVertexShader()
+//{
+//	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VS_Moon", "vs_5_1", &m_pd3dVertexShaderBlob));
+//}
+//
+//D3D12_SHADER_BYTECODE CMoonShader::CreatePixelShader()
+//{
+//	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PS_Moon", "ps_5_1", &m_pd3dPixelShaderBlob));
+//}
 

@@ -823,6 +823,20 @@ void CScene::ReleaseObjects()
 		m_pShadowMapToViewport->ReleaseShaderVariables();
 		m_pShadowMapToViewport->ReleaseObjects();
 		m_pShadowMapToViewport->Release();
+	}	
+
+	if (m_pSceneRenderShader)
+	{
+		m_pSceneRenderShader->ReleaseShaderVariables();
+		m_pSceneRenderShader->ReleaseObjects();
+		m_pSceneRenderShader->Release();
+	}
+
+	if (m_pSceneMapShader)
+	{
+		m_pSceneMapShader->ReleaseShaderVariables();
+		m_pSceneMapShader->ReleaseObjects();
+		m_pSceneMapShader->Release();
 	}
 
 
@@ -1588,7 +1602,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	if (m_pSkyBox) m_pSkyBox->Render(pd3dCommandList, pCamera);
 	if (pMoonObject&&!b_Inside) {
 		pMoonObject->SetLookAt(m_pPlayer[0]->GetPosition());
-		pMoonObject->SetPosition(Vector3::Add(m_pPlayer[0]->GetPosition(), XMFLOAT3(50.f, 0.f, 50.f)));
+		pMoonObject->SetPosition(Vector3::Add(m_pPlayer[0]->GetPosition(), XMFLOAT3(500.f, 0.f, 500.f)));
 		pMoonObject->Render(pd3dCommandList, pCamera);
 	}
 
@@ -2061,7 +2075,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	if (b_Inside)
 	{
 		if (m_pShadowShader) m_pShadowShader->Render(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
-		if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(pd3dCommandList, pCamera); //깊이맵 상태를 보여줌 
+		//if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(pd3dCommandList, pCamera); //깊이맵 상태를 보여줌 
 	}
 	else {
 		RenderGodRay(pd3dCommandList, pCamera);
@@ -2341,11 +2355,11 @@ void CScene::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* m_
 {
 	//그림자맵 깊이 랜더 
 	if (!b_Inside) {
-		m_pSceneRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
+		/*m_pSceneRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
 		m_pSceneRenderShader->PrepareShadowMap(pd3dCommandList, m_pSkyBox, m_pPlayer, m_pTargetCamera);
 
 		m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
-		m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer, m_pTargetCamera,pMoonObject);
+		m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer, m_pTargetCamera,pMoonObject);*/
 	}
 	else {
 		m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;

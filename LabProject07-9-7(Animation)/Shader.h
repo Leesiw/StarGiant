@@ -298,7 +298,16 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
 
 };
-
+//class CMoonShader : public CUIShader
+//{
+//public:
+//	CMoonShader() {};
+//	virtual ~CMoonShader() {};
+//
+//	virtual D3D12_SHADER_BYTECODE CreateVertexShader();
+//	virtual D3D12_SHADER_BYTECODE CreatePixelShader();
+//
+//};
 class CSpriteShader : public CShader
 {
 public:
@@ -391,6 +400,7 @@ public:
 	void PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** Map, CPlayer** Player, CCamera* View, CGameObject* Ray);
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player);
+	virtual void Render2(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player);
 
 protected:
 	CTexture* m_pDepthTexture = NULL;
