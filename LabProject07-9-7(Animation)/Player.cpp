@@ -382,10 +382,9 @@ CCamera* CPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 CCamera* CPlayer::ChangeToCutSceneCamera(DWORD nNewCameraMode, float fTimeElapsed)
 {
 	DWORD nCurrentCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
-	if (nCurrentCameraMode == nNewCameraMode) return(m_pCamera);
+	//if (nCurrentCameraMode == nNewCameraMode) { cout << "같아서 안온거구나\n"; return(m_pCamera); }
 	switch (nNewCameraMode)
 	{
-
 	case CUT_SCENE_CAMERA:
 		cout << "CUT_SCENE_CAMERA\n";
 		SetMaxVelocityXZ(0.0f);
@@ -399,6 +398,7 @@ CCamera* CPlayer::ChangeToCutSceneCamera(DWORD nNewCameraMode, float fTimeElapse
 		break;
 
 	default:
+		cout << "아무것도 안해요\n";
 		break;
 	}
 
