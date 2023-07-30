@@ -482,28 +482,20 @@ void CScene::BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 
 void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CPlayer** pPlayer)
 {
-	m_pSceneRenderShader = new CSceneRenderShader(pPlayer, m_pInsideLights);//m_pInsideLights);
+	m_pSceneRenderShader = new CSceneRenderShader(pPlayer, m_pInsideLights);//m_pInsideLights); //Csene buffer 
 	DXGI_FORMAT pdxgiRtvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
 	m_pSceneRenderShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pSceneRenderShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
 
-	m_pSceneMapShader = new CSceneMapShader(pPlayer);
-	m_pSceneMapShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
-	m_pSceneMapShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pSceneRenderShader->GetDepthTexture());
-	//
 	CGodRayShader* pGodRayShader = new CGodRayShader(); //inside Godray light need bulidobject
 
-	m_pDepthRenderShader = new CDepthRenderShader(pGodRayShader, m_pInsideLights);//m_pInsideLights);
+	m_pDepthRenderShader = new CDepthRenderShader(pGodRayShader, m_pInsideLights);//m_pInsideLights);//Csene Depth buffer 
 	m_pDepthRenderShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pDepthRenderShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
 
-	m_pShadowShader = new CShadowMapShader(pGodRayShader);
-	m_pShadowShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
-	m_pShadowShader->BuildSceneObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
-
-	m_pShadowMapToViewport = new CTextureToViewportShader();
+	/*m_pShadowMapToViewport = new CTextureToViewportShader();
 	m_pShadowMapToViewport->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
-	m_pShadowMapToViewport->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
+	m_pShadowMapToViewport->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());*/
 
 }
 
@@ -2174,8 +2166,8 @@ void CScene::RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 void CScene::RenderGodRay(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject* obj1, CGameObject* obj2)
 {
 	if (!b_Inside) {
-		if (m_pSceneMapShader) m_pSceneMapShader->Render(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
-		if (m_pShadowShader) m_pShadowShader->SceneRender(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
+		/*if (m_pSceneMapShader) m_pSceneMapShader->Render(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
+		if (m_pShadowShader) m_pShadowShader->SceneRender(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);*/
 		//if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(pd3dCommandList, pCamera); //깊이맵 상태를 보여줌 
 	}
 
@@ -2291,16 +2283,23 @@ void CScene::CheckBoomSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	//}
 }
 
-void CScene::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void CScene::OnPreRender(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	//그림자맵 깊이 랜더 
-	if (!b_Inside) {
+	if (!b_Inside) { //when outside, buffer update 
 		m_pSceneRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
 		m_pSceneRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
+		CreateShaderResourceViews(pd3dDevice, m_pSceneRenderShader->m_pRenderTexture, 13, false);
+
+		m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
+		m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
+		CreateShaderResourceViews(pd3dDevice, m_pSceneRenderShader->m_pRenderTexture, 14, false);
+
 	}
 	m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
 	m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
 }
+
 void CScene::OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 }

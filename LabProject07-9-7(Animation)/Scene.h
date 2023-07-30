@@ -99,7 +99,7 @@ public:
     void AnimateObjects(float fTimeElapsed);
 
 	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
-	void OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	void OnPreRender(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void OnPostRender(ID3D12GraphicsCommandList* pd3dCommandList);
 
     void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
@@ -255,7 +255,6 @@ public:
 
 
 	CSceneRenderShader* m_pSceneRenderShader = NULL;
-	CSceneMapShader* m_pSceneMapShader = NULL;
 
 	CDepthRenderShader* m_pDepthRenderShader = NULL;
 	CShadowMapShader* m_pShadowShader = NULL;
