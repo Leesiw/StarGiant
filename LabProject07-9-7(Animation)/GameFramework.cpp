@@ -3243,7 +3243,7 @@ void CGameFramework::ProcessPacket(char* p)
 			//}
 		}
 
-		if (curMissionType != MissionType::CS_ENDING) {
+		if (curMissionType == MissionType::CS_ENDING) {
 			for (int i = 0; i < MISSILES; ++i) {
 				m_pScene->m_ppEnemyMissiles[i]->m_bActive = false;
 			}
