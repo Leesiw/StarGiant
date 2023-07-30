@@ -318,7 +318,7 @@ void CSceneRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommand
 		//FLOAT pfClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		pd3dCommandList->ClearRenderTargetView(m_pd3dRtvCPUDescriptorHandle, pfClearColor, 0, NULL);
 
-		pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+		pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH /*| D3D12_CLEAR_FLAG_STENCIL*/, 1.0f, 0, 0, NULL);
 
 		pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandle, TRUE, &m_d3dDsvDescriptorCPUHandle);
 
