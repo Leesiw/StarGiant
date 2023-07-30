@@ -821,12 +821,12 @@ void CScene::MoveEnemy(char obj_id)
 			clients[pl_id].send_enemy_state_packet(obj_id, EnemyState::AIMING);
 		}
 
-		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_AIMING_ENEMY, static_cast<short>(num) };
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 7ms, EV_AIMING_ENEMY, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
 	}
 
-	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_MOVE_ENEMY, static_cast<short>(num) };
+	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 7ms, EV_MOVE_ENEMY, static_cast<short>(num) };
 	timer_queue.push(ev);
 }
 
@@ -908,12 +908,12 @@ void CScene::AimingEnemy(char obj_id)
 			clients[pl_id].send_enemy_state_packet(obj_id, EnemyState::MOVE);
 		}
 
-		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_MOVE_ENEMY, static_cast<short>(num) };
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 7ms, EV_MOVE_ENEMY, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
 	}
 
-	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_AIMING_ENEMY, static_cast<short>(num) };
+	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 7ms, EV_AIMING_ENEMY, static_cast<short>(num) };
 	timer_queue.push(ev);
 
 }
@@ -967,7 +967,7 @@ void CScene::UpdateMeteo(char obj_id)
 		}
 	}
 
-	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_METEO, static_cast<short>(num) };
+	TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 7ms, EV_UPDATE_METEO, static_cast<short>(num) };
 	timer_queue.push(ev);
 }
 
@@ -1060,7 +1060,7 @@ void CScene::UpdateMissile(char obj_id)
 	}
 
 	if (m_ppMissiles[obj_id]->GetisActive()) {
-		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 10ms, EV_UPDATE_MISSILE, static_cast<short>(num) };
+		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 7ms, EV_UPDATE_MISSILE, static_cast<short>(num) };
 		timer_queue.push(ev);
 	}
 	else {
@@ -1166,7 +1166,7 @@ void CScene::UpdateSpaceship()
 
 	CheckMissionComplete();
 
-	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 10ms, EV_UPDATE_SPACESHIP, static_cast<short>(num) };
+	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 5ms, EV_UPDATE_SPACESHIP, static_cast<short>(num) };
 	timer_queue.push(ev);
 }
 
