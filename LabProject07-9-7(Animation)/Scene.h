@@ -79,7 +79,7 @@ public:
 	void BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void BuildGod(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
-	void BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CPlayer** pPlayer);
+	void BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CPlayer** pPlayer, ID3D12RootSignature* pd3dGraphicsRootSignature);
 
 	void BuildInsideObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* descriptor_heap);
 	void ReleaseObjects();
@@ -195,7 +195,6 @@ public:
 
 	Boss* m_ppBoss = NULL;
 	God* m_ppGod = NULL;
-	CGameObject* pMoonObject;
 
 
 
@@ -239,7 +238,8 @@ public:
 	CSkyBox								*m_pSkyBox = NULL;
 	CHeightMapTerrain					*m_pTerrain = NULL;
 
-
+	CGameObject* pMoonObject = NULL;
+	CTexture* pMoonTexture = NULL;
 	CFireObject* m_pFire[MAX_FIRE] = {};
 
 	CParticleObject* m_pParticle[MAX_PARTICLES] = {};

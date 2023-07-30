@@ -64,8 +64,6 @@ public:
 	void PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CSkyBox* Map, CPlayer** Player, CCamera* View);
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CSkyBox* Sky, CPlayer** Player);
-	void SetMoonObject(CGameObject* Moon);
-	CGameObject *pMoonObject; 
 };
 
 /*class CDepthRenderShader : public CBaseShader

@@ -261,7 +261,7 @@ void CSceneRenderShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	m_ppRenderCamera->SetViewport(0, 0, _DEPTH_BUFFER_WIDTH, _DEPTH_BUFFER_HEIGHT, 0.0f, 1.0f);
 	m_ppRenderCamera->SetScissorRect(0, 0, _DEPTH_BUFFER_WIDTH, _DEPTH_BUFFER_HEIGHT);
 	m_ppRenderCamera->CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	pMoonObject = new CGameObject();
+	
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -338,26 +338,15 @@ void CSceneRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCam
 {
 	CShader::Render(pd3dCommandList, pCamera);
 
-	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+	pCamera->SetViewportsAndScissorRects(pd3dCommandList); //플레이어 시야에서 그려져야할 화면 그린 것임. 
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
 	Sky->Render(pd3dCommandList, pCamera);
 
-	for (int i = 0; i < 3; i++) {
-		//if (Player[i]->isAlive) Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
-		if(Player[0])if(Player[0]->isAlive) Player[i]->ShadowRender(pd3dCommandList, pCamera); //only shadow to player
+	if(Player[0])if(Player[0]->isAlive) Player[0]->Render(pd3dCommandList, pCamera); //only shadow to player
 
-	}
-	if (Player[0]) {
-		//pMoonObject->SetLookAt(Player[0]->GetPosition());
-		//pMoonObject->SetPosition(Vector3::Add(Player[0]->GetPosition(), XMFLOAT3(50.f, 0.f, 50.f)));
-		//pMoonObject->Render(pd3dCommandList, pCamera); // 맵에 생겨버리면, 밖으로 뺴서 따로 적용시켜야함. 
-	}
 }
-void CSceneRenderShader::SetMoonObject(CGameObject* Moon)
-{
-	pMoonObject = Moon; 
-}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 CSceneMapShader::CSceneMapShader(CPlayer** pPlayer)
