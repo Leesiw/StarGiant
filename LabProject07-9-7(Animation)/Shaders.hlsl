@@ -913,3 +913,44 @@ float4 PSTextureToViewport(VS_TEXTURED_OUTPUT input) : SV_Target
 
 	return((float4)(fDepthFromLight0 * 0.8f));
 }
+
+//
+//float4 ps_main(float4 toProj : TEXCOORD0, float4 toProjScrolll : TEXCORRD1,
+//    float4 toProjScroll2 : TEXCOORD2, float4 IsPos_dept : TEXCOORD3, float4 ChannelMask : COLOR0,
+//    uniform bool bScrollingNoise,
+//    uniform bool bShadowMapping,
+//    uniform bool bCookie) :COLOR
+//{
+//    float compositeNoise = 0.015f;
+//float shadow = 1.0f;
+//float4 cookie = (1.0f, 1.0f, 1.0f, 1.0f);
+//
+//float shadowMapDepth;
+//float4 output; 
+//
+//if (bCookie) {
+//    cookie = tex2Dproj(CookieSampler, toProj);
+//}
+//
+//if (bScrollingNosie) {
+//    float4 noise1 = tex2Dproj(ScrollingNoiseSampler, toProjScroll1);
+//    float4 noise2 = tex2Dproj(ScrollingNoiseSampler, toProjScroll2);
+//
+//    compositeNoise = noise1.r * noise2.g * 0.05f;
+//    
+//}
+//
+//shadowMapDepth = tex2Dproj(ShadowMapSampler, tcProj);
+//
+//if (bShadowMapping) {
+//    if (IsPos_depth.w < shadowMapDepth)
+//        shadow = 1.0f;
+//    else
+//        shadow = 0.0f;
+//}
+//float atten = 0.25f + 20000.f / dot(IsPos_depth.xyz, IsPos_depth.xyz); 
+//float scale = 9.0f / fFractionOfMaxShells; 
+//
+//output.rgb = compositeNoise * cookie.rgb * lightColor * scale * atten * shadow * ChannelMask;
+//return output;
+//}

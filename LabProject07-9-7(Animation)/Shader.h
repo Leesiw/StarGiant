@@ -449,6 +449,7 @@ public:
 	virtual void ReleaseUploadBuffers();
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player);
+	virtual void SceneRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player);
 
 public:
 	CShader* m_pObjectsShader = NULL;

@@ -1979,12 +1979,21 @@ void CShadowMapShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 	//Map[0]->Render(pd3dCommandList, pCamera);
 
 	Map[0]->ShadowRender(pd3dCommandList, pCamera);
-	//Map[1]->Render(pd3dCommandList, pCamera); //Map과 Player내용물이 shadowMapshader로 그려지도록 해야함. 다른 Standard shadeer로 그려지면 안됌 
+	Map[1]->Render(pd3dCommandList, pCamera); //Map과 Player내용물이 shadowMapshader로 그려지도록 해야함. 다른 Standard shadeer로 그려지면 안됌 
 
 	for (int i = 0; i < 3; i++) {
 		if (Player[i]->isAlive) Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
 
 	}
+}
+
+void CShadowMapShader::SceneRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject** Map, CPlayer** Player)
+{
+	CShader::Render(pd3dCommandList, pCamera);
+
+	UpdateShaderVariables(pd3dCommandList);
+
+	if (Player[0]->isAlive) Player[0]->Render(pd3dCommandList, pCamera); //only shadow to player
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

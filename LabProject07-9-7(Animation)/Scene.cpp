@@ -494,17 +494,16 @@ void CScene::BuildGodRay(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	CGodRayShader* pGodRayShader = new CGodRayShader(); //inside Godray light need bulidobject
 
 	m_pDepthRenderShader = new CDepthRenderShader(pGodRayShader, m_pInsideLights);//m_pInsideLights);
-	//DXGI_FORMAT pdxgiRtvFormats[1] = { DXGI_FORMAT_R32_FLOAT };
 	m_pDepthRenderShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, pdxgiRtvFormats, DXGI_FORMAT_D32_FLOAT);
 	m_pDepthRenderShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
 
 	m_pShadowShader = new CShadowMapShader(pGodRayShader);
 	m_pShadowShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
-	m_pShadowShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
+	m_pShadowShader->BuildSceneObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
 
-	//m_pShadowMapToViewport = new CTextureToViewportShader();
-	//m_pShadowMapToViewport->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
-	//m_pShadowMapToViewport->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
+	m_pShadowMapToViewport = new CTextureToViewportShader();
+	m_pShadowMapToViewport->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature, D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE, 1, NULL, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	m_pShadowMapToViewport->BuildObjects(pd3dDevice, pd3dCommandList, m_pDepthRenderShader->GetDepthTexture());
 
 }
 
@@ -1550,6 +1549,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
 	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	//if (b_Inside)if (m_pDepthRenderShader)m_pDepthRenderShader->UpdateShaderVariables(pd3dCommandList); //깊이값 없뎃
+	//if (!b_Inside)if (pSceneRenderShader)m_pDepthRenderShader->UpdateShaderVariables(pd3dCommandList); //깊이값 없뎃
+	//if (!b_Inside)if (m_pDepthRenderShader)m_pDepthRenderShader->UpdateShaderVariables(pd3dCommandList); //깊이값 없뎃
 
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
@@ -1973,17 +1974,17 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 
 	//미안 모르겠어
-	for (int i = 0; i < MAX_FIRE; ++i) {
+	/*for (int i = 0; i < MAX_FIRE; ++i) {
 		if (!b_Inside) {
 			if (m_pFire[i]) {
 				m_pFire[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
 				m_pFire[i]->SetPosition(m_pPlayer[0]->m_pEngine[i]->GetPosition());
-				m_pFire[i]->Animate(m_fElapsedTime);
+				m_pFire[i]->Animate(0.0);
 				m_pFire[i]->UpdateShaderVariables(pd3dCommandList, m_pFire[i]->GetShaderVariables());
 				m_pFire[i]->Render(pd3dCommandList, pCamera);
 			}
 		}
-	}
+	}*/
 
 
 
@@ -2016,6 +2017,9 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	{
 		if (m_pShadowShader) m_pShadowShader->Render(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
 		if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(pd3dCommandList, pCamera); //깊이맵 상태를 보여줌 
+	}
+	else {
+		RenderGodRay(pd3dCommandList, pCamera);
 	}
 }
 
@@ -2167,6 +2171,16 @@ void CScene::RenderUIInside(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 	
 }
 
+void CScene::RenderGodRay(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, CGameObject* obj1, CGameObject* obj2)
+{
+	if (!b_Inside) {
+		if (m_pSceneMapShader) m_pSceneMapShader->Render(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
+		if (m_pShadowShader) m_pShadowShader->SceneRender(pd3dCommandList, pCamera, m_ppHierarchicalGameObjects, m_pPlayer);
+		//if (m_pShadowMapToViewport) m_pShadowMapToViewport->Render(pd3dCommandList, pCamera); //깊이맵 상태를 보여줌 
+	}
+
+}
+
 
 void CScene::AddDieSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, XMFLOAT3 Position, int Target)
 {//m_pDieSprite 의 함수를 발동하면, 그만큼 있다가 알아서 사라지게하기.
@@ -2280,8 +2294,10 @@ void CScene::CheckBoomSprite(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 void CScene::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	//그림자맵 깊이 랜더 
-	/*m_pDepthRenderShader->m_pLights[0].m_xmf3Direction = XMFLOAT3(
-		m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.x, m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.y, m_pDepthRenderShader->m_pLights[0].m_xmf3Direction.z+0.01);*/
+	if (!b_Inside) {
+		m_pSceneRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
+		m_pSceneRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
+	}
 	m_pDepthRenderShader->m_pd3dCbvSrvDescriptorHeap = m_pd3dCbvSrvDescriptorHeap;
 	m_pDepthRenderShader->PrepareShadowMap(pd3dCommandList, m_ppHierarchicalGameObjects, m_pPlayer);
 }

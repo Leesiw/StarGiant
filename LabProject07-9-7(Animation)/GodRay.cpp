@@ -349,9 +349,11 @@ void CSceneRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCam
 		//if(Player[i]->isAlive) Player[i]->ShadowRender(pd3dCommandList, pCamera); //only shadow to player
 
 	}
-	pMoonObject->SetLookAt(Player[0]->GetPosition());
-	pMoonObject->SetPosition(Vector3::Add(Player[0]->GetPosition(), XMFLOAT3(50.f, 0.f, 50.f)));
-	pMoonObject->Render(pd3dCommandList, pCamera); // 맵에 생겨버리면, 밖으로 뺴서 따로 적용시켜야함. 
+	if (Player[0]) {
+		//pMoonObject->SetLookAt(Player[0]->GetPosition());
+		//pMoonObject->SetPosition(Vector3::Add(Player[0]->GetPosition(), XMFLOAT3(50.f, 0.f, 50.f)));
+		//pMoonObject->Render(pd3dCommandList, pCamera); // 맵에 생겨버리면, 밖으로 뺴서 따로 적용시켜야함. 
+	}
 }
 void CSceneRenderShader::SetMoonObject(CGameObject* Moon)
 {
@@ -497,17 +499,10 @@ void CSceneMapShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 
 	UpdateShaderVariables(pd3dCommandList);
 
-	Map[0]->Animate(m_fElapsedTime);
-	if (!Map[0]->m_pSkinnedAnimationController) Map[0]->UpdateTransform(NULL);
-	//Map[0]->Render(pd3dCommandList, pCamera);
 
-	Map[0]->ShadowRender(pd3dCommandList, pCamera);
-	//Map[1]->Render(pd3dCommandList, pCamera); //Map과 Player내용물이 shadowMapshader로 그려지도록 해야함. 다른 Standard shadeer로 그려지면 안됌 
+		if (Player[0]->isAlive) Player[0]->Render(pd3dCommandList, pCamera); //only shadow to player
 
-	for (int i = 0; i < 3; i++) {
-		if (Player[i]->isAlive) Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
 
-	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
