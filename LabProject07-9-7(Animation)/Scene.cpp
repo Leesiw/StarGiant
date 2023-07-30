@@ -1786,13 +1786,12 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 
 
-
-
 		if (m_fredbosscutTime < 2.0f && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT) {
 			//cout << "curmission - " << int(m_pPlayer[0]->curMissionType) << endl;
 			//cout << "boss yes render\n";
 			m_ppBoss->Render(pd3dCommandList, pCamera);
 		}
+
 		//else {
 		//	cout << "curmission - " << int(m_pPlayer[0]->curMissionType) << endl;
 		//	cout << "boss no render\n";

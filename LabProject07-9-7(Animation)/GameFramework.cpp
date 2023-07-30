@@ -2050,9 +2050,11 @@ void CGameFramework::UpdateUI()
 
 
 	uiScripts = ChangeScripts(curMissionType);
-	if(curMissionType<MissionType::CS_SHOW_GOD)
-	uiBossScripts = ChangeBossScripts(m_pScene->m_ppBoss->GetAnimation(),m_pScene->m_ppBoss->GetcurHp());
-	else{ uiBossScripts = ChangeBossScripts( m_pScene->m_ppGod->GetAnimation(), m_pScene->m_ppGod->GetcurHp()); }
+	if (curMissionType > MissionType::FIND_BOSS && curMissionType < MissionType::CS_SHOW_STARGIANT && curMissionType != MissionType::CS_BAD_ENDING)
+		uiBossScripts = ChangeBossScripts(m_pScene->m_ppBoss->GetAnimation(), m_pScene->m_ppBoss->GetcurHp());
+	else if (curMissionType > MissionType::KILL_GOD && curMissionType != MissionType::CS_BAD_ENDING)
+		uiBossScripts = ChangeBossScripts(m_pScene->m_ppGod->GetAnimation(), m_pScene->m_ppGod->GetcurHp());
+	else uiBossScripts = L" ";
 
 	if (_state == SCENE_INGAME) {
 
@@ -2650,7 +2652,6 @@ wstring CGameFramework::ChangeBossScripts(BossAnimation bA, short hp)
 		uiScripts = L"ÀßÇß¾î!";
 		bossScriptsOn = true;
 		bossScriptsTime = 0;
-
 		break;
 	}
 
