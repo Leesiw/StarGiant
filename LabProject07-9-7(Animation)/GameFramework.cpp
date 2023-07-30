@@ -2794,6 +2794,7 @@ void CGameFramework::Reset_game()
 	curMissionType = MissionType::TU_SIT;
 	pastMissionType = MissionType::TU_SIT;
 
+
 	cntParticle = 0;
 	cntdieParticle = 5;
 	bgmstart = 0;
@@ -2814,7 +2815,8 @@ void CGameFramework::Reset_game()
 	m_pScene->m_fredbosscutTime = 0;
 	m_pScene->m_eTime = 0;
 
-
+	m_pScene->m_ppBoss->CurMotion = BossAnimation::SLEEP;
+	m_pScene->m_ppGod->CurMotion = GodAnimation::IDLE2;
 
 	bossdie = 0;
 	firstSc = -2;

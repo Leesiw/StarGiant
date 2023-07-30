@@ -1723,79 +1723,91 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	//=======================================================
 	if (m_ppBoss) {
 
-		if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
-			m_ppBoss->CurState = BossState::SCREAM;
-			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
-			m_ppBoss->SetHP(100);	
-		}
+		if (m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS) {
 
-		m_ppBoss->Animate(m_fElapsedTime);
-		if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
-		//m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
-		m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
+			if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
+				m_ppBoss->CurState = BossState::SCREAM;
+				m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
+				m_ppBoss->SetHP(100);
+			}
 
-		if (m_ppBoss->GetAnimation() == BossAnimation::BASIC_ATTACT) {
-			if (!b_Inside) {
-				m_pMagicCircle[0]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
-				m_pMagicCircle[0]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-				m_pMagicCircle[0]->Rotate(0, 0, m_eTime * 100);
-				m_pMagicCircle[0]->Animate(m_fElapsedTime);
-				m_pMagicCircle[0]->Render(pd3dCommandList, pCamera);
+
+			m_ppBoss->Animate(m_fElapsedTime);
+			if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
+			//m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
+			m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
+
+			if (m_ppBoss->GetAnimation() == BossAnimation::BASIC_ATTACT) {
+				if (!b_Inside) {
+					m_pMagicCircle[0]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
+					m_pMagicCircle[0]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+					m_pMagicCircle[0]->Rotate(0, 0, m_eTime * 100);
+					m_pMagicCircle[0]->Animate(m_fElapsedTime);
+					m_pMagicCircle[0]->Render(pd3dCommandList, pCamera);
+				}
+			}
+			else if (m_ppBoss->GetAnimation() == BossAnimation::CLAW_ATTACT) {
+				if (!b_Inside) {
+					m_pMagicCircle[1]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
+					m_pMagicCircle[1]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+					m_pMagicCircle[1]->Rotate(0, 0, m_eTime * 100);
+					m_pMagicCircle[1]->Animate(m_fElapsedTime);
+					m_pMagicCircle[1]->Render(pd3dCommandList, pCamera);
+				}
+			}
+			else if (m_ppBoss->GetAnimation() == BossAnimation::FLAME_ATTACK) {
+				if (!b_Inside) {
+					m_pMagicCircle[2]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
+					m_pMagicCircle[2]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+					m_pMagicCircle[2]->Rotate(0, 0, m_eTime * 100);
+					m_pMagicCircle[2]->Animate(m_fElapsedTime);
+					m_pMagicCircle[2]->Render(pd3dCommandList, pCamera);
+				}
+			}
+
+			if (m_pPlayer[0]->curMissionType == MissionType::CS_ANGRY_BOSS)
+			{
+
+				m_ppBoss->CurState = BossState::SCREAM;
+				m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
 			}
 		}
-		else if (m_ppBoss->GetAnimation() == BossAnimation::CLAW_ATTACT) {
-			if (!b_Inside) {
-				m_pMagicCircle[1]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
-				m_pMagicCircle[1]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-				m_pMagicCircle[1]->Rotate(0, 0, m_eTime * 100);
-				m_pMagicCircle[1]->Animate(m_fElapsedTime);
-				m_pMagicCircle[1]->Render(pd3dCommandList, pCamera);
-			}
-		}
-		else if (m_ppBoss->GetAnimation() == BossAnimation::FLAME_ATTACK) {
-			if (!b_Inside) {
-				m_pMagicCircle[2]->setPos(m_ppBoss->m_pHead->GetPosition()); //m_ppBoss->m_pHead->GetPosition()
-				m_pMagicCircle[2]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-				m_pMagicCircle[2]->Rotate(0, 0, m_eTime * 100);
-				m_pMagicCircle[2]->Animate(m_fElapsedTime);
-				m_pMagicCircle[2]->Render(pd3dCommandList, pCamera);
-			}
-		}
-
-		if (m_pPlayer[0]->curMissionType == MissionType::CS_ANGRY_BOSS)
-		{
-			
-			m_ppBoss->CurState = BossState::SCREAM;
-			m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
-		}
-
-		if (m_ppBoss->BossHP <= 0 || m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_STARGIANT)
-		{
-			m_ppBoss->onceScream = true;
-			m_fredbosscutTime += m_fElapsedTime;
-			m_ppBoss->CurState = BossState::DIE;
-			m_ppBoss->ChangeAnimation(BossAnimation::DIE);
-		}
 
 
-		if (m_fredbosscutTime < 2 && m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT) {
+
+
+		if (m_fredbosscutTime < 2.0f && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT) {
+			//cout << "curmission - " << int(m_pPlayer[0]->curMissionType) << endl;
+			//cout << "boss yes render\n";
 			m_ppBoss->Render(pd3dCommandList, pCamera);
 		}
-		
-		if(m_pPlayer[0]->curMissionType == MissionType::GO_CENTER) {
-			m_fredbosscutTime = 0;
-		}
+		//else {
+		//	cout << "curmission - " << int(m_pPlayer[0]->curMissionType) << endl;
+		//	cout << "boss no render\n";
+		//}
 
-	}
-
-	if (landob) {
-		if (m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT)
-			landob->Render(pd3dCommandList, pCamera);
-		if (m_ppBoss) {
+		if (landob) {
 			landob->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y - 827.0f, m_ppBoss->GetPosition().z);
+			landob->Render(pd3dCommandList, pCamera);
 		}
+
 	}
 
+
+	if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_STARGIANT)
+	{
+		m_ppBoss->BossHP = 0;
+		m_ppBoss->onceScream = true;
+		m_fredbosscutTime += m_fElapsedTime;
+		m_ppBoss->CurState = BossState::DIE;
+		m_ppBoss->ChangeAnimation(BossAnimation::DIE);
+		m_ppBoss->CurMotion = BossAnimation::DIE;
+
+	}
+	//else {
+	//	cout << "ssscurmission - " << int(m_pPlayer[0]->curMissionType) << endl;
+	//	cout << "sssboss no render\n";
+	//}
 
 
 	if (m_pPlayer[0]->curMissionType == MissionType::CS_SHOW_GOD) {
