@@ -1723,7 +1723,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	//=======================================================
 	if (m_ppBoss) {
 
-		if (m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS) {
+		if (m_pPlayer[0]->curMissionType >= MissionType::FIND_BOSS && m_pPlayer[0]->curMissionType != MissionType::CS_BAD_ENDING) {
 
 			if (m_pPlayer[0]->curMissionType == MissionType::CS_BOSS_SCREAM) {
 				m_ppBoss->CurState = BossState::SCREAM;
@@ -1732,10 +1732,11 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 			}
 
 
-			m_ppBoss->Animate(m_fElapsedTime);
-			if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
 			//m_ppBoss->Boss_Ai(m_ppBoss->GetState(), m_pPlayer[0]->GetPosition(), m_ppBoss->GetHP());
 			m_ppBoss->ChangeAnimation(m_ppBoss->GetAnimation());
+			m_ppBoss->Animate(m_fElapsedTime);
+			if (!m_ppBoss->m_pSkinnedAnimationController) m_ppBoss->UpdateTransform(NULL);
+
 
 			if (m_ppBoss->GetAnimation() == BossAnimation::BASIC_ATTACT) {
 				if (!b_Inside) {
@@ -1771,6 +1772,17 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 				m_ppBoss->CurState = BossState::SCREAM;
 				m_ppBoss->ChangeAnimation(BossAnimation::SCREAM);
 			}
+
+			if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_STARGIANT&& m_pPlayer[0]->curMissionType != MissionType::CS_BAD_ENDING)
+			{
+				m_ppBoss->BossHP = 0;
+				m_ppBoss->onceScream = true;
+				m_fredbosscutTime += m_fElapsedTime;
+				m_ppBoss->CurState = BossState::DIE;
+				m_ppBoss->ChangeAnimation(BossAnimation::DIE);
+				m_ppBoss->CurMotion = BossAnimation::DIE;
+
+			}
 		}
 
 
@@ -1794,16 +1806,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	}
 
 
-	if (m_pPlayer[0]->curMissionType >= MissionType::CS_SHOW_STARGIANT)
-	{
-		m_ppBoss->BossHP = 0;
-		m_ppBoss->onceScream = true;
-		m_fredbosscutTime += m_fElapsedTime;
-		m_ppBoss->CurState = BossState::DIE;
-		m_ppBoss->ChangeAnimation(BossAnimation::DIE);
-		m_ppBoss->CurMotion = BossAnimation::DIE;
 
-	}
 	//else {
 	//	cout << "ssscurmission - " << int(m_pPlayer[0]->curMissionType) << endl;
 	//	cout << "sssboss no render\n";

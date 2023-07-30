@@ -672,41 +672,49 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
         m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarRight, FRAME_BUFFER_HEIGHT - 50), Whitebrush); //배경
         if (hpbarRight - hpBar > hpbarLeft)
             m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, FRAME_BUFFER_HEIGHT - 60, hpbarRight - hpBar, FRAME_BUFFER_HEIGHT - 50), Redbrush); // hp
-    }
 
-    if(mty == MissionType::CS_SHOW_PLANET || mty == MissionType::CS_BOSS_SCREAM || mty == MissionType::CS_ANGRY_BOSS || mty == MissionType::CS_SHOW_STARGIANT || mty == MissionType::CS_SHOW_BLACK_HOLE || mty == MissionType::CS_SHOW_GOD || mty == MissionType::CS_ANGRY_GOD)
-        for (auto textBlock : m_vSkipBlocks)
+        for (auto& a : m_enemyDot)
         {
-            m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, Redbrush);
+            if (!(a.x == 100.0f && a.z == FRAME_BUFFER_HEIGHT / 2.0f + 100.0f))
+                m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(a.x, a.z), 5.0f, 5.0f), Redbrush);
         }
 
 
-    for (auto& a : m_enemyDot)
-    {
-        if(!(a.x == 100.0f && a.z == FRAME_BUFFER_HEIGHT / 2.0f + 100.0f))
-            m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(a.x, a.z), 5.0f, 5.0f), Redbrush);
+        if (mty == MissionType::CS_SHOW_PLANET || mty == MissionType::CS_BOSS_SCREAM || mty == MissionType::CS_ANGRY_BOSS || mty == MissionType::CS_SHOW_STARGIANT || mty == MissionType::CS_SHOW_BLACK_HOLE || mty == MissionType::CS_SHOW_GOD || mty == MissionType::CS_ANGRY_GOD)
+            for (auto textBlock : m_vSkipBlocks)
+            {
+                m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, Redbrush);
+            }
+
+        m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(m_bossDot.x, m_bossDot.z), 5.0f, 5.0f), DotBossbrush);
+
+
+
+
+        if (mty == MissionType::DEFEAT_BOSS || mty == MissionType::DEFEAT_BOSS2) {
+            m_pd2dDeviceContext->FillRectangle(D2D1::RectF(bossHpbarLeft, bossHpbarTop, bossHpbarRight, bossHpbarBottom), Whitebrush); //배경
+            if (bossHpbarRight - BosshpBar > bossHpbarLeft)
+                m_pd2dDeviceContext->FillRectangle(D2D1::RectF(bossHpbarLeft, bossHpbarTop, bossHpbarRight - BosshpBar, bossHpbarBottom), Redbrush); // hp
+        }
+
+        if (mty == MissionType::KILL_GOD || mty == MissionType::KILL_GOD2) {
+            m_pd2dDeviceContext->FillRectangle(D2D1::RectF(GodbossHpbarLeft, GodbossHpbarTop, GodbossHpbarRight, GodbossHpbarBottom), Whitebrush); //배경
+            if (GodbossHpbarRight - GodBosshpBar > GodbossHpbarLeft)
+                m_pd2dDeviceContext->FillRectangle(D2D1::RectF(GodbossHpbarLeft, GodbossHpbarTop, GodbossHpbarRight - GodBosshpBar, GodbossHpbarBottom), Redbrush); // hp
+        }
+
     }
 
 
+
+
+
+
   //  if (!(m_bossDot.x == 100.0f && m_bossDot.z == FRAME_BUFFER_HEIGHT / 2.0f + 100.0f))
-    m_pd2dDeviceContext->FillEllipse(D2D1::Ellipse(D2D1::Point2F(m_bossDot.x, m_bossDot.z), 5.0f, 5.0f), DotBossbrush);
 
 
 
     
-
-
-    if (mty == MissionType::DEFEAT_BOSS || mty == MissionType::DEFEAT_BOSS2) {
-        m_pd2dDeviceContext->FillRectangle(D2D1::RectF(bossHpbarLeft, bossHpbarTop, bossHpbarRight, bossHpbarBottom), Whitebrush); //배경
-        if (bossHpbarRight - BosshpBar > bossHpbarLeft)
-            m_pd2dDeviceContext->FillRectangle(D2D1::RectF(bossHpbarLeft, bossHpbarTop, bossHpbarRight - BosshpBar, bossHpbarBottom), Redbrush); // hp
-    }
-
-    if (mty == MissionType::KILL_GOD|| mty == MissionType::KILL_GOD2) {
-        m_pd2dDeviceContext->FillRectangle(D2D1::RectF(GodbossHpbarLeft, GodbossHpbarTop, GodbossHpbarRight, GodbossHpbarBottom), Whitebrush); //배경
-        if (GodbossHpbarRight - GodBosshpBar > GodbossHpbarLeft)
-            m_pd2dDeviceContext->FillRectangle(D2D1::RectF(GodbossHpbarLeft, GodbossHpbarTop, GodbossHpbarRight - GodBosshpBar, GodbossHpbarBottom), Redbrush); // hp
-    }
 
 
 
