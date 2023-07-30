@@ -390,7 +390,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 		case '0':
 		case VK_NUMPAD0:
-			if (roomNum.length() < 6) {
+			if (roomNum.length() < 4) {
 				cout << "0";
 				roomNum += L"0";
 			}
@@ -398,7 +398,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 		case '1':
 		case VK_NUMPAD1:
-			if (roomNum.length() < 6) {
+			if (roomNum.length() < 4) {
 
 			cout << "1";
 			roomNum += L"1";
@@ -408,7 +408,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 		case '2':
 		case VK_NUMPAD2:
-			if (roomNum.length() < 6) {
+			if (roomNum.length() < 4) {
 
 			cout << "2";
 			roomNum += L"2";
@@ -417,7 +417,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 		case '3':
 		case VK_NUMPAD3:
-			if (roomNum.length() < 6) {
+			if (roomNum.length() < 4) {
 
 			cout << "3";
 			roomNum += L"3";
@@ -426,7 +426,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 		case '4':
 		case VK_NUMPAD4:
-			if (roomNum.length() < 6) {
+			if (roomNum.length() < 4) {
 
 			cout << "4";
 			roomNum += L"4";
@@ -435,7 +435,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 		case '5':
 		case VK_NUMPAD5:
-			if (roomNum.length() < 6) {
+			if (roomNum.length() < 4) {
 
 			cout << "5";
 			roomNum += L"5";
@@ -444,7 +444,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 		case '6':
 		case VK_NUMPAD6:
-			if (roomNum.length() < 6) {
+			if (roomNum.length() < 4) {
 
 			cout << "6";
 			roomNum += L"6";
@@ -452,7 +452,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			break;
 		case '7':
 		case VK_NUMPAD7:
-			if (roomNum.length() < 6) {
+			if (roomNum.length() < 4) {
 
 			cout << "7";
 			roomNum += L"7";
@@ -460,7 +460,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			break;
 		case '8':
 		case VK_NUMPAD8:
-			if (roomNum.length() < 6) {
+			if (roomNum.length() < 4) {
 
 			cout << "8";
 			roomNum += L"8";
@@ -468,7 +468,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			break;
 		case '9':
 		case VK_NUMPAD9:
-			if (roomNum.length() < 6) {
+			if (roomNum.length() < 4) {
 
 				cout << "9";
 				roomNum += L"9";
