@@ -583,14 +583,16 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		for (auto pl_id : scene->_plist) {
 			if (pl_id == -1) { continue; }
 			if (pl_id == c_id) { continue; }
+			char t_pid = clients[pl_id].room_pid;
+			if (t_pid == -1) { continue; }
 			SC_LOGIN_INFO_PACKET my_packet{};
 			my_packet.type = SC_ADD_PLAYER;
 			my_packet.size = sizeof(my_packet);
 			my_packet.data.id = clients[pl_id].room_pid;
-			my_packet.data.yaw = scene->m_ppPlayers[clients[pl_id].room_pid]->GetYaw();
+			my_packet.data.yaw = scene->m_ppPlayers[t_pid]->GetYaw();
 			my_packet.data.player_type = clients[pl_id].type;
-			my_packet.data.x = scene->m_ppPlayers[clients[pl_id].room_pid]->GetPosition().x;
-			my_packet.data.z = scene->m_ppPlayers[clients[pl_id].room_pid]->GetPosition().z;
+			my_packet.data.x = scene->m_ppPlayers[t_pid]->GetPosition().x;
+			my_packet.data.z = scene->m_ppPlayers[t_pid]->GetPosition().z;
 
 			clients[c_id].do_send(&my_packet);
 			
