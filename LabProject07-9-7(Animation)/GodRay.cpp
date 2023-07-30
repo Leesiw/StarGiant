@@ -271,7 +271,7 @@ void CSceneRenderShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 //}
 
 
-void CSceneRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** Map, CPlayer** Player) // ?          ?  ? ? 
+void CSceneRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** Map, CPlayer** Player,CCamera* View) // ?          ?  ? ? 
 {
 	if (m_pLights->m_bEnable)
 	{

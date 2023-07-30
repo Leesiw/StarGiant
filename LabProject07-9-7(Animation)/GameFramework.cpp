@@ -1921,12 +1921,12 @@ void CGameFramework::FrameAdvance()
 
 	if (b_Inside) {
 		m_pInsideScene->OnPrepareRender(m_pd3dCommandList);
-		m_pInsideScene->OnPreRender(m_pd3dCommandList);
+		m_pInsideScene->OnPreRender(m_pd3dCommandList, m_pCamera);
 	}
 	else
 	{
 		m_pScene->OnPrepareRender(m_pd3dCommandList);
-		m_pScene->OnPreRender(m_pd3dCommandList);
+		m_pScene->OnPreRender(m_pd3dCommandList, m_pInsideCamera);
 	}
 
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
