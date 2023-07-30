@@ -139,7 +139,7 @@ D3D12_SHADER_BYTECODE CSceneRenderShader::CreateVertexShader(ID3DBlob** ppd3dSha
 
 D3D12_SHADER_BYTECODE CSceneRenderShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSDepthWriteShader", "ps_5_1", ppd3dShaderBlob));
+	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSSceneWriteShader", "ps_5_1", ppd3dShaderBlob));
 }
 
 D3D12_DEPTH_STENCIL_DESC CSceneRenderShader::CreateDepthStencilState()
@@ -149,7 +149,7 @@ D3D12_DEPTH_STENCIL_DESC CSceneRenderShader::CreateDepthStencilState()
 	d3dDepthStencilDesc.DepthEnable = TRUE;
 	d3dDepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	d3dDepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS; //D3D12_COMPARISON_FUNC_LESS_EQUAL
-	d3dDepthStencilDesc.StencilEnable = FALSE;
+	d3dDepthStencilDesc.StencilEnable = TRUE;//
 	d3dDepthStencilDesc.StencilReadMask = 0x00;
 	d3dDepthStencilDesc.StencilWriteMask = 0x00;
 	d3dDepthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
@@ -187,6 +187,7 @@ D3D12_RASTERIZER_DESC CSceneRenderShader::CreateRasterizerState()
 
 void CSceneRenderShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
+	///
 	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
 	::ZeroMemory(&d3dDescriptorHeapDesc, sizeof(D3D12_DESCRIPTOR_HEAP_DESC));
 	d3dDescriptorHeapDesc.NumDescriptors = 1;
@@ -272,65 +273,62 @@ void CSceneRenderShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 
 void CSceneRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommandList, CGameObject** Map, CPlayer** Player) // ?          ?  ? ? 
 {
-	for (int j = 0; j < MAX_GODRAY_LIGHTS; j++)
+	if (m_pLights->m_bEnable)
 	{
-		if (m_pLights->m_bEnable)
+		XMFLOAT3 xmf3Position = m_pLights->m_xmf3Position;//XMFLOAT3(430.219f, 244.f, 693.263f);//m_pLights[j].m_xmf3Position;
+		XMFLOAT3 xmf3Look = m_pLights->m_xmf3Direction;
+		XMFLOAT3 xmf3Up = XMFLOAT3(+0.0f, 1.0f, 0.0f);
+
+		XMMATRIX xmmtxView = XMMatrixLookToLH(XMLoadFloat3(&xmf3Position), XMLoadFloat3(&xmf3Look), XMLoadFloat3(&xmf3Up));
+
+		float fNearPlaneDistance = 0.1f, fFarPlaneDistance = m_pLights->m_fRange;//5.0f;
+
+		XMMATRIX xmmtxProjection;
+		if (m_pLights->m_nType == DIRECTIONAL_LIGHT)
 		{
-			XMFLOAT3 xmf3Position = m_pLights[j].m_xmf3Position;//XMFLOAT3(430.219f, 244.f, 693.263f);//m_pLights[j].m_xmf3Position;
-			XMFLOAT3 xmf3Look = m_pLights[j].m_xmf3Direction;
-			XMFLOAT3 xmf3Up = XMFLOAT3(+0.0f, 1.0f, 0.0f);
-
-			XMMATRIX xmmtxView = XMMatrixLookToLH(XMLoadFloat3(&xmf3Position), XMLoadFloat3(&xmf3Look), XMLoadFloat3(&xmf3Up));
-
-			float fNearPlaneDistance = 0.1f, fFarPlaneDistance = m_pLights[j].m_fRange;//5.0f;
-
-			XMMATRIX xmmtxProjection;
-			if (m_pLights->m_nType == DIRECTIONAL_LIGHT)
-			{
-				float fWidth = 1024, fHeight = 1024;
-				xmmtxProjection = XMMatrixOrthographicLH(fWidth, fHeight, fNearPlaneDistance, fFarPlaneDistance);
-				//float fLeft = -(_PLANE_WIDTH * 0.5f), fRight = +(_PLANE_WIDTH * 0.5f), fTop = +(_PLANE_HEIGHT * 0.5f), fBottom = -(_PLANE_HEIGHT * 0.5f);
-				//xmmtxProjection = XMMatrixOrthographicOffCenterLH(fLeft * 6.0f, fRight * 6.0f, fBottom * 6.0f, fTop * 6.0f, fBack, fFront);
-			}
-			else if (m_pLights->m_nType == SPOT_LIGHT)
-			{
-				float fFovAngle = 60.0f; // m_pLights->m_pLights[j].m_fPhi = cos(60.0f);
-				float fAspectRatio = float(_DEPTH_BUFFER_WIDTH) / float(_DEPTH_BUFFER_HEIGHT);
-				xmmtxProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(fFovAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
-			}
-			else if (m_pLights->m_nType == POINT_LIGHT)
-			{
-				//ShadowMap[6]
-			}
-
-			m_ppRenderCamera->SetPosition(xmf3Position);
-			XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4View, xmmtxView);//m_ppDepthRenderCameras                 ?  ??    
-			XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4Projection, xmmtxProjection);
-
-			XMMATRIX xmmtxToTexture = XMMatrixTranspose(xmmtxView * xmmtxProjection * m_xmProjectionToTexture);
-			XMStoreFloat4x4(&m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4x4ToTexture, xmmtxToTexture);
-
-			//m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(xmf3Position.x, xmf3Position.y, xmf3Position.z, 1.0f);
-			//임시 조명 위치 
-			m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4Position = XMFLOAT4(430.219f, 244.f, 693.263f, 1.0f);
-			::SynchronizeResourceTransition(pd3dCommandList, m_pRenderTexture->GetTexture(0), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-			FLOAT pfClearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-			//FLOAT pfClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-			pd3dCommandList->ClearRenderTargetView(m_pd3dRtvCPUDescriptorHandle, pfClearColor, 0, NULL);
-
-			pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, NULL);
-
-			pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandle, TRUE, &m_d3dDsvDescriptorCPUHandle);
-
-			Render(pd3dCommandList, m_ppRenderCamera, Map, Player);
-
-			::SynchronizeResourceTransition(pd3dCommandList, m_pRenderTexture->GetTexture(0), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON);
+			float fWidth = 1024, fHeight = 1024;
+			xmmtxProjection = XMMatrixOrthographicLH(fWidth, fHeight, fNearPlaneDistance, fFarPlaneDistance);
+			//float fLeft = -(_PLANE_WIDTH * 0.5f), fRight = +(_PLANE_WIDTH * 0.5f), fTop = +(_PLANE_HEIGHT * 0.5f), fBottom = -(_PLANE_HEIGHT * 0.5f);
+			//xmmtxProjection = XMMatrixOrthographicOffCenterLH(fLeft * 6.0f, fRight * 6.0f, fBottom * 6.0f, fTop * 6.0f, fBack, fFront);
 		}
-		else
+		else if (m_pLights->m_nType == SPOT_LIGHT)
 		{
-			m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4Position.w = 0.0f;
+			float fFovAngle = 60.0f; // m_pLights->m_pLights[j].m_fPhi = cos(60.0f);
+			float fAspectRatio = float(_DEPTH_BUFFER_WIDTH) / float(_DEPTH_BUFFER_HEIGHT);
+			xmmtxProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(fFovAngle), fAspectRatio, fNearPlaneDistance, fFarPlaneDistance);
 		}
+		else if (m_pLights->m_nType == POINT_LIGHT)
+		{
+			//ShadowMap[6]
+		}
+
+		m_ppRenderCamera->SetPosition(xmf3Position);
+		XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4View, xmmtxView);//m_ppDepthRenderCameras                 ?  ??    
+		XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4Projection, xmmtxProjection);
+
+		XMMATRIX xmmtxToTexture = XMMatrixTranspose(xmmtxView * xmmtxProjection * m_xmProjectionToTexture);
+		XMStoreFloat4x4(&m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4x4ToTexture, xmmtxToTexture);
+
+		//m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(xmf3Position.x, xmf3Position.y, xmf3Position.z, 1.0f);
+		//임시 조명 위치 
+		m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4Position = XMFLOAT4(430.219f, 244.f, 693.263f, 1.0f);
+		::SynchronizeResourceTransition(pd3dCommandList, m_pRenderTexture->GetTexture(0), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+		FLOAT pfClearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		//FLOAT pfClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		pd3dCommandList->ClearRenderTargetView(m_pd3dRtvCPUDescriptorHandle, pfClearColor, 0, NULL);
+
+		pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+
+		pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandle, TRUE, &m_d3dDsvDescriptorCPUHandle);
+
+		Render(pd3dCommandList, m_ppRenderCamera, Map, Player);
+
+		::SynchronizeResourceTransition(pd3dCommandList, m_pRenderTexture->GetTexture(0), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_COMMON);
+	}
+	else
+	{
+		m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4Position.w = 0.0f;
 	}
 }
 
@@ -347,10 +345,17 @@ void CSceneRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCam
 
 	}*/
 	for (int i = 0; i < 3; i++) {
-		if (Player[i]->isAlive) Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
+		//if (Player[i]->isAlive) Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
 		//if(Player[i]->isAlive) Player[i]->ShadowRender(pd3dCommandList, pCamera); //only shadow to player
 
 	}
+	pMoonObject->SetLookAt(Player[0]->GetPosition());
+	pMoonObject->SetPosition(Vector3::Add(Player[0]->GetPosition(), XMFLOAT3(50.f, 0.f, 50.f)));
+	pMoonObject->Render(pd3dCommandList, pCamera); // 맵에 생겨버리면, 밖으로 뺴서 따로 적용시켜야함. 
+}
+void CSceneRenderShader::SetMoonObject(CGameObject* Moon)
+{
+	pMoonObject = Moon; 
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -476,7 +481,7 @@ void CSceneMapShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pRenderTexture->AddRef();
 
 	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, m_pDepthTexture->GetTextures());
-	CScene::CreateShaderResourceViews(pd3dDevice, m_pRenderTexture, 20, false); //Depth buffer
+	CScene::CreateShaderResourceViews(pd3dDevice, m_pRenderTexture, 13, false); //Depth buffer
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }

@@ -1693,6 +1693,7 @@ void CDepthRenderShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
+
 void CDepthRenderShader::ReleaseObjects()
 {
 	for (int i = 0; i < MAX_DEPTH_TEXTURES; i++)
@@ -1815,7 +1816,7 @@ void CDepthRenderShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCam
 
 	}*/
 	for (int i = 0; i < 3; i++) {
-		if (Player[i]->isAlive) Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
+		if(Player[i])if (Player[i]->isAlive) Player[i]->Render(pd3dCommandList, pCamera); //only shadow to player
 		//if(Player[i]->isAlive) Player[i]->ShadowRender(pd3dCommandList, pCamera); //only shadow to player
 
 	}
@@ -1948,6 +1949,18 @@ void CShadowMapShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 	CScene::CreateShaderResourceViews(pd3dDevice, m_pDepthTexture, 20, false); //Depth buffer
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+}
+
+void CShadowMapShader::BuildSceneObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
+{
+	m_pDepthTexture = (CTexture*)pContext;
+	m_pDepthTexture->AddRef();
+
+	//CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, m_pDepthTexture->GetTextures());
+	CScene::CreateShaderResourceViews(pd3dDevice, m_pDepthTexture, 14, false); //Depth buffer
+
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
 }
 
 void CShadowMapShader::ReleaseObjects()
