@@ -2645,6 +2645,15 @@ wstring CGameFramework::ChangeBossScripts(BossAnimation bA, short hp)
 		break;
 	}
 
+	case BossAnimation::DIE:
+	{
+		uiScripts = L"잘했어!";
+		bossScriptsOn = true;
+		bossScriptsTime = 0;
+
+		break;
+	}
+
 
 	default:
 		uiScripts = L" ";
@@ -2751,6 +2760,16 @@ wstring CGameFramework::ChangeBossScripts(GodAnimation gA, short hp)
 		}
 		break;
 	}
+
+	case GodAnimation::DEATH:
+	{
+		uiScripts = L"잘했어!";
+		bossScriptsOn = true;
+		bossScriptsTime = 0;
+
+		break;
+	}
+
 
 	default:
 		uiScripts = L" ";
