@@ -97,13 +97,13 @@ void CScene::BuildDefaultLightsAndMaterials()
 
 	m_nInsideLights = MAX_GODRAY_LIGHTS;
 	m_pInsideLights = new LIGHT[MAX_GODRAY_LIGHTS];
-	m_pInsideLights[0].m_nType = SPOT_LIGHT;
-	m_pInsideLights[0].m_fRange = 1000.0f;
+	m_pInsideLights[0].m_nType = DIRECTIONAL_LIGHT;
+	m_pInsideLights[0].m_fRange = 240.0f;
 	m_pInsideLights[0].m_bEnable = true;
 	m_pInsideLights[0].m_xmf4Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-	m_pInsideLights[0].m_xmf4Diffuse = XMFLOAT4(0.54f, 0.54f, 0.54f, 1.0f);
+	m_pInsideLights[0].m_xmf4Diffuse = XMFLOAT4(0.24f, 0.24f, 0.24f, 1.0f);
 	m_pInsideLights[0].m_xmf4Specular = XMFLOAT4(0.13f, 0.13f, 0.13f, 0.0f);
-	m_pInsideLights[0].m_xmf3Position = XMFLOAT3(430.219f, 244.f, 693.263f);
+	m_pInsideLights[0].m_xmf3Position = XMFLOAT3(530.219f, 284.f, 593.263f);
 	m_pInsideLights[0].m_xmf3Direction = XMFLOAT3(-1.0f, -1.0f, 1.0f);
 	m_pInsideLights[0].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.1f, 0.001f);
 
@@ -1790,12 +1790,13 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		}
 
 
+
+
 		if (m_fredbosscutTime < 2.0f && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT) {
 			//cout << "curmission - " << int(m_pPlayer[0]->curMissionType) << endl;
 			//cout << "boss yes render\n";
 			m_ppBoss->Render(pd3dCommandList, pCamera);
 		}
-
 		//else {
 		//	cout << "curmission - " << int(m_pPlayer[0]->curMissionType) << endl;
 		//	cout << "boss no render\n";

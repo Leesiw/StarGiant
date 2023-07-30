@@ -302,16 +302,18 @@ void CSceneRenderShader::PrepareShadowMap(ID3D12GraphicsCommandList* pd3dCommand
 			//ShadowMap[6]
 		}
 
-		m_ppRenderCamera->SetPosition(xmf3Position);
-		XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4View, xmmtxView);//m_ppDepthRenderCameras                 ?  ??    
-		XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4Projection, xmmtxProjection);
+		m_ppRenderCamera = View;
+		m_ppRenderCamera->m_xmf4x4View = View->m_xmf4x4View;
+		m_ppRenderCamera->m_xmf4x4Projection = View->m_xmf4x4Projection;
+		//XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4View, xmmtxView);//m_ppDepthRenderCameras                 ?  ??    
+		//XMStoreFloat4x4(&m_ppRenderCamera->m_xmf4x4Projection, xmmtxProjection);
 
 		XMMATRIX xmmtxToTexture = XMMatrixTranspose(xmmtxView * xmmtxProjection * m_xmProjectionToTexture);
 		XMStoreFloat4x4(&m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4x4ToTexture, xmmtxToTexture);
 
 		//m_pToLightSpaces->m_pToLightSpaces[j].m_xmf4Position = XMFLOAT4(xmf3Position.x, xmf3Position.y, xmf3Position.z, 1.0f);
 		//임시 조명 위치 
-		m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4Position = XMFLOAT4(430.219f, 244.f, 693.263f, 1.0f);
+		m_pToLightSpaces->m_pToLightSpaces[0].m_xmf4Position = XMFLOAT4(430.219f, 244.f, 693.263f, 1.0f); //?
 		::SynchronizeResourceTransition(pd3dCommandList, m_pRenderTexture->GetTexture(0), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		FLOAT pfClearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
