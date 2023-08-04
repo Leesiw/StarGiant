@@ -3124,6 +3124,9 @@ void CGameFramework::ProcessPacket(char* p)
 					// 보스 죽음 (게임 클리어?)
 				}
 				m_pScene->m_ppBoss->BossHP = packet->data.hp;
+				/*SParticle(cntParticle, 20, packet->data.id);
+				cntParticle += 1;
+				if (cntParticle == 5) cntParticle = 0;*/
 				
 
 				break;
@@ -3134,7 +3137,16 @@ void CGameFramework::ProcessPacket(char* p)
 				if (packet->data.hp <= 0) {
 					// 보스 죽음 (게임 클리어?)
 				}
+				/*if (m_pScene->m_ppGod->GodHP > packet->data.hp) {
+					m_pScene->m_ppGod->GodHP = packet->data.hp;
+					SParticle(cntParticle, 20, packet->data.id);
+					cntParticle += 1;
+					if (cntParticle == 5) cntParticle = 0;
+				}
+				else*/
 				m_pScene->m_ppGod->GodHP = packet->data.hp;
+
+
 
 				break;
 			}

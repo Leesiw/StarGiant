@@ -518,6 +518,10 @@ float UILayer::UpdatePlanetDist(CAirplanePlayer* player, XMFLOAT3& lpos)
 
 void UILayer::UpdateHp(short curhp, short maxHp)
 {
+
+    float hpbarLeft = m_nScreenWidth / 10 * 8;
+    float hpbarRight = m_nScreenWidth / 10 * 8.7;
+
     hpBar =(hpbarRight - hpbarLeft) - (float(curhp) / float(maxHp)) * (hpbarRight - hpbarLeft);
 }
 
@@ -687,6 +691,10 @@ void UILayer::Render(UINT nFrame, MissionType mty, BossState bst, int sst, float
     }
     else
     {
+
+        float hpbarLeft = m_nScreenWidth / 10 * 8;
+        float hpbarRight = m_nScreenWidth / 10 * 8.7;
+
         m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, m_nScreenHeight - 60, hpbarRight, m_nScreenHeight - 50), Whitebrush); //¹è°æ
         if (hpbarRight - hpBar > hpbarLeft)
             m_pd2dDeviceContext->FillRectangle(D2D1::RectF(hpbarLeft, m_nScreenHeight - 60, hpbarRight - hpBar, m_nScreenHeight - 50), Redbrush); // hp

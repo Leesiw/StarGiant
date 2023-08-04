@@ -72,8 +72,6 @@ private:
     float scaleY;
 
 
-    float hpbarLeft = m_nScreenWidth /10 * 8;
-    float hpbarRight = m_nScreenWidth / 10 * 8.7;
 
 
 
