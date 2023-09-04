@@ -1841,7 +1841,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		//	cout << "boss no render\n";
 		//}
 
-		if (landob) {
+		if (landob && m_pPlayer[0]->curMissionType <= MissionType::CS_SHOW_STARGIANT) {
 			landob->SetPosition(m_ppBoss->GetPosition().x, m_ppBoss->GetPosition().y - 827.0f, m_ppBoss->GetPosition().z);
 			landob->Render(pd3dCommandList, pCamera);
 		}
