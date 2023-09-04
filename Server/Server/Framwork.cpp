@@ -344,6 +344,8 @@ void CGameFramework::SetMission()
 	levels[MissionType::CS_ANGRY_BOSS].RestartMission = MissionType::CS_BOSS_SCREAM;
 	levels[MissionType::CS_ANGRY_BOSS].RestartPosition = XMFLOAT3{ 2300.f ,0.f ,-1300.f };
 
+	levels[MissionType::DEFEAT_BOSS2].set_maxmonsternum(0);
+
 	levels[MissionType::DEFEAT_BOSS2].NextMission = MissionType::CS_SHOW_STARGIANT;
 	levels[MissionType::DEFEAT_BOSS2].MaxMonsterNum = 0;
 	levels[MissionType::DEFEAT_BOSS2].SpawnMonsterNum = 0;

@@ -1,5 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
+#include "pp.pb.h"
 
 using namespace DirectX;
 //using namespace DirectX::PackedVector;

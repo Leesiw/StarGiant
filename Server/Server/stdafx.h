@@ -38,21 +38,6 @@ struct MonsterStatus {
 	char ATK = 3;
 };
 
-struct Level {
-	MissionType NextMission = MissionType::CS_TURN;
-	MonsterStatus PlasmaCannon;
-	MonsterStatus Missile;
-	MonsterStatus Laser;
-
-	char MaxMonsterNum = 0;
-	char SpawnMonsterNum = 0;
-
-	bool cutscene = false;
-
-	MissionType RestartMission = MissionType::CS_TURN;
-	XMFLOAT3 RestartPosition = XMFLOAT3{0.f, 0.f ,100.f};
-};
-
 static std::random_device rdd;
 static std::default_random_engine dree(rdd());
 static std::uniform_real_distribution<float> urdPos(300, 650);

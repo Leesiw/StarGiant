@@ -118,12 +118,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>Default</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\LSW\Downloads\protobuf-cpp-3.11.4\protobuf-3.11.4\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\workspace\StarGiant\Server;C:\Users\LSW\Downloads\protobuf-cpp-3.11.4\protobuf-3.11.4\src</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -132,6 +136,7 @@
     <ClCompile Include="Framwork.cpp" />
     <ClCompile Include="God.cpp" />
     <ClCompile Include="Missile.cpp" />
+    <ClCompile Include="pp.pb.cc" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -145,6 +150,7 @@
     <ClInclude Include="Framework.h" />
     <ClInclude Include="God.h" />
     <ClInclude Include="Missile.h" />
+    <ClInclude Include="pp.pb.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />

@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+message Level {
+  int32 NextMission = 1;
+
+  message MonsterStatus {
+    int32 MAX_HP = 1;
+    int32 ATK = 2;
+  }
+
+  MonsterStatus PlasmaCannon = 2;
+  MonsterStatus Missile = 3;
+  MonsterStatus Laser = 4;
+
+  int32 MaxMonsterNum = 5;
+  int32 SpawnMonsterNum = 6;
+
+   enum MissionType {
+    CUTSCENE = 0;
+	DEFEAT_MONSTER = 1;
+    DEFEAT_METEOR = 2;
+	GO_TO_DESTINATION = 3;
+	TU_SIT = 4;
+	TU_HEAL = 5;
+	GET_JEWELS = 6;
+	DEFEAT_BOSS = 7;
+	DEFEAT_BOSS2 = 8;
+	GO_CENTER = 9;
+	ESCAPE_BLACK_HOLE = 10;
+	KILL_GOD = 11;
+	KILL_GOD2 = 12;
+	CS_ENDING = 13;
+	CS_BAD_ENDING = 14;
+  }
+
+  MissionType Requirement = 7;
+
+  int32 RestartMission = 8;
+  float RestartPosition_x = 9;
+  float RestartPosition_y = 10;
+  float RestartPosition_z = 11;
+
+  int32 KillMonsterNum = 12;
+  float Destination_x = 13;
+  float Destination_y = 14;
+  float Destination_z = 15;
+  float Dist = 16;
+}
