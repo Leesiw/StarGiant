@@ -1,5 +1,7 @@
 -- god_ai.lua
 
+
+-- 보스 상태
 GodState = {
     IDLE1 = 0,
     IDLE2 = 1,
@@ -11,36 +13,31 @@ GodState = {
     ROAR = 7,
     DEATH = 8,
     ATTACK = 9
-
 }
 
+-- 보스 스킬 쿨타임
 SHOT_COOL_TIME = 4
 MELEE1_COOL_TIME = 4
 MELEE2_COOL_TIME = 4
 HIT1_COOL_TIME = 4
 HIT2_COOL_TIME = 4
-
-
-
 ATTACK_COOL_TIME = 4
 MOVE_COOL_TIME = 4
-
 
 
 -- 보스의 초기 상태
 state = GodState.IDLE2
 motion = GodState.IDLE2
 MaxHp = 100
+curHp = MaxHp
+onappear = true
 
-god_x = -15000   --초기 위치
+
+-- 보스 초기 위치
+god_x = -15000   
 god_y = -15000
 god_z = -15000
 
-
-curHp = MaxHp
-
---true false
-onappear = true
 
 -- 공격 상태와 쿨타임 변수 초기화
 attackState = false
@@ -50,12 +47,7 @@ melee1Cooldown = MELEE1_COOL_TIME
 melee2Cooldown = MELEE2_COOL_TIME
 hit1Cooldown = HIT1_COOL_TIME
 hit2Cooldown = HIT2_COOL_TIME
-
-
 moveCooldown = MOVE_COOL_TIME
-
-
-
 
 -- 프레임 시간 관련 변수 초기화
 frameTime = 0
