@@ -397,8 +397,8 @@ void CMissileEnemy::Attack(float fTimeElapsed, CAirplanePlayer* player)
 
 void CMissileEnemy::SetStatus(MissionType cur_mission)
 {
-	hp = levels[cur_mission].Missile.MAX_HP;
-	damage = levels[cur_mission].Missile.ATK;
+	hp = levels[cur_mission].missile().max_hp();
+	damage = levels[cur_mission].missile().atk();
 }
 
 void CMissileEnemy::Animate(float fTimeElapsed)
@@ -432,8 +432,8 @@ CLaserEnemy::~CLaserEnemy()
 
 void CLaserEnemy::SetStatus(MissionType cur_mission)
 {
-	hp = levels[cur_mission].Laser.MAX_HP;
-	damage = levels[cur_mission].Laser.ATK;
+	hp = levels[cur_mission].laser().max_hp();
+	damage = levels[cur_mission].laser().atk();
 }
 
 void CLaserEnemy::Animate(float fTimeElapsed)
@@ -465,8 +465,8 @@ CPlasmaCannonEnemy::~CPlasmaCannonEnemy()
 
 void CPlasmaCannonEnemy::SetStatus(MissionType cur_mission)
 {
-	hp = levels[cur_mission].PlasmaCannon.MAX_HP;
-	damage = levels[cur_mission].PlasmaCannon.ATK;
+	hp = levels[cur_mission].plasmacannon().max_hp();
+	damage = levels[cur_mission].plasmacannon().atk();
 }
 
 void CPlasmaCannonEnemy::Animate(float fTimeElapsed)

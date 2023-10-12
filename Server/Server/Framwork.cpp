@@ -233,6 +233,8 @@ void CGameFramework::Init() {
 
 void CGameFramework::SetMission()
 {
+	/*
+
 	levels[MissionType::CS_TURN].NextMission = MissionType::TU_SIT;
 	levels[MissionType::CS_TURN].cutscene = true;
 	levels[MissionType::CS_TURN].RestartMission = MissionType::CS_TURN;
@@ -472,7 +474,7 @@ void CGameFramework::SetMission()
 	levels[MissionType::CS_BAD_ENDING].cutscene = true;
 	levels[MissionType::CS_BAD_ENDING].RestartMission = MissionType::CS_TURN;
 	levels[MissionType::CS_BAD_ENDING].RestartPosition = XMFLOAT3{ 0.f ,0.f ,100.f };
-
+	*/
 }
 
 void CGameFramework::ReleaseObjects()
@@ -717,7 +719,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			short p_id = clients[c_id].room_pid;
 			if (t_room_id == -1 || p_id == -1) { break; }
 			CScene* scene = scene_manager.GetScene(t_room_id);
-			if (levels[scene->cur_mission].cutscene) { break; }
+			if (levels[scene->cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) { break; }
 			float yaw = scene->m_ppPlayers[p_id]->GetYaw();
 			if (yaw != p->data.yaw)
 			{
@@ -848,7 +850,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (t_room_id == -1) { break; }
 		CScene* scene = scene_manager.GetScene(t_room_id);
 		if (scene->_state != ST_INGAME) { break; }
-		if (levels[scene->cur_mission].cutscene) {
+		if (levels[scene->cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
 
 			char p_id = clients[c_id].room_pid;
 			if (p_id == -1) { break; }
