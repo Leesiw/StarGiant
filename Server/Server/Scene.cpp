@@ -399,6 +399,16 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 
 void CScene::CheckMissionComplete()
 {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_GO_TO_DESTINATION) {
+		XMFLOAT3 dest{ levels[cur_mission].destination_x(), levels[cur_mission].destination_y(), levels[cur_mission].destination_z() };
+		float dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(),
+			dest));
+		if (dist <= levels[cur_mission].dist()) {
+			MissionClear();
+		}
+	}
+
+	/*
 	switch (cur_mission) {
 	case MissionType::GO_PLANET: {
 		XMFLOAT3 player_pos = m_pSpaceship->GetPosition();
@@ -428,7 +438,7 @@ void CScene::CheckMissionComplete()
 		return;
 	}
 	}
-	
+	*/
 }
 
 void CScene::MissionClear()
