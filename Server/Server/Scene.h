@@ -29,7 +29,7 @@ public:
 	void CheckMeteoByBulletCollisions(BULLET_INFO& data);
 
 	void CheckMissionComplete();
-	void MissionClear();
+	void MissionClear(MissionType mission);
 	void SetMission(MissionType mission);
 	void SetMissionFindBoss();
 

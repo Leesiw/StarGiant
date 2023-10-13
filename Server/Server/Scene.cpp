@@ -279,8 +279,8 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 			m_ppEnemies[num]->SetisAliveFalse();
 
 			// 미션
-			if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_MONSTER) {
-				mission_m.lock();
+			MissionType miss = cur_mission;
+			if (levels[miss].requirement() == Level_MissionType::Level_MissionType_DEFEAT_MONSTER) {
 				++kill_monster_num;
 				for (short pl_id : _plist) {
 					if (pl_id == -1) continue;
@@ -288,11 +288,12 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 					clients[pl_id].send_kill_num_packet(kill_monster_num);
 				}
 
-				if (kill_monster_num == levels[cur_mission].killmonsternum() && levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_MONSTER) {
+				if (kill_monster_num >= levels[cur_mission].killmonsternum()) {
 					kill_monster_num = 0;
-					MissionClear();
+					mission_m.lock();
+					MissionClear(miss);
+					mission_m.unlock();
 				}
-				mission_m.unlock();
 			}
 
 			/*
@@ -396,8 +397,8 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 		{
 			SpawnMeteo(i);
 			
-			if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_METEOR) {
-				mission_m.lock();
+			MissionType miss = cur_mission;
+			if (levels[miss].requirement() == Level_MissionType::Level_MissionType_DEFEAT_METEOR) {
 				++kill_monster_num;
 				for (short pl_id : _plist) {
 					if (pl_id == -1) continue;
@@ -405,11 +406,12 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 					clients[pl_id].send_kill_num_packet(kill_monster_num);
 				}
 
-				if (kill_monster_num == levels[cur_mission].killmonsternum() && levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_METEOR) {
+				if (kill_monster_num >= levels[cur_mission].killmonsternum()) {
 					kill_monster_num = 0;
-					MissionClear();
+					mission_m.lock();
+					MissionClear(miss);
+					mission_m.unlock();
 				}
-				mission_m.unlock();
 			}
 			/*
 			if (cur_mission == MissionType::KILL_METEOR) {
@@ -437,7 +439,7 @@ void CScene::CheckMissionComplete()
 		float dist = Vector3::Length(Vector3::Subtract(m_pSpaceship->GetPosition(),
 			dest));
 		if (dist <= levels[cur_mission].dist()) {
-			MissionClear();
+			MissionClear(cur_mission);
 		}
 	}
 
@@ -474,8 +476,18 @@ void CScene::CheckMissionComplete()
 	*/
 }
 
-void CScene::MissionClear()
+void CScene::MissionClear(MissionType mission)
 {
+	if ((int)cur_mission != levels[cur_mission].nextmission() && cur_mission == mission) {
+		cur_mission = (MissionType)levels[cur_mission].nextmission();
+
+		for (short pl_id : _plist) {
+			if (pl_id == -1) continue;
+			if (clients[pl_id]._state != ST_INGAME) continue;
+			clients[pl_id].send_mission_start_packet(cur_mission);
+		}
+	}
+
 	/*
 	if (cur_mission != levels[cur_mission].NextMission) 
 	{
@@ -746,9 +758,12 @@ void CScene::GetJewels()
 	}
 
 	// 미션
-	if (cur_mission == MissionType::GET_JEWELS)
+	MissionType miss = cur_mission;
+	if (levels[miss].requirement() == Level_MissionType::Level_MissionType_GET_JEWELS)
 	{
-		SetMission(MissionType::Kill_MONSTER);
+		mission_m.lock();
+		MissionClear(miss);
+		mission_m.unlock();
 	}
 }
 
@@ -1122,11 +1137,12 @@ void CScene::UpdateMissile(char obj_id)
 void CScene::UpdateBoss()
 {
 	if (_state != ST_INGAME) { boss_timer_on = false;  return; }
-	if (cur_mission != MissionType::DEFEAT_BOSS && cur_mission != MissionType::CS_BOSS_SCREAM && cur_mission != MissionType::CS_ANGRY_BOSS 
-		&& cur_mission != MissionType::FIND_BOSS && cur_mission != MissionType::DEFEAT_BOSS2 && cur_mission != MissionType::CS_BAD_ENDING) { boss_timer_on = false; return; }
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_BOSS && levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CUTSCENE
+		&& levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_BOSS2 && 
+		levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) { boss_timer_on = false; return; }
 	if (m_pBoss->BossHP <= 0) {
 		boss_timer_on = false;
-		SetMission(MissionType::CS_SHOW_STARGIANT);
+		MissionClear(cur_mission);
 		return;
 	}
 	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
@@ -1137,8 +1153,8 @@ void CScene::UpdateBoss()
 
 	m_pBoss->Boss_Ai(0.025f, m_pSpaceship, m_pBoss->GetHP());
 
-	if (cur_mission == MissionType::DEFEAT_BOSS && m_pBoss->BossHP <= 50) {
-		SetMission(MissionType::CS_ANGRY_BOSS);
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_BOSS && m_pBoss->BossHP <= 50) {
+		MissionClear(cur_mission);
 	}
 
 	float dist;

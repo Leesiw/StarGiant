@@ -162,7 +162,7 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
 			if (scene->_state == ST_INGAME && levels[scene->cur_mission].requirement() == Level_MissionType::Level_MissionType_GO_CENTER) {
 				if (scene->mission_start + 20s <= std::chrono::system_clock::now()) {
-					scene->MissionClear();
+					scene->MissionClear(scene->cur_mission);
 				}
 				else {
 					TIMER_EVENT ev{ 0, scene->mission_start + 20s, EV_MISSION_CLEAR, (static_cast<short>(key)) };
@@ -671,7 +671,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			// 미션
 			if (levels[scene->cur_mission].requirement() == Level_MissionType::Level_MissionType_TU_SIT && p->player_type == PlayerType::MOVE)
 			{
-				scene->MissionClear();
+				scene->MissionClear(scene->cur_mission);
 			}
 
 
@@ -793,7 +793,7 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 				// 미션
 				if (levels[m_pScene->cur_mission].requirement() == Level_MissionType::Level_MissionType_TU_HEAL)
 				{
-					m_pScene->MissionClear();
+					m_pScene->MissionClear(m_pScene->cur_mission);
 					//m_pScene->MissionClear(); // 일단 TU_END 건너뜀
 				}
 			}
@@ -803,7 +803,10 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 	case CS_NEXT_MISSION: {
 		short t_room_id = clients[c_id].room_id;
 		if (t_room_id == -1) { break; }
-		scene_manager.GetScene(t_room_id)->MissionClear();
+		CScene* m_pScene = scene_manager.GetScene(t_room_id);
+		m_pScene->mission_m.lock();
+		m_pScene->MissionClear(m_pScene->cur_mission);
+		m_pScene->mission_m.unlock();
 		break;
 	}
 	case CS_INVINCIBLE_MODE: {
