@@ -1137,14 +1137,10 @@ void CScene::UpdateMissile(char obj_id)
 void CScene::UpdateBoss()
 {
 	if (_state != ST_INGAME) { boss_timer_on = false;  return; }
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_BOSS && levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CUTSCENE
-		&& levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_BOSS2 && 
-		levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) { boss_timer_on = false; return; }
-	if (m_pBoss->BossHP <= 0) {
-		boss_timer_on = false;
-		MissionClear(cur_mission);
-		return;
-	}
+	if (levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_DEFEAT_BOSS && levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CUTSCENE
+		&& levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_DEFEAT_BOSS2 && 
+		levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CS_BAD_ENDING) { boss_timer_on = false; return; }
+	
 	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_BOSS, static_cast<short>(num) };
 		timer_queue.push(ev);
@@ -1155,6 +1151,11 @@ void CScene::UpdateBoss()
 
 	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_BOSS && m_pBoss->BossHP <= 50) {
 		MissionClear(cur_mission);
+	}
+	else if (m_pBoss->BossHP <= 0 && levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_BOSS2) {
+		boss_timer_on = false;
+		MissionClear(cur_mission);
+		return;
 	}
 
 	float dist;
@@ -1174,13 +1175,10 @@ void CScene::UpdateBoss()
 void CScene::UpdateGod()
 {
 	if (_state != ST_INGAME) { god_timer_on = false; return; }
-	if (m_pGod->GetcurHp() <= 0) {
-		god_timer_on = false;
-		SetMission(MissionType::CS_ENDING);
-		return;
-	}
-	if (cur_mission != MissionType::KILL_GOD && cur_mission != MissionType::CS_SHOW_GOD && cur_mission != MissionType::CS_ANGRY_GOD
-		&& cur_mission != MissionType::KILL_GOD2 && cur_mission != MissionType::CS_BAD_ENDING) { god_timer_on = false; return; }
+	
+	if (levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_KILL_GOD && levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CUTSCENE
+		&& levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_KILL_GOD2 &&
+		levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CS_BAD_ENDING) { god_timer_on = false; return; }
 	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_GOD, static_cast<short>(num) };
 		timer_queue.push(ev);
@@ -1191,8 +1189,13 @@ void CScene::UpdateGod()
 		SpawnEnemyFromGod();
 	}
 
-	if (cur_mission == MissionType::KILL_GOD && m_pGod->GodHP <= 50) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_KILL_GOD && m_pGod->GodHP <= 50) {
 		SetMission(MissionType::CS_ANGRY_GOD);
+	}
+	else if(m_pGod->GetcurHp() <= 0 && levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_KILL_GOD2) {
+		god_timer_on = false;
+		MissionClear(cur_mission);
+		return;
 	}
 
 	float dist;
