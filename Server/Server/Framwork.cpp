@@ -160,9 +160,9 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 		}
 		case OP_MISSION_CLEAR: {
 			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			if (scene->_state == ST_INGAME && scene->cur_mission == MissionType::GO_CENTER) {
+			if (scene->_state == ST_INGAME && levels[scene->cur_mission].requirement() == Level_MissionType::Level_MissionType_GO_CENTER) {
 				if (scene->mission_start + 20s <= std::chrono::system_clock::now()) {
-					scene->SetMission(MissionType::KILL_MONSTER3);
+					scene->MissionClear();
 				}
 				else {
 					TIMER_EVENT ev{ 0, scene->mission_start + 20s, EV_MISSION_CLEAR, (static_cast<short>(key)) };
@@ -669,9 +669,9 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 			clients[c_id].type = p->player_type;
 
 			// 미션
-			if (scene->cur_mission == MissionType::TU_SIT && p->player_type == PlayerType::MOVE)
+			if (levels[scene->cur_mission].requirement() == Level_MissionType::Level_MissionType_TU_SIT && p->player_type == PlayerType::MOVE)
 			{
-				scene->SetMission(MissionType::TU_KILL);
+				scene->MissionClear();
 			}
 
 
@@ -791,9 +791,9 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 				m_pScene->heal_player = -1;
 
 				// 미션
-				if (m_pScene->cur_mission == MissionType::TU_HILL)
+				if (levels[m_pScene->cur_mission].requirement() == Level_MissionType::Level_MissionType_TU_HEAL)
 				{
-					m_pScene->SetMission(MissionType::GET_JEWELS);
+					m_pScene->MissionClear();
 					//m_pScene->MissionClear(); // 일단 TU_END 건너뜀
 				}
 			}

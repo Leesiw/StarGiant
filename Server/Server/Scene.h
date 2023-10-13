@@ -91,6 +91,7 @@ public:
 
 	MissionType cur_mission;
 	MissionType prev_mission;
+	mutex mission_m;
 
 	std::atomic_bool can_sit[4];
 

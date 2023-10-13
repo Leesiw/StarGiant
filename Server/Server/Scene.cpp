@@ -279,6 +279,23 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 			m_ppEnemies[num]->SetisAliveFalse();
 
 			// 미션
+			if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_MONSTER) {
+				mission_m.lock();
+				++kill_monster_num;
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_kill_num_packet(kill_monster_num);
+				}
+
+				if (kill_monster_num == levels[cur_mission].killmonsternum() && levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_MONSTER) {
+					kill_monster_num = 0;
+					MissionClear();
+				}
+				mission_m.unlock();
+			}
+
+			/*
 			if (cur_mission == MissionType::TU_KILL)
 			{
 				SetMission(MissionType::TU_HILL);
@@ -332,7 +349,7 @@ void CScene::CheckEnemyByBulletCollisions(BULLET_INFO& data)
 					SetMission(MissionType::KILL_METEOR);
 				}
 			}
-
+			*/
 			GetJewels();
 		}
 	}
@@ -378,7 +395,23 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 		if (meteor_bbox.Intersects(pos, dir, dist)) //총알/적 충돌시
 		{
 			SpawnMeteo(i);
+			
+			if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_METEOR) {
+				mission_m.lock();
+				++kill_monster_num;
+				for (short pl_id : _plist) {
+					if (pl_id == -1) continue;
+					if (clients[pl_id]._state != ST_INGAME) continue;
+					clients[pl_id].send_kill_num_packet(kill_monster_num);
+				}
 
+				if (kill_monster_num == levels[cur_mission].killmonsternum() && levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_METEOR) {
+					kill_monster_num = 0;
+					MissionClear();
+				}
+				mission_m.unlock();
+			}
+			/*
 			if (cur_mission == MissionType::KILL_METEOR) {
 				++kill_monster_num;
 				for (short pl_id : _plist) {
@@ -391,7 +424,7 @@ void CScene::CheckMeteoByBulletCollisions(BULLET_INFO& data)
 					kill_monster_num = 0;
 					SetMission(MissionType::CS_SHOW_BLACK_HOLE);
 				}
-			}
+			}*/
 			return;
 		}
 	}
