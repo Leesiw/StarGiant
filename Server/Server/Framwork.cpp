@@ -608,8 +608,8 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		miss_packet.next_mission = scene->cur_mission;
 		clients[c_id].do_send(&miss_packet);
 
-		if (scene->cur_mission == MissionType::Kill_MONSTER || scene->cur_mission == MissionType::KILL_MONSTER_ONE_MORE_TIME 
-			|| scene->cur_mission == MissionType::KILL_MONSTER3 || scene->cur_mission == MissionType::KILL_METEOR)
+		if (levels[scene->cur_mission].requirement() != Level_MissionType::Level_MissionType_DEFEAT_MONSTER ||
+			levels[scene->cur_mission].requirement() != Level_MissionType::Level_MissionType_DEFEAT_METEOR)
 		{
 			SC_KILL_NUM_PACKET pack{};
 			pack.size = sizeof(pack);

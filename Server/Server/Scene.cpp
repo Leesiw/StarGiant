@@ -1304,8 +1304,8 @@ void CScene::SendSceneInfo()
 void CScene::BlackHole()
 {
 	if (_state != ST_INGAME) { black_hole_timer_on = false; return; }
-	if (cur_mission != MissionType::ESCAPE_BLACK_HOLE && cur_mission != MissionType::CS_BAD_ENDING) { black_hole_timer_on = false;  return; }
-	if(cur_mission == MissionType::CS_BAD_ENDING){
+	if (levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_ESCAPE_BLACK_HOLE && levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CS_BAD_ENDING) { black_hole_timer_on = false;  return; }
+	if(levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING){
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 500ms, EV_BLACK_HOLE, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
