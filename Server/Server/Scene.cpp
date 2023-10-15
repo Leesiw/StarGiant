@@ -487,182 +487,53 @@ void CScene::MissionClear(MissionType mission)
 			if (clients[pl_id]._state != ST_INGAME) continue;
 			clients[pl_id].send_mission_start_packet(cur_mission);
 		}
-	}
 
-	/*
-	if (cur_mission != levels[cur_mission].NextMission) 
-	{
-		cur_mission = levels[cur_mission].NextMission;
+		if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_BOSS) {
+			m_pBoss->SetPosition(2300.f, 0.f, 0.f);
+			m_pBoss->BossHP = 100;
+			m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
 
-		if (levels[cur_mission].cutscene) {
-			for (char i = 0; i < 3; ++i) {
-				if (_plist[i] == -1) { continue; }
-				m_ppPlayers[i]->cutscene_end = false;
-			}
-			TIMER_EVENT ev{ static_cast<char>(levels[cur_mission].NextMission), chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
-			timer_queue.push(ev);
+			SC_MOVE_SPACESHIP_PACKET p{};
+			p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
+			p.type = SC_MOVE_SPACESHIP;
+			p.pos = m_pSpaceship->GetPosition();
+			Send((char*)&p);
 
-			if (cur_mission == MissionType::CS_SHOW_GOD) {
-				m_pGod->SetPosition(1300.f, 0.f, 0.f);
-				m_pGod->GodHP = 100;
-				m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
-
-				SC_MOVE_SPACESHIP_PACKET p{};
-				p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
-				p.type = SC_MOVE_SPACESHIP;
-				p.pos = m_pSpaceship->GetPosition();
-				Send((char*)&p);
-
-				god_timer_m.lock();
-				if (!god_timer_on) {
-					god_timer_on = true;
-					god_timer_m.unlock();
-					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
-					timer_queue.push(ev);
-				}
-				else{ god_timer_m.unlock(); }
-			}
-			else if (cur_mission == MissionType::CS_BOSS_SCREAM) {
-				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
-				m_pBoss->BossHP = 100;
-				m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
-				
-				SC_MOVE_SPACESHIP_PACKET p{};
-				p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
-				p.type = SC_MOVE_SPACESHIP;
-				p.pos = m_pSpaceship->GetPosition();
-				Send((char*)&p);
-
-				boss_timer_m.lock();
-				if (!boss_timer_on) {
-					boss_timer_on = true;
-					boss_timer_m.unlock();
-					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
-					timer_queue.push(ev);
-				}
-				else{ boss_timer_m.unlock(); }
-			}
-			else if (cur_mission == MissionType::CS_ENDING) {
-				for (short pl_id : _plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_mission_start_packet(cur_mission);
-				}
-				ResetScene();
-				return;
-			}
-		}
-		else if (cur_mission == MissionType::FIND_BOSS) {
 			boss_timer_m.lock();
 			if (!boss_timer_on) {
-				boss_timer_m.unlock();
 				boss_timer_on = true;
+				boss_timer_m.unlock();
 				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
 				timer_queue.push(ev);
 			}
-			else{ boss_timer_m.unlock(); }
+			else { boss_timer_m.unlock(); }
 		}
-		else if (cur_mission == MissionType::GO_CENTER) {
+		else if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_KILL_GOD) {
+			m_pGod->SetPosition(1300.f, 0.f, 0.f);
+			m_pGod->GodHP = 100;
+			m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
+
+			SC_MOVE_SPACESHIP_PACKET p{};
+			p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
+			p.type = SC_MOVE_SPACESHIP;
+			p.pos = m_pSpaceship->GetPosition();
+			Send((char*)&p);
+
+			god_timer_m.lock();
+			if (!god_timer_on) {
+				god_timer_on = true;
+				god_timer_m.unlock();
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
+				timer_queue.push(ev);
+			}
+			else { god_timer_m.unlock(); }
+		}
+		else if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_GO_CENTER) {
 			mission_start = chrono::system_clock::now();
 			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
 			timer_queue.push(ev);
 		}
-		else if (cur_mission == MissionType::ESCAPE_BLACK_HOLE) {
-			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
-			black_hole_time = 30.f;
-
-			SC_BLACK_HOLE_PACKET p{};
-			p.size = sizeof(SC_BLACK_HOLE_PACKET);
-			p.type = SC_BLACK_HOLE;
-			p.pos = black_hole_pos;
-			Send((char*) & p);
-
-			if (black_hole_timer_on == false) {
-				black_hole_timer_on = true;
-				b_prev_time = chrono::steady_clock::now();
-				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, static_cast<short>(num) };
-				timer_queue.push(ev);
-			}
-		}
-
-		for (short pl_id : _plist) {
-			if (pl_id == -1) continue;
-			if (clients[pl_id]._state != ST_INGAME) continue;
-			clients[pl_id].send_mission_start_packet(cur_mission);
-		}
-	}
-	else {
-
-	}
-	*/
-}
-
-void CScene::SetMission(MissionType mission)
-{
-	/*
-	if (cur_mission != mission)
-	{
-		cur_mission = mission;
-		if (levels[mission].cutscene) {
-			for (char i = 0; i < 3; ++i) {
-				if (_plist[i] == -1) { continue; }
-				m_ppPlayers[i]->cutscene_end = false;
-			}
-			TIMER_EVENT ev{ static_cast<char>(levels[mission].NextMission), chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
-			timer_queue.push(ev);
-
-			if (mission == MissionType::CS_SHOW_GOD) {
-				m_pGod->SetPosition(1300.f, 0.f, 0.f);
-				m_pGod->GodHP = 100;
-
-				god_timer_m.lock();
-				if (!god_timer_on) {
-					god_timer_on = true;
-					god_timer_m.unlock();
-					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
-					timer_queue.push(ev);
-				}
-				else{ god_timer_m.unlock(); }
-			}
-			else if (mission == MissionType::CS_BOSS_SCREAM) {
-				m_pBoss->SetPosition(2300.f, 0.f, 0.f);
-				m_pBoss->BossHP = 100;
-				
-				boss_timer_m.lock();
-				if (!boss_timer_on) {
-					boss_timer_m.unlock();
-					boss_timer_on = true;
-					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
-					timer_queue.push(ev);
-				}
-				else{ boss_timer_m.unlock(); }
-			}
-			else if (cur_mission == MissionType::CS_ENDING) {
-				for (short pl_id : _plist) {
-					if (pl_id == -1) continue;
-					if (clients[pl_id]._state != ST_INGAME) continue;
-					clients[pl_id].send_mission_start_packet(cur_mission);
-				}
-				ResetScene();
-				return;
-			}
-		}
-		else if (mission == MissionType::FIND_BOSS) {
-			boss_timer_m.lock();
-			if (!boss_timer_on) {
-				boss_timer_m.unlock();
-				boss_timer_on = true;
-				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
-				timer_queue.push(ev);
-			}
-			else{ boss_timer_m.unlock(); }
-		}
-		else if (mission == MissionType::GO_CENTER) {
-			mission_start = chrono::system_clock::now();
-			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
-			timer_queue.push(ev);
-		}
-		else if (mission == MissionType::ESCAPE_BLACK_HOLE) {
+		else if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_ESCAPE_BLACK_HOLE) {
 			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
 			black_hole_time = 30.f;
 
@@ -679,14 +550,104 @@ void CScene::SetMission(MissionType mission)
 				timer_queue.push(ev);
 			}
 		}
+		else if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_ENDING) {
+			for (short pl_id : _plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_mission_start_packet(cur_mission);
+			}
+			ResetScene();
+		}
+	}
+}
+
+void CScene::SetMission(MissionType mission)
+{
+	if (cur_mission != mission) {
+		cur_mission = mission;
 
 		for (short pl_id : _plist) {
 			if (pl_id == -1) continue;
 			if (clients[pl_id]._state != ST_INGAME) continue;
 			clients[pl_id].send_mission_start_packet(cur_mission);
 		}
+
+		if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_DEFEAT_BOSS) {
+			m_pBoss->SetPosition(2300.f, 0.f, 0.f);
+			m_pBoss->BossHP = 100;
+			m_pSpaceship->SetPosition(XMFLOAT3(2300.f, 0.f, -1300.f));
+
+			SC_MOVE_SPACESHIP_PACKET p{};
+			p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
+			p.type = SC_MOVE_SPACESHIP;
+			p.pos = m_pSpaceship->GetPosition();
+			Send((char*)&p);
+
+			boss_timer_m.lock();
+			if (!boss_timer_on) {
+				boss_timer_on = true;
+				boss_timer_m.unlock();
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
+				timer_queue.push(ev);
+			}
+			else { boss_timer_m.unlock(); }
+		}
+		else if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_KILL_GOD) {
+			m_pGod->SetPosition(1300.f, 0.f, 0.f);
+			m_pGod->GodHP = 100;
+			m_pSpaceship->SetPosition(XMFLOAT3(1300.f, 0.f, -700.f));
+
+			SC_MOVE_SPACESHIP_PACKET p{};
+			p.size = sizeof(SC_MOVE_SPACESHIP_PACKET);
+			p.type = SC_MOVE_SPACESHIP;
+			p.pos = m_pSpaceship->GetPosition();
+			Send((char*)&p);
+
+			god_timer_m.lock();
+			if (!god_timer_on) {
+				god_timer_on = true;
+				god_timer_m.unlock();
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_GOD, static_cast<short>(num) };
+				timer_queue.push(ev);
+			}
+			else { god_timer_m.unlock(); }
+		}
+		else if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_GO_CENTER) {
+			mission_start = chrono::system_clock::now();
+			TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_MISSION_CLEAR, static_cast<short>(num) };
+			timer_queue.push(ev);
+		}
+		else if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_ESCAPE_BLACK_HOLE) {
+			black_hole_pos = Vector3::Add(m_pSpaceship->GetPosition(), m_pSpaceship->GetLook(), -200.f);
+			black_hole_time = 30.f;
+
+			SC_BLACK_HOLE_PACKET p{};
+			p.size = sizeof(SC_BLACK_HOLE_PACKET);
+			p.type = SC_BLACK_HOLE;
+			p.pos = black_hole_pos;
+			Send((char*)&p);
+
+			black_hole_timer_m.lock();
+			if (black_hole_timer_on == false) {
+				black_hole_timer_on = true;
+				black_hole_timer_m.unlock();
+				b_prev_time = chrono::steady_clock::now();
+				TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_BLACK_HOLE, static_cast<short>(num) };
+				timer_queue.push(ev);
+			}
+			else {
+				black_hole_timer_m.unlock();
+			}
+		}
+		else if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_ENDING) {
+			for (short pl_id : _plist) {
+				if (pl_id == -1) continue;
+				if (clients[pl_id]._state != ST_INGAME) continue;
+				clients[pl_id].send_mission_start_packet(cur_mission);
+			}
+			ResetScene();
+		}
 	}
-	*/
 }
 
 void CScene::GetJewels()
@@ -1304,7 +1265,7 @@ void CScene::SendSceneInfo()
 void CScene::BlackHole()
 {
 	if (_state != ST_INGAME) { black_hole_timer_on = false; return; }
-	if (levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_ESCAPE_BLACK_HOLE && levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CS_BAD_ENDING) { black_hole_timer_on = false;  return; }
+	if (levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_ESCAPE_BLACK_HOLE && levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CS_BAD_ENDING) { black_hole_timer_on = false; return; }
 	if(levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING){
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 500ms, EV_BLACK_HOLE, static_cast<short>(num) };
 		timer_queue.push(ev);
