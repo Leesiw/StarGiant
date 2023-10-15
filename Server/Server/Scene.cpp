@@ -1384,52 +1384,32 @@ void CScene::BlackHole()
 
 }
 
-void CScene::CheckCutsceneEnd(MissionType next_mission)
+void CScene::Restart()
 {
-	if (_state != ST_INGAME) { return; }
-	if (levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CUTSCENE) { return; }
-
-	bool cutscene_end = true;
-	for (char i = 0; i < 3; ++i) {
-		if (_plist[i] == -1) { continue; }
-		if (m_ppPlayers[i]->cutscene_end == false) { cutscene_end = false; }
-	}
-
-	if (cutscene_end == true) {
-		if (cur_mission == MissionType::CS_BAD_ENDING ) {
-			m_pSpaceship->SetPosition({ levels[prev_mission].restartposition_x(), levels[prev_mission].restartposition_y(), 
-				levels[prev_mission].restartposition_z()});
-			for (char i = (char)ItemType::JEWEL_ATT; i < (char)ItemType::JEWEL_HP; ++i) {
-				if (items[(ItemType)i] > 0) { 
-					--items[(ItemType)i];
-					ITEM_INFO i_info{};
-					i_info.num = items[(ItemType)i];
-					i_info.type = (ItemType)i;
-					for (short pl_id : _plist) {
-						if (pl_id == -1) continue;
-						if (clients[pl_id]._state != ST_INGAME) continue;
-						clients[pl_id].send_item_packet(i_info);
-					}
-				}
-			}
-			m_pSpaceship->hp = m_pSpaceship->max_hp;
-			kill_monster_num = 0;
+	m_pSpaceship->SetPosition({ levels[prev_mission].restartposition_x(), levels[prev_mission].restartposition_y(),
+				levels[prev_mission].restartposition_z() });
+	for (char i = (char)ItemType::JEWEL_ATT; i < (char)ItemType::JEWEL_HP; ++i) {
+		if (items[(ItemType)i] > 0) {
+			--items[(ItemType)i];
+			ITEM_INFO i_info{};
+			i_info.num = items[(ItemType)i];
+			i_info.type = (ItemType)i;
 			for (short pl_id : _plist) {
 				if (pl_id == -1) continue;
 				if (clients[pl_id]._state != ST_INGAME) continue;
-				clients[pl_id].send_bullet_hit_packet(-1, m_pSpaceship->hp);
+				clients[pl_id].send_item_packet(i_info);
 			}
-
-			SetMission((MissionType)levels[prev_mission].restartmission());
 		}
-		else if (levels[cur_mission].nextmission() == (int)next_mission) {
-			SetMission(next_mission);
-		}
-		return;
+	}
+	m_pSpaceship->hp = m_pSpaceship->max_hp;
+	kill_monster_num = 0;
+	for (short pl_id : _plist) {
+		if (pl_id == -1) continue;
+		if (clients[pl_id]._state != ST_INGAME) continue;
+		clients[pl_id].send_bullet_hit_packet(-1, m_pSpaceship->hp);
 	}
 
-	TIMER_EVENT ev{ static_cast<char>(next_mission), chrono::system_clock::now() + 500ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num)};
-	timer_queue.push(ev);
+	SetMission((MissionType)levels[prev_mission].restartmission());
 }
 
 void CScene::SpawnEnemyFromGod()
@@ -1589,9 +1569,6 @@ bool CScene::Start()
 
 		TIMER_EVENT ev2{ 0, chrono::system_clock::now() + 33ms, EV_SEND_SCENE_INFO, static_cast<short>(num) };
 		timer_queue.push(ev2);
-
-		TIMER_EVENT ev3{ 1, chrono::system_clock::now() + 100ms, EV_CHECK_CUTSCENE_END, static_cast<short>(num) };
-		timer_queue.push(ev3);
 		return true;
 	}
 	_s_lock.unlock();

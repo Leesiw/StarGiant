@@ -46,7 +46,8 @@ public:
 	void Heal();
 	void SendSceneInfo();
 	void BlackHole();
-	void CheckCutsceneEnd(MissionType next_mission);
+
+	void Restart();
 
 	void SpawnEnemyFromGod();
 	void SpawnEnemyFromGod(char id, char num);
@@ -85,6 +86,7 @@ public:
 	chrono::steady_clock::time_point b_prev_time;
 	float black_hole_time;
 	bool black_hole_timer_on = false;
+	mutex black_hole_timer_m;
 
 	char	kill_monster_num = 0;
 
@@ -104,4 +106,6 @@ public:
 
 	array<short, 3> _plist;
 	mutex _plist_lock;
+
+	mutex cutscene_m;
 };

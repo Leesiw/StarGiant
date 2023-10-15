@@ -184,12 +184,6 @@ void CGameFramework::worker_thread(HANDLE h_iocp)
 			delete ex_over;
 			break;
 		}
-		case OP_CHECK_CUTSCENE_END: {
-			CScene* scene = scene_manager.GetScene(static_cast<short>(key));
-			scene->CheckCutsceneEnd(static_cast<MissionType>(ex_over->obj_id));
-			delete ex_over;
-			break;
-		}
 		}
 	}
 }
@@ -853,24 +847,47 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		if (t_room_id == -1) { break; }
 		CScene* scene = scene_manager.GetScene(t_room_id);
 		if (scene->_state != ST_INGAME) { break; }
-		if (levels[scene->cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+		if (levels[scene->cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE 
+			|| levels[scene->cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 
 			char p_id = clients[c_id].room_pid;
 			if (p_id == -1) { break; }
-			scene->m_ppPlayers[p_id]->cutscene_end = true;
-			
-			char num = 0;
-			for (char i = 0; i < 3; ++i) {
-				if (scene->m_ppPlayers[i]->cutscene_end) {
-					++num;
+			scene->_plist_lock.lock();
+			bool cutscene_end = false;
+			if (!scene->m_ppPlayers[p_id]->cutscene_end) {
+				scene->m_ppPlayers[p_id]->cutscene_end = true;
+				cutscene_end = true;
+				for (char i = 0; i < 3; ++i) {
+					if (scene->_plist[i] == -1) { continue; }
+					if (scene->m_ppPlayers[i]->cutscene_end == false) { cutscene_end = false; }
 				}
-			}
+				scene->_plist_lock.unlock();
 
-			SC_CUTSCENE_END_NUM_PACKET packet{};
-			packet.size = sizeof(SC_CUTSCENE_END_NUM_PACKET);
-			packet.type = SC_CUTSCENE_END_NUM;
-			packet.num = num;
-			scene->Send((char*)&packet);
+				if (cutscene_end) {
+					if (levels[scene->cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
+						scene->Restart();
+					}
+					else {
+						scene->MissionClear(scene->cur_mission);
+					}
+					break;
+				}
+
+				char num = 0;
+				for (char i = 0; i < 3; ++i) {
+					if (scene->m_ppPlayers[i]->cutscene_end) {
+						++num;
+					}
+				}
+				SC_CUTSCENE_END_NUM_PACKET packet{};
+				packet.size = sizeof(SC_CUTSCENE_END_NUM_PACKET);
+				packet.type = SC_CUTSCENE_END_NUM;
+				packet.num = num;
+				scene->Send((char*)&packet);
+			}
+			else {
+				scene->_plist_lock.unlock();
+			}			
 		}
 		break;
 	}
@@ -982,13 +999,6 @@ void CGameFramework::TimerThread(HANDLE h_iocp)
 			case EV_BLACK_HOLE: {
 				OVER_EXP* ov = new OVER_EXP;
 				ov->_comp_type = OP_BLACK_HOLE;
-				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
-				break;
-			}
-			case EV_CHECK_CUTSCENE_END: {
-				OVER_EXP* ov = new OVER_EXP;
-				ov->obj_id = ev.obj_id;
-				ov->_comp_type = OP_CHECK_CUTSCENE_END;
 				PostQueuedCompletionStatus(h_iocp, 1, ev.room_id, &ov->_over);
 				break;
 			}
