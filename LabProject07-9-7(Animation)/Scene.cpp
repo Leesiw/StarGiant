@@ -455,7 +455,7 @@ void CScene::BuildBoss(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CLoadedModelInfo* pBossModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Red.bin", NULL);
 	m_ppBoss = new Boss();
 	m_ppBoss->BossObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBossModel);
-	m_ppBoss->SetPosition(5000.0f, 5000.0f, 5000.0f);
+	m_ppBoss->SetPosition(2300.f, 0.f, 0.f);
 	m_ppBoss->Rotate(0.f, 180.f, 0.f);
 	m_ppBoss->SetScale(100.0f, 100.0f, 100.0f);
 	if (pBossModel) delete pBossModel;

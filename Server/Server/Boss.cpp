@@ -169,6 +169,9 @@ void Boss::Reset()
 
 	condition = false;
 
+	SetPosition(2300.f, 0.f, 0.f);
+	BossHP = 100;
+
 	MAXBossHP = 100.0f;
 	BossHP = MAXBossHP;
 	CurMotion = BossAnimation::SLEEP;

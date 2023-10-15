@@ -116,6 +116,7 @@ void CScene::BuildObjects()
 	// boss
 	m_pBoss = new Boss();
 	m_pBoss->scene_num = num;
+	m_pBoss->Reset();
 	//m_pBoss->SetPosition(3000.f, 3000.f, 3000.f);
 
 	// god
@@ -688,27 +689,6 @@ void CScene::SetMission(MissionType mission)
 	*/
 }
 
-void CScene::SetMissionFindBoss()
-{
-	boss_timer_m.lock();
-	if (!boss_timer_on) {
-		boss_timer_on = true;
-		boss_timer_m.unlock();
-		cur_mission = MissionType::FIND_BOSS;
-
-		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, num };
-		timer_queue.push(ev);
-
-		for (short pl_id : _plist) {
-			if (pl_id == -1) continue;
-			if (clients[pl_id]._state != ST_INGAME) continue;
-			clients[pl_id].send_mission_start_packet(cur_mission);
-		}
-		return;
-	}
-	boss_timer_m.unlock();
-}
-
 void CScene::GetJewels()
 {
 
@@ -1190,7 +1170,7 @@ void CScene::UpdateGod()
 	}
 
 	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_KILL_GOD && m_pGod->GodHP <= 50) {
-		SetMission(MissionType::CS_ANGRY_GOD);
+		MissionClear(cur_mission);
 	}
 	else if(m_pGod->GetcurHp() <= 0 && levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_KILL_GOD2) {
 		god_timer_on = false;
@@ -1335,7 +1315,7 @@ void CScene::BlackHole()
 	std::chrono::duration<float> elapsed_time = (time_now - b_prev_time);
 	b_prev_time = time_now;
 	black_hole_time -= elapsed_time.count();
-	if (black_hole_time <= 0.f) { SetMission(MissionType::GO_CENTER_REAL); return; }
+	if (black_hole_time <= 0.f) { MissionClear(cur_mission); return; }
 
 	SC_BLACK_HOLE_TIME_PACKET packet;
 	packet.size = sizeof(packet);

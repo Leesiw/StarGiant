@@ -31,7 +31,6 @@ public:
 	void CheckMissionComplete();
 	void MissionClear(MissionType mission);
 	void SetMission(MissionType mission);
-	void SetMissionFindBoss();
 
 	void GetJewels();
 

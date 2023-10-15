@@ -60,6 +60,8 @@ void God::Reset()
 {
 	GodHP = MAXGodHP;
 
+	SetPosition(1300.f, 0.f, 0.f);
+
 	CurState = GodState::IDLE1;
 	PastState = CurState;
 	CurMotion = GodAnimation::IDLE1;

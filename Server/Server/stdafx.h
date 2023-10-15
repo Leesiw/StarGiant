@@ -17,6 +17,7 @@ using namespace std::chrono;
 #include <fstream>
 #include <sqlext.h>
 #include "protocol.h"
+#include "pp.pb.h"
 
 using namespace DirectX;
 using namespace std;
