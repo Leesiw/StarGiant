@@ -273,8 +273,8 @@ void CGameFramework::SetMission()
 		cout << as->laser().max_hp() << endl;
 		cout << as->maxmonsternum() << endl;
 		cout << as->spawnmonsternum() << endl;
-		cout << as->requirement() << endl;
-		cout << as->restartmission() << endl;
+		cout << "requirement" << as->requirement() << endl;
+		cout << "restartmission" << as->restartmission() << endl;
 		cout << as->restartposition_x() << endl;
 		cout << as->restartposition_y() << endl;
 		cout << as->restartposition_z() << endl;
@@ -283,8 +283,8 @@ void CGameFramework::SetMission()
 		cout << as->destination_y() << endl;
 		cout << as->destination_z() << endl;
 		cout << as->dist() << endl;
-		cout << endl << endl;
-		*/
+		cout << endl << endl;*/
+		
 	}
 	cout << "set mission end" << endl;
 
@@ -927,9 +927,15 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 				if (cutscene_end) {
 					if (levels[scene->cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 						scene->Restart();
+						for (char i = 0; i < 3; ++i) {
+							scene->m_ppPlayers[i]->cutscene_end = false;
+						}
 					}
 					else {
 						scene->MissionClear(scene->cur_mission);
+						for (char i = 0; i < 3; ++i) {
+							scene->m_ppPlayers[i]->cutscene_end = false;
+						}
 					}
 					break;
 				}

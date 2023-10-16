@@ -711,7 +711,8 @@ void CScene::GetJewels()
 void CScene::SpawnEnemy()
 {
 	if (_state != ST_INGAME) { return; }
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE
+		|| levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 20s, EV_SPAWN_ENEMY, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
@@ -749,7 +750,8 @@ void CScene::MoveEnemy(char obj_id)
 		m_ppEnemies[obj_id]->SetisAliveFalse();
 		return;
 	}
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE
+		|| levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 		if (cur_mission == MissionType::CS_BAD_ENDING || 
 			cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::CS_SHOW_GOD) {
 			m_ppEnemies[obj_id]->SetisAliveFalse();
@@ -840,7 +842,8 @@ void CScene::AimingEnemy(char obj_id)
 		m_ppEnemies[obj_id]->SetisAliveFalse();
 		return;
 	}
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE
+		|| levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 		if (cur_mission == MissionType::CS_BAD_ENDING ||
 			cur_mission == MissionType::CS_BOSS_SCREAM || cur_mission == MissionType::CS_SHOW_GOD) {
 			m_ppEnemies[obj_id]->SetisAliveFalse();
@@ -924,7 +927,8 @@ void CScene::AimingEnemy(char obj_id)
 void CScene::UpdateMeteo(char obj_id)
 {
 	if (_state != ST_INGAME) { return; }
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE
+		|| levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 		m_ppMeteoObjects[obj_id]->prev_time = chrono::steady_clock::now();
 		TIMER_EVENT ev{ obj_id, chrono::system_clock::now() + 1s, EV_UPDATE_METEO, static_cast<short>(num) };
 		timer_queue.push(ev);
@@ -981,7 +985,8 @@ void CScene::SpawnMissile(char obj_id)
 		m_ppEnemies[obj_id]->SetAttackTimerFalse();
 		return;
 	}
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE
+		|| levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 		if (cur_mission == MissionType::CS_BAD_ENDING) {
 			m_ppEnemies[obj_id]->SetAttackTimerFalse();
 			return;
@@ -1027,7 +1032,8 @@ void CScene::UpdateMissile(char obj_id)
 {
 	if (_state != ST_INGAME) { return; }
 	if (!m_ppMissiles[obj_id]->GetisActive()) { return; }
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE
+		|| levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 		if (cur_mission == MissionType::CS_BAD_ENDING) {
 			m_ppMissiles[obj_id]->SetisActive(false);
 			return;
@@ -1082,7 +1088,8 @@ void CScene::UpdateBoss()
 		&& levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_DEFEAT_BOSS2 && 
 		levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CS_BAD_ENDING) { boss_timer_on = false; return; }
 	
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE 
+		|| levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_BOSS, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
@@ -1120,7 +1127,8 @@ void CScene::UpdateGod()
 	if (levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_KILL_GOD && levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CUTSCENE
 		&& levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_KILL_GOD2 &&
 		levels[cur_mission].requirement() != Level_MissionType::Level_MissionType_CS_BAD_ENDING) { god_timer_on = false; return; }
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE
+		|| levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_GOD, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
@@ -1156,7 +1164,8 @@ void CScene::UpdateGod()
 void CScene::UpdateSpaceship()
 {
 	if (_state != ST_INGAME) { return; }
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE
+		|| levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_UPDATE_SPACESHIP, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
@@ -1180,7 +1189,8 @@ void CScene::UpdateSpaceship()
 void CScene::Heal()
 {
 	if (_state != ST_INGAME) { return; }
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE
+		|| levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 1s, EV_HEAL, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
@@ -1203,7 +1213,8 @@ void CScene::Heal()
 void CScene::SendSceneInfo()
 {
 	if (_state != ST_INGAME) { return; }
-	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE) {
+	if (levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CUTSCENE
+		|| levels[cur_mission].requirement() == Level_MissionType::Level_MissionType_CS_BAD_ENDING) {
 		TIMER_EVENT ev{ 0, chrono::system_clock::now() + 500ms, EV_SEND_SCENE_INFO, static_cast<short>(num) };
 		timer_queue.push(ev);
 		return;
@@ -1369,7 +1380,6 @@ void CScene::Restart()
 		if (clients[pl_id]._state != ST_INGAME) continue;
 		clients[pl_id].send_bullet_hit_packet(-1, m_pSpaceship->hp);
 	}
-
 	SetMission((MissionType)levels[prev_mission].restartmission());
 }
 
