@@ -1,19 +1,20 @@
 syntax = "proto3";
 
 message Level {
-  int32 NextMission = 1;
+  int32 CurMission = 1;
+  int32 NextMission = 2;
 
   message MonsterStatus {
     int32 MAX_HP = 1;
     int32 ATK = 2;
   }
 
-  MonsterStatus PlasmaCannon = 2;
-  MonsterStatus Missile = 3;
-  MonsterStatus Laser = 4;
+  MonsterStatus PlasmaCannon = 3;
+  MonsterStatus Missile = 4;
+  MonsterStatus Laser = 5;
 
-  int32 MaxMonsterNum = 5;
-  int32 SpawnMonsterNum = 6;
+  int32 MaxMonsterNum = 6;
+  int32 SpawnMonsterNum = 7;
 
    enum MissionType {
     CUTSCENE = 0;
@@ -33,16 +34,21 @@ message Level {
 	CS_BAD_ENDING = 14;
   }
 
-  MissionType Requirement = 7;
+  MissionType Requirement = 8;
 
-  int32 RestartMission = 8;
-  float RestartPosition_x = 9;
-  float RestartPosition_y = 10;
-  float RestartPosition_z = 11;
+  int32 RestartMission = 9;
+  float RestartPosition_x = 10;
+  float RestartPosition_y = 11;
+  float RestartPosition_z = 12;
 
-  int32 KillMonsterNum = 12;
-  float Destination_x = 13;
-  float Destination_y = 14;
-  float Destination_z = 15;
-  float Dist = 16;
+  int32 KillMonsterNum = 13;
+  float Destination_x = 14;
+  float Destination_y = 15;
+  float Destination_z = 16;
+  float Dist = 17;
+}
+
+
+message Levels {
+	repeated Level level = 1;
 }

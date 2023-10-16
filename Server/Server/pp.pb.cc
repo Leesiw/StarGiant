@@ -14,6 +14,7 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
+extern PROTOBUF_INTERNAL_EXPORT_pp_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_Level_pp_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_pp_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Level_MonsterStatus_pp_2eproto;
 class Level_MonsterStatusDefaultTypeInternal {
  public:
@@ -23,6 +24,10 @@ class LevelDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Level> _instance;
 } _Level_default_instance_;
+class LevelsDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Levels> _instance;
+} _Levels_default_instance_;
 static void InitDefaultsscc_info_Level_pp_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -52,7 +57,22 @@ static void InitDefaultsscc_info_Level_MonsterStatus_pp_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Level_MonsterStatus_pp_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Level_MonsterStatus_pp_2eproto}, {}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_pp_2eproto[2];
+static void InitDefaultsscc_info_Levels_pp_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_Levels_default_instance_;
+    new (ptr) ::Levels();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::Levels::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_Levels_pp_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_Levels_pp_2eproto}, {
+      &scc_info_Level_pp_2eproto.base,}};
+
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_pp_2eproto[3];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_pp_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_pp_2eproto = nullptr;
 
@@ -69,6 +89,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_pp_2eproto::offsets[] PROTOBUF
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::Level, curmission_),
   PROTOBUF_FIELD_OFFSET(::Level, nextmission_),
   PROTOBUF_FIELD_OFFSET(::Level, plasmacannon_),
   PROTOBUF_FIELD_OFFSET(::Level, missile_),
@@ -85,52 +106,62 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_pp_2eproto::offsets[] PROTOBUF
   PROTOBUF_FIELD_OFFSET(::Level, destination_y_),
   PROTOBUF_FIELD_OFFSET(::Level, destination_z_),
   PROTOBUF_FIELD_OFFSET(::Level, dist_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Levels, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::Levels, level_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::Level_MonsterStatus)},
   { 7, -1, sizeof(::Level)},
+  { 29, -1, sizeof(::Levels)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Level_MonsterStatus_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Level_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_Levels_default_instance_),
 };
 
 const char descriptor_table_protodef_pp_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\010pp.proto\"\374\005\n\005Level\022\023\n\013NextMission\030\001 \001("
-  "\005\022*\n\014PlasmaCannon\030\002 \001(\0132\024.Level.MonsterS"
-  "tatus\022%\n\007Missile\030\003 \001(\0132\024.Level.MonsterSt"
-  "atus\022#\n\005Laser\030\004 \001(\0132\024.Level.MonsterStatu"
-  "s\022\025\n\rMaxMonsterNum\030\005 \001(\005\022\027\n\017SpawnMonster"
-  "Num\030\006 \001(\005\022\'\n\013Requirement\030\007 \001(\0162\022.Level.M"
-  "issionType\022\026\n\016RestartMission\030\010 \001(\005\022\031\n\021Re"
-  "startPosition_x\030\t \001(\002\022\031\n\021RestartPosition"
-  "_y\030\n \001(\002\022\031\n\021RestartPosition_z\030\013 \001(\002\022\026\n\016K"
-  "illMonsterNum\030\014 \001(\005\022\025\n\rDestination_x\030\r \001"
-  "(\002\022\025\n\rDestination_y\030\016 \001(\002\022\025\n\rDestination"
-  "_z\030\017 \001(\002\022\014\n\004Dist\030\020 \001(\002\032,\n\rMonsterStatus\022"
-  "\016\n\006MAX_HP\030\001 \001(\005\022\013\n\003ATK\030\002 \001(\005\"\212\002\n\013Mission"
-  "Type\022\014\n\010CUTSCENE\020\000\022\022\n\016DEFEAT_MONSTER\020\001\022\021"
-  "\n\rDEFEAT_METEOR\020\002\022\025\n\021GO_TO_DESTINATION\020\003"
-  "\022\n\n\006TU_SIT\020\004\022\013\n\007TU_HEAL\020\005\022\016\n\nGET_JEWELS\020"
-  "\006\022\017\n\013DEFEAT_BOSS\020\007\022\020\n\014DEFEAT_BOSS2\020\010\022\r\n\t"
-  "GO_CENTER\020\t\022\025\n\021ESCAPE_BLACK_HOLE\020\n\022\014\n\010KI"
-  "LL_GOD\020\013\022\r\n\tKILL_GOD2\020\014\022\r\n\tCS_ENDING\020\r\022\021"
-  "\n\rCS_BAD_ENDING\020\016b\006proto3"
+  "\n\010pp.proto\"\220\006\n\005Level\022\022\n\nCurMission\030\001 \001(\005"
+  "\022\023\n\013NextMission\030\002 \001(\005\022*\n\014PlasmaCannon\030\003 "
+  "\001(\0132\024.Level.MonsterStatus\022%\n\007Missile\030\004 \001"
+  "(\0132\024.Level.MonsterStatus\022#\n\005Laser\030\005 \001(\0132"
+  "\024.Level.MonsterStatus\022\025\n\rMaxMonsterNum\030\006"
+  " \001(\005\022\027\n\017SpawnMonsterNum\030\007 \001(\005\022\'\n\013Require"
+  "ment\030\010 \001(\0162\022.Level.MissionType\022\026\n\016Restar"
+  "tMission\030\t \001(\005\022\031\n\021RestartPosition_x\030\n \001("
+  "\002\022\031\n\021RestartPosition_y\030\013 \001(\002\022\031\n\021RestartP"
+  "osition_z\030\014 \001(\002\022\026\n\016KillMonsterNum\030\r \001(\005\022"
+  "\025\n\rDestination_x\030\016 \001(\002\022\025\n\rDestination_y\030"
+  "\017 \001(\002\022\025\n\rDestination_z\030\020 \001(\002\022\014\n\004Dist\030\021 \001"
+  "(\002\032,\n\rMonsterStatus\022\016\n\006MAX_HP\030\001 \001(\005\022\013\n\003A"
+  "TK\030\002 \001(\005\"\212\002\n\013MissionType\022\014\n\010CUTSCENE\020\000\022\022"
+  "\n\016DEFEAT_MONSTER\020\001\022\021\n\rDEFEAT_METEOR\020\002\022\025\n"
+  "\021GO_TO_DESTINATION\020\003\022\n\n\006TU_SIT\020\004\022\013\n\007TU_H"
+  "EAL\020\005\022\016\n\nGET_JEWELS\020\006\022\017\n\013DEFEAT_BOSS\020\007\022\020"
+  "\n\014DEFEAT_BOSS2\020\010\022\r\n\tGO_CENTER\020\t\022\025\n\021ESCAP"
+  "E_BLACK_HOLE\020\n\022\014\n\010KILL_GOD\020\013\022\r\n\tKILL_GOD"
+  "2\020\014\022\r\n\tCS_ENDING\020\r\022\021\n\rCS_BAD_ENDING\020\016\"\037\n"
+  "\006Levels\022\025\n\005level\030\001 \003(\0132\006.Levelb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_pp_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_pp_2eproto_sccs[2] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_pp_2eproto_sccs[3] = {
   &scc_info_Level_pp_2eproto.base,
   &scc_info_Level_MonsterStatus_pp_2eproto.base,
+  &scc_info_Levels_pp_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_pp_2eproto_once;
 static bool descriptor_table_pp_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_pp_2eproto = {
-  &descriptor_table_pp_2eproto_initialized, descriptor_table_protodef_pp_2eproto, "pp.proto", 785,
-  &descriptor_table_pp_2eproto_once, descriptor_table_pp_2eproto_sccs, descriptor_table_pp_2eproto_deps, 2, 0,
+  &descriptor_table_pp_2eproto_initialized, descriptor_table_protodef_pp_2eproto, "pp.proto", 838,
+  &descriptor_table_pp_2eproto_once, descriptor_table_pp_2eproto_sccs, descriptor_table_pp_2eproto_deps, 3, 0,
   schemas, file_default_instances, TableStruct_pp_2eproto::offsets,
-  file_level_metadata_pp_2eproto, 2, file_level_enum_descriptors_pp_2eproto, file_level_service_descriptors_pp_2eproto,
+  file_level_metadata_pp_2eproto, 3, file_level_enum_descriptors_pp_2eproto, file_level_service_descriptors_pp_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -452,9 +483,9 @@ Level::Level(const Level& from)
   } else {
     laser_ = nullptr;
   }
-  ::memcpy(&nextmission_, &from.nextmission_,
+  ::memcpy(&curmission_, &from.curmission_,
     static_cast<size_t>(reinterpret_cast<char*>(&dist_) -
-    reinterpret_cast<char*>(&nextmission_)) + sizeof(dist_));
+    reinterpret_cast<char*>(&curmission_)) + sizeof(dist_));
   // @@protoc_insertion_point(copy_constructor:Level)
 }
 
@@ -503,9 +534,9 @@ void Level::Clear() {
     delete laser_;
   }
   laser_ = nullptr;
-  ::memset(&nextmission_, 0, static_cast<size_t>(
+  ::memset(&curmission_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&dist_) -
-      reinterpret_cast<char*>(&nextmission_)) + sizeof(dist_));
+      reinterpret_cast<char*>(&curmission_)) + sizeof(dist_));
   _internal_metadata_.Clear();
 }
 
@@ -516,115 +547,122 @@ const char* Level::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // int32 NextMission = 1;
+      // int32 CurMission = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          curmission_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 NextMission = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
           nextmission_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .Level.MonsterStatus PlasmaCannon = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+      // .Level.MonsterStatus PlasmaCannon = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
           ptr = ctx->ParseMessage(_internal_mutable_plasmacannon(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .Level.MonsterStatus Missile = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+      // .Level.MonsterStatus Missile = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
           ptr = ctx->ParseMessage(_internal_mutable_missile(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .Level.MonsterStatus Laser = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+      // .Level.MonsterStatus Laser = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
           ptr = ctx->ParseMessage(_internal_mutable_laser(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // int32 MaxMonsterNum = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+      // int32 MaxMonsterNum = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
           maxmonsternum_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // int32 SpawnMonsterNum = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+      // int32 SpawnMonsterNum = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
           spawnmonsternum_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // .Level.MissionType Requirement = 7;
-      case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56)) {
+      // .Level.MissionType Requirement = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
           ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
           _internal_set_requirement(static_cast<::Level_MissionType>(val));
         } else goto handle_unusual;
         continue;
-      // int32 RestartMission = 8;
-      case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
+      // int32 RestartMission = 9;
+      case 9:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 72)) {
           restartmission_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // float RestartPosition_x = 9;
-      case 9:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 77)) {
+      // float RestartPosition_x = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 85)) {
           restartposition_x_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // float RestartPosition_y = 10;
-      case 10:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 85)) {
+      // float RestartPosition_y = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 93)) {
           restartposition_y_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // float RestartPosition_z = 11;
-      case 11:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 93)) {
+      // float RestartPosition_z = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 101)) {
           restartposition_z_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // int32 KillMonsterNum = 12;
-      case 12:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 96)) {
+      // int32 KillMonsterNum = 13;
+      case 13:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 104)) {
           killmonsternum_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // float Destination_x = 13;
-      case 13:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 109)) {
+      // float Destination_x = 14;
+      case 14:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 117)) {
           destination_x_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // float Destination_y = 14;
-      case 14:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 117)) {
+      // float Destination_y = 15;
+      case 15:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 125)) {
           destination_y_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // float Destination_z = 15;
-      case 15:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 125)) {
+      // float Destination_z = 16;
+      case 16:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 133)) {
           destination_z_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // float Dist = 16;
-      case 16:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 133)) {
+      // float Dist = 17;
+      case 17:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 141)) {
           dist_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
@@ -655,107 +693,113 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 NextMission = 1;
-  if (this->nextmission() != 0) {
+  // int32 CurMission = 1;
+  if (this->curmission() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_nextmission(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_curmission(), target);
   }
 
-  // .Level.MonsterStatus PlasmaCannon = 2;
+  // int32 NextMission = 2;
+  if (this->nextmission() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_nextmission(), target);
+  }
+
+  // .Level.MonsterStatus PlasmaCannon = 3;
   if (this->has_plasmacannon()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        2, _Internal::plasmacannon(this), target, stream);
+        3, _Internal::plasmacannon(this), target, stream);
   }
 
-  // .Level.MonsterStatus Missile = 3;
+  // .Level.MonsterStatus Missile = 4;
   if (this->has_missile()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        3, _Internal::missile(this), target, stream);
+        4, _Internal::missile(this), target, stream);
   }
 
-  // .Level.MonsterStatus Laser = 4;
+  // .Level.MonsterStatus Laser = 5;
   if (this->has_laser()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        4, _Internal::laser(this), target, stream);
+        5, _Internal::laser(this), target, stream);
   }
 
-  // int32 MaxMonsterNum = 5;
+  // int32 MaxMonsterNum = 6;
   if (this->maxmonsternum() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(5, this->_internal_maxmonsternum(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(6, this->_internal_maxmonsternum(), target);
   }
 
-  // int32 SpawnMonsterNum = 6;
+  // int32 SpawnMonsterNum = 7;
   if (this->spawnmonsternum() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(6, this->_internal_spawnmonsternum(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(7, this->_internal_spawnmonsternum(), target);
   }
 
-  // .Level.MissionType Requirement = 7;
+  // .Level.MissionType Requirement = 8;
   if (this->requirement() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
-      7, this->_internal_requirement(), target);
+      8, this->_internal_requirement(), target);
   }
 
-  // int32 RestartMission = 8;
+  // int32 RestartMission = 9;
   if (this->restartmission() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(8, this->_internal_restartmission(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(9, this->_internal_restartmission(), target);
   }
 
-  // float RestartPosition_x = 9;
+  // float RestartPosition_x = 10;
   if (!(this->restartposition_x() <= 0 && this->restartposition_x() >= 0)) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(9, this->_internal_restartposition_x(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(10, this->_internal_restartposition_x(), target);
   }
 
-  // float RestartPosition_y = 10;
+  // float RestartPosition_y = 11;
   if (!(this->restartposition_y() <= 0 && this->restartposition_y() >= 0)) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(10, this->_internal_restartposition_y(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(11, this->_internal_restartposition_y(), target);
   }
 
-  // float RestartPosition_z = 11;
+  // float RestartPosition_z = 12;
   if (!(this->restartposition_z() <= 0 && this->restartposition_z() >= 0)) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(11, this->_internal_restartposition_z(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(12, this->_internal_restartposition_z(), target);
   }
 
-  // int32 KillMonsterNum = 12;
+  // int32 KillMonsterNum = 13;
   if (this->killmonsternum() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(12, this->_internal_killmonsternum(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(13, this->_internal_killmonsternum(), target);
   }
 
-  // float Destination_x = 13;
+  // float Destination_x = 14;
   if (!(this->destination_x() <= 0 && this->destination_x() >= 0)) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(13, this->_internal_destination_x(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(14, this->_internal_destination_x(), target);
   }
 
-  // float Destination_y = 14;
+  // float Destination_y = 15;
   if (!(this->destination_y() <= 0 && this->destination_y() >= 0)) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(14, this->_internal_destination_y(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(15, this->_internal_destination_y(), target);
   }
 
-  // float Destination_z = 15;
+  // float Destination_z = 16;
   if (!(this->destination_z() <= 0 && this->destination_z() >= 0)) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(15, this->_internal_destination_z(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(16, this->_internal_destination_z(), target);
   }
 
-  // float Dist = 16;
+  // float Dist = 17;
   if (!(this->dist() <= 0 && this->dist() >= 0)) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(16, this->_internal_dist(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(17, this->_internal_dist(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -774,99 +818,106 @@ size_t Level::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .Level.MonsterStatus PlasmaCannon = 2;
+  // .Level.MonsterStatus PlasmaCannon = 3;
   if (this->has_plasmacannon()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *plasmacannon_);
   }
 
-  // .Level.MonsterStatus Missile = 3;
+  // .Level.MonsterStatus Missile = 4;
   if (this->has_missile()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *missile_);
   }
 
-  // .Level.MonsterStatus Laser = 4;
+  // .Level.MonsterStatus Laser = 5;
   if (this->has_laser()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *laser_);
   }
 
-  // int32 NextMission = 1;
+  // int32 CurMission = 1;
+  if (this->curmission() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_curmission());
+  }
+
+  // int32 NextMission = 2;
   if (this->nextmission() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_nextmission());
   }
 
-  // int32 MaxMonsterNum = 5;
+  // int32 MaxMonsterNum = 6;
   if (this->maxmonsternum() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_maxmonsternum());
   }
 
-  // int32 SpawnMonsterNum = 6;
+  // int32 SpawnMonsterNum = 7;
   if (this->spawnmonsternum() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_spawnmonsternum());
   }
 
-  // .Level.MissionType Requirement = 7;
+  // .Level.MissionType Requirement = 8;
   if (this->requirement() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_requirement());
   }
 
-  // int32 RestartMission = 8;
+  // int32 RestartMission = 9;
   if (this->restartmission() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_restartmission());
   }
 
-  // float RestartPosition_x = 9;
+  // float RestartPosition_x = 10;
   if (!(this->restartposition_x() <= 0 && this->restartposition_x() >= 0)) {
     total_size += 1 + 4;
   }
 
-  // float RestartPosition_y = 10;
+  // float RestartPosition_y = 11;
   if (!(this->restartposition_y() <= 0 && this->restartposition_y() >= 0)) {
     total_size += 1 + 4;
   }
 
-  // float RestartPosition_z = 11;
+  // float RestartPosition_z = 12;
   if (!(this->restartposition_z() <= 0 && this->restartposition_z() >= 0)) {
     total_size += 1 + 4;
   }
 
-  // int32 KillMonsterNum = 12;
+  // int32 KillMonsterNum = 13;
   if (this->killmonsternum() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_killmonsternum());
   }
 
-  // float Destination_x = 13;
+  // float Destination_x = 14;
   if (!(this->destination_x() <= 0 && this->destination_x() >= 0)) {
     total_size += 1 + 4;
   }
 
-  // float Destination_y = 14;
+  // float Destination_y = 15;
   if (!(this->destination_y() <= 0 && this->destination_y() >= 0)) {
     total_size += 1 + 4;
   }
 
-  // float Destination_z = 15;
+  // float Destination_z = 16;
   if (!(this->destination_z() <= 0 && this->destination_z() >= 0)) {
-    total_size += 1 + 4;
+    total_size += 2 + 4;
   }
 
-  // float Dist = 16;
+  // float Dist = 17;
   if (!(this->dist() <= 0 && this->dist() >= 0)) {
     total_size += 2 + 4;
   }
@@ -910,6 +961,9 @@ void Level::MergeFrom(const Level& from) {
   }
   if (from.has_laser()) {
     _internal_mutable_laser()->::Level_MonsterStatus::MergeFrom(from._internal_laser());
+  }
+  if (from.curmission() != 0) {
+    _internal_set_curmission(from._internal_curmission());
   }
   if (from.nextmission() != 0) {
     _internal_set_nextmission(from._internal_nextmission());
@@ -976,6 +1030,7 @@ void Level::InternalSwap(Level* other) {
   swap(plasmacannon_, other->plasmacannon_);
   swap(missile_, other->missile_);
   swap(laser_, other->laser_);
+  swap(curmission_, other->curmission_);
   swap(nextmission_, other->nextmission_);
   swap(maxmonsternum_, other->maxmonsternum_);
   swap(spawnmonsternum_, other->spawnmonsternum_);
@@ -996,6 +1051,197 @@ void Level::InternalSwap(Level* other) {
 }
 
 
+// ===================================================================
+
+void Levels::InitAsDefaultInstance() {
+}
+class Levels::_Internal {
+ public:
+};
+
+Levels::Levels()
+  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Levels)
+}
+Levels::Levels(const Levels& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      _internal_metadata_(nullptr),
+      level_(from.level_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:Levels)
+}
+
+void Levels::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Levels_pp_2eproto.base);
+}
+
+Levels::~Levels() {
+  // @@protoc_insertion_point(destructor:Levels)
+  SharedDtor();
+}
+
+void Levels::SharedDtor() {
+}
+
+void Levels::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Levels& Levels::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Levels_pp_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Levels::Clear() {
+// @@protoc_insertion_point(message_clear_start:Levels)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  level_.Clear();
+  _internal_metadata_.Clear();
+}
+
+const char* Levels::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated .Level level = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_level(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Levels::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Levels)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .Level level = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_level_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, this->_internal_level(i), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Levels)
+  return target;
+}
+
+size_t Levels::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Levels)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .Level level = 1;
+  total_size += 1UL * this->_internal_level_size();
+  for (const auto& msg : this->level_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Levels::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:Levels)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Levels* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Levels>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:Levels)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:Levels)
+    MergeFrom(*source);
+  }
+}
+
+void Levels::MergeFrom(const Levels& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Levels)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  level_.MergeFrom(from.level_);
+}
+
+void Levels::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:Levels)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Levels::CopyFrom(const Levels& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Levels)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Levels::IsInitialized() const {
+  return true;
+}
+
+void Levels::InternalSwap(Levels* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  level_.InternalSwap(&other->level_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Levels::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::Level_MonsterStatus* Arena::CreateMaybeMessage< ::Level_MonsterStatus >(Arena* arena) {
@@ -1003,6 +1249,9 @@ template<> PROTOBUF_NOINLINE ::Level_MonsterStatus* Arena::CreateMaybeMessage< :
 }
 template<> PROTOBUF_NOINLINE ::Level* Arena::CreateMaybeMessage< ::Level >(Arena* arena) {
   return Arena::CreateInternal< ::Level >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Levels* Arena::CreateMaybeMessage< ::Levels >(Arena* arena) {
+  return Arena::CreateInternal< ::Levels >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

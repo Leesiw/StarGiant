@@ -48,7 +48,7 @@ struct TableStruct_pp_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[2]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -61,9 +61,13 @@ extern LevelDefaultTypeInternal _Level_default_instance_;
 class Level_MonsterStatus;
 class Level_MonsterStatusDefaultTypeInternal;
 extern Level_MonsterStatusDefaultTypeInternal _Level_MonsterStatus_default_instance_;
+class Levels;
+class LevelsDefaultTypeInternal;
+extern LevelsDefaultTypeInternal _Levels_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
 template<> ::Level* Arena::CreateMaybeMessage<::Level>(Arena*);
 template<> ::Level_MonsterStatus* Arena::CreateMaybeMessage<::Level_MonsterStatus>(Arena*);
+template<> ::Levels* Arena::CreateMaybeMessage<::Levels>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 
 enum Level_MissionType : int {
@@ -409,24 +413,25 @@ class Level :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kPlasmaCannonFieldNumber = 2,
-    kMissileFieldNumber = 3,
-    kLaserFieldNumber = 4,
-    kNextMissionFieldNumber = 1,
-    kMaxMonsterNumFieldNumber = 5,
-    kSpawnMonsterNumFieldNumber = 6,
-    kRequirementFieldNumber = 7,
-    kRestartMissionFieldNumber = 8,
-    kRestartPositionXFieldNumber = 9,
-    kRestartPositionYFieldNumber = 10,
-    kRestartPositionZFieldNumber = 11,
-    kKillMonsterNumFieldNumber = 12,
-    kDestinationXFieldNumber = 13,
-    kDestinationYFieldNumber = 14,
-    kDestinationZFieldNumber = 15,
-    kDistFieldNumber = 16,
+    kPlasmaCannonFieldNumber = 3,
+    kMissileFieldNumber = 4,
+    kLaserFieldNumber = 5,
+    kCurMissionFieldNumber = 1,
+    kNextMissionFieldNumber = 2,
+    kMaxMonsterNumFieldNumber = 6,
+    kSpawnMonsterNumFieldNumber = 7,
+    kRequirementFieldNumber = 8,
+    kRestartMissionFieldNumber = 9,
+    kRestartPositionXFieldNumber = 10,
+    kRestartPositionYFieldNumber = 11,
+    kRestartPositionZFieldNumber = 12,
+    kKillMonsterNumFieldNumber = 13,
+    kDestinationXFieldNumber = 14,
+    kDestinationYFieldNumber = 15,
+    kDestinationZFieldNumber = 16,
+    kDistFieldNumber = 17,
   };
-  // .Level.MonsterStatus PlasmaCannon = 2;
+  // .Level.MonsterStatus PlasmaCannon = 3;
   bool has_plasmacannon() const;
   private:
   bool _internal_has_plasmacannon() const;
@@ -441,7 +446,7 @@ class Level :
   ::Level_MonsterStatus* _internal_mutable_plasmacannon();
   public:
 
-  // .Level.MonsterStatus Missile = 3;
+  // .Level.MonsterStatus Missile = 4;
   bool has_missile() const;
   private:
   bool _internal_has_missile() const;
@@ -456,7 +461,7 @@ class Level :
   ::Level_MonsterStatus* _internal_mutable_missile();
   public:
 
-  // .Level.MonsterStatus Laser = 4;
+  // .Level.MonsterStatus Laser = 5;
   bool has_laser() const;
   private:
   bool _internal_has_laser() const;
@@ -471,7 +476,16 @@ class Level :
   ::Level_MonsterStatus* _internal_mutable_laser();
   public:
 
-  // int32 NextMission = 1;
+  // int32 CurMission = 1;
+  void clear_curmission();
+  ::PROTOBUF_NAMESPACE_ID::int32 curmission() const;
+  void set_curmission(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_curmission() const;
+  void _internal_set_curmission(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // int32 NextMission = 2;
   void clear_nextmission();
   ::PROTOBUF_NAMESPACE_ID::int32 nextmission() const;
   void set_nextmission(::PROTOBUF_NAMESPACE_ID::int32 value);
@@ -480,7 +494,7 @@ class Level :
   void _internal_set_nextmission(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // int32 MaxMonsterNum = 5;
+  // int32 MaxMonsterNum = 6;
   void clear_maxmonsternum();
   ::PROTOBUF_NAMESPACE_ID::int32 maxmonsternum() const;
   void set_maxmonsternum(::PROTOBUF_NAMESPACE_ID::int32 value);
@@ -489,7 +503,7 @@ class Level :
   void _internal_set_maxmonsternum(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // int32 SpawnMonsterNum = 6;
+  // int32 SpawnMonsterNum = 7;
   void clear_spawnmonsternum();
   ::PROTOBUF_NAMESPACE_ID::int32 spawnmonsternum() const;
   void set_spawnmonsternum(::PROTOBUF_NAMESPACE_ID::int32 value);
@@ -498,7 +512,7 @@ class Level :
   void _internal_set_spawnmonsternum(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // .Level.MissionType Requirement = 7;
+  // .Level.MissionType Requirement = 8;
   void clear_requirement();
   ::Level_MissionType requirement() const;
   void set_requirement(::Level_MissionType value);
@@ -507,7 +521,7 @@ class Level :
   void _internal_set_requirement(::Level_MissionType value);
   public:
 
-  // int32 RestartMission = 8;
+  // int32 RestartMission = 9;
   void clear_restartmission();
   ::PROTOBUF_NAMESPACE_ID::int32 restartmission() const;
   void set_restartmission(::PROTOBUF_NAMESPACE_ID::int32 value);
@@ -516,7 +530,7 @@ class Level :
   void _internal_set_restartmission(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // float RestartPosition_x = 9;
+  // float RestartPosition_x = 10;
   void clear_restartposition_x();
   float restartposition_x() const;
   void set_restartposition_x(float value);
@@ -525,7 +539,7 @@ class Level :
   void _internal_set_restartposition_x(float value);
   public:
 
-  // float RestartPosition_y = 10;
+  // float RestartPosition_y = 11;
   void clear_restartposition_y();
   float restartposition_y() const;
   void set_restartposition_y(float value);
@@ -534,7 +548,7 @@ class Level :
   void _internal_set_restartposition_y(float value);
   public:
 
-  // float RestartPosition_z = 11;
+  // float RestartPosition_z = 12;
   void clear_restartposition_z();
   float restartposition_z() const;
   void set_restartposition_z(float value);
@@ -543,7 +557,7 @@ class Level :
   void _internal_set_restartposition_z(float value);
   public:
 
-  // int32 KillMonsterNum = 12;
+  // int32 KillMonsterNum = 13;
   void clear_killmonsternum();
   ::PROTOBUF_NAMESPACE_ID::int32 killmonsternum() const;
   void set_killmonsternum(::PROTOBUF_NAMESPACE_ID::int32 value);
@@ -552,7 +566,7 @@ class Level :
   void _internal_set_killmonsternum(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // float Destination_x = 13;
+  // float Destination_x = 14;
   void clear_destination_x();
   float destination_x() const;
   void set_destination_x(float value);
@@ -561,7 +575,7 @@ class Level :
   void _internal_set_destination_x(float value);
   public:
 
-  // float Destination_y = 14;
+  // float Destination_y = 15;
   void clear_destination_y();
   float destination_y() const;
   void set_destination_y(float value);
@@ -570,7 +584,7 @@ class Level :
   void _internal_set_destination_y(float value);
   public:
 
-  // float Destination_z = 15;
+  // float Destination_z = 16;
   void clear_destination_z();
   float destination_z() const;
   void set_destination_z(float value);
@@ -579,7 +593,7 @@ class Level :
   void _internal_set_destination_z(float value);
   public:
 
-  // float Dist = 16;
+  // float Dist = 17;
   void clear_dist();
   float dist() const;
   void set_dist(float value);
@@ -596,6 +610,7 @@ class Level :
   ::Level_MonsterStatus* plasmacannon_;
   ::Level_MonsterStatus* missile_;
   ::Level_MonsterStatus* laser_;
+  ::PROTOBUF_NAMESPACE_ID::int32 curmission_;
   ::PROTOBUF_NAMESPACE_ID::int32 nextmission_;
   ::PROTOBUF_NAMESPACE_ID::int32 maxmonsternum_;
   ::PROTOBUF_NAMESPACE_ID::int32 spawnmonsternum_;
@@ -609,6 +624,143 @@ class Level :
   float destination_y_;
   float destination_z_;
   float dist_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_pp_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Levels :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Levels) */ {
+ public:
+  Levels();
+  virtual ~Levels();
+
+  Levels(const Levels& from);
+  Levels(Levels&& from) noexcept
+    : Levels() {
+    *this = ::std::move(from);
+  }
+
+  inline Levels& operator=(const Levels& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Levels& operator=(Levels&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Levels& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Levels* internal_default_instance() {
+    return reinterpret_cast<const Levels*>(
+               &_Levels_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(Levels& a, Levels& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Levels* other) {
+    if (other == this) return;
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Levels* New() const final {
+    return CreateMaybeMessage<Levels>(nullptr);
+  }
+
+  Levels* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Levels>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Levels& from);
+  void MergeFrom(const Levels& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Levels* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Levels";
+  }
+  private:
+  inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_pp_2eproto);
+    return ::descriptor_table_pp_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kLevelFieldNumber = 1,
+  };
+  // repeated .Level level = 1;
+  int level_size() const;
+  private:
+  int _internal_level_size() const;
+  public:
+  void clear_level();
+  ::Level* mutable_level(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Level >*
+      mutable_level();
+  private:
+  const ::Level& _internal_level(int index) const;
+  ::Level* _internal_add_level();
+  public:
+  const ::Level& level(int index) const;
+  ::Level* add_level();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Level >&
+      level() const;
+
+  // @@protoc_insertion_point(class_scope:Levels)
+ private:
+  class _Internal;
+
+  ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Level > level_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_pp_2eproto;
 };
@@ -667,7 +819,27 @@ inline void Level_MonsterStatus::set_atk(::PROTOBUF_NAMESPACE_ID::int32 value) {
 
 // Level
 
-// int32 NextMission = 1;
+// int32 CurMission = 1;
+inline void Level::clear_curmission() {
+  curmission_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Level::_internal_curmission() const {
+  return curmission_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Level::curmission() const {
+  // @@protoc_insertion_point(field_get:Level.CurMission)
+  return _internal_curmission();
+}
+inline void Level::_internal_set_curmission(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  curmission_ = value;
+}
+inline void Level::set_curmission(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_curmission(value);
+  // @@protoc_insertion_point(field_set:Level.CurMission)
+}
+
+// int32 NextMission = 2;
 inline void Level::clear_nextmission() {
   nextmission_ = 0;
 }
@@ -687,7 +859,7 @@ inline void Level::set_nextmission(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:Level.NextMission)
 }
 
-// .Level.MonsterStatus PlasmaCannon = 2;
+// .Level.MonsterStatus PlasmaCannon = 3;
 inline bool Level::_internal_has_plasmacannon() const {
   return this != internal_default_instance() && plasmacannon_ != nullptr;
 }
@@ -747,7 +919,7 @@ inline void Level::set_allocated_plasmacannon(::Level_MonsterStatus* plasmacanno
   // @@protoc_insertion_point(field_set_allocated:Level.PlasmaCannon)
 }
 
-// .Level.MonsterStatus Missile = 3;
+// .Level.MonsterStatus Missile = 4;
 inline bool Level::_internal_has_missile() const {
   return this != internal_default_instance() && missile_ != nullptr;
 }
@@ -807,7 +979,7 @@ inline void Level::set_allocated_missile(::Level_MonsterStatus* missile) {
   // @@protoc_insertion_point(field_set_allocated:Level.Missile)
 }
 
-// .Level.MonsterStatus Laser = 4;
+// .Level.MonsterStatus Laser = 5;
 inline bool Level::_internal_has_laser() const {
   return this != internal_default_instance() && laser_ != nullptr;
 }
@@ -867,7 +1039,7 @@ inline void Level::set_allocated_laser(::Level_MonsterStatus* laser) {
   // @@protoc_insertion_point(field_set_allocated:Level.Laser)
 }
 
-// int32 MaxMonsterNum = 5;
+// int32 MaxMonsterNum = 6;
 inline void Level::clear_maxmonsternum() {
   maxmonsternum_ = 0;
 }
@@ -887,7 +1059,7 @@ inline void Level::set_maxmonsternum(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:Level.MaxMonsterNum)
 }
 
-// int32 SpawnMonsterNum = 6;
+// int32 SpawnMonsterNum = 7;
 inline void Level::clear_spawnmonsternum() {
   spawnmonsternum_ = 0;
 }
@@ -907,7 +1079,7 @@ inline void Level::set_spawnmonsternum(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:Level.SpawnMonsterNum)
 }
 
-// .Level.MissionType Requirement = 7;
+// .Level.MissionType Requirement = 8;
 inline void Level::clear_requirement() {
   requirement_ = 0;
 }
@@ -927,7 +1099,7 @@ inline void Level::set_requirement(::Level_MissionType value) {
   // @@protoc_insertion_point(field_set:Level.Requirement)
 }
 
-// int32 RestartMission = 8;
+// int32 RestartMission = 9;
 inline void Level::clear_restartmission() {
   restartmission_ = 0;
 }
@@ -947,7 +1119,7 @@ inline void Level::set_restartmission(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:Level.RestartMission)
 }
 
-// float RestartPosition_x = 9;
+// float RestartPosition_x = 10;
 inline void Level::clear_restartposition_x() {
   restartposition_x_ = 0;
 }
@@ -967,7 +1139,7 @@ inline void Level::set_restartposition_x(float value) {
   // @@protoc_insertion_point(field_set:Level.RestartPosition_x)
 }
 
-// float RestartPosition_y = 10;
+// float RestartPosition_y = 11;
 inline void Level::clear_restartposition_y() {
   restartposition_y_ = 0;
 }
@@ -987,7 +1159,7 @@ inline void Level::set_restartposition_y(float value) {
   // @@protoc_insertion_point(field_set:Level.RestartPosition_y)
 }
 
-// float RestartPosition_z = 11;
+// float RestartPosition_z = 12;
 inline void Level::clear_restartposition_z() {
   restartposition_z_ = 0;
 }
@@ -1007,7 +1179,7 @@ inline void Level::set_restartposition_z(float value) {
   // @@protoc_insertion_point(field_set:Level.RestartPosition_z)
 }
 
-// int32 KillMonsterNum = 12;
+// int32 KillMonsterNum = 13;
 inline void Level::clear_killmonsternum() {
   killmonsternum_ = 0;
 }
@@ -1027,7 +1199,7 @@ inline void Level::set_killmonsternum(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:Level.KillMonsterNum)
 }
 
-// float Destination_x = 13;
+// float Destination_x = 14;
 inline void Level::clear_destination_x() {
   destination_x_ = 0;
 }
@@ -1047,7 +1219,7 @@ inline void Level::set_destination_x(float value) {
   // @@protoc_insertion_point(field_set:Level.Destination_x)
 }
 
-// float Destination_y = 14;
+// float Destination_y = 15;
 inline void Level::clear_destination_y() {
   destination_y_ = 0;
 }
@@ -1067,7 +1239,7 @@ inline void Level::set_destination_y(float value) {
   // @@protoc_insertion_point(field_set:Level.Destination_y)
 }
 
-// float Destination_z = 15;
+// float Destination_z = 16;
 inline void Level::clear_destination_z() {
   destination_z_ = 0;
 }
@@ -1087,7 +1259,7 @@ inline void Level::set_destination_z(float value) {
   // @@protoc_insertion_point(field_set:Level.Destination_z)
 }
 
-// float Dist = 16;
+// float Dist = 17;
 inline void Level::clear_dist() {
   dist_ = 0;
 }
@@ -1107,9 +1279,54 @@ inline void Level::set_dist(float value) {
   // @@protoc_insertion_point(field_set:Level.Dist)
 }
 
+// -------------------------------------------------------------------
+
+// Levels
+
+// repeated .Level level = 1;
+inline int Levels::_internal_level_size() const {
+  return level_.size();
+}
+inline int Levels::level_size() const {
+  return _internal_level_size();
+}
+inline void Levels::clear_level() {
+  level_.Clear();
+}
+inline ::Level* Levels::mutable_level(int index) {
+  // @@protoc_insertion_point(field_mutable:Levels.level)
+  return level_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Level >*
+Levels::mutable_level() {
+  // @@protoc_insertion_point(field_mutable_list:Levels.level)
+  return &level_;
+}
+inline const ::Level& Levels::_internal_level(int index) const {
+  return level_.Get(index);
+}
+inline const ::Level& Levels::level(int index) const {
+  // @@protoc_insertion_point(field_get:Levels.level)
+  return _internal_level(index);
+}
+inline ::Level* Levels::_internal_add_level() {
+  return level_.Add();
+}
+inline ::Level* Levels::add_level() {
+  // @@protoc_insertion_point(field_add:Levels.level)
+  return _internal_add_level();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Level >&
+Levels::level() const {
+  // @@protoc_insertion_point(field_list:Levels.level)
+  return level_;
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 
