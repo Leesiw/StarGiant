@@ -227,6 +227,67 @@ void CGameFramework::Init() {
 
 void CGameFramework::SetMission()
 {
+	ifstream is{ "mission.txt", std::ios::in | std::ios::binary };
+	Levels l;
+	l.ParseFromIstream(&is);
+	cout << l.level_size() << endl;
+	
+	for (auto as = l.level().begin(); as != l.level().end(); ++as) {
+		Level_MonsterStatus* pc = new Level_MonsterStatus;
+		Level_MonsterStatus* ms = new Level_MonsterStatus;
+		Level_MonsterStatus* ls = new Level_MonsterStatus;
+
+		MissionType c_miss = (MissionType)as->curmission();
+		levels[c_miss].set_nextmission(as->nextmission());
+		pc->set_atk(as->plasmacannon().atk());
+		pc->set_max_hp(as->plasmacannon().max_hp());
+		ms->set_atk(as->missile().atk());
+		ms->set_max_hp(as->missile().max_hp());
+		ls->set_atk(as->laser().atk());
+		ls->set_max_hp(as->laser().max_hp());
+		levels[c_miss].set_allocated_plasmacannon(pc);
+		levels[c_miss].set_allocated_missile(ms);
+		levels[c_miss].set_allocated_laser(ls);
+		levels[c_miss].set_maxmonsternum(as->maxmonsternum());
+		levels[c_miss].set_spawnmonsternum(as->spawnmonsternum());
+
+		levels[c_miss].set_requirement(as->requirement());
+		levels[c_miss].set_restartmission(as->restartmission());
+		levels[c_miss].set_restartposition_x(as->restartposition_x());
+		levels[c_miss].set_restartposition_y(as->restartposition_y());
+		levels[c_miss].set_restartposition_z(as->restartposition_z());
+
+		levels[c_miss].set_killmonsternum(as->killmonsternum());
+		levels[c_miss].set_destination_x(as->destination_x());
+		levels[c_miss].set_destination_y(as->destination_y());
+		levels[c_miss].set_destination_z(as->destination_z());
+		levels[c_miss].set_dist(as->dist());
+		/*
+		cout << "curmission " << as->curmission() << endl;
+		cout << "nextmission " << as->nextmission() << endl;
+		cout << "plasmacannon().atk " << as->plasmacannon().atk() << endl;
+		cout << "plasmacannon().max_hp " << as->plasmacannon().max_hp() << endl;
+		cout << as->missile().atk() << endl;
+		cout << as->missile().max_hp() << endl;
+		cout << as->laser().atk() << endl;
+		cout << as->laser().max_hp() << endl;
+		cout << as->maxmonsternum() << endl;
+		cout << as->spawnmonsternum() << endl;
+		cout << as->requirement() << endl;
+		cout << as->restartmission() << endl;
+		cout << as->restartposition_x() << endl;
+		cout << as->restartposition_y() << endl;
+		cout << as->restartposition_z() << endl;
+		cout << as->killmonsternum() << endl;
+		cout << as->destination_x() << endl;
+		cout << as->destination_y() << endl;
+		cout << as->destination_z() << endl;
+		cout << as->dist() << endl;
+		cout << endl << endl;
+		*/
+	}
+	cout << "set mission end" << endl;
+
 	/*
 
 	levels[MissionType::CS_TURN].NextMission = MissionType::TU_SIT;
