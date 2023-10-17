@@ -28,6 +28,7 @@ public:
 
 public:
 	void Reset();
+	void modifyLua();
 
 	GodState GetState() { return CurState; };
 	GodState SetState(GodState GState) { return CurState = GState; };

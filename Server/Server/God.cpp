@@ -28,11 +28,6 @@ God::God()
 		printf("Error loading boss_ai.lua: %s\n", error);
 	}
 
-	XMFLOAT3 position;
-
-	position = { position.x = 0.0, position.y = 0.0, position.z = 0.0 };
-
-
 	lua_getglobal(m_L, "state");
 	lua_getglobal(m_L, "motion");
 	lua_getglobal(m_L, "MaxHp");
@@ -64,6 +59,32 @@ void God::Reset()
 	PastState = CurState;
 	CurMotion = GodAnimation::IDLE1;
 	PastMotion = CurMotion;
+}
+
+void God::modifyLua()
+{
+	// Lua 파일 불러오기
+	if (luaL_loadfile(m_L, "god_ai.lua") || lua_pcall(m_L, 0, 0, 0))
+	{
+		const char* error = lua_tostring(m_L, -1);
+		printf("Error loading boss_ai.lua: %s\n", error);
+	}
+
+	lua_getglobal(m_L, "state");
+	lua_getglobal(m_L, "motion");
+	lua_getglobal(m_L, "MaxHp");
+
+	lua_getglobal(m_L, "god_x");
+	lua_getglobal(m_L, "god_y");
+	lua_getglobal(m_L, "god_z");
+
+	CurState = GodState(lua_tonumber(m_L, -6));
+	CurMotion = GodAnimation(lua_tonumber(m_L, -5));
+
+	MAXGodHP = lua_tonumber(m_L, -4);
+	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+
+	lua_pop(m_L, 6);
 }
 
 void God::SendPosition()

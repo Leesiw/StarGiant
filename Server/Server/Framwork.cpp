@@ -841,6 +841,15 @@ void CGameFramework::ProcessPacket(int c_id, char* packet)
 		}
 		break;
 	}
+	
+	case CS_CHANGED_LUA: {
+		short t_room_id = clients[c_id].room_id;
+		if (t_room_id == -1) { break; }
+		CScene* scene = scene_manager.GetScene(t_room_id);
+		scene->UpdateLua();
+		break;
+
+	}
 	case CS_CUTSCENE_END: {
 		short t_room_id = clients[c_id].room_id;
 		if (t_room_id == -1) { break; }

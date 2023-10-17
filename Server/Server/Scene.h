@@ -43,6 +43,7 @@ public:
 	void UpdateMissile(char obj_id);
 	void UpdateBoss();
 	void UpdateGod();
+	void UpdateLua();
 	void UpdateSpaceship();
 	void Heal();
 	void SendSceneInfo();

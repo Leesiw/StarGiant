@@ -571,6 +571,7 @@ void CScene::SetMission(MissionType mission)
 				
 				boss_timer_m.lock();
 				if (!boss_timer_on) {
+
 					boss_timer_m.unlock();
 					boss_timer_on = true;
 					TIMER_EVENT ev{ 0, chrono::system_clock::now() + 33ms, EV_UPDATE_BOSS, static_cast<short>(num) };
@@ -1144,6 +1145,12 @@ void CScene::UpdateGod()
 
 	TIMER_EVENT ev{ 0, chrono::system_clock::now() + 25ms, EV_UPDATE_GOD, static_cast<short>(num) };
 	timer_queue.push(ev);
+}
+
+void CScene::UpdateLua()
+{
+	m_pBoss->modifyLua();
+	m_pGod->modifyLua();
 }
 
 void CScene::UpdateSpaceship()

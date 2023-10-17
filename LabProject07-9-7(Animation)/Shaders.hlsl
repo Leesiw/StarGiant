@@ -689,7 +689,7 @@ float4 PS_FIRE(VS_FIRE_OUTPUT input) : SV_TARGET
 
 
 	fireColor = gtxtFIRETexture.Sample(gssFIRE2, noiseCoords.xy);
-
+	
 
 	// 불의 투명도
 	alphaColor = gtxtAlphaTexture.Sample(gssFIRE2, noiseCoords.xy);

@@ -97,6 +97,10 @@ constexpr char CS_NEXT_MISSION = 50;
 constexpr char CS_START = 51;
 constexpr char CS_INVINCIBLE_MODE = 52;
 
+//LUA
+constexpr char CS_CHANGED_LUA = 53;
+
+
 
 
 enum class PlayerType : char
@@ -310,6 +314,11 @@ struct ITEM_INFO {
 
 // cheat / debugging
 struct CS_NEXT_MISSION_PACKET {
+	unsigned char size;
+	char	type;
+};
+
+struct CS_CHANGE_LUA_PACKET {
 	unsigned char size;
 	char	type;
 };

@@ -175,6 +175,30 @@ void Boss::Reset()
 	CurState = BossState::SLEEP;
 }
 
+void Boss::modifyLua()
+{
+	// Lua 파일 불러오기
+	if (luaL_loadfile(m_L, "boss_ai.lua") || lua_pcall(m_L, 0, 0, 0))
+	{
+		const char* error = lua_tostring(m_L, -1);
+		printf("Error loading boss_ai.lua: %s\n", error);
+	}
+	lua_getglobal(m_L, "state");
+	lua_getglobal(m_L, "motion");
+	lua_getglobal(m_L, "MaxHp");
+
+	lua_getglobal(m_L, "boss_x");
+	lua_getglobal(m_L, "boss_y");
+	lua_getglobal(m_L, "boss_z");
+
+	CurState = BossState(lua_tonumber(m_L, -6));
+	CurMotion = BossAnimation(lua_tonumber(m_L, -5));
+
+	MAXBossHP = lua_tonumber(m_L, -4);
+	SetPosition(lua_tonumber(m_L, -3), lua_tonumber(m_L, -2), lua_tonumber(m_L, -1));
+	lua_pop(m_L, 6);
+}
+
 void Boss::MeteoAttack(float fTimeElapsed, const XMFLOAT3& TargetPos) // 공격 시작 시 한 번 실행
 {
 	XMFLOAT3 xmf3Pos = GetPosition();

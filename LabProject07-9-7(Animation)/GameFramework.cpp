@@ -489,6 +489,13 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		}
 
 		case VK_F1:
+			cout << "lua º¯°æ\n";
+			CS_CHANGE_LUA_PACKET my_packet;
+			my_packet.size = sizeof(CS_CHANGE_LUA_PACKET);
+			my_packet.type = CS_CHANGED_LUA;
+			send(sock, reinterpret_cast<char*>(&my_packet), sizeof(my_packet), NULL);
+
+			break;
 		case VK_F2:
 			break;
 		case VK_F9:
